@@ -160,18 +160,7 @@
     --color-button-secondary-text: var(--white);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: var(--white);
-  }
-
-  p {
-    color: var(--warm-gray-400);
-  }
+  /* Removed global h1-h6 and p color overrides to allow inline styles to work */
 }
 
 @theme inline {
@@ -260,9 +249,9 @@ a:hover {
 /* Remove underline from button-styled links */
 a.btn,
 a.btn:hover {
-  text-decoration: none !important;
-  text-decoration-thickness: 0 !important;
-  color: inherit !important;
+  text-decoration: none;
+  text-decoration-thickness: 0;
+  color: inherit;
 }
 
 code {
