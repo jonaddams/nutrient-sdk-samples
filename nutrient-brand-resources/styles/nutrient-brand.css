@@ -1,0 +1,487 @@
+/**
+ * Nutrient Brand Guidelines - CSS Variables and Styles
+ *
+ * This file contains the official Nutrient design system including:
+ * - Brand colors
+ * - Typography system
+ * - Spacing scale
+ * - Border radius scale
+ * - Button components
+ * - Badge components
+ * - Alert components
+ *
+ * Usage:
+ * 1. Copy fonts from ../fonts/ to your project's public/fonts/ directory
+ * 2. Import this CSS file in your project
+ * 3. Customize as needed while maintaining brand consistency
+ */
+
+/* ============================================================================
+   FONT FACES
+   ========================================================================== */
+
+@font-face {
+  font-family: "ABC Monument Grotesk";
+  src: url("/fonts/ABCMonumentGroteskVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ABC Monument Grotesk Mono";
+  src: url("/fonts/ABCMonumentGroteskSemi-Mono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ABC Monument Grotesk Mono";
+  src: url("/fonts/ABCMonumentGroteskMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ========================================================================== */
+
+:root {
+  /* Nutrient Brand Colors */
+  --disc-pink: hsla(317, 50%, 74%, 1);
+  --disc-pink-dark: hsla(317, 30%, 24%, 1);
+  --code-coral: hsla(9, 87%, 61%, 1);
+  --code-coral-dark: hsla(9, 49%, 27%, 1);
+  --data-green: hsla(129, 32%, 57%, 1);
+  --data-green-dark: hsla(131, 20%, 21%, 1);
+  --digital-pollen: hsla(43, 82%, 67%, 1);
+  --digital-pollen-dark: hsla(42, 56%, 23%, 1);
+  --white: hsla(0, 0%, 100%, 1);
+  --warm-gray-100: hsla(30, 20%, 92%, 1);
+  --warm-gray-200: hsla(13, 13%, 87%, 1);
+  --warm-gray-400: hsla(30, 14%, 72%, 1);
+  --warm-gray-600: hsla(32, 10%, 49%, 1);
+  --warm-gray-800: hsla(30, 16%, 35%, 1);
+  --warm-gray-900: hsla(27, 15%, 24%, 1);
+  --warm-gray-950: hsla(24, 15%, 13%, 1);
+  --black: hsla(0, 13%, 9%, 1);
+
+  /* Light Theme Semantic Colors */
+  --background: var(--warm-gray-100);
+  --foreground: var(--black);
+  --accent: var(--black);
+  --neutral: var(--warm-gray-400);
+
+  /* Typography */
+  --font-sans: "ABC Monument Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono:
+    "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas", ui-monospace, "Courier New", monospace;
+
+  /* Spacing - Nutrient Scale */
+  --spacing-4xs: 0.125rem;
+  --spacing-3xs: 0.25rem;
+  --spacing-2xs: 0.5rem;
+  --spacing-xs: 0.75rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.25rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 2.5rem;
+  --spacing-3xl: 3rem;
+
+  /* Border Radius - Nutrient Scale */
+  --radius-xxs: 0.25rem;
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+/* Dark Theme Override */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--black);
+    --foreground: var(--warm-gray-400);
+    --accent: var(--warm-gray-400);
+    --neutral: var(--warm-gray-600);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--white);
+  }
+
+  p {
+    color: var(--warm-gray-400);
+  }
+}
+
+/* ============================================================================
+   TYPOGRAPHY DEFAULTS
+   ========================================================================== */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--foreground);
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.2em;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* Remove underline from button-styled links */
+a.btn,
+a.btn:hover {
+  text-decoration: none !important;
+  text-decoration-thickness: 0 !important;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  code {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ============================================================================
+   BUTTON COMPONENTS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  gap: 0.25rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.24px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  white-space: normal;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition-property: opacity, color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
+  text-decoration: none;
+  width: fit-content;
+  max-width: max-content;
+  cursor: pointer;
+  /* Default button styling */
+  /* Light mode: Solid black button */
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+}
+
+.btn:hover {
+  text-decoration: none;
+  background: var(--warm-gray-900);
+  color: var(--white);
+  border-color: var(--warm-gray-900);
+  opacity: 1;
+}
+
+/* Dark mode: Solid yellow (digital-pollen) button */
+@media (prefers-color-scheme: dark) {
+  .btn {
+    background: var(--digital-pollen);
+    color: var(--black);
+    border: 2px solid var(--digital-pollen);
+  }
+
+  .btn:hover {
+    background: var(--digital-pollen);
+    color: var(--black);
+    border-color: var(--digital-pollen);
+    opacity: 0.85;
+  }
+}
+
+/* Button Variants */
+
+/* Primary button variant (explicit) - same as default */
+.btn-primary {
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+}
+
+.btn-primary:hover {
+  background: var(--warm-gray-900);
+  color: var(--white);
+  border-color: var(--warm-gray-900);
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-primary {
+    background: var(--digital-pollen);
+    color: var(--black);
+    border: 2px solid var(--digital-pollen);
+  }
+
+  .btn-primary:hover {
+    background: var(--digital-pollen);
+    color: var(--black);
+    border-color: var(--digital-pollen);
+    opacity: 0.85;
+  }
+}
+
+.btn-secondary {
+  border: 2px solid var(--black);
+  color: var(--black);
+  background: transparent;
+}
+
+.btn-secondary:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-secondary {
+    border: 2px solid var(--white);
+    color: var(--white);
+  }
+
+  .btn-secondary:hover {
+    background: var(--white);
+    color: var(--black);
+  }
+}
+
+.btn-success {
+  background: var(--data-green);
+  color: var(--black);
+}
+
+.btn-success:hover {
+  color: var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-success {
+    background: var(--data-green);
+    color: var(--black);
+  }
+
+  .btn-success:hover {
+    color: var(--black);
+  }
+}
+
+/* Button Sizes */
+.btn-sm {
+  min-height: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.625rem;
+}
+
+.btn-lg {
+  min-height: 3rem;
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+}
+
+/* ============================================================================
+   BADGE COMPONENTS
+   ========================================================================== */
+
+.nutrient-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-2xs);
+  min-height: 2rem;
+  width: fit-content;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+  line-height: normal;
+}
+
+/* Badge Variants */
+.nutrient-badge-neutral {
+  background: var(--warm-gray-200);
+  color: var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+  .nutrient-badge-neutral {
+    background: var(--warm-gray-800);
+    color: var(--white);
+  }
+}
+
+.nutrient-badge-accent {
+  background: var(--digital-pollen);
+  color: var(--black);
+}
+
+.nutrient-badge-success {
+  background: var(--data-green);
+  color: var(--black);
+}
+
+.nutrient-badge-pink {
+  background: var(--disc-pink);
+  color: var(--black);
+}
+
+.nutrient-badge-coral {
+  background: var(--code-coral);
+  color: var(--black);
+}
+
+/* ============================================================================
+   ALERT COMPONENTS
+   ========================================================================== */
+
+.nutrient-alert {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-xs);
+  width: 100%;
+}
+
+.nutrient-alert-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-xs);
+  background: var(--black);
+  color: var(--white);
+}
+
+.nutrient-alert-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  line-height: 160%;
+}
+
+/* Alert Variants */
+.nutrient-alert-neutral {
+  background: var(--warm-gray-100);
+}
+
+@media (prefers-color-scheme: dark) {
+  .nutrient-alert-neutral {
+    background: var(--warm-gray-900);
+  }
+}
+
+.nutrient-alert-success {
+  background: var(--data-green-dark);
+  color: var(--white);
+}
+
+.nutrient-alert-warning {
+  background: var(--digital-pollen-dark);
+  color: var(--white);
+}
+
+.nutrient-alert-error {
+  background: var(--code-coral-dark);
+  color: var(--white);
+}
+
+.nutrient-alert-info {
+  background: var(--disc-pink-dark);
+  color: var(--white);
+}

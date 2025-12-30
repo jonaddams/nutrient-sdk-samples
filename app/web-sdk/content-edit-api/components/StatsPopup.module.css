@@ -1,0 +1,85 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-success);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-popover);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  min-width: 300px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .popup {
+    animation: none;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.header {
+  margin-bottom: var(--spacing-xs);
+}
+
+.icon {
+  display: inline-block;
+  margin-right: var(--spacing-2xs);
+  vertical-align: middle;
+}
+
+.message {
+  margin-top: var(--spacing-3xs);
+}
+
+.closeButton {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-2xs) var(--spacing-xs);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-xxs);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.closeButton:active {
+  transform: scale(0.98);
+}
+
+/* Respect reduced motion for button transform too */
+@media (prefers-reduced-motion: reduce) {
+  .closeButton:active {
+    transform: none;
+  }
+}
