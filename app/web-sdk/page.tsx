@@ -19,6 +19,13 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Form Designer",
+    category: "Forms",
+    description:
+      "Drag and drop form fields onto PDF documents with an intuitive form creator mode for building interactive forms",
+    path: "/web-sdk/form-designer",
+  },
+  {
     name: "Patient Intake Forms",
     category: "Forms",
     description:
