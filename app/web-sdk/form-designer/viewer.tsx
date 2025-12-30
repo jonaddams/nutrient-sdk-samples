@@ -328,6 +328,7 @@ export default function FormDesignerViewer() {
   // Initialize the viewer (runs once on mount)
   useEffect(() => {
     const container = containerRef.current;
+    let isMounted = true; // Track if component is still mounted
 
     const initViewer = async () => {
       // Check if container already has an instance or if ref is already set
@@ -348,6 +349,15 @@ export default function FormDesignerViewer() {
           useCDN: true,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         });
+
+        // Only proceed if component is still mounted
+        if (!isMounted) {
+          // Component unmounted during load, clean up immediately
+          if (NutrientViewer) {
+            NutrientViewer.unload(instance);
+          }
+          return;
+        }
 
         viewerInstanceRef.current = instance;
 
@@ -370,6 +380,8 @@ export default function FormDesignerViewer() {
     initViewer();
 
     return () => {
+      isMounted = false; // Mark as unmounted
+
       // Use the ref for cleanup, not the local variable
       const instance = viewerInstanceRef.current;
       if (instance && container) {
