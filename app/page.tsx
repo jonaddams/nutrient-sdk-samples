@@ -145,6 +145,12 @@ export default function Home() {
               and templates.
             </p>
             <div className="flex gap-4 flex-wrap">
+              <Link
+                href="/document-authoring-sdk"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                View Samples
+              </Link>
               <a
                 href="https://www.nutrient.io/sdk/document-authoring/"
                 target="_blank"
