@@ -328,48 +328,52 @@ export default function FormDesignerViewer() {
   // Initialize the viewer (runs once on mount)
   useEffect(() => {
     const container = containerRef.current;
-    let viewerInstance: Instance | null = null;
 
     const initViewer = async () => {
-      if (container && !viewerInstanceRef.current) {
-        const { NutrientViewer } = window as any;
+      // Check if container already has an instance or if ref is already set
+      if (!container || viewerInstanceRef.current) {
+        return;
+      }
 
-        if (NutrientViewer) {
-          try {
-            const instance = await NutrientViewer.load({
-              container,
-              document: "/documents/example.pdf",
-              allowLinearizedLoading: true,
-              useCDN: true,
-              licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-            });
+      const { NutrientViewer } = window as any;
+      if (!NutrientViewer) {
+        return;
+      }
 
-            viewerInstance = instance;
-            viewerInstanceRef.current = instance;
+      try {
+        const instance = await NutrientViewer.load({
+          container,
+          document: "/documents/example.pdf",
+          allowLinearizedLoading: true,
+          useCDN: true,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+        });
 
-            const interactionMode = formCreatorMode
-              ? NutrientViewer.InteractionMode.FORM_CREATOR
-              : null;
+        viewerInstanceRef.current = instance;
 
-            instance.setViewState((viewState: ViewState) =>
-              interactionMode
-                ? viewState.set("interactionMode", interactionMode)
-                : viewState.set("interactionMode", null),
-            );
+        const interactionMode = formCreatorMode
+          ? NutrientViewer.InteractionMode.FORM_CREATOR
+          : null;
 
-            setupDragAndDrop(instance, formCreatorMode);
-          } catch (error) {
-            console.error("Error loading viewer:", error);
-          }
-        }
+        instance.setViewState((viewState: ViewState) =>
+          interactionMode
+            ? viewState.set("interactionMode", interactionMode)
+            : viewState.set("interactionMode", null),
+        );
+
+        setupDragAndDrop(instance, formCreatorMode);
+      } catch (error) {
+        console.error("Error loading viewer:", error);
       }
     };
 
     initViewer();
 
     return () => {
-      if (viewerInstance) {
-        cleanupDragAndDrop(viewerInstance);
+      // Use the ref for cleanup, not the local variable
+      const instance = viewerInstanceRef.current;
+      if (instance && container) {
+        cleanupDragAndDrop(instance);
         const { NutrientViewer } = window as any;
         if (NutrientViewer) {
           NutrientViewer.unload(container);
