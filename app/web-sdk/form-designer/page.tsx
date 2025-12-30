@@ -1,0 +1,29 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
+import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+
+const FormDesignerViewer = dynamic(
+  () => import("@/app/web-sdk/form-designer/viewer"),
+  {
+    ssr: false,
+    loading: () => <LoadingSpinner message="Loading form designer..." />,
+  },
+);
+
+export default function FormDesignerPage() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#1a1414] flex flex-col">
+      <SampleHeader
+        title="Form Designer"
+        description="Drag and drop form fields onto PDF documents with an intuitive form creator mode"
+      />
+
+      {/* Viewer Container */}
+      <main className="flex-1">
+        <FormDesignerViewer />
+      </main>
+    </div>
+  );
+}
