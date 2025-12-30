@@ -367,7 +367,7 @@ export default function SearchViewer({
                     key={term}
                     type="button"
                     onClick={() => performSearch(term)}
-                    className="px-3 py-1.5 text-sm rounded-full border transition-colors"
+                    className="px-3 py-1.5 text-sm font-semibold rounded-full border transition-colors cursor-pointer"
                     style={{
                       borderColor: "var(--digital-pollen)",
                       color: "var(--digital-pollen)",
@@ -399,7 +399,7 @@ export default function SearchViewer({
               <button
                 type="button"
                 onClick={clearSearch}
-                className="text-xs px-3 py-1 rounded-md transition-colors"
+                className="text-xs font-semibold px-3 py-1 rounded-md transition-colors cursor-pointer"
                 style={{
                   color: "var(--digital-pollen)",
                   border: "1px solid var(--digital-pollen)",
@@ -433,7 +433,7 @@ export default function SearchViewer({
               key={`${result.pageIndex}-${index}`}
               type="button"
               onClick={() => jumpToResult(index)}
-              className={`w-full text-left p-4 border-b border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-200)] dark:hover:bg-[#3a3030] transition-colors ${
+              className={`w-full text-left p-4 border-b border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-200)] dark:hover:bg-[#3a3030] transition-colors cursor-pointer ${
                 currentResultIndex === index
                   ? "bg-[var(--warm-gray-200)] dark:bg-[#3a3030]"
                   : ""
