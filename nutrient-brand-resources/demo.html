@@ -630,7 +630,7 @@
   </div>
 
   <script>
-    function toggleTheme() {
+    function _toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute('data-theme');
 
@@ -644,7 +644,7 @@
     }
 
     // Set initial color scheme based on system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
       document.documentElement.style.colorScheme = 'dark';
     } else {
       document.documentElement.style.colorScheme = 'light';

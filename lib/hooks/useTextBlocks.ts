@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import type {
+  ContentEditingSession,
+  SDKTextBlock,
+  TextBlock,
+  UpdatedTextBlock,
+} from "@/lib/types/nutrient";
 import { createAppError, ErrorType } from "@/lib/utils/errorHandler";
 import { measurePerformance } from "@/lib/utils/performanceMonitor";
-import type {
-	SDKTextBlock,
-	TextBlock,
-	ContentEditingSession,
-	UpdatedTextBlock,
-} from "@/lib/types/nutrient";
 
 /**
  * Hook for managing text blocks state and operations
@@ -58,8 +58,12 @@ import type {
  * ```
  */
 export function useTextBlocks() {
-  const [textBlocks, setTextBlocks] = useState<(TextBlock & { pageIndex: number })[]>([]);
-  const [selectedBlocks, setSelectedBlocks] = useState<(TextBlock & { pageIndex: number })[]>([]);
+  const [textBlocks, setTextBlocks] = useState<
+    (TextBlock & { pageIndex: number })[]
+  >([]);
+  const [selectedBlocks, setSelectedBlocks] = useState<
+    (TextBlock & { pageIndex: number })[]
+  >([]);
   const [isDetecting, setIsDetecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,42 +81,45 @@ export function useTextBlocks() {
    * @returns Promise resolving to array of detected text blocks with page indices
    * @throws AppError if detection fails
    */
-  const detectTextBlocks = useCallback(async (session: ContentEditingSession, totalPages: number) => {
-    setIsDetecting(true);
-    setError(null);
-    try {
-      const { result: allTextBlocks } = await measurePerformance(
-        'detectTextBlocks',
-        async () => {
-          let blocks: (TextBlock & { pageIndex: number })[] = [];
+  const detectTextBlocks = useCallback(
+    async (session: ContentEditingSession, totalPages: number) => {
+      setIsDetecting(true);
+      setError(null);
+      try {
+        const { result: allTextBlocks } = await measurePerformance(
+          "detectTextBlocks",
+          async () => {
+            let blocks: (TextBlock & { pageIndex: number })[] = [];
 
-          for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
-            const pageTextBlocks = await session.getTextBlocks(pageIndex);
-            const textBlocksWithPageIndex = pageTextBlocks.map(
-              (tb: SDKTextBlock): TextBlock => ({ ...tb, pageIndex })
-            );
-            blocks = blocks.concat(textBlocksWithPageIndex);
-          }
+            for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+              const pageTextBlocks = await session.getTextBlocks(pageIndex);
+              const textBlocksWithPageIndex = pageTextBlocks.map(
+                (tb: SDKTextBlock): TextBlock => ({ ...tb, pageIndex }),
+              );
+              blocks = blocks.concat(textBlocksWithPageIndex);
+            }
 
-          return blocks;
-        },
-        { totalPages, blocksFound: 0 },
-        { warning: 2000, error: 10000 }
-      );
+            return blocks;
+          },
+          { totalPages, blocksFound: 0 },
+          { warning: 2000, error: 10000 },
+        );
 
-      setTextBlocks(allTextBlocks);
-      return allTextBlocks;
-    } catch (err) {
-      const appError = createAppError(ErrorType.TEXT_DETECTION, err, {
-        operation: 'detectTextBlocks',
-        totalPages,
-      });
-      setError(appError.message);
-      throw appError;
-    } finally {
-      setIsDetecting(false);
-    }
-  }, []);
+        setTextBlocks(allTextBlocks);
+        return allTextBlocks;
+      } catch (err) {
+        const appError = createAppError(ErrorType.TEXT_DETECTION, err, {
+          operation: "detectTextBlocks",
+          totalPages,
+        });
+        setError(appError.message);
+        throw appError;
+      } finally {
+        setIsDetecting(false);
+      }
+    },
+    [],
+  );
 
   /**
    * Toggle selection state of a specific text block
@@ -124,15 +131,19 @@ export function useTextBlocks() {
       setSelectedBlocks((prevSelected) => {
         if (isSelected) {
           // Add if not already present
-          const isAlreadySelected = prevSelected.some((tb) => tb.id === textBlock.id);
-          return isAlreadySelected ? prevSelected : [...prevSelected, textBlock];
+          const isAlreadySelected = prevSelected.some(
+            (tb) => tb.id === textBlock.id,
+          );
+          return isAlreadySelected
+            ? prevSelected
+            : [...prevSelected, textBlock];
         } else {
           // Remove from selection
           return prevSelected.filter((tb) => tb.id !== textBlock.id);
         }
       });
     },
-    []
+    [],
   );
 
   /**
@@ -182,7 +193,7 @@ export function useTextBlocks() {
 
       return { updates, count: replacementCount };
     },
-    [textBlocks]
+    [textBlocks],
   );
 
   /**
@@ -191,10 +202,14 @@ export function useTextBlocks() {
    * @param updates - Array of text block updates to apply
    */
   const applyTextBlockUpdates = useCallback((updates: UpdatedTextBlock[]) => {
-    setTextBlocks(prev => prev.map(block => {
-      const update = updates.find(u => u.id === block.id);
-      return update && update.text !== undefined ? { ...block, text: update.text } : block;
-    }));
+    setTextBlocks((prev) =>
+      prev.map((block) => {
+        const update = updates.find((u) => u.id === block.id);
+        return update && update.text !== undefined
+          ? { ...block, text: update.text }
+          : block;
+      }),
+    );
   }, []);
 
   return {

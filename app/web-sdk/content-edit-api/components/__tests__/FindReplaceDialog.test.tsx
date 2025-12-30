@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { FindReplaceDialog } from "../FindReplaceDialog";
 import styles from "../FindReplaceDialog.module.css";
 
@@ -30,13 +30,22 @@ describe("FindReplaceDialog", () => {
 
   it("should display find and replace inputs", () => {
     render(<FindReplaceDialog {...defaultProps} />);
-    expect(screen.getByPlaceholderText("Enter text to find")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Enter replacement text")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Enter text to find"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Enter replacement text"),
+    ).toBeInTheDocument();
   });
 
   it("should call onFindTextChange when find input changes", () => {
     const onFindTextChange = vi.fn();
-    render(<FindReplaceDialog {...defaultProps} onFindTextChange={onFindTextChange} />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        onFindTextChange={onFindTextChange}
+      />,
+    );
 
     const findInput = screen.getByPlaceholderText("Enter text to find");
     fireEvent.change(findInput, { target: { value: "search text" } });
@@ -46,7 +55,12 @@ describe("FindReplaceDialog", () => {
 
   it("should call onReplaceTextChange when replace input changes", () => {
     const onReplaceTextChange = vi.fn();
-    render(<FindReplaceDialog {...defaultProps} onReplaceTextChange={onReplaceTextChange} />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        onReplaceTextChange={onReplaceTextChange}
+      />,
+    );
 
     const replaceInput = screen.getByPlaceholderText("Enter replacement text");
     fireEvent.change(replaceInput, { target: { value: "replace text" } });
@@ -56,7 +70,13 @@ describe("FindReplaceDialog", () => {
 
   it("should call onReplaceAll when Replace All button is clicked", () => {
     const onReplaceAll = vi.fn();
-    render(<FindReplaceDialog {...defaultProps} findText="test" onReplaceAll={onReplaceAll} />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        findText="test"
+        onReplaceAll={onReplaceAll}
+      />,
+    );
 
     const replaceButton = screen.getByText("Replace All");
     fireEvent.click(replaceButton);
@@ -93,18 +113,35 @@ describe("FindReplaceDialog", () => {
   });
 
   it("should show Processing... when isProcessing is true", () => {
-    render(<FindReplaceDialog {...defaultProps} isProcessing={true} findText="test" />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        isProcessing={true}
+        findText="test"
+      />,
+    );
     expect(screen.getByText("Processing...")).toBeInTheDocument();
   });
 
   it("should disable Replace All button when isProcessing", () => {
-    render(<FindReplaceDialog {...defaultProps} isProcessing={true} findText="test" />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        isProcessing={true}
+        findText="test"
+      />,
+    );
     const replaceButton = screen.getByText("Processing...");
     expect(replaceButton).toBeDisabled();
   });
 
   it("should display replacement result when provided", () => {
-    render(<FindReplaceDialog {...defaultProps} replacementResult="Replaced 5 instances" />);
+    render(
+      <FindReplaceDialog
+        {...defaultProps}
+        replacementResult="Replaced 5 instances"
+      />,
+    );
     expect(screen.getByText("Replaced 5 instances")).toBeInTheDocument();
   });
 
@@ -115,13 +152,17 @@ describe("FindReplaceDialog", () => {
 
   it("should display controlled find text value", () => {
     render(<FindReplaceDialog {...defaultProps} findText="search query" />);
-    const findInput = screen.getByPlaceholderText("Enter text to find") as HTMLInputElement;
+    const findInput = screen.getByPlaceholderText(
+      "Enter text to find",
+    ) as HTMLInputElement;
     expect(findInput.value).toBe("search query");
   });
 
   it("should display controlled replace text value", () => {
     render(<FindReplaceDialog {...defaultProps} replaceText="new text" />);
-    const replaceInput = screen.getByPlaceholderText("Enter replacement text") as HTMLInputElement;
+    const replaceInput = screen.getByPlaceholderText(
+      "Enter replacement text",
+    ) as HTMLInputElement;
     expect(replaceInput.value).toBe("new text");
   });
 
@@ -136,7 +177,9 @@ describe("FindReplaceDialog", () => {
     it("should apply input class to text inputs", () => {
       render(<FindReplaceDialog {...defaultProps} />);
       const findInput = screen.getByPlaceholderText("Enter text to find");
-      const replaceInput = screen.getByPlaceholderText("Enter replacement text");
+      const replaceInput = screen.getByPlaceholderText(
+        "Enter replacement text",
+      );
       expect(findInput).toHaveClass(styles.input);
       expect(replaceInput).toHaveClass(styles.input);
     });
@@ -150,14 +193,26 @@ describe("FindReplaceDialog", () => {
     });
 
     it("should apply success class to success result message", () => {
-      render(<FindReplaceDialog {...defaultProps} replacementResult="Success!" isError={false} />);
+      render(
+        <FindReplaceDialog
+          {...defaultProps}
+          replacementResult="Success!"
+          isError={false}
+        />,
+      );
       const resultMessage = screen.getByText("Success!");
       expect(resultMessage).toHaveClass(styles.resultMessage, styles.success);
       expect(resultMessage).not.toHaveClass(styles.error);
     });
 
     it("should apply error class to error result message", () => {
-      render(<FindReplaceDialog {...defaultProps} replacementResult="Error occurred" isError={true} />);
+      render(
+        <FindReplaceDialog
+          {...defaultProps}
+          replacementResult="Error occurred"
+          isError={true}
+        />,
+      );
       const resultMessage = screen.getByText("Error occurred");
       expect(resultMessage).toHaveClass(styles.resultMessage, styles.error);
       expect(resultMessage).not.toHaveClass(styles.success);
@@ -186,7 +241,7 @@ describe("FindReplaceDialog", () => {
           {...defaultProps}
           replacementResult="Operation failed: invalid input"
           isError={true}
-        />
+        />,
       );
       const errorMessage = screen.getByText(/operation failed/i);
       expect(errorMessage).toHaveClass(styles.error);
@@ -199,7 +254,7 @@ describe("FindReplaceDialog", () => {
           {...defaultProps}
           replacementResult="Successfully replaced 5 instances"
           isError={false}
-        />
+        />,
       );
       const successMessage = screen.getByText(/successfully replaced/i);
       expect(successMessage).toHaveClass(styles.success);
@@ -207,7 +262,13 @@ describe("FindReplaceDialog", () => {
     });
 
     it("should disable replace button during processing", () => {
-      render(<FindReplaceDialog {...defaultProps} isProcessing={true} findText="test" />);
+      render(
+        <FindReplaceDialog
+          {...defaultProps}
+          isProcessing={true}
+          findText="test"
+        />,
+      );
       const button = screen.getByText("Processing...");
       expect(button).toBeDisabled();
     });
@@ -219,7 +280,9 @@ describe("FindReplaceDialog", () => {
     });
 
     it("should handle rapid open/close cycles", () => {
-      const { rerender } = render(<FindReplaceDialog {...defaultProps} isVisible={true} />);
+      const { rerender } = render(
+        <FindReplaceDialog {...defaultProps} isVisible={true} />,
+      );
       expect(screen.getByText("Find & Replace")).toBeInTheDocument();
 
       rerender(<FindReplaceDialog {...defaultProps} isVisible={false} />);
@@ -230,8 +293,12 @@ describe("FindReplaceDialog", () => {
     });
 
     it("should handle empty replacement result gracefully", () => {
-      const { container } = render(<FindReplaceDialog {...defaultProps} replacementResult="" />);
-      const resultMessages = container.querySelectorAll(`.${styles.resultMessage}`);
+      const { container } = render(
+        <FindReplaceDialog {...defaultProps} replacementResult="" />,
+      );
+      const resultMessages = container.querySelectorAll(
+        `.${styles.resultMessage}`,
+      );
       expect(resultMessages).toHaveLength(0);
     });
   });

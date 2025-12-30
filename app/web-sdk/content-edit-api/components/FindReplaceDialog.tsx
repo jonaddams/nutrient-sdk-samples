@@ -112,7 +112,10 @@ export function FindReplaceDialog({
         replaceInputRef.current,
         replaceButtonRef.current,
         closeButtonRef.current,
-      ].filter((el): el is HTMLInputElement | HTMLButtonElement => el !== null && !el.hasAttribute("disabled"));
+      ].filter(
+        (el): el is HTMLInputElement | HTMLButtonElement =>
+          el !== null && !el.hasAttribute("disabled"),
+      );
 
       if (focusableElements.length === 0) return;
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getTheme, NUTRIENT_SDK, SDK_LOADING } from "@/lib/constants";
 import type { NutrientInstance } from "@/lib/types/nutrient";
-import { SDK_LOADING, getTheme, NUTRIENT_SDK } from "@/lib/constants";
 
 interface UseNutrientSDKOptions {
   container: HTMLElement | null;
@@ -46,7 +46,7 @@ export function useNutrientSDK({
     // Poll for SDK availability
     while (!checkSDK()) {
       await new Promise((resolve) =>
-        setTimeout(resolve, SDK_LOADING.POLL_INTERVAL_MS)
+        setTimeout(resolve, SDK_LOADING.POLL_INTERVAL_MS),
       );
     }
 
@@ -92,7 +92,7 @@ export function useNutrientSDK({
         instance.destroy();
       }
     };
-  }, [loadSDK]);
+  }, [loadSDK, instance]);
 
   return { instance, loading, error };
 }

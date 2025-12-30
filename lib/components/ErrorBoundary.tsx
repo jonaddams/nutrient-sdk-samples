@@ -26,7 +26,10 @@ interface ErrorBoundaryState {
  * </ErrorBoundary>
  * ```
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -63,17 +66,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       // Default fallback UI
       return (
         <div className={styles.errorContainer}>
-          <h2 className={styles.errorTitle}>
-            Something went wrong
-          </h2>
+          <h2 className={styles.errorTitle}>Something went wrong</h2>
           <p className={styles.errorMessage}>
-            An error occurred while rendering this component. Please try refreshing the page.
+            An error occurred while rendering this component. Please try
+            refreshing the page.
           </p>
           {this.state.error && process.env.NODE_ENV === "development" && (
             <details className={styles.errorDetails}>
-              <summary className={styles.errorSummary}>
-                Error details
-              </summary>
+              <summary className={styles.errorSummary}>Error details</summary>
               <pre className={styles.errorPre}>
                 {this.state.error.message}
                 {this.state.error.stack && `\n\n${this.state.error.stack}`}
@@ -110,17 +110,11 @@ export function ErrorFallback({
 }) {
   return (
     <div className={styles.errorContainerCentered}>
-      <h2 className={styles.errorTitleLarge}>
-        Oops! Something went wrong
-      </h2>
+      <h2 className={styles.errorTitleLarge}>Oops! Something went wrong</h2>
       <p className={styles.errorMessageSmall}>
         We encountered an unexpected error. Please try again.
       </p>
-      {error && (
-        <p className={styles.errorMessageCode}>
-          {error.message}
-        </p>
-      )}
+      {error && <p className={styles.errorMessageCode}>{error.message}</p>}
       <div className={styles.buttonGroup}>
         {resetError && (
           <button

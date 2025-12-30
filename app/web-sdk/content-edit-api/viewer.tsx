@@ -222,7 +222,6 @@ export default function Viewer({ document }: ViewerProps) {
     },
     [
       isEditing,
-      instance,
       clearTextBlocks,
       clearSelection,
       discardSession,
@@ -230,6 +229,8 @@ export default function Viewer({ document }: ViewerProps) {
       detectTextBlocks,
       toggleBlockSelection,
       selectedCount,
+      instanceRef.current,
+      isProcessingRef.current,
     ],
   );
 
@@ -258,7 +259,7 @@ export default function Viewer({ document }: ViewerProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown, true);
     };
-  }, [handleContentBoxesPress]);
+  }, [handleContentBoxesPress, isEditingRef.current]);
 
   const handleFindReplace = useCallback(async () => {
     if (!findText.trim()) {
@@ -390,7 +391,7 @@ export default function Viewer({ document }: ViewerProps) {
     } catch (error) {
       console.error("Error toggling content editor:", error);
     }
-  }, []);
+  }, [instanceRef.current, isContentEditingRef.current]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -572,9 +573,12 @@ export default function Viewer({ document }: ViewerProps) {
                     selectedCount: 0,
                   },
                 );
-                dispatchViewerEventDeferred(VIEWER_EVENTS.EDITING_STATE_CHANGE, {
-                  isEditing: false,
-                });
+                dispatchViewerEventDeferred(
+                  VIEWER_EVENTS.EDITING_STATE_CHANGE,
+                  {
+                    isEditing: false,
+                  },
+                );
               } catch (updateError) {
                 console.error("Error during AI text update:", updateError);
                 throw updateError;
@@ -675,6 +679,12 @@ export default function Viewer({ document }: ViewerProps) {
     discardSession,
     getSession,
     setInstance,
+    instance,
+    isEditingRef.current,
+    isProcessingRef.current,
+    selectedBlocksRef.current.map,
+    selectedCountRef.current,
+    toggleContentEditor,
   ]);
 
   // Separate effect to update toolbar items

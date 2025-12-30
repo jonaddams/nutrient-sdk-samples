@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FileText, Search, Sparkles, Edit3 } from "lucide-react";
+import { Edit3, FileText, Search, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface EditingSidebarProps {
   isEditing: boolean;
@@ -23,7 +23,8 @@ export function EditingSidebar({
   onContentEditClick,
 }: EditingSidebarProps) {
   const [showStats, setShowStats] = useState(false);
-  const [currentSelectedCount, setCurrentSelectedCount] = useState(selectedCount);
+  const [currentSelectedCount, setCurrentSelectedCount] =
+    useState(selectedCount);
 
   useEffect(() => {
     setCurrentSelectedCount(selectedCount);

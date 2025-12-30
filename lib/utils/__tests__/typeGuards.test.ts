@@ -1,9 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  extractAnnotationId,
-  toAnnotation,
-  isAnnotation,
-} from "../typeGuards";
+import { describe, expect, it } from "vitest";
+import { extractAnnotationId, isAnnotation, toAnnotation } from "../typeGuards";
 
 describe("typeGuards", () => {
   describe("extractAnnotationId", () => {

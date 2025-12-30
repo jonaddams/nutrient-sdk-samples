@@ -512,12 +512,19 @@ export default function StyleGuide() {
           <div>
             <h3 className="mb-4">Badge Examples</h3>
             <p className="mb-6 text-sm opacity-60">
-              Badges display small pieces of information like statuses, categories, or counts.
+              Badges display small pieces of information like statuses,
+              categories, or counts.
             </p>
             <div className="flex flex-wrap gap-3">
-              <span className="nutrient-badge nutrient-badge-neutral">Neutral</span>
-              <span className="nutrient-badge nutrient-badge-accent">Accent</span>
-              <span className="nutrient-badge nutrient-badge-success">Success</span>
+              <span className="nutrient-badge nutrient-badge-neutral">
+                Neutral
+              </span>
+              <span className="nutrient-badge nutrient-badge-accent">
+                Accent
+              </span>
+              <span className="nutrient-badge nutrient-badge-success">
+                Success
+              </span>
               <span className="nutrient-badge nutrient-badge-pink">Pink</span>
               <span className="nutrient-badge nutrient-badge-coral">Coral</span>
             </div>
@@ -549,7 +556,8 @@ export default function StyleGuide() {
           <div>
             <h3 className="mb-4">Tag Examples</h3>
             <p className="mb-6 text-sm opacity-60">
-              Tags are used for labeling and categorization with rounded pill shapes.
+              Tags are used for labeling and categorization with rounded pill
+              shapes.
             </p>
             <div className="flex flex-wrap gap-3">
               <span className="nutrient-tag">JavaScript</span>

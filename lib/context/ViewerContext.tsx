@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
 import type { Instance } from "@nutrient-sdk/viewer";
+import React, { createContext, useContext, useState } from "react";
 import type { ContentEditingSession } from "@/lib/types/nutrient";
 
 // ============================================================================

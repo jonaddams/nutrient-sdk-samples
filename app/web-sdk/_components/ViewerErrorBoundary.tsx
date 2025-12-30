@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import React from "react";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -74,7 +74,8 @@ export class ViewerErrorBoundary extends React.Component<
             </div>
 
             <p className="mb-4 text-[var(--warm-gray-600)]">
-              The document viewer encountered an error and could not load properly.
+              The document viewer encountered an error and could not load
+              properly.
             </p>
 
             {this.state.error && (
