@@ -12,6 +12,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Document Search",
+    category: "User Interface",
+    description:
+      "Search through PDF documents with context-aware results, instant highlighting, and automatic navigation to matches",
+    path: "/web-sdk/search",
+  },
+  {
     name: "Patient Intake Forms",
     category: "Forms",
     description:
