@@ -125,7 +125,7 @@ export async function measurePerformance<T>(
     const duration = monitor.end(metadata);
     return { result, duration };
   } catch (error) {
-    const duration = monitor.end({ ...metadata, error: true });
+    const _duration = monitor.end({ ...metadata, error: true });
     throw error;
   }
 }
@@ -161,7 +161,7 @@ export function measurePerformanceSync<T>(
     const duration = monitor.end(metadata);
     return { result, duration };
   } catch (error) {
-    const duration = monitor.end({ ...metadata, error: true });
+    const _duration = monitor.end({ ...metadata, error: true });
     throw error;
   }
 }

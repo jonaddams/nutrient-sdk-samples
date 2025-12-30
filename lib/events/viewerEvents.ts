@@ -4,7 +4,8 @@ import { TIMING, VIEWER_EVENTS } from "@/lib/constants";
 // Typed Event System for Viewer Communication
 // ============================================================================
 
-export type ViewerEventType = typeof VIEWER_EVENTS[keyof typeof VIEWER_EVENTS];
+export type ViewerEventType =
+  (typeof VIEWER_EVENTS)[keyof typeof VIEWER_EVENTS];
 
 export interface ViewerEventMap {
   [VIEWER_EVENTS.EDITING_STATE_CHANGE]: { isEditing: boolean };

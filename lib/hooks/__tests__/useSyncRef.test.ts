@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { useSyncRef } from "../useSyncRef";
 
 describe("useSyncRef", () => {
@@ -46,12 +46,9 @@ describe("useSyncRef", () => {
   });
 
   it("should work with null and undefined", () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useSyncRef(value),
-      {
-        initialProps: { value: null as string | null },
-      },
-    );
+    const { result, rerender } = renderHook(({ value }) => useSyncRef(value), {
+      initialProps: { value: null as string | null },
+    });
 
     expect(result.current.current).toBe(null);
 

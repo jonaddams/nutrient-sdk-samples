@@ -77,7 +77,8 @@
   /* Typography */
   --font-sans: "ABC Monument Grotesk", system-ui, -apple-system, sans-serif;
   --font-mono:
-    "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas", ui-monospace, "Courier New", monospace;
+    "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas",
+    ui-monospace, "Courier New", monospace;
 
   /* Spacing - Nutrient Scale */
   --spacing-4xs: 0.125rem;
@@ -204,8 +205,8 @@ a:hover {
 /* Remove underline from button-styled links */
 a.btn,
 a.btn:hover {
-  text-decoration: none !important;
-  text-decoration-thickness: 0 !important;
+  text-decoration: none;
+  text-decoration-thickness: 0;
 }
 
 code {

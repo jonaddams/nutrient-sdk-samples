@@ -65,11 +65,7 @@ export function StatsPopup({
   }
 
   return (
-    <output
-      className={styles.popup}
-      aria-live="polite"
-      aria-atomic="true"
-    >
+    <output className={styles.popup} aria-live="polite" aria-atomic="true">
       <div className={styles.header}>
         <svg
           width="24"

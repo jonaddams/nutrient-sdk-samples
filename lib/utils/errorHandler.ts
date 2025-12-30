@@ -62,7 +62,7 @@ export class AppError extends Error {
     message: string,
     public originalError?: unknown,
     public context?: Record<string, unknown>,
-    public code?: ErrorCode
+    public code?: ErrorCode,
   ) {
     super(message);
     this.name = "AppError";
@@ -79,8 +79,7 @@ const ERROR_MESSAGES: Record<ErrorType, string> = {
     "Unable to manage editing session. Please try again.",
   [ErrorType.TEXT_DETECTION]:
     "Unable to detect text in the document. Please ensure the PDF contains selectable text.",
-  [ErrorType.TEXT_REPLACEMENT]:
-    "Failed to replace text. Please try again.",
+  [ErrorType.TEXT_REPLACEMENT]: "Failed to replace text. Please try again.",
   [ErrorType.ANNOTATION]:
     "Unable to create or update annotations. Please try again.",
   [ErrorType.NETWORK]:
@@ -131,15 +130,12 @@ export function getUserFriendlyMessage(error: unknown): string {
 
     if (
       message.includes("replace") ||
-      message.includes("update") && message.includes("text")
+      (message.includes("update") && message.includes("text"))
     ) {
       return ERROR_MESSAGES[ErrorType.TEXT_REPLACEMENT];
     }
 
-    if (
-      message.includes("annotation") ||
-      message.includes("markup")
-    ) {
+    if (message.includes("annotation") || message.includes("markup")) {
       return ERROR_MESSAGES[ErrorType.ANNOTATION];
     }
   }
@@ -152,15 +148,21 @@ export function getUserFriendlyMessage(error: unknown): string {
  * @param error - Error to log
  * @param context - Additional context
  */
-export function logError(error: unknown, context?: Record<string, unknown>): void {
+export function logError(
+  error: unknown,
+  context?: Record<string, unknown>,
+): void {
   const timestamp = new Date().toISOString();
   const errorInfo = {
     timestamp,
-    error: error instanceof Error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : error,
+    error:
+      error instanceof Error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : error,
     context,
   };
 
@@ -177,7 +179,7 @@ export function logError(error: unknown, context?: Record<string, unknown>): voi
  */
 export function handleError(
   error: unknown,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): string {
   logError(error, context);
   return getUserFriendlyMessage(error);
@@ -193,7 +195,7 @@ export function handleError(
 export function createAppError(
   type: ErrorType,
   error: unknown,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): AppError {
   const message = ERROR_MESSAGES[type];
   return new AppError(type, message, error, context);
@@ -209,7 +211,7 @@ export function createAppError(
 export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
   fn: T,
   errorType: ErrorType,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): T {
   return (async (...args: Parameters<T>) => {
     try {
@@ -246,7 +248,7 @@ export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxAttempts = 3,
   delayMs = 1000,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<T> {
   let lastError: unknown;
 
@@ -266,7 +268,7 @@ export async function retryWithBackoff<T>(
       }
 
       // Exponential backoff: 1s, 2s, 4s, etc.
-      const delay = delayMs * Math.pow(2, attempt - 1);
+      const delay = delayMs * 2 ** (attempt - 1);
 
       // Use AbortSignal-aware delay if signal provided
       if (signal) {
@@ -279,7 +281,7 @@ export async function retryWithBackoff<T>(
           signal.addEventListener("abort", abortHandler, { once: true });
         });
       } else {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }

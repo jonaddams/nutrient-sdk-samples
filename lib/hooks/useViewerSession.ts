@@ -2,9 +2,9 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useViewer } from "@/lib/context/ViewerContext";
+import type { ContentEditingSession } from "@/lib/types/nutrient";
 import { createAppError, ErrorType } from "@/lib/utils/errorHandler";
 import { measurePerformance } from "@/lib/utils/performanceMonitor";
-import type { ContentEditingSession } from "@/lib/types/nutrient";
 
 /**
  * Hook for managing content editing sessions with Nutrient SDK
@@ -76,7 +76,7 @@ export function useViewerSession() {
       throw createAppError(
         ErrorType.VIEWER_INITIALIZATION,
         new Error("Viewer instance not available"),
-        { operation: 'beginSession' }
+        { operation: "beginSession" },
       );
     }
 
@@ -85,7 +85,7 @@ export function useViewerSession() {
       throw createAppError(
         ErrorType.SESSION_MANAGEMENT,
         new Error("Session creation already in progress"),
-        { operation: 'beginSession' }
+        { operation: "beginSession" },
       );
     }
 
@@ -105,20 +105,18 @@ export function useViewerSession() {
 
       // Create new session with performance monitoring
       const { result: session } = await measurePerformance(
-        'beginContentEditingSession',
+        "beginContentEditingSession",
         async () => await instance.beginContentEditingSession(),
         undefined,
-        { warning: 500, error: 2000 }
+        { warning: 500, error: 2000 },
       );
 
       activeSessionRef.current = session;
       return session;
     } catch (error) {
-      throw createAppError(
-        ErrorType.SESSION_MANAGEMENT,
-        error,
-        { operation: 'beginSession' }
-      );
+      throw createAppError(ErrorType.SESSION_MANAGEMENT, error, {
+        operation: "beginSession",
+      });
     } finally {
       isCreatingSessionRef.current = false;
       setIsCreatingSession(false);
@@ -135,7 +133,7 @@ export function useViewerSession() {
       throw createAppError(
         ErrorType.SESSION_MANAGEMENT,
         new Error("No active session to commit"),
-        { operation: 'commitSession' }
+        { operation: "commitSession" },
       );
     }
 
@@ -144,18 +142,16 @@ export function useViewerSession() {
 
     try {
       await measurePerformance(
-        'commitContentEditingSession',
+        "commitContentEditingSession",
         async () => await session.commit(),
         undefined,
-        { warning: 1000, error: 5000 }
+        { warning: 1000, error: 5000 },
       );
       activeSessionRef.current = null;
     } catch (error) {
-      throw createAppError(
-        ErrorType.SESSION_MANAGEMENT,
-        error,
-        { operation: 'commitSession' }
-      );
+      throw createAppError(ErrorType.SESSION_MANAGEMENT, error, {
+        operation: "commitSession",
+      });
     } finally {
       setIsCommitting(false);
     }

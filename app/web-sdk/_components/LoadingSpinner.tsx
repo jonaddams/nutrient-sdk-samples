@@ -34,9 +34,7 @@ export function LoadingSpinner({
           className={`${sizeClasses[size]} animate-spin text-[var(--digital-pollen)]`}
         />
         {message && (
-          <p className="text-sm text-[var(--warm-gray-600)] !mb-0">
-            {message}
-          </p>
+          <p className="text-sm text-[var(--warm-gray-600)] !mb-0">{message}</p>
         )}
       </div>
     </div>

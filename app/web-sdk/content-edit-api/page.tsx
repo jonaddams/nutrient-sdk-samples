@@ -2,13 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
-import { EditingSidebar } from "./_components/EditingSidebar";
-import { ViewerErrorBoundary } from "@/app/web-sdk/_components/ViewerErrorBoundary";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
+import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { ViewerErrorBoundary } from "@/app/web-sdk/_components/ViewerErrorBoundary";
+import { TIMING, VIEWER_EVENTS } from "@/lib/constants";
 import { ViewerProvider } from "@/lib/context/ViewerContext";
 import { addViewerEventListener } from "@/lib/events/viewerEvents";
-import { VIEWER_EVENTS, TIMING } from "@/lib/constants";
+import { EditingSidebar } from "./_components/EditingSidebar";
 
 const Viewer = dynamic(() => import("@/app/web-sdk/content-edit-api/viewer"), {
   ssr: false,

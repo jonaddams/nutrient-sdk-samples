@@ -66,7 +66,9 @@
   border-radius: var(--radius-xxs);
   cursor: pointer;
   font-size: 0.875rem;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
 .closeButton:hover {

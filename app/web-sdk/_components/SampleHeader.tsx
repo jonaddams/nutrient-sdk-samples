@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 interface SampleHeaderProps {
   title: string;
@@ -22,7 +22,9 @@ export function SampleHeader({ title, description }: SampleHeaderProps) {
           <span className="text-[var(--warm-gray-600)]">{title}</span>
         </nav>
         <h1 className="!mb-0">{title}</h1>
-        {description && <p className="text-[var(--warm-gray-600)] mt-2">{description}</p>}
+        {description && (
+          <p className="text-[var(--warm-gray-600)] mt-2">{description}</p>
+        )}
       </div>
     </header>
   );
