@@ -243,6 +243,24 @@ export default function SearchViewer({
     }
   };
 
+  const clearSearch = async () => {
+    setSearchTerm("");
+    setSearchResults([]);
+    setCurrentResultIndex(null);
+
+    // Remove any highlight annotation
+    if (currentAnnotation) {
+      try {
+        await instance?.delete(currentAnnotation);
+        console.log("Removed annotation on clear");
+      } catch (error) {
+        console.error("Error removing annotation:", error);
+      }
+      setCurrentAnnotation(null);
+      setCurrentAnnotationPage(null);
+    }
+  };
+
   const highlightSearchTerm = (text: string, start: number, length: number) => {
     const before = text.slice(0, start);
     const match = text.slice(start, start + length);
@@ -373,9 +391,31 @@ export default function SearchViewer({
           )}
 
           {searchResults.length > 0 && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Found {searchResults.length} result
-              {searchResults.length !== 1 ? "s" : ""}
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Found {searchResults.length} result
+                {searchResults.length !== 1 ? "s" : ""}
+              </div>
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="text-xs px-3 py-1 rounded-md transition-colors"
+                style={{
+                  color: "var(--digital-pollen)",
+                  border: "1px solid var(--digital-pollen)",
+                  background: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--digital-pollen)";
+                  e.currentTarget.style.color = "var(--black)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "var(--digital-pollen)";
+                }}
+              >
+                New Search
+              </button>
             </div>
           )}
         </div>
