@@ -1,0 +1,102 @@
+.errorContainer {
+  padding: var(--spacing-md);
+  margin: var(--spacing-md);
+  border: 2px solid var(--color-error-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+.errorContainerCentered {
+  composes: errorContainer;
+  text-align: center;
+}
+
+.errorTitle {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.errorTitleLarge {
+  composes: errorTitle;
+  font-size: 1.25rem;
+}
+
+.errorMessage {
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.errorMessageSmall {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 0.875rem;
+}
+
+.errorMessageCode {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.errorDetails {
+  margin-top: var(--spacing-xs);
+}
+
+.errorSummary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.errorPre {
+  margin-top: var(--spacing-2xs);
+  padding: var(--spacing-2xs);
+  background-color: var(--white);
+  border: 1px solid var(--warm-gray-200);
+  border-radius: var(--radius-xxs);
+  font-size: 0.75rem;
+  overflow: auto;
+}
+
+.errorButton {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-2xs) var(--spacing-md);
+  background-color: var(--color-error);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xxs);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.errorButton:hover {
+  opacity: 0.9;
+}
+
+.errorButton:active {
+  transform: scale(0.98);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .errorButton:active {
+    transform: none;
+  }
+}
+
+.errorButtonSecondary {
+  composes: errorButton;
+  background-color: var(--color-button-secondary-bg);
+  color: var(--color-button-secondary-text);
+}
+
+.errorButtonSecondary:hover {
+  opacity: 0.9;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-2xs);
+  justify-content: center;
+}
