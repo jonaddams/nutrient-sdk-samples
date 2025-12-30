@@ -12,6 +12,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Patient Intake Forms",
+    category: "Forms",
+    description:
+      "Digital patient check-in with smart form pre-population, progressive form completion, and HIPAA-compliant data handling",
+    path: "/web-sdk/patient-intake",
+  },
+  {
     name: "Text Comparison",
     category: "Document Comparison",
     description:

@@ -1,0 +1,80 @@
+{
+	"patient": {
+		"firstName": "Sarah",
+		"lastName": "Johnson",
+		"middleName": "Marie",
+		"dateOfBirth": "1987-03-15",
+		"ssn": "XXX-XX-7834",
+		"gender": "Female",
+		"maritalStatus": "Married",
+		"phone": "(555) 123-4567",
+		"email": "sarah.johnson@email.com",
+		"address": {
+			"street": "1245 Oak Street",
+			"city": "Springfield",
+			"state": "IL",
+			"zipCode": "62701"
+		},
+		"employer": "Springfield General Hospital",
+		"occupation": "Registered Nurse"
+	},
+	"emergencyContact": {
+		"name": "Michael Johnson",
+		"relationship": "Spouse",
+		"phone": "(555) 987-6543",
+		"address": {
+			"street": "1245 Oak Street",
+			"city": "Springfield",
+			"state": "IL",
+			"zipCode": "62701"
+		}
+	},
+	"insurance": {
+		"primary": {
+			"company": "Blue Cross Blue Shield",
+			"policyNumber": "BCB123456789",
+			"groupNumber": "GRP98765",
+			"subscriberName": "Sarah M. Johnson",
+			"subscriberDOB": "1987-03-15",
+			"relationship": "Self"
+		},
+		"secondary": {
+			"company": "United Healthcare",
+			"policyNumber": "UHC987654321",
+			"groupNumber": "GRP54321",
+			"subscriberName": "Michael R. Johnson",
+			"subscriberDOB": "1985-07-22",
+			"relationship": "Spouse"
+		}
+	},
+	"medicalHistory": {
+		"allergies": [
+			"Penicillin - causes rash",
+			"Shellfish - anaphylaxis",
+			"Grass pollen - hay fever symptoms"
+		],
+		"medications": [
+			"Lisinopril 10mg - daily for blood pressure",
+			"Vitamin D3 1000 IU - daily",
+			"Claritin 10mg - as needed for allergies"
+		],
+		"conditions": [
+			"Hypertension - diagnosed 2019",
+			"Seasonal allergies",
+			"Hay fever"
+		],
+		"surgeries": ["Appendectomy - 2010", "Wisdom teeth removal - 2005"],
+		"familyHistory": [
+			"Mother: Diabetes Type 2, Hypertension",
+			"Father: Heart Disease, High Cholesterol",
+			"Maternal Grandmother: Breast Cancer"
+		]
+	},
+	"visitInfo": {
+		"date": "2025-09-22",
+		"time": "2:30 PM",
+		"provider": "Dr. Amanda Rodriguez, MD",
+		"reasonForVisit": "Annual physical examination",
+		"referringPhysician": "Dr. James Wilson, MD"
+	}
+}
