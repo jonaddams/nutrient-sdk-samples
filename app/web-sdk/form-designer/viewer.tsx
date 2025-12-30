@@ -328,37 +328,27 @@ export default function FormDesignerViewer() {
   // Initialize the viewer (runs once on mount)
   useEffect(() => {
     const container = containerRef.current;
-    let isMounted = true; // Track if component is still mounted
+    if (!container) return;
 
-    const initViewer = async () => {
-      // Check if container already has an instance or if ref is already set
-      if (!container || viewerInstanceRef.current) {
-        return;
-      }
+    const { NutrientViewer } = window as any;
+    if (!NutrientViewer) return;
 
-      const { NutrientViewer } = window as any;
-      if (!NutrientViewer) {
-        return;
-      }
+    // Unload any existing instance first (handles React Strict Mode double mount)
+    try {
+      NutrientViewer.unload(container);
+    } catch {
+      // Ignore errors if no instance exists
+    }
 
-      try {
-        const instance = await NutrientViewer.load({
-          container,
-          document: "/documents/example.pdf",
-          allowLinearizedLoading: true,
-          useCDN: true,
-          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-        });
-
-        // Only proceed if component is still mounted
-        if (!isMounted) {
-          // Component unmounted during load, clean up immediately
-          if (NutrientViewer) {
-            NutrientViewer.unload(instance);
-          }
-          return;
-        }
-
+    // Load viewer
+    NutrientViewer.load({
+      container,
+      document: "/documents/example.pdf",
+      allowLinearizedLoading: true,
+      useCDN: true,
+      licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+    })
+      .then((instance: Instance) => {
         viewerInstanceRef.current = instance;
 
         const interactionMode = formCreatorMode
@@ -372,23 +362,19 @@ export default function FormDesignerViewer() {
         );
 
         setupDragAndDrop(instance, formCreatorMode);
-      } catch (error) {
+      })
+      .catch((error: Error) => {
         console.error("Error loading viewer:", error);
-      }
-    };
-
-    initViewer();
+      });
 
     return () => {
-      isMounted = false; // Mark as unmounted
-
-      // Use the ref for cleanup, not the local variable
       const instance = viewerInstanceRef.current;
-      if (instance && container) {
+      if (instance) {
         cleanupDragAndDrop(instance);
-        const { NutrientViewer } = window as any;
-        if (NutrientViewer) {
+        try {
           NutrientViewer.unload(container);
+        } catch {
+          // Ignore errors if already unloaded
         }
         viewerInstanceRef.current = null;
       }
