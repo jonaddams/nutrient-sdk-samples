@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 interface ViewerProps {
   document: string | ArrayBuffer;
+  exampleSearchTerms?: string[];
 }
 
 interface SearchResult {
@@ -21,7 +22,10 @@ interface SearchResult {
   }>;
 }
 
-export default function SearchViewer({ document }: ViewerProps) {
+export default function SearchViewer({
+  document,
+  exampleSearchTerms = [],
+}: ViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [instance, setInstance] = useState<Instance | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,9 +64,15 @@ export default function SearchViewer({ document }: ViewerProps) {
     };
   }, [document, instance]);
 
-  const performSearch = async () => {
-    if (!instance || !searchTerm.trim()) {
+  const performSearch = async (termToSearch?: string) => {
+    const searchQuery = termToSearch || searchTerm;
+    if (!instance || !searchQuery.trim()) {
       return;
+    }
+
+    // Update search term if provided
+    if (termToSearch) {
+      setSearchTerm(termToSearch);
     }
 
     // Remove previous highlight annotation if it exists
@@ -84,7 +94,7 @@ export default function SearchViewer({ document }: ViewerProps) {
       const results: SearchResult[] = [];
 
       // Use the search API to find all matches
-      const searchResultsIterable = await instance.search(searchTerm);
+      const searchResultsIterable = await instance.search(searchQuery);
 
       // Iterate through all search results
       searchResultsIterable.forEach((result: any) => {
@@ -275,7 +285,7 @@ export default function SearchViewer({ document }: ViewerProps) {
               />
               <button
                 type="button"
-                onClick={performSearch}
+                onClick={() => performSearch()}
                 disabled={isSearching || !searchTerm.trim()}
                 className="px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 style={{
@@ -326,6 +336,41 @@ export default function SearchViewer({ document }: ViewerProps) {
               </button>
             </div>
           </div>
+
+          {/* Example Search Terms */}
+          {exampleSearchTerms.length > 0 && !searchResults.length && (
+            <div className="mb-4">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                Try searching for:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {exampleSearchTerms.map((term) => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => performSearch(term)}
+                    className="px-3 py-1.5 text-sm rounded-full border transition-colors"
+                    style={{
+                      borderColor: "var(--digital-pollen)",
+                      color: "var(--digital-pollen)",
+                      background: "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background =
+                        "var(--digital-pollen)";
+                      e.currentTarget.style.color = "var(--black)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "var(--digital-pollen)";
+                    }}
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {searchResults.length > 0 && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
