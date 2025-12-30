@@ -50,7 +50,7 @@ export default function SearchPage() {
 
         {/* Viewer Container */}
         <div className="max-w-7xl mx-auto h-[calc(100vh-5rem)]">
-          <SearchViewer document="/documents/the-wind-in-the-willows.pdf" />
+          <SearchViewer document="/documents/20000-leagues-under-the-sea.pdf" />
         </div>
       </div>
     );
@@ -165,10 +165,10 @@ export default function SearchPage() {
                 Sample Document
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                The Wind in the Willows
+                20,000 Leagues Under the Sea
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-500">
-                Try searching for terms like "river", "toad", or "mole"
+                Try searching for terms like "nautilus", "ocean", or "captain"
               </p>
             </div>
           </div>
