@@ -325,23 +325,25 @@ export default function FormDesignerViewer() {
     }
   }, [formCreatorMode]);
 
-  // Initialize the viewer
+  // Initialize the viewer (runs once on mount)
   useEffect(() => {
     const container = containerRef.current;
     let viewerInstance: Instance | null = null;
 
-    if (container && !viewerInstanceRef.current) {
-      const { NutrientViewer } = window as any;
+    const initViewer = async () => {
+      if (container && !viewerInstanceRef.current) {
+        const { NutrientViewer } = window as any;
 
-      if (NutrientViewer) {
-        NutrientViewer.load({
-          container,
-          document: "/documents/example.pdf",
-          allowLinearizedLoading: true,
-          useCDN: true,
-          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-        })
-          .then((instance: Instance) => {
+        if (NutrientViewer) {
+          try {
+            const instance = await NutrientViewer.load({
+              container,
+              document: "/documents/example.pdf",
+              allowLinearizedLoading: true,
+              useCDN: true,
+              licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+            });
+
             viewerInstance = instance;
             viewerInstanceRef.current = instance;
 
@@ -356,22 +358,27 @@ export default function FormDesignerViewer() {
             );
 
             setupDragAndDrop(instance, formCreatorMode);
-          })
-          .catch((error: Error) => {
+          } catch (error) {
             console.error("Error loading viewer:", error);
-          });
+          }
+        }
       }
-    }
+    };
+
+    initViewer();
 
     return () => {
       if (viewerInstance) {
         cleanupDragAndDrop(viewerInstance);
         const { NutrientViewer } = window as any;
-        NutrientViewer?.unload(container);
+        if (NutrientViewer) {
+          NutrientViewer.unload(container);
+        }
         viewerInstanceRef.current = null;
       }
     };
-  }, [cleanupDragAndDrop, formCreatorMode, setupDragAndDrop]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only run on mount/unmount
 
   // Setup drag and drop handlers whenever formCreatorMode changes
   useEffect(() => {
