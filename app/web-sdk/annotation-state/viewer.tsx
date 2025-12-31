@@ -117,26 +117,43 @@ export default function AnnotationStateViewer() {
     }
   };
 
-  const formatTimestamp = (date: Date) => {
+  const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
+      year: "numeric",
+    }).format(date);
+  };
+
+  const formatTime = (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
       minute: "2-digit",
-      second: "2-digit",
       hour12: true,
     }).format(date);
+  };
+
+  const getRelativeTime = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return formatDate(date);
   };
 
   return (
     <div className="flex h-full">
       {/* Sidebar with saved states */}
-      <aside className="w-80 bg-gray-100 dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700 overflow-y-auto flex flex-col">
-        <div className="p-4">
-          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-            Saved Annotation States
+      <aside className="w-80 bg-white dark:bg-[#1a1414] border-r border-[var(--warm-gray-400)] overflow-y-auto flex flex-col">
+        <div className="p-6">
+          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+            Saved States
           </h2>
 
           {savedStates.length === 0 ? (
@@ -145,20 +162,52 @@ export default function AnnotationStateViewer() {
               Annotation State" to create your first saved state.
             </p>
           ) : (
-            <ul className="space-y-3">
-              {savedStates.map((state) => (
+            <ul className="space-y-2">
+              {savedStates.map((state, index) => (
                 <li key={state.key}>
                   <button
                     type="button"
                     onClick={() => handleStateClick(state.key)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                       selectedState === state.key
-                        ? "bg-[#bb2324] text-white font-semibold"
-                        : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        ? "bg-[#bb2324] text-white border-[#bb2324]"
+                        : "bg-white dark:bg-[#2a2020] border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] text-gray-900 dark:text-white"
                     }`}
                   >
-                    <div className="text-sm break-words">
-                      {formatTimestamp(state.timestamp)}
+                    <div className="flex items-start gap-3">
+                      {/* Version icon/number */}
+                      <div
+                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                          selectedState === state.key
+                            ? "bg-white text-[#bb2324]"
+                            : "bg-gray-100 dark:bg-[#1a1414] text-gray-600 dark:text-gray-400"
+                        }`}
+                      >
+                        {savedStates.length - index}
+                      </div>
+
+                      {/* State info */}
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className={`font-semibold text-sm mb-1 ${
+                            selectedState === state.key
+                              ? "text-white"
+                              : "text-gray-900 dark:text-white"
+                          }`}
+                        >
+                          {getRelativeTime(state.timestamp)}
+                        </div>
+                        <div
+                          className={`text-xs ${
+                            selectedState === state.key
+                              ? "text-white opacity-90"
+                              : "text-gray-500 dark:text-gray-400"
+                          }`}
+                        >
+                          {formatDate(state.timestamp)} •{" "}
+                          {formatTime(state.timestamp)}
+                        </div>
+                      </div>
                     </div>
                   </button>
                 </li>
