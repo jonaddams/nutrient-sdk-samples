@@ -52,7 +52,7 @@ export default function AnnotationStateViewer() {
     const exportButton: typeof NutrientViewer.ToolbarItem = {
       type: "custom",
       id: "export-state",
-      title: "Save Annotation State",
+      title: "Save State",
       onPress: async () => {
         if (!instanceRef.current) return;
 
