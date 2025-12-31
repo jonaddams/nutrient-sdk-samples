@@ -173,17 +173,17 @@ export default function AnnotationStateViewer() {
 
           {savedStates.length === 0 ? (
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              No saved states yet. Make some annotations and click "Save
-              Annotation State" to create your first saved state.
+              No saved states yet. Make some annotations and click "Save State"
+              to create your first saved state.
             </p>
           ) : (
-            <ul className="space-y-1">
+            <ul className="space-y-1 w-full">
               {savedStates.map((state, index) => (
                 <li key={state.key}>
                   <div
                     className={`flex items-center gap-2 px-3 py-2 rounded border transition-all ${
                       selectedState === state.key
-                        ? "bg-[#bb2324] text-white border-[#bb2324]"
+                        ? "bg-[#4CAF50] text-white border-[#4CAF50]"
                         : "bg-white dark:bg-[#2a2020] border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] text-gray-900 dark:text-white"
                     }`}
                   >
@@ -196,7 +196,7 @@ export default function AnnotationStateViewer() {
                       <div
                         className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                           selectedState === state.key
-                            ? "bg-white text-[#bb2324]"
+                            ? "bg-white text-[#4CAF50]"
                             : "bg-gray-100 dark:bg-[#1a1414] text-gray-600 dark:text-gray-400"
                         }`}
                       >
