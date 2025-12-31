@@ -117,6 +117,21 @@ export default function AnnotationStateViewer() {
     }
   };
 
+  const handleDeleteState = (
+    key: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation(); // Prevent triggering handleStateClick
+    localStorage.removeItem(key);
+    setSavedStates((prev) => prev.filter((state) => state.key !== key));
+
+    // If we deleted the currently selected state, clear the selection
+    if (selectedState === key) {
+      setSelectedState(null);
+      setInstantJSON(null);
+    }
+  };
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -165,19 +180,21 @@ export default function AnnotationStateViewer() {
             <ul className="space-y-1">
               {savedStates.map((state, index) => (
                 <li key={state.key}>
-                  <button
-                    type="button"
-                    onClick={() => handleStateClick(state.key)}
-                    className={`w-full text-left px-3 py-2 rounded border transition-all ${
+                  <div
+                    className={`flex items-center gap-2 px-3 py-2 rounded border transition-all ${
                       selectedState === state.key
                         ? "bg-[#bb2324] text-white border-[#bb2324]"
                         : "bg-white dark:bg-[#2a2020] border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] text-gray-900 dark:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleStateClick(state.key)}
+                      className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
+                    >
                       {/* Version number */}
                       <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                           selectedState === state.key
                             ? "bg-white text-[#bb2324]"
                             : "bg-gray-100 dark:bg-[#1a1414] text-gray-600 dark:text-gray-400"
@@ -207,8 +224,35 @@ export default function AnnotationStateViewer() {
                           {formatTime(state.timestamp)}
                         </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+
+                    {/* Delete button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteState(state.key, e)}
+                      className={`shrink-0 p-1 rounded hover:bg-opacity-20 transition-colors cursor-pointer ${
+                        selectedState === state.key
+                          ? "hover:bg-white"
+                          : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                      }`}
+                      aria-label="Delete saved state"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
