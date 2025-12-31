@@ -20,8 +20,8 @@ export default function FormDesignerPage() {
         description="Drag and drop form fields onto PDF documents with an intuitive form creator mode"
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden justify-center">
+        <main className="flex-1 overflow-hidden max-w-7xl">
           <FormDesignerViewer />
         </main>
       </div>

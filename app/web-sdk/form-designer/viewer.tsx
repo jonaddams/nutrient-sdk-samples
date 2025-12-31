@@ -37,6 +37,7 @@ export default function FormDesignerViewer() {
   const [draggingItem, setDraggingItem] = useState<string | null>(null);
   const [formCreatorMode, setFormCreatorMode] = useState(false);
   const viewerInstanceRef = useRef<Instance | null>(null);
+  const nutrientViewerRef = useRef<typeof window.NutrientViewer | null>(null);
   const eventHandlersRef = useRef<{
     dragover: EventHandler;
     drop: EventHandler;
@@ -80,8 +81,8 @@ export default function FormDesignerViewer() {
   // Helper function to set up drag and drop handlers
   const setupDragAndDrop = useCallback(
     (instance: Instance, enabled: boolean) => {
-      if (!window.NutrientViewer) return;
-      const { NutrientViewer } = window;
+      const NutrientViewer = nutrientViewerRef.current;
+      if (!NutrientViewer) return;
       let label = "";
 
       // Dragover handler
@@ -169,11 +170,14 @@ export default function FormDesignerViewer() {
 
         try {
           let boundingBoxDimensions = { height: 55, width: 225 };
-          const horizontalOffset = 100;
+
+          // Center the form field on the cursor position
+          // We subtract half width/height so the field is centered where user drops
           const clientRect = new NutrientViewer.Geometry.Rect({
-            left: dragEvent.clientX - horizontalOffset,
+            left: dragEvent.clientX - boundingBoxDimensions.width / 2,
             top: dragEvent.clientY - boundingBoxDimensions.height / 2,
-            ...boundingBoxDimensions,
+            width: boundingBoxDimensions.width,
+            height: boundingBoxDimensions.height,
           });
 
           const pageRect = instance.transformContentClientToPageSpace(
@@ -212,9 +216,10 @@ export default function FormDesignerViewer() {
               boundingBoxDimensions = { height: 55, width: 225 };
 
               const dateClientRect = new NutrientViewer.Geometry.Rect({
-                left: dragEvent.clientX - horizontalOffset - 10,
+                left: dragEvent.clientX - boundingBoxDimensions.width / 2,
                 top: dragEvent.clientY - boundingBoxDimensions.height / 2,
-                ...boundingBoxDimensions,
+                width: boundingBoxDimensions.width,
+                height: boundingBoxDimensions.height,
               });
               const datePageRect = instance.transformContentClientToPageSpace(
                 dateClientRect,
@@ -250,9 +255,10 @@ export default function FormDesignerViewer() {
               boundingBoxDimensions = { height: 50, width: 50 };
 
               const initialsClientRect = new NutrientViewer.Geometry.Rect({
-                left: dragEvent.clientX - horizontalOffset - 15,
+                left: dragEvent.clientX - boundingBoxDimensions.width / 2,
                 top: dragEvent.clientY - boundingBoxDimensions.height / 2,
-                ...boundingBoxDimensions,
+                width: boundingBoxDimensions.width,
+                height: boundingBoxDimensions.height,
               });
               const initialsPageRect =
                 instance.transformContentClientToPageSpace(
@@ -326,12 +332,16 @@ export default function FormDesignerViewer() {
   }, [formCreatorMode]);
 
   // Initialize the viewer (runs once on mount)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount/unmount
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const { NutrientViewer } = window as any;
-    if (!NutrientViewer) return;
+    if (!window.NutrientViewer) return;
+    const { NutrientViewer } = window;
+
+    // Store NutrientViewer reference for consistent usage
+    nutrientViewerRef.current = NutrientViewer;
 
     // Unload any existing instance first (handles React Strict Mode double mount)
     try {
@@ -343,7 +353,7 @@ export default function FormDesignerViewer() {
     // Load viewer
     NutrientViewer.load({
       container,
-      document: "/documents/example.pdf",
+      document: "/text-comparison-a.pdf",
       allowLinearizedLoading: true,
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
@@ -432,17 +442,12 @@ export default function FormDesignerViewer() {
             </label>
           </div>
 
-          {/* Status message when Form Creator mode is disabled */}
-          {!formCreatorMode && (
-            <div className="mb-6 p-3 bg-[var(--warm-gray-200)] dark:bg-[#3a3030] text-gray-700 dark:text-gray-300 text-sm rounded-md">
-              Enable Form Creator Mode to drag and drop form fields
-            </div>
-          )}
-
           {/* Form Field Items */}
           <div className="space-y-3">
+            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
             <div
-              role="presentation"
+              role="button"
+              tabIndex={0}
               className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
                 formCreatorMode
                   ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
@@ -451,6 +456,7 @@ export default function FormDesignerViewer() {
               draggable={formCreatorMode}
               onDragStart={(e) => handleDragStart(e, "Signature")}
               onDragEnd={handleDragEnd}
+              onKeyDown={() => {}}
             >
               <div className="flex items-center">
                 <div className="w-8 h-8 flex items-center justify-center mr-3">
@@ -476,8 +482,10 @@ export default function FormDesignerViewer() {
               </div>
             </div>
 
+            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
             <div
-              role="presentation"
+              role="button"
+              tabIndex={0}
               className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
                 formCreatorMode
                   ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
@@ -486,6 +494,7 @@ export default function FormDesignerViewer() {
               draggable={formCreatorMode}
               onDragStart={(e) => handleDragStart(e, "DateSigned")}
               onDragEnd={handleDragEnd}
+              onKeyDown={() => {}}
             >
               <div className="flex items-center">
                 <div className="w-8 h-8 flex items-center justify-center mr-3">
@@ -511,8 +520,10 @@ export default function FormDesignerViewer() {
               </div>
             </div>
 
+            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
             <div
-              role="presentation"
+              role="button"
+              tabIndex={0}
               className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
                 formCreatorMode
                   ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
@@ -521,6 +532,7 @@ export default function FormDesignerViewer() {
               draggable={formCreatorMode}
               onDragStart={(e) => handleDragStart(e, "Initials")}
               onDragEnd={handleDragEnd}
+              onKeyDown={() => {}}
             >
               <div className="flex items-center">
                 <div className="w-8 h-8 flex items-center justify-center mr-3">
@@ -548,7 +560,10 @@ export default function FormDesignerViewer() {
           </div>
 
           <div className="mt-6 text-sm text-gray-600 dark:text-gray-400">
-            <p>Drag and drop form fields onto the document to add them.</p>
+            <p>
+              Enable Form Creator Mode to drag and drop form fields. Drag and
+              drop form fields onto the document to add them.
+            </p>
           </div>
         </div>
       </div>
