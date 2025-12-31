@@ -33,6 +33,13 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
+    name: "Annotation State Management",
+    category: "Annotations",
+    description:
+      "Save and restore annotation states locally with version control-like functionality for managing document changes",
+    path: "/web-sdk/annotation-state",
+  },
+  {
     name: "Text Comparison",
     category: "Document Comparison",
     description:
