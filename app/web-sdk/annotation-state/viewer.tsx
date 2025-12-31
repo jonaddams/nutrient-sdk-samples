@@ -131,9 +131,9 @@ export default function AnnotationStateViewer() {
   };
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex h-full">
       {/* Sidebar with saved states */}
-      <aside className="w-80 bg-gray-100 dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700 overflow-y-auto">
+      <aside className="w-80 bg-gray-100 dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700 overflow-y-auto flex flex-col">
         <div className="p-4">
           <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
             Saved Annotation States
