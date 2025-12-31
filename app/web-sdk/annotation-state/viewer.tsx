@@ -31,7 +31,7 @@ export default function AnnotationStateViewer() {
     setSavedStates(keys);
   }, []);
 
-  // Initialize viewer
+  // Initialize viewer (reload when instantJSON changes to apply saved state)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -49,8 +49,8 @@ export default function AnnotationStateViewer() {
     }
 
     // Custom toolbar button to export annotation state
-    const exportButton: typeof NutrientViewer.ToolbarItem = {
-      type: "custom",
+    const exportButton = {
+      type: "custom" as const,
       id: "export-state",
       title: "Save State",
       onPress: async () => {
@@ -167,12 +167,22 @@ export default function AnnotationStateViewer() {
       {/* Sidebar with saved states */}
       <aside className="w-80 bg-white dark:bg-[#1a1414] border-r border-[var(--warm-gray-400)] overflow-y-auto flex flex-col">
         <div className="p-4">
-          <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+          <h2
+            className="mb-4 text-gray-900 dark:text-white"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "1rem",
+              fontWeight: 600,
+            }}
+          >
             Saved States
           </h2>
 
           {savedStates.length === 0 ? (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p
+              className="text-sm text-gray-600 dark:text-gray-400"
+              style={{ fontFamily: "var(--font-sans)" }}
+            >
               No saved states yet. Make some annotations and click "Save State"
               to create your first saved state.
             </p>
@@ -186,9 +196,10 @@ export default function AnnotationStateViewer() {
                   <div
                     className={`flex items-center gap-2 px-3 py-2 rounded border transition-all ${
                       selectedState === state.key
-                        ? "bg-[#4CAF50] text-white border-[#4CAF50]"
+                        ? "bg-(--data-green) text-white border-(--data-green)"
                         : "bg-white dark:bg-[#2a2020] border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] text-gray-900 dark:text-white"
                     }`}
+                    style={{ fontFamily: "var(--font-sans)" }}
                   >
                     <button
                       type="button"
@@ -199,9 +210,10 @@ export default function AnnotationStateViewer() {
                       <div
                         className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                           selectedState === state.key
-                            ? "bg-white text-[#4CAF50]"
+                            ? "bg-white text-(--data-green)"
                             : "bg-gray-100 dark:bg-[#1a1414] text-gray-600 dark:text-gray-400"
                         }`}
+                        style={{ fontFamily: "var(--font-mono)" }}
                       >
                         {savedStates.length - index}
                       </div>
@@ -214,6 +226,7 @@ export default function AnnotationStateViewer() {
                               ? "text-white"
                               : "text-gray-900 dark:text-white"
                           }`}
+                          style={{ fontFamily: "var(--font-sans)" }}
                         >
                           {getRelativeTime(state.timestamp)}
                         </div>
@@ -223,6 +236,7 @@ export default function AnnotationStateViewer() {
                               ? "text-white opacity-80"
                               : "text-gray-500 dark:text-gray-400"
                           }`}
+                          style={{ fontFamily: "var(--font-sans)" }}
                         >
                           {formatTime(state.timestamp)}
                         </div>
