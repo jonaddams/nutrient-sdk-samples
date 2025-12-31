@@ -76,7 +76,7 @@ export default function AnnotationStateViewer() {
 
     NutrientViewer.load({
       container,
-      document: "/blank.pdf",
+      document: "/documents/blank.pdf",
       allowLinearizedLoading: true,
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
