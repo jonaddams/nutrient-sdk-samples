@@ -1,42 +1,34 @@
 import Link from "next/link";
+import { PageHeader } from "@/app/_components/PageHeader";
 
 export default function AIDocumentProcessingHome() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      {/* Header */}
-      <header className="border-b border-[var(--warm-gray-400)] bg-white dark:bg-[#1a1414]">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <Link href="/" className="text-sm opacity-60 hover:opacity-100 mb-2">
-            ← Back to Home
-          </Link>
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="!mb-0">Nutrient AI Document Processing</h1>
-              <p className="text-sm opacity-60 mt-2">
-                Formerly known as XtractFlow
-              </p>
-            </div>
-            <div className="flex gap-3 mb-1">
-              <a
-                href="https://www.nutrient.io/sdk/ai-document-processing/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-secondary"
-              >
-                Product Home
-              </a>
-              <a
-                href="https://www.nutrient.io/guides/ai-document-processing/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-secondary"
-              >
-                Guides
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Nutrient AI Document Processing"
+        description="Formerly known as XtractFlow"
+        breadcrumbs={[{ label: "Home", href: "/" }]}
+        actions={
+          <>
+            <a
+              href="https://www.nutrient.io/sdk/ai-document-processing/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Product Home
+            </a>
+            <a
+              href="https://www.nutrient.io/guides/ai-document-processing/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Guides
+            </a>
+          </>
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">

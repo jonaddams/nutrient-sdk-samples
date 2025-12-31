@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PageHeader } from "@/app/_components/PageHeader";
 
 type Sample = {
   name: string;
@@ -22,35 +23,30 @@ const samples: Sample[] = [
 export default function DocumentAuthoringSdkSamplesPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      {/* Header */}
-      <header className="border-b border-[var(--warm-gray-400)] bg-white dark:bg-[#1a1414]">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <Link href="/" className="text-sm opacity-60 hover:opacity-100 mb-2">
-            ← Back to Home
-          </Link>
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <h1 className="!mb-0">Document Authoring SDK Samples</h1>
-            <div className="flex gap-3 mb-1">
-              <a
-                href="https://www.nutrient.io/sdk/document-authoring/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-secondary"
-              >
-                Product Home
-              </a>
-              <a
-                href="https://www.nutrient.io/guides/document-authoring-sdk/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-secondary"
-              >
-                Guides
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Document Authoring SDK"
+        breadcrumbs={[{ label: "Home", href: "/" }]}
+        actions={
+          <>
+            <a
+              href="https://www.nutrient.io/sdk/document-authoring/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Product Home
+            </a>
+            <a
+              href="https://www.nutrient.io/guides/document-authoring-sdk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Guides
+            </a>
+          </>
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
