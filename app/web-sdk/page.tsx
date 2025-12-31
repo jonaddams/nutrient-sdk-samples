@@ -48,6 +48,13 @@ const samples: Sample[] = [
     path: "/web-sdk/text-comparison",
   },
   {
+    name: "Cross-Page Text Comparison",
+    category: "Document Comparison",
+    description:
+      "Extract and compare full document text across page boundaries with visual diff highlighting and change navigation",
+    path: "/web-sdk/text-comparison-cross-page",
+  },
+  {
     name: "Content Editing API",
     category: "Content Editor",
     description:
