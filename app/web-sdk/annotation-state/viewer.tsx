@@ -151,8 +151,8 @@ export default function AnnotationStateViewer() {
     <div className="flex h-full">
       {/* Sidebar with saved states */}
       <aside className="w-80 bg-white dark:bg-[#1a1414] border-r border-[var(--warm-gray-400)] overflow-y-auto flex flex-col">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+        <div className="p-4">
+          <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
             Saved States
           </h2>
 
@@ -162,22 +162,22 @@ export default function AnnotationStateViewer() {
               Annotation State" to create your first saved state.
             </p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {savedStates.map((state, index) => (
                 <li key={state.key}>
                   <button
                     type="button"
                     onClick={() => handleStateClick(state.key)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                    className={`w-full text-left px-3 py-2 rounded border transition-all ${
                       selectedState === state.key
                         ? "bg-[#bb2324] text-white border-[#bb2324]"
                         : "bg-white dark:bg-[#2a2020] border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] text-gray-900 dark:text-white"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      {/* Version icon/number */}
+                    <div className="flex items-center gap-2">
+                      {/* Version number */}
                       <div
-                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                           selectedState === state.key
                             ? "bg-white text-[#bb2324]"
                             : "bg-gray-100 dark:bg-[#1a1414] text-gray-600 dark:text-gray-400"
@@ -189,7 +189,7 @@ export default function AnnotationStateViewer() {
                       {/* State info */}
                       <div className="flex-1 min-w-0">
                         <div
-                          className={`font-semibold text-sm mb-1 ${
+                          className={`font-medium text-sm ${
                             selectedState === state.key
                               ? "text-white"
                               : "text-gray-900 dark:text-white"
@@ -200,11 +200,10 @@ export default function AnnotationStateViewer() {
                         <div
                           className={`text-xs ${
                             selectedState === state.key
-                              ? "text-white opacity-90"
+                              ? "text-white opacity-80"
                               : "text-gray-500 dark:text-gray-400"
                           }`}
                         >
-                          {formatDate(state.timestamp)} •{" "}
                           {formatTime(state.timestamp)}
                         </div>
                       </div>
