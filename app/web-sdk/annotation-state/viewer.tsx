@@ -177,7 +177,7 @@ export default function AnnotationStateViewer() {
               to create your first saved state.
             </p>
           ) : (
-            <ul className="space-y-1 w-full">
+            <ul className="space-y-1 w-full p-0">
               {savedStates.map((state, index) => (
                 <li key={state.key}>
                   <div
