@@ -25,7 +25,7 @@ function ContentEditAPIContent() {
     const timer = setTimeout(() => {
       const link = document.createElement("link");
       link.rel = "prefetch";
-      link.href = "/sample-doc-with-google-fonts.pdf";
+      link.href = "/documents/sample-doc-with-google-fonts.pdf";
       document.head.appendChild(link);
     }, TIMING.PDF_PREFETCH_DELAY_MS);
     return () => clearTimeout(timer);
@@ -100,7 +100,7 @@ function ContentEditAPIContent() {
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 overflow-hidden">
           <ViewerErrorBoundary>
-            <Viewer document="/sample-doc-with-google-fonts.pdf" />
+            <Viewer document="/documents/sample-doc-with-google-fonts.pdf" />
           </ViewerErrorBoundary>
         </main>
 

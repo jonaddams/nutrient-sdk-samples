@@ -65,8 +65,8 @@ export const HIGHLIGHT_COLORS = {
 // ============================================================================
 
 export const COMPARISON_CONFIG = {
-  ORIGINAL_DOC: "/text-comparison-a.pdf",
-  CHANGED_DOC: "/text-comparison-b.pdf",
+  ORIGINAL_DOC: "/text-comparison/text-comparison-a.pdf",
+  CHANGED_DOC: "/text-comparison/text-comparison-b.pdf",
   CONTEXT_WORDS: 100,
 } as const;
 
