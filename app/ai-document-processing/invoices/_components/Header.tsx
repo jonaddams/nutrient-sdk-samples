@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
@@ -10,6 +11,17 @@ export default function Header() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <nav className="flex items-center gap-2 text-sm mb-2">
+          <Link href="/" className="hover:underline">
+            Home
+          </Link>
+          <ChevronRight className="w-4 h-4" />
+          <Link href="/ai-document-processing" className="hover:underline">
+            AI Document Processing
+          </Link>
+          <ChevronRight className="w-4 h-4" />
+          <span style={{ color: "var(--warm-gray-600)" }}>Invoices</span>
+        </nav>
         <Link
           href="/"
           className="hover:opacity-80 transition-opacity flex items-center"
