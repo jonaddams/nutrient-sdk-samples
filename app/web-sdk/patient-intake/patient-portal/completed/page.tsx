@@ -41,10 +41,7 @@ export default function CompletedPage() {
           </div>
 
           {/* Title */}
-          <h1
-            className="text-2xl font-bold mb-4"
-            style={{ color: "var(--foreground)" }}
-          >
+          <h1 className="font-bold mb-4" style={{ color: "var(--foreground)" }}>
             Forms Complete!
           </h1>
 
