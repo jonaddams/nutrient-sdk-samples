@@ -70,7 +70,7 @@ export class ViewerErrorBoundary extends React.Component<
           <div className="max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="w-8 h-8 text-red-600" />
-              <h2 className="text-2xl font-bold !mb-0">Viewer Error</h2>
+              <h2 className="!mb-0">Viewer Error</h2>
             </div>
 
             <p className="mb-4 text-[var(--warm-gray-600)]">

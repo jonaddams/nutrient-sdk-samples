@@ -131,13 +131,13 @@ export default function PatientIntakeHome() {
               </svg>
             </div>
             <h2
-              className="text-3xl font-bold mb-2"
+              className="font-bold mb-2"
               style={{ color: "var(--foreground)" }}
             >
               Welcome, {patientData?.patient.firstName}!
             </h2>
             <p
-              className="text-lg mb-6"
+              className="mb-6"
               style={{ color: "var(--foreground)", opacity: 0.85 }}
             >
               Thank you for choosing Springfield Family Medical Center
@@ -227,7 +227,7 @@ export default function PatientIntakeHome() {
           {/* Check-In Instructions */}
           <div className="mb-8">
             <h3
-              className="text-lg font-semibold mb-4"
+              className="font-semibold mb-4"
               style={{ color: "var(--foreground)" }}
             >
               Before Your Appointment

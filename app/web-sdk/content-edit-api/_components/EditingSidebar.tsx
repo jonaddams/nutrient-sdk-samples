@@ -33,7 +33,7 @@ export function EditingSidebar({
 
   return (
     <aside className="w-80 border-l border-[var(--warm-gray-400)] bg-white dark:bg-[#1a1414] p-6 overflow-y-auto">
-      <h2 className="text-xl font-bold mb-6">Content Editing Tools</h2>
+      <h2 className="mb-6">Content Editing Tools</h2>
 
       <div className="space-y-4">
         {/* Detect Text Button */}
@@ -123,7 +123,7 @@ export function EditingSidebar({
 
         {/* Instructions */}
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h3 className="font-semibold mb-2 !text-sm">How to use:</h3>
+          <div className="font-semibold mb-2 text-sm">How to use:</div>
           <ol className="text-sm space-y-1 list-decimal list-inside text-[var(--warm-gray-600)]">
             <li>Click "Detect Text" to identify text blocks</li>
             <li>Click on text blocks to select them (turns red)</li>

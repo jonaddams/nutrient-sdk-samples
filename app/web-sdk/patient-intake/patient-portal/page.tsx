@@ -151,7 +151,7 @@ export default function PatientPortal() {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-4">
                 <h1
-                  className="text-xl font-semibold"
+                  className="font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   {forms[currentStep].name}
@@ -232,7 +232,7 @@ export default function PatientPortal() {
               </div>
               <div className="py-1">
                 <h1
-                  className="text-xl font-semibold"
+                  className="font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Patient Check-In
@@ -293,10 +293,7 @@ export default function PatientPortal() {
               </svg>
             </div>
             <div>
-              <h2
-                className="text-2xl font-bold"
-                style={{ color: "var(--foreground)" }}
-              >
+              <h2 className="font-bold" style={{ color: "var(--foreground)" }}>
                 Welcome, {patientData?.patient.firstName}{" "}
                 {patientData?.patient.lastName}!
               </h2>
@@ -413,7 +410,7 @@ export default function PatientPortal() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3
-              className="text-lg font-semibold"
+              className="font-semibold"
               style={{ color: "var(--foreground)" }}
             >
               Your Progress
@@ -458,7 +455,7 @@ export default function PatientPortal() {
           }}
         >
           <h3
-            className="text-lg font-semibold mb-6"
+            className="font-semibold mb-6"
             style={{ color: "var(--foreground)" }}
           >
             Intake Forms
@@ -619,7 +616,7 @@ export default function PatientPortal() {
           }}
         >
           <h3
-            className="text-lg font-semibold mb-4"
+            className="font-semibold mb-4"
             style={{ color: "var(--foreground)" }}
           >
             Need Help?
