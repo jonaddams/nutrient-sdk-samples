@@ -114,7 +114,7 @@ export default function Home() {
 
           {/* API */}
           <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Nutrient API</h2>
+            <h2 className="!mb-4">Nutrient DWS API</h2>
             <p className="!mb-6">
               RESTful API for document operations without SDK installation or
               server management.

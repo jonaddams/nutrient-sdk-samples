@@ -40,6 +40,7 @@ export default function PdfViewer({
         const viewerConfig: {
           container: string;
           document: ArrayBuffer;
+          // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types are not available
           initialViewState?: any;
           licenseKey?: string;
         } = {
@@ -59,6 +60,7 @@ export default function PdfViewer({
         };
 
         const viewer = await window.NutrientViewer.load(viewerConfig);
+        // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types are not available
         updateAppState({ pdfViewer: viewer as any });
       }
     } catch (error) {
