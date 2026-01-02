@@ -48,6 +48,7 @@ export default function TextComparisonPage() {
   const changedInstanceRef = useRef<Instance | null>(null);
   const selectionAnnotationIdsRef = useRef<string[]>([]);
   const annotationToChangeIndexRef = useRef<Map<string, number>>(new Map());
+  const isInitializingRef = useRef<boolean>(false);
   const cleanupRef = useRef<{
     originalInstance: Instance;
     changedInstance: Instance;
@@ -789,11 +790,21 @@ export default function TextComparisonPage() {
     // Wait for NutrientViewer to be available
     const initializeComparison = () => {
       if (!isMounted.current) return;
+
+      // Prevent multiple simultaneous initializations (React Strict Mode)
+      if (isInitializingRef.current) {
+        return;
+      }
+
       if (!window.NutrientViewer) {
         setTimeout(initializeComparison, 100);
         return;
       }
-      compareDocumentsRef.current?.(isMounted);
+
+      isInitializingRef.current = true;
+      compareDocumentsRef.current?.(isMounted).finally(() => {
+        isInitializingRef.current = false;
+      });
     };
 
     initializeComparison();
