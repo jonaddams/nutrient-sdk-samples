@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
 const DocumentComparisonViewer = dynamic(

@@ -40,8 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
-@nutrient-sdk_viewer-mcp@16065f4
-package
+.claude
 
 

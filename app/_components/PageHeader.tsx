@@ -95,7 +95,9 @@ export function PageHeader({
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-[var(--warm-gray-600)]">{crumb.label}</span>
+                <span className="text-[var(--warm-gray-600)]">
+                  {crumb.label}
+                </span>
               )}
             </div>
           ))}
