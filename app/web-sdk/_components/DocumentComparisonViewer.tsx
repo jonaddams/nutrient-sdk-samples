@@ -64,10 +64,18 @@ export default function DocumentComparisonViewer({
         let allText1 = "";
 
         for (let pageIndex = 0; pageIndex < pageCount1; pageIndex++) {
-          if (!isMounted) break;
-          const textLines = await instance1.textLinesForPageIndex(pageIndex);
-          const pageText = textLines.map((l: any) => l.contents).join("\n");
-          allText1 = `${allText1}${pageText}\n`;
+          if (!isMounted) {
+            await NutrientViewer.unload(tempContainer1);
+            return;
+          }
+          try {
+            const textLines = await instance1.textLinesForPageIndex(pageIndex);
+            const pageText = textLines.map((l: any) => l.contents).join("\n");
+            allText1 = `${allText1}${pageText}\n`;
+          } catch (err) {
+            console.error(`Error extracting text from page ${pageIndex}:`, err);
+            // Continue with other pages
+          }
         }
 
         if (!isMounted) {
@@ -96,10 +104,19 @@ export default function DocumentComparisonViewer({
         let allText2 = "";
 
         for (let pageIndex = 0; pageIndex < pageCount2; pageIndex++) {
-          if (!isMounted) break;
-          const textLines = await instance2.textLinesForPageIndex(pageIndex);
-          const pageText = textLines.map((l: any) => l.contents).join("\n");
-          allText2 = `${allText2}${pageText}\n`;
+          if (!isMounted) {
+            await NutrientViewer.unload(tempContainer1);
+            await NutrientViewer.unload(tempContainer2);
+            return;
+          }
+          try {
+            const textLines = await instance2.textLinesForPageIndex(pageIndex);
+            const pageText = textLines.map((l: any) => l.contents).join("\n");
+            allText2 = `${allText2}${pageText}\n`;
+          } catch (err) {
+            console.error(`Error extracting text from page ${pageIndex}:`, err);
+            // Continue with other pages
+          }
         }
 
         if (!isMounted) {
