@@ -130,16 +130,24 @@ export default function TextComparisonPage() {
   const deleteHighlightColor = HIGHLIGHT_COLORS.DELETE_RGB;
   const insertHighlightColor = HIGHLIGHT_COLORS.INSERT_RGB;
 
-  async function compareDocuments() {
-    if (!window.NutrientViewer) {
-      console.error("NutrientViewer not available on window");
+  const compareDocumentsRef = useRef<
+    ((isMounted: { current: boolean }) => Promise<void>) | null
+  >(null);
+
+  compareDocumentsRef.current = async function compareDocuments(isMounted: {
+    current: boolean;
+  }) {
+    if (!isMounted.current || !window.NutrientViewer) {
+      if (!window.NutrientViewer) {
+        console.error("NutrientViewer not available on window");
+      }
       return;
     }
 
     const originalContainer = originalContainerRef.current;
     const changedContainer = changedContainerRef.current;
 
-    if (!originalContainer || !changedContainer) {
+    if (!isMounted.current || !originalContainer || !changedContainer) {
       console.error("Container elements not found");
       return;
     }
@@ -159,6 +167,8 @@ export default function TextComparisonPage() {
     window.NutrientViewer.unload(originalContainer);
     window.NutrientViewer.unload(changedContainer);
 
+    if (!isMounted.current) return;
+
     const loadConfig = {
       container: originalContainer,
       document: originalDoc,
@@ -170,7 +180,12 @@ export default function TextComparisonPage() {
     let originalInstance: Instance;
     try {
       originalInstance = await window.NutrientViewer.load(loadConfig);
+      if (!isMounted.current) {
+        await window.NutrientViewer.unload(originalContainer);
+        return;
+      }
     } catch (error) {
+      if (!isMounted.current) return;
       console.error("Failed to load original instance:", error);
       throw error;
     }
@@ -186,7 +201,16 @@ export default function TextComparisonPage() {
     let changedInstance: Instance;
     try {
       changedInstance = await window.NutrientViewer.load(changedLoadConfig);
+      if (!isMounted.current) {
+        await window.NutrientViewer.unload(originalContainer);
+        await window.NutrientViewer.unload(changedContainer);
+        return;
+      }
     } catch (error) {
+      if (!isMounted.current) {
+        await window.NutrientViewer.unload(originalContainer);
+        return;
+      }
       console.error("Failed to load changed instance:", error);
       throw error;
     }
@@ -333,6 +357,12 @@ export default function TextComparisonPage() {
     const totalPageCount = await originalInstance.totalPageCount;
 
     for (let pageIndex = 0; pageIndex < totalPageCount; pageIndex++) {
+      if (!isMounted.current) {
+        await window.NutrientViewer.unload(originalContainer);
+        await window.NutrientViewer.unload(changedContainer);
+        return;
+      }
+
       const originalDocument = new window.NutrientViewer.DocumentDescriptor({
         filePath: originalDoc,
         pageIndexes: [pageIndex],
@@ -351,13 +381,19 @@ export default function TextComparisonPage() {
           { numberOfContextWords },
         );
 
+      if (!isMounted.current) {
+        await window.NutrientViewer.unload(originalContainer);
+        await window.NutrientViewer.unload(changedContainer);
+        return;
+      }
+
       const comparisonResult = await originalInstance.compareDocuments(
         { originalDocument, changedDocument },
         textComparisonOperation,
       );
 
       async function processOperation(operation: Operation) {
-        if (!window.NutrientViewer) return;
+        if (!isMounted.current || !window.NutrientViewer) return;
 
         switch (operation.type) {
           case "delete": {
@@ -563,7 +599,7 @@ export default function TextComparisonPage() {
       }
     });
     annotationToChangeIndexRef.current = annotationMap;
-  }
+  };
 
   function countWords(text: string | undefined): number {
     return text ? text.trim().split(/\s+/).length : 0;
@@ -748,19 +784,24 @@ export default function TextComparisonPage() {
   }
 
   useEffect(() => {
+    const isMounted = { current: true };
+
     // Wait for NutrientViewer to be available
     const initializeComparison = () => {
+      if (!isMounted.current) return;
       if (!window.NutrientViewer) {
         setTimeout(initializeComparison, 100);
         return;
       }
-      compareDocuments();
+      compareDocumentsRef.current?.(isMounted);
     };
 
     initializeComparison();
 
     // Cleanup function to remove event listeners
     return () => {
+      isMounted.current = false;
+
       const cleanup = cleanupRef.current;
       if (!cleanup) return;
 
@@ -803,9 +844,17 @@ export default function TextComparisonPage() {
         "viewState.zoom.change",
         cleanup.syncChangedToOriginal,
       );
+
+      // Unload Nutrient Viewer instances
+      if (originalContainerRef.current) {
+        window.NutrientViewer?.unload(originalContainerRef.current);
+      }
+      if (changedContainerRef.current) {
+        window.NutrientViewer?.unload(changedContainerRef.current);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [compareDocuments]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
