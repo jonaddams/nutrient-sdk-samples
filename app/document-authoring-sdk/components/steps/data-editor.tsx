@@ -149,7 +149,7 @@ export default function DataEditor({
         console.log("✅ CodeMirror editor created:", editor);
 
         // Validate JSON on change
-        editor.on("change", (instance: any) => {
+        editor.on("change", (instance: { getValue: () => string }) => {
           const value = instance.getValue();
           if (validateJsonString(value)) {
             setJsonError(null);

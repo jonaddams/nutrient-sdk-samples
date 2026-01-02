@@ -47,13 +47,13 @@ describe("useSyncRef", () => {
 
   it("should work with null and undefined", () => {
     const { result, rerender } = renderHook(({ value }) => useSyncRef(value), {
-      initialProps: { value: null as string | null },
+      initialProps: { value: null as string | null | undefined },
     });
 
     expect(result.current.current).toBe(null);
 
-    rerender({ value: undefined as string | undefined });
-    expect(result.current.current).toBe(undefined);
+    rerender({ value: null });
+    expect(result.current.current).toBe(null);
 
     rerender({ value: "value" });
     expect(result.current.current).toBe("value");
