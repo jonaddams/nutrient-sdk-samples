@@ -19,12 +19,18 @@ export default function DocumentComparisonViewer({
   const [extractionProgress, setExtractionProgress] = useState<string>("");
 
   useEffect(() => {
+    let isMounted = true;
+    let tempContainer1: HTMLDivElement | null = null;
+    let tempContainer2: HTMLDivElement | null = null;
+
     async function extractData() {
       try {
+        if (!isMounted) return;
         setLoading(true);
         setError(null);
 
         // Extract text using Nutrient Viewer
+        if (!isMounted) return;
         setExtractionProgress("Loading first document...");
         const { NutrientViewer } = window;
 
@@ -33,8 +39,8 @@ export default function DocumentComparisonViewer({
         }
 
         // Create temporary containers for text extraction
-        const tempContainer1 = document.createElement("div");
-        const tempContainer2 = document.createElement("div");
+        tempContainer1 = document.createElement("div");
+        tempContainer2 = document.createElement("div");
         tempContainer1.style.display = "none";
         tempContainer2.style.display = "none";
         document.body.appendChild(tempContainer1);
@@ -48,16 +54,26 @@ export default function DocumentComparisonViewer({
           headless: true,
         });
 
+        if (!isMounted) {
+          await NutrientViewer.unload(tempContainer1);
+          return;
+        }
+
         setExtractionProgress("Extracting text from first document...");
         const pageCount1 = instance1.totalPageCount;
         let allText1 = "";
 
         for (let pageIndex = 0; pageIndex < pageCount1; pageIndex++) {
+          if (!isMounted) break;
           const textLines = await instance1.textLinesForPageIndex(pageIndex);
           const pageText = textLines.map((l: any) => l.contents).join("\n");
           allText1 = `${allText1}${pageText}\n`;
         }
 
+        if (!isMounted) {
+          await NutrientViewer.unload(tempContainer1);
+          return;
+        }
         setText1(allText1);
 
         // Extract text from document 2
@@ -69,28 +85,46 @@ export default function DocumentComparisonViewer({
           headless: true,
         });
 
+        if (!isMounted) {
+          await NutrientViewer.unload(tempContainer1);
+          await NutrientViewer.unload(tempContainer2);
+          return;
+        }
+
         setExtractionProgress("Extracting text from second document...");
         const pageCount2 = instance2.totalPageCount;
         let allText2 = "";
 
         for (let pageIndex = 0; pageIndex < pageCount2; pageIndex++) {
+          if (!isMounted) break;
           const textLines = await instance2.textLinesForPageIndex(pageIndex);
           const pageText = textLines.map((l: any) => l.contents).join("\n");
           allText2 = `${allText2}${pageText}\n`;
         }
 
+        if (!isMounted) {
+          await NutrientViewer.unload(tempContainer1);
+          await NutrientViewer.unload(tempContainer2);
+          return;
+        }
         setText2(allText2);
 
         // Cleanup
         await NutrientViewer.unload(tempContainer1);
         await NutrientViewer.unload(tempContainer2);
-        document.body.removeChild(tempContainer1);
-        document.body.removeChild(tempContainer2);
+        if (document.body.contains(tempContainer1)) {
+          document.body.removeChild(tempContainer1);
+        }
+        if (document.body.contains(tempContainer2)) {
+          document.body.removeChild(tempContainer2);
+        }
 
+        if (!isMounted) return;
         setExtractionProgress("Comparison ready!");
         setLoading(false);
       } catch (err) {
         console.error("Error extracting data:", err);
+        if (!isMounted) return;
         setError(
           err instanceof Error
             ? err.message
@@ -101,6 +135,18 @@ export default function DocumentComparisonViewer({
     }
 
     extractData();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+      // Cleanup containers if they still exist
+      if (tempContainer1 && document.body.contains(tempContainer1)) {
+        document.body.removeChild(tempContainer1);
+      }
+      if (tempContainer2 && document.body.contains(tempContainer2)) {
+        document.body.removeChild(tempContainer2);
+      }
+    };
   }, [document1, document2]);
 
   if (loading) {
