@@ -406,9 +406,7 @@ export default function FormDesignerViewer() {
       {/* Sidebar */}
       <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
         <div className="p-6">
-          <h2 className="mb-6 text-gray-900 dark:text-white">
-            Form Fields
-          </h2>
+          <h2 className="mb-6 text-gray-900 dark:text-white">Form Fields</h2>
 
           {/* Form Creator Mode Toggle */}
           <div className="mb-6 pb-6 border-b border-[var(--warm-gray-400)]">

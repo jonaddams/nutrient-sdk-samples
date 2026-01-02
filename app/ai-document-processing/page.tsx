@@ -96,15 +96,6 @@ export default function AIDocumentProcessingHome() {
                     receipts, and purchase orders with built-in validation
                   </td>
                 </tr>
-                <tr>
-                  <td className="nutrient-td opacity-50">
-                    More Samples Coming Soon
-                  </td>
-                  <td className="nutrient-td opacity-50">
-                    Additional samples will be added to demonstrate more use
-                    cases
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
