@@ -13,10 +13,10 @@ const DocumentComparisonViewer = dynamic(
 
 export default function CrossPageTextComparisonPage() {
   const [doc1, setDoc1] = useState<string>(
-    "/text-comparison/text-comparison-a.pdf",
+    "/documents/text-comparison-a.pdf",
   );
   const [doc2, setDoc2] = useState<string>(
-    "/text-comparison/text-comparison-b.pdf",
+    "/documents/text-comparison-b.pdf",
   );
   const [isComparing, setIsComparing] = useState(false);
 
@@ -38,7 +38,7 @@ export default function CrossPageTextComparisonPage() {
 
         {/* Comparison Container */}
         <div className="max-w-7xl mx-auto px-6 pb-8">
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 mt-4 flex justify-end">
             <button
               type="button"
               onClick={resetComparison}
@@ -163,10 +163,10 @@ export default function CrossPageTextComparisonPage() {
                 onChange={(e) => setDoc1(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="/text-comparison/text-comparison-a.pdf">
+                <option value="/documents/text-comparison-a.pdf">
                   Text Comparison Document A
                 </option>
-                <option value="/text-comparison/text-comparison-b.pdf">
+                <option value="/documents/text-comparison-b.pdf">
                   Text Comparison Document B
                 </option>
               </select>
@@ -201,10 +201,10 @@ export default function CrossPageTextComparisonPage() {
                 onChange={(e) => setDoc2(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="/text-comparison/text-comparison-a.pdf">
+                <option value="/documents/text-comparison-a.pdf">
                   Text Comparison Document A
                 </option>
-                <option value="/text-comparison/text-comparison-b.pdf">
+                <option value="/documents/text-comparison-b.pdf">
                   Text Comparison Document B
                 </option>
               </select>

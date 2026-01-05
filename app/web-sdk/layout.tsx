@@ -8,7 +8,7 @@ export default function WebSDKLayout({
 }>) {
   return (
     <>
-      <Script src={SDK_CDN_URL} strategy="lazyOnload" />
+      <Script src={SDK_CDN_URL} strategy="beforeInteractive" />
       {children}
     </>
   );
