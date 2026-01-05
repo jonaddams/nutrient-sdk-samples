@@ -207,9 +207,6 @@ export default function DownloadStep() {
   const isInitializingRef = useRef(false);
 
   useEffect(() => {
-    // Capture the current ref value
-    const currentViewer = viewerRef.current;
-
     // Only initialize if we have PDF document and no existing viewer and not already initializing
     if (state.pdfDocument && !state.pdfViewer && !isInitializingRef.current) {
       isInitializingRef.current = true;
@@ -220,10 +217,10 @@ export default function DownloadStep() {
 
     // Cleanup function
     return () => {
-      if (currentViewer && window.PSPDFKit && state.pdfViewer) {
+      if (state.pdfViewer) {
         console.log("🧹 Cleaning up PDF viewer");
         try {
-          window.PSPDFKit.unload(currentViewer);
+          state.pdfViewer.unload();
         } catch (error) {
           console.warn("⚠️ PDF viewer cleanup error:", error);
         }
@@ -287,9 +284,9 @@ export default function DownloadStep() {
 
   const handleReset = () => {
     // Clean up viewers before resetting
-    if (viewerRef.current && window.PSPDFKit) {
+    if (state.pdfViewer) {
       try {
-        window.PSPDFKit.unload(viewerRef.current);
+        state.pdfViewer.unload();
         dispatch({ type: "SET_PDF_VIEWER", payload: null });
       } catch (error) {
         console.warn("⚠️ Error cleaning up PDF viewer during reset:", error);

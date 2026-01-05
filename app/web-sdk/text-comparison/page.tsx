@@ -171,26 +171,30 @@ export default function Page() {
 			];
 
 			originalContainer
-				? window.NutrientViewer.unload(originalContainer)
+				? window.NutrientViewer!.unload(originalContainer)
 				: null;
-			changedContainer ? window.NutrientViewer.unload(changedContainer) : null;
+			changedContainer ? window.NutrientViewer!.unload(changedContainer) : null;
 
-			const originalInstance: Instance = await window.NutrientViewer.load({
-				container: originalContainer,
+			// biome-ignore lint/style/noNonNullAssertion: containers are checked to exist via refs
+			const originalInstance: Instance = await window.NutrientViewer!.load({
+				container: originalContainer!,
 				document: originalDoc,
 				useCDN: true,
 				styleSheets: ["/styles.css"],
 				licenseKey: licenseKey,
-				toolbarItems: toolbarItems,
+				// biome-ignore lint/suspicious/noExplicitAny: toolbar items type inference fails with CDN types
+				toolbarItems: toolbarItems as any,
 			});
 
-			const changedInstance: Instance = await window.NutrientViewer.load({
-				container: changedContainer,
+			// biome-ignore lint/style/noNonNullAssertion: containers are checked to exist via refs
+			const changedInstance: Instance = await window.NutrientViewer!.load({
+				container: changedContainer!,
 				document: changedDoc,
 				useCDN: true,
 				styleSheets: ["/styles.css"],
 				licenseKey: licenseKey,
-				toolbarItems: toolbarItems,
+				// biome-ignore lint/suspicious/noExplicitAny: toolbar items type inference fails with CDN types
+				toolbarItems: toolbarItems as any,
 			});
 
 			// Store instances in refs for access from click handlers
@@ -352,13 +356,13 @@ export default function Page() {
 			// Process each page in the document
 			for (let pageIndex = 0; pageIndex < totalPageCount; pageIndex++) {
 				// Create a document descriptor for the original document
-				const originalDocument = new window.NutrientViewer.DocumentDescriptor({
+				const originalDocument = new window.NutrientViewer!.DocumentDescriptor({
 					filePath: originalDoc,
 					pageIndexes: [pageIndex],
 				});
 
 				// Create a document descriptor for the changed document
-				const changedDocument = new window.NutrientViewer.DocumentDescriptor({
+				const changedDocument = new window.NutrientViewer!.DocumentDescriptor({
 					filePath: changedDoc,
 					pageIndexes: [pageIndex],
 				});
@@ -368,8 +372,8 @@ export default function Page() {
 
 				// Configure text comparison
 				const textComparisonOperation =
-					new window.NutrientViewer.ComparisonOperation(
-						window.NutrientViewer.ComparisonOperationType.TEXT,
+					new window.NutrientViewer!.ComparisonOperation(
+						window.NutrientViewer!.ComparisonOperationType.TEXT,
 						{ numberOfContextWords },
 					);
 
@@ -387,7 +391,7 @@ export default function Page() {
 							const rect = operation.originalTextBlocks[0].rect;
 							const coordinate = `${rect[0]},${rect[1]}`;
 
-							const originalRect = new window.NutrientViewer.Geometry.Rect({
+							const originalRect = new window.NutrientViewer!.Geometry.Rect({
 								left: operation.originalTextBlocks[0].rect[0],
 								top: operation.originalTextBlocks[0].rect[1],
 								width: operation.originalTextBlocks[0].rect[2],
@@ -396,10 +400,10 @@ export default function Page() {
 
 							// Create annotation and get its ID
 							const annotation =
-								new window.NutrientViewer.Annotations.HighlightAnnotation({
+								new window.NutrientViewer!.Annotations.HighlightAnnotation({
 									pageIndex,
-									rects: window.NutrientViewer.Immutable.List([originalRect]),
-									color: new window.NutrientViewer.Color(deleteHighlightColor),
+									rects: window.NutrientViewer!.Immutable.List([originalRect]),
+									color: new window.NutrientViewer!.Color(deleteHighlightColor),
 								});
 							const created = await originalInstance.create(annotation);
 							const annotationId =
@@ -437,7 +441,7 @@ export default function Page() {
 							const rect = operation.changedTextBlocks[0].rect;
 							const coordinate = `${rect[0]},${rect[1]}`;
 
-							const changedRect = new window.NutrientViewer.Geometry.Rect({
+							const changedRect = new window.NutrientViewer!.Geometry.Rect({
 								left: rect[0],
 								top: rect[1],
 								width: rect[2],
@@ -446,10 +450,10 @@ export default function Page() {
 
 							// Create annotation and get its ID
 							const annotation =
-								new window.NutrientViewer.Annotations.HighlightAnnotation({
+								new window.NutrientViewer!.Annotations.HighlightAnnotation({
 									pageIndex,
-									rects: window.NutrientViewer.Immutable.List([changedRect]),
-									color: new window.NutrientViewer.Color(insertHighlightColor),
+									rects: window.NutrientViewer!.Immutable.List([changedRect]),
+									color: new window.NutrientViewer!.Color(insertHighlightColor),
 								});
 							const created = await changedInstance.create(annotation);
 							const annotationId =
@@ -516,7 +520,7 @@ export default function Page() {
 										const coordinate = `${deleteRect[0]},${deleteRect[1]}`;
 
 										const originalRect =
-											new window.NutrientViewer.Geometry.Rect({
+											new window.NutrientViewer!.Geometry.Rect({
 												left: deleteRect[0],
 												top: deleteRect[1],
 												width: deleteRect[2],
@@ -524,7 +528,7 @@ export default function Page() {
 											});
 
 										const insertRect = insertOp.changedTextBlocks[0].rect;
-										const changedRect = new window.NutrientViewer.Geometry.Rect(
+										const changedRect = new window.NutrientViewer!.Geometry.Rect(
 											{
 												left: insertRect[0],
 												top: insertRect[1],
@@ -535,13 +539,13 @@ export default function Page() {
 
 										// Create delete annotation
 										const deleteAnnotation =
-											new window.NutrientViewer.Annotations.HighlightAnnotation(
+											new window.NutrientViewer!.Annotations.HighlightAnnotation(
 												{
 													pageIndex,
-													rects: window.NutrientViewer.Immutable.List([
+													rects: window.NutrientViewer!.Immutable.List([
 														originalRect,
 													]),
-													color: new window.NutrientViewer.Color(
+													color: new window.NutrientViewer!.Color(
 														deleteHighlightColor,
 													),
 												},
@@ -556,13 +560,13 @@ export default function Page() {
 
 										// Create insert annotation
 										const insertAnnotation =
-											new window.NutrientViewer.Annotations.HighlightAnnotation(
+											new window.NutrientViewer!.Annotations.HighlightAnnotation(
 												{
 													pageIndex,
-													rects: window.NutrientViewer.Immutable.List([
+													rects: window.NutrientViewer!.Immutable.List([
 														changedRect,
 													]),
-													color: new window.NutrientViewer.Color(
+													color: new window.NutrientViewer!.Color(
 														insertHighlightColor,
 													),
 												},
@@ -679,7 +683,7 @@ export default function Page() {
 		selectionAnnotationIdsRef.current = [];
 
 		// Create border color (blue to match Nutrient UI)
-		const borderColor = new window.NutrientViewer.Color({
+		const borderColor = new window.NutrientViewer!.Color({
 			r: 59,
 			g: 130,
 			b: 246,
@@ -692,7 +696,7 @@ export default function Page() {
 			operation.pageIndex !== undefined
 		) {
 			// Expand the bounding box by a few pixels
-			const expandedRect = new window.NutrientViewer.Geometry.Rect({
+			const expandedRect = new window.NutrientViewer!.Geometry.Rect({
 				left: operation.originalRect.left - 3,
 				top: operation.originalRect.top - 3,
 				width: operation.originalRect.width + 6,
@@ -700,7 +704,7 @@ export default function Page() {
 			});
 
 			const borderAnnotation =
-				new window.NutrientViewer.Annotations.RectangleAnnotation({
+				new window.NutrientViewer!.Annotations.RectangleAnnotation({
 					pageIndex: operation.pageIndex,
 					boundingBox: expandedRect,
 					strokeColor: borderColor,
@@ -725,7 +729,7 @@ export default function Page() {
 			operation.pageIndex !== undefined
 		) {
 			// Expand the bounding box by a few pixels
-			const expandedRect = new window.NutrientViewer.Geometry.Rect({
+			const expandedRect = new window.NutrientViewer!.Geometry.Rect({
 				left: operation.changedRect.left - 3,
 				top: operation.changedRect.top - 3,
 				width: operation.changedRect.width + 6,
@@ -733,7 +737,7 @@ export default function Page() {
 			});
 
 			const borderAnnotation =
-				new window.NutrientViewer.Annotations.RectangleAnnotation({
+				new window.NutrientViewer!.Annotations.RectangleAnnotation({
 					pageIndex: operation.pageIndex,
 					boundingBox: expandedRect,
 					strokeColor: borderColor,

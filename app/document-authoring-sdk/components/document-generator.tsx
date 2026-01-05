@@ -145,8 +145,8 @@ export default function DocumentGenerator() {
     if (appState.docxEditor) {
       appState.docxEditor.destroy();
     }
-    if (appState.pdfViewer && window.PSPDFKit) {
-      window.PSPDFKit.unload(appState.pdfViewer);
+    if (appState.pdfViewer) {
+      appState.pdfViewer.unload();
     }
     if (appState.dataEditor) {
       appState.dataEditor.toTextArea();

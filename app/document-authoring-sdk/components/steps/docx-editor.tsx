@@ -116,7 +116,8 @@ export default function DocxEditor({
 
         console.log("🔧 Populating template with data...");
         console.log("Data to populate:", appState.dataJson);
-        const docxBuffer = await window.PSPDFKit.populateDocumentTemplate(
+        // biome-ignore lint/suspicious/noExplicitAny: PSPDFKit global API has flexible type signature
+        const docxBuffer = await (window.PSPDFKit as any).populateDocumentTemplate(
           { document: templateBuffer },
           appState.dataJson,
         );

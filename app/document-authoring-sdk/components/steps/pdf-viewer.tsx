@@ -75,16 +75,16 @@ export default function PdfViewer({
 
     // Cleanup function
     return () => {
-      if (appState.pdfViewer && window.PSPDFKit) {
-        window.PSPDFKit.unload(appState.pdfViewer);
+      if (appState.pdfViewer) {
+        appState.pdfViewer.unload();
         updateAppState({ pdfViewer: null });
       }
     };
   }, [appState.pdfViewer, initializePdfViewer, updateAppState]);
 
   const handleBackToDocx = useCallback(async () => {
-    if (appState.pdfViewer && window.PSPDFKit) {
-      await window.PSPDFKit.unload(appState.pdfViewer);
+    if (appState.pdfViewer) {
+      await appState.pdfViewer.unload();
     }
     updateAppState({ pdfViewer: null });
     await navigateToStep("docx-editor");
