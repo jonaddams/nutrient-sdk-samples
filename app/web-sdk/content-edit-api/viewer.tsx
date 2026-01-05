@@ -577,19 +577,22 @@ export default function Viewer({ document }: ViewerProps) {
         return;
       }
 
+      const NutrientViewer = nutrientViewerRef.current;
+      if (!NutrientViewer) return;
+
       if (isContentEditingRef.current) {
         // Exit content editing mode - return to default interaction mode
         console.log("Exiting content editing mode");
         window.viewerInstance?.setViewState(
-          (v: typeof PSPDFKit.ViewState.prototype) =>
-            v.set("interactionMode", PSPDFKit.InteractionMode.PAN),
+          (v: ViewState) =>
+            v.set("interactionMode", NutrientViewer.InteractionMode.PAN),
         );
       } else {
         // Enter content editing mode
         console.log("Entering content editing mode");
         window.viewerInstance?.setViewState(
-          (v: typeof PSPDFKit.ViewState.prototype) =>
-            v.set("interactionMode", PSPDFKit.InteractionMode.CONTENT_EDITOR),
+          (v: ViewState) =>
+            v.set("interactionMode", NutrientViewer.InteractionMode.CONTENT_EDITOR),
         );
       }
       // Note: State updates are handled by the interactionMode change event listener

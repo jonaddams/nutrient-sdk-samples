@@ -13,8 +13,7 @@ declare global {
   interface Window {
     // Nutrient Web SDK will be available on window.NutrientViewer once loaded
     NutrientViewer?: typeof NutrientViewer;
-    // PSPDFKit is available for backward compatibility
-    PSPDFKit?: typeof NutrientViewer;
+    // Note: PSPDFKit types are defined in app/document-authoring-sdk/types/index.ts
     // Instance will be stored on window after loading
     instance?: Instance;
     // Used in text-comparison and content-edit-api samples
