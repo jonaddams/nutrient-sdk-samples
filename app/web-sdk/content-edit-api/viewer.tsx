@@ -49,13 +49,30 @@ interface ContentEditingSession {
   discard(): Promise<void>;
 }
 
-// Removed font loading for initial performance - can be added back later if needed
+/**
+ * To load custom fonts for content editing, add them to the viewer configuration:
+ *
+ * 1. Place font files in public/fonts/
+ * 2. Create a font fetcher function:
+ *    const fetcher = (name: string) => fetch(name).then(res => res.blob());
+ *
+ * 3. Create Font instances:
+ *    const customFonts = ["Roboto-Regular.ttf", "Lato-Bold.ttf"].map(
+ *      font => new NutrientViewer.Font({
+ *        name: `/fonts/${font}`,
+ *        callback: fetcher
+ *      })
+ *    );
+ *
+ * 4. Pass to viewer: NutrientViewer.load({ customFonts, ... })
+ *
+ * Note: This sample uses a PDF with embedded fonts, so custom font loading is not required.
+ */
 
 export default function Viewer({ document }: ViewerProps) {
   const containerRef = useRef(null);
   const findInputRef = useRef<HTMLInputElement>(null);
 
-  // Removed customFontsRef for initial performance
   const overlaysRef = useRef<string[]>([]);
   const textBlocksRef = useRef<(TextBlock & { pageIndex: number })[]>([]); // Store all text blocks for all pages
   const isEditingRef = useRef<boolean>(false);
@@ -601,7 +618,7 @@ export default function Viewer({ document }: ViewerProps) {
         licenseKey ? `Found (length: ${licenseKey.length})` : "Not found",
       );
 
-      // Load viewer without custom fonts first for faster initial render
+      // Load viewer without custom fonts (fonts are embedded in the PDF)
       NutrientViewer.load({
         container,
         document,
@@ -609,9 +626,7 @@ export default function Viewer({ document }: ViewerProps) {
           ...minimalToolbarItems,
           ...(isEditingRef.current ? [] : [{ type: "export-pdf" } as const]),
         ],
-        licenseKey: licenseKey, // Uncomment if you have a license key
-        // customFonts: [], // Load without fonts first
-        // Optimize initial loading
+        licenseKey: licenseKey,
         initialViewState: new NutrientViewer.ViewState({
           zoom: NutrientViewer.ZoomMode.AUTO,
         }),
