@@ -285,8 +285,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document]); // Only reload if document URL changes, not toolbar or certificates
+  }, [document, certificatesLoaded]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
