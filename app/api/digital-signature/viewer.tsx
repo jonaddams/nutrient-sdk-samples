@@ -42,6 +42,7 @@ export default function Viewer({ document }: ViewerProps) {
   // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
   const instanceRef = useRef<any>(null);
   const certificatesRef = useRef<{ ca_certificates: string[] } | null>(null);
+  const hasLoadedRef = useRef(false);
   const [isSigning, setIsSigning] = useState(false);
   const [signStatus, setSignStatus] = useState<string>("");
   const [certificatesLoaded, setCertificatesLoaded] = useState(false);
@@ -179,6 +180,12 @@ export default function Viewer({ document }: ViewerProps) {
       return;
     }
 
+    // Prevent double-loading in React strict mode
+    if (hasLoadedRef.current) {
+      return;
+    }
+
+    hasLoadedRef.current = true;
     let isMounted = true;
 
     const loadViewer = async () => {
@@ -254,6 +261,7 @@ export default function Viewer({ document }: ViewerProps) {
         console.log("Viewer loaded successfully");
       } catch (error) {
         console.error("Error loading viewer:", error);
+        hasLoadedRef.current = false; // Reset on error
       }
     };
 
