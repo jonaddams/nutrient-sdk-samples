@@ -79,8 +79,8 @@ export default function APIPage() {
                     </Link>
                   </td>
                   <td className="nutrient-td">
-                    Upload and sign PDF documents server-side using DWS Processor
-                    API with visible or invisible signatures
+                    Upload and sign PDF documents server-side using DWS
+                    Processor API with visible or invisible signatures
                   </td>
                 </tr>
                 <tr>
@@ -128,7 +128,8 @@ export default function APIPage() {
         <div className="text-sm opacity-60">
           <p>
             These samples demonstrate the Nutrient DWS API capabilities.
-            Requires a Nutrient DWS API key configured in .env.local
+            Requires a Nutrient DWS API key configured in your environment
+            variables.
           </p>
         </div>
       </main>

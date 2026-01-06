@@ -265,7 +265,8 @@ export default function MarkdownComparisonPage() {
               Tip: For best results, compare two versions of the same document
             </p>
             <p className="mt-2">
-              Note: Requires Nutrient DWS API key (configured in .env.local)
+              Note: Requires Nutrient DWS API key (configured in environment
+              variables).
             </p>
           </div>
         </div>
