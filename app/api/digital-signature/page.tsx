@@ -169,7 +169,7 @@ export default function DigitalSignaturePage() {
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
           <p>
             This sample demonstrates digital signature integration with Nutrient DWS API.
-            Requires NUTRIENT_API_KEY configured in .env.local
+            Requires NUTRIENT_API_KEY environment variable to be configured
           </p>
           <p>
             Note: Signature validation requires CA certificate configuration.
