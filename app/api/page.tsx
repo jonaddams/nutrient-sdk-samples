@@ -58,6 +58,34 @@ export default function APIPage() {
                 <tr>
                   <td className="nutrient-td nutrient-td-bold">
                     <Link
+                      href="/api/digital-signature"
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      Web SDK Digital Signature
+                    </Link>
+                  </td>
+                  <td className="nutrient-td">
+                    Sign documents directly in the Nutrient Web SDK viewer using
+                    DWS API for secure, in-browser digital signatures
+                  </td>
+                </tr>
+                <tr>
+                  <td className="nutrient-td nutrient-td-bold">
+                    <Link
+                      href="/api/sign-document-dws"
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      DWS Document Signing
+                    </Link>
+                  </td>
+                  <td className="nutrient-td">
+                    Upload and sign PDF documents server-side using DWS Processor
+                    API with visible or invisible signatures
+                  </td>
+                </tr>
+                <tr>
+                  <td className="nutrient-td nutrient-td-bold">
+                    <Link
                       href="/api/markdown-comparison"
                       className="hover:opacity-70 transition-opacity"
                     >
