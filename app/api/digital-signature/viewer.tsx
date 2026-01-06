@@ -270,6 +270,7 @@ export default function Viewer({ document }: ViewerProps) {
     // Cleanup
     return () => {
       isMounted = false;
+      hasLoadedRef.current = false; // Reset for potential remount
 
       // Unload using the container reference
       // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
