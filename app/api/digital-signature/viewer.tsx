@@ -162,6 +162,12 @@ export default function Viewer({ document }: ViewerProps) {
     const container = containerRef.current;
     if (!container) return;
 
+    // Wait for certificates to be loaded before initializing viewer
+    if (certificates === null) {
+      console.log("Waiting for certificates to load...");
+      return;
+    }
+
     let isMounted = true;
 
     const loadViewer = async () => {
