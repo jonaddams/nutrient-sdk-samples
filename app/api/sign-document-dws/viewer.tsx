@@ -28,6 +28,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
   // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
   const instanceRef = useRef<any>(null);
   const certificatesRef = useRef<{ ca_certificates: string[] } | null>(null);
+  const hasLoadedRef = useRef(false);
   const [certificatesLoaded, setCertificatesLoaded] = useState(false);
 
   // Fetch CA certificates on mount
@@ -61,6 +62,12 @@ export default function Viewer({ documentUrl }: ViewerProps) {
       return;
     }
 
+    // Prevent double-loading in React strict mode
+    if (hasLoadedRef.current) {
+      return;
+    }
+
+    hasLoadedRef.current = true;
     let isMounted = true;
 
     const loadViewer = async () => {
@@ -127,6 +134,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
         console.log("Signed document loaded successfully");
       } catch (error) {
         console.error("Error loading viewer:", error);
+        hasLoadedRef.current = false; // Reset on error
       }
     };
 
@@ -135,6 +143,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
     // Cleanup
     return () => {
       isMounted = false;
+      hasLoadedRef.current = false; // Reset for potential remount
 
       // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
       const NutrientViewer = (window as any)?.NutrientViewer;
@@ -148,8 +157,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
 
       instanceRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentUrl]); // certificatesLoaded triggers initial load via early return, but shouldn't cause reload
+  }, [documentUrl, certificatesLoaded]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
