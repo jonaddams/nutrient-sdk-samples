@@ -161,7 +161,7 @@ export default function DigitalSignaturePage() {
             <li>The app requests an authentication token from the DWS API with signing permissions</li>
             <li>The Web SDK generates a document hash and sends it to the DWS API for signing</li>
             <li>The DWS API signs the document hash using its secure signing service</li>
-            <li>The signed document is returned, maintaining end-to-end document privacy</li>
+            <li>The signature is returned and applied to the document in the viewer, maintaining end-to-end document privacy</li>
           </ol>
         </details>
 
