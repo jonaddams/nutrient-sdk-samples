@@ -127,7 +127,7 @@ export default function Viewer({ document }: ViewerProps) {
             // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types not available
             const NutrientViewer = (window as any).NutrientViewer;
 
-            await instance.signDocument(
+            const result = await instance.signDocument(
               {
                 signingData: {
                   signatureType: NutrientViewer.SignatureType.CAdES,
@@ -139,7 +139,16 @@ export default function Viewer({ document }: ViewerProps) {
               },
             );
 
+            console.log("signDocument result:", result);
             console.log("Document signed successfully with DWS API!");
+
+            // Check if document actually has signatures
+            try {
+              const annotations = await instance.getAnnotations(0);
+              console.log("Annotations on page 0:", annotations.size);
+            } catch (e) {
+              console.log("Could not get annotations:", e);
+            }
 
             setSignStatus("Document signed successfully!");
             setTimeout(() => setSignStatus(""), 3000);
@@ -263,7 +272,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, toolbarItems, certificates]);
+  }, [document, toolbarItems]); // Don't include certificates to avoid reload after signing
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>

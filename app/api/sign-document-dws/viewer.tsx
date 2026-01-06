@@ -145,7 +145,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [documentUrl, certificates]);
+  }, [documentUrl]); // Don't include certificates to avoid reload
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
