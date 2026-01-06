@@ -276,7 +276,8 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, toolbarItems, certificatesLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document, toolbarItems]); // certificatesLoaded triggers initial load via early return, but shouldn't cause reload
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
