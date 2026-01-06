@@ -1,0 +1,282 @@
+"use client";
+
+/**
+ * Digital Signature Sample with Nutrient DWS API
+ *
+ * This component demonstrates how to:
+ * 1. Create a custom toolbar item with a signature icon
+ * 2. Request authentication tokens from the DWS API
+ * 3. Use the instance.signDocument() method to digitally sign documents
+ * 4. Configure trusted CA certificates to validate signatures
+ *
+ * Key Features:
+ * - Custom toolbar integration using toolbarItems configuration
+ * - Token-based authentication with DWS API
+ * - Trusted certificate callback for signature validation
+ * - Status feedback during the signing process
+ *
+ * References:
+ * - DWS API Signing: https://www.nutrient.io/api/signing-api/
+ * - Custom Toolbar: https://www.nutrient.io/guides/web/user-interface/main-toolbar/create-a-new-tool/
+ * - signDocument API: https://www.nutrient.io/api/web/classes/NutrientViewer.Instance.html#signdocument
+ */
+
+import { useEffect, useMemo, useRef, useState } from "react";
+
+interface ViewerProps {
+  document: string;
+}
+
+// Helper function to decode base64 certificates
+function decodeBase64String(base64: string): ArrayBuffer {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+export default function Viewer({ document }: ViewerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
+  const instanceRef = useRef<any>(null);
+  const [isSigning, setIsSigning] = useState(false);
+  const [signStatus, setSignStatus] = useState<string>("");
+  const [certificates, setCertificates] = useState<{ ca_certificates: string[] } | null>(null);
+
+  // Fetch CA certificates on mount
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      try {
+        // Fetch the CA certificates from DWS API
+        const response = await fetch("/api/digital-signature/api/certificates");
+        if (response.ok) {
+          const data = await response.json();
+          setCertificates(data);
+        } else {
+          console.warn("Failed to fetch certificates - signature validation may be limited");
+          // Continue without certificates - signing will still work
+        }
+      } catch (error) {
+        console.warn("Error fetching certificates:", error);
+        // Continue without certificates - signing will still work
+      }
+    };
+
+    fetchCertificates();
+  }, []);
+
+  // Create custom toolbar items with signature button
+  const toolbarItems = useMemo(() => {
+    return [
+      { type: "sidebar-thumbnails" },
+      { type: "sidebar-document-outline" },
+      { type: "sidebar-annotations" },
+      { type: "sidebar-bookmarks" },
+      { type: "pager" },
+      { type: "zoom-out" },
+      { type: "zoom-in" },
+      { type: "zoom-mode" },
+      { type: "spacer" },
+      {
+        type: "custom",
+        id: "digital-signature-button",
+        title: "Sign Document",
+        className: "DigitalSignatureButton",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M17 7l5 5-5 5M7 7l-5 5 5 5"/>
+          <path d="M3 12h18"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        </svg>`,
+        onPress: async () => {
+          const instance = instanceRef.current;
+
+          if (!instance) {
+            setSignStatus("Error: Viewer not loaded yet");
+            setTimeout(() => setSignStatus(""), 3000);
+            return;
+          }
+
+          if (isSigning) {
+            return;
+          }
+
+          try {
+            setIsSigning(true);
+            setSignStatus("Requesting authentication token...");
+
+            const tokenResponse = await fetch("/api/digital-signature/api/token", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                origin: window.location.origin,
+              }),
+            });
+
+            if (!tokenResponse.ok) {
+              throw new Error("Failed to get authentication token");
+            }
+
+            const { token } = await tokenResponse.json();
+
+            setSignStatus("Signing document...");
+
+            // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types not available
+            const NutrientViewer = (window as any).NutrientViewer;
+
+            await instance.signDocument(
+              {
+                signingData: {
+                  signatureType: NutrientViewer.SignatureType.CAdES,
+                  padesLevel: NutrientViewer.PAdESLevel.b_lt,
+                },
+              },
+              {
+                jwt: token,
+              },
+            );
+
+            console.log("Document signed successfully with DWS API!");
+
+            setSignStatus("Document signed successfully!");
+            setTimeout(() => setSignStatus(""), 3000);
+          } catch (error) {
+            console.error("Error signing document:", error);
+            setSignStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
+            setTimeout(() => setSignStatus(""), 5000);
+          } finally {
+            setIsSigning(false);
+          }
+        },
+      },
+      { type: "search" },
+      { type: "print" },
+      { type: "export-pdf" },
+    ] as const;
+  }, [isSigning]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let isMounted = true;
+
+    const loadViewer = async () => {
+      try {
+        // Load Nutrient Web SDK
+        // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
+        const NutrientViewer = (window as any).NutrientViewer;
+
+        if (!NutrientViewer) {
+          console.error("NutrientViewer is not loaded");
+          return;
+        }
+
+        // Ensure container is empty before loading
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        // Unload any existing instance in this container
+        try {
+          await NutrientViewer.unload(container);
+        } catch {
+          // No existing instance, continue
+        }
+
+        // Only proceed if component is still mounted
+        if (!isMounted) return;
+
+        // Prepare configuration
+        // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer configuration type is not available
+        const configuration: any = {
+          container,
+          document,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          toolbarItems,
+          instant: false,
+          useCDN: true,
+          // Show signature validation status when document is signed
+          initialViewState: new NutrientViewer.ViewState({
+            showSignatureValidationStatus:
+              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+          }),
+        };
+
+        // Add certificate trust callback if certificates are available
+        if (certificates?.ca_certificates && certificates.ca_certificates.length > 0) {
+          configuration.trustedCAsCallback = async () => {
+            return certificates.ca_certificates.map((cert) =>
+              decodeBase64String(cert)
+            );
+          };
+        }
+
+        // Load the instance
+        const instance = await NutrientViewer.load(configuration);
+
+        if (!isMounted) {
+          // Component unmounted during load, clean up using NutrientViewer.unload
+          await NutrientViewer.unload(container);
+          return;
+        }
+
+        instanceRef.current = instance;
+
+        // Make instance available globally for debugging
+        if (typeof window !== "undefined") {
+          // biome-ignore lint/suspicious/noExplicitAny: Window global type extension
+          (window as any).viewerInstance = instance;
+        }
+
+        console.log("Viewer loaded successfully");
+      } catch (error) {
+        console.error("Error loading viewer:", error);
+      }
+    };
+
+    loadViewer();
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+
+      // Unload using the container reference
+      // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
+      const NutrientViewer = (window as any)?.NutrientViewer;
+      if (NutrientViewer && container) {
+        try {
+          NutrientViewer.unload(container);
+        } catch {
+          // Ignore unload errors during cleanup
+        }
+      }
+
+      instanceRef.current = null;
+    };
+  }, [document, toolbarItems, certificates]);
+
+  return (
+    <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
+      <div ref={containerRef} className="h-full w-full" style={{ minHeight: "600px" }} />
+
+      {/* Status overlay */}
+      {signStatus && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className={`px-6 py-3 rounded-lg shadow-lg ${
+            signStatus.includes("Error")
+              ? "bg-red-500 text-white"
+              : signStatus.includes("success")
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}>
+            {signStatus}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
