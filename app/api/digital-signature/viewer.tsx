@@ -41,9 +41,10 @@ export default function Viewer({ document }: ViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
   const instanceRef = useRef<any>(null);
+  const certificatesRef = useRef<{ ca_certificates: string[] } | null>(null);
   const [isSigning, setIsSigning] = useState(false);
   const [signStatus, setSignStatus] = useState<string>("");
-  const [certificates, setCertificates] = useState<{ ca_certificates: string[] } | null>(null);
+  const [certificatesLoaded, setCertificatesLoaded] = useState(false);
 
   // Fetch CA certificates on mount
   useEffect(() => {
@@ -53,14 +54,16 @@ export default function Viewer({ document }: ViewerProps) {
         const response = await fetch("/api/digital-signature/api/certificates");
         if (response.ok) {
           const data = await response.json();
-          setCertificates(data);
+          certificatesRef.current = data;
+          console.log("Certificates loaded:", data);
         } else {
           console.warn("Failed to fetch certificates - signature validation may be limited");
-          // Continue without certificates - signing will still work
         }
       } catch (error) {
         console.warn("Error fetching certificates:", error);
-        // Continue without certificates - signing will still work
+      } finally {
+        // Always mark as loaded even if fetch failed
+        setCertificatesLoaded(true);
       }
     };
 
@@ -172,8 +175,7 @@ export default function Viewer({ document }: ViewerProps) {
     if (!container) return;
 
     // Wait for certificates to be loaded before initializing viewer
-    if (certificates === null) {
-      console.log("Waiting for certificates to load...");
+    if (!certificatesLoaded) {
       return;
     }
 
@@ -222,12 +224,14 @@ export default function Viewer({ document }: ViewerProps) {
         };
 
         // Add certificate trust callback if certificates are available
-        if (certificates?.ca_certificates && certificates.ca_certificates.length > 0) {
+        const certs = certificatesRef.current;
+        if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
           configuration.trustedCAsCallback = async () => {
-            return certificates.ca_certificates.map((cert) =>
+            return certs.ca_certificates.map((cert: string) =>
               decodeBase64String(cert)
             );
           };
+          console.log("Trusting", certs.ca_certificates.length, "CA certificates");
         }
 
         // Load the instance
@@ -272,7 +276,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, toolbarItems]); // Don't include certificates to avoid reload after signing
+  }, [document, toolbarItems, certificatesLoaded]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
