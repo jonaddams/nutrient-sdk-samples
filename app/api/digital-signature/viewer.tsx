@@ -88,7 +88,7 @@ export default function Viewer({ document }: ViewerProps) {
         id: "digital-signature-button",
         title: "Sign Document",
         className: "DigitalSignatureButton",
-        icon: `<img src="/digital-fingerprint.png" alt="Sign" width="24" height="24" />`,
+        icon: "/digital-fingerprint.png",
         onPress: async () => {
           const instance = instanceRef.current;
 
