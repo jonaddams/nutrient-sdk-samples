@@ -389,7 +389,7 @@ export default function SignDocumentDWSPage() {
           <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 text-center">
             <p>
               This sample demonstrates server-side document signing using DWS Processor API.
-              Requires NUTRIENT_API_KEY configured in .env.local
+              Requires NUTRIENT_API_KEY environment variable to be configured
             </p>
           </div>
         )}

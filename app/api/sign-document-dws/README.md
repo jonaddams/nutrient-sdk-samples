@@ -110,7 +110,7 @@ FormData:
 
 ## Configuration
 
-Ensure the following environment variables are set in `.env.local`:
+Ensure the following environment variables are configured:
 
 ```env
 NUTRIENT_API_KEY=your_dws_api_key
