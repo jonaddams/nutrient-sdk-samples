@@ -1,4 +1,4 @@
-# Actually Awesome - Nutrient SDK Showcase
+# Nutrient SDK Showcase
 
 A comprehensive showcase application demonstrating Nutrient Web SDK capabilities, built with Next.js 16, React 19, and TypeScript.
 
@@ -44,7 +44,7 @@ A comprehensive showcase application demonstrating Nutrient Web SDK capabilities
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd actually-awesome
+cd nutrient-sdk-samples
 ```
 
 2. Install dependencies:
