@@ -52,13 +52,17 @@ export default function Viewer({ document }: ViewerProps) {
     const fetchCertificates = async () => {
       try {
         // Fetch the CA certificates from DWS API
-        const response = await fetch("/api/sign-document-web-sdk-dws/api/certificates");
+        const response = await fetch(
+          "/api/sign-document-web-sdk-dws/api/certificates",
+        );
         if (response.ok) {
           const data = await response.json();
           certificatesRef.current = data;
           console.log("Certificates loaded:", data);
         } else {
-          console.warn("Failed to fetch certificates - signature validation may be limited");
+          console.warn(
+            "Failed to fetch certificates - signature validation may be limited",
+          );
         }
       } catch (error) {
         console.warn("Error fetching certificates:", error);
@@ -106,15 +110,18 @@ export default function Viewer({ document }: ViewerProps) {
             setIsSigning(true);
             setSignStatus("Requesting authentication token...");
 
-            const tokenResponse = await fetch("/api/sign-document-web-sdk-dws/api/token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
+            const tokenResponse = await fetch(
+              "/api/sign-document-web-sdk-dws/api/token",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  origin: window.location.origin,
+                }),
               },
-              body: JSON.stringify({
-                origin: window.location.origin,
-              }),
-            });
+            );
 
             if (!tokenResponse.ok) {
               throw new Error("Failed to get authentication token");
@@ -154,7 +161,9 @@ export default function Viewer({ document }: ViewerProps) {
             setTimeout(() => setSignStatus(""), 3000);
           } catch (error) {
             console.error("Error signing document:", error);
-            setSignStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
+            setSignStatus(
+              `Error: ${error instanceof Error ? error.message : String(error)}`,
+            );
             setTimeout(() => setSignStatus(""), 5000);
           } finally {
             setIsSigning(false);
@@ -231,10 +240,14 @@ export default function Viewer({ document }: ViewerProps) {
         if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
           configuration.trustedCAsCallback = async () => {
             return certs.ca_certificates.map((cert: string) =>
-              decodeBase64String(cert)
+              decodeBase64String(cert),
             );
           };
-          console.log("Trusting", certs.ca_certificates.length, "CA certificates");
+          console.log(
+            "Trusting",
+            certs.ca_certificates.length,
+            "CA certificates",
+          );
         }
 
         // Load the instance
@@ -281,22 +294,28 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, certificatesLoaded]);
+  }, [document, certificatesLoaded, toolbarItems]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
-      <div ref={containerRef} className="h-full w-full" style={{ minHeight: "600px" }} />
+      <div
+        ref={containerRef}
+        className="h-full w-full"
+        style={{ minHeight: "600px" }}
+      />
 
       {/* Status overlay */}
       {signStatus && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className={`px-6 py-3 rounded-lg shadow-lg ${
-            signStatus.includes("Error")
-              ? "bg-red-500 text-white"
-              : signStatus.includes("success")
-              ? "bg-green-500 text-white"
-              : "bg-blue-500 text-white"
-          }`}>
+          <div
+            className={`px-6 py-3 rounded-lg shadow-lg ${
+              signStatus.includes("Error")
+                ? "bg-red-500 text-white"
+                : signStatus.includes("success")
+                  ? "bg-green-500 text-white"
+                  : "bg-blue-500 text-white"
+            }`}
+          >
             {signStatus}
           </div>
         </div>
