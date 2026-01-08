@@ -162,7 +162,7 @@ export default function Viewer({ document }: ViewerProps) {
             await instance.setViewState(
               currentViewState.set(
                 "showSignatureValidationStatus",
-                NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+                NutrientViewer.ShowSignatureValidationStatusMode.ALWAYS,
               ),
             );
 
@@ -237,10 +237,10 @@ export default function Viewer({ document }: ViewerProps) {
           toolbarItems,
           instant: false,
           useCDN: true,
-          // Show signature validation status when document is signed
+          // Always show signature validation status
           initialViewState: new NutrientViewer.ViewState({
             showSignatureValidationStatus:
-              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+              NutrientViewer.ShowSignatureValidationStatusMode.ALWAYS,
           }),
         };
 
