@@ -157,6 +157,15 @@ export default function Viewer({ document }: ViewerProps) {
               console.log("Could not get annotations:", e);
             }
 
+            // Force update the view state to ensure signature validation banner appears
+            const currentViewState = instance.viewState;
+            await instance.setViewState(
+              currentViewState.set(
+                "showSignatureValidationStatus",
+                NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+              ),
+            );
+
             setSignStatus("Document signed successfully!");
             setTimeout(() => setSignStatus(""), 3000);
           } catch (error) {
