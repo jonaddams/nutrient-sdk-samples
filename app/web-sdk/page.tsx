@@ -61,6 +61,13 @@ const samples: Sample[] = [
       "Advanced content editing with text detection, find & replace, and AI text generation",
     path: "/web-sdk/content-edit-api",
   },
+  {
+    name: "Document Markup Modes",
+    category: "Document Conversion",
+    description:
+      "View Word documents with tracked changes and comments in different markup modes: no markup, original, simple markup, and all markup",
+    path: "/web-sdk/document-markup",
+  },
 ];
 
 const categories = [
@@ -73,6 +80,7 @@ const categories = [
   "Content Editor",
   "Redaction",
   "Document Comparison",
+  "Document Conversion",
 ];
 
 export default function WebSDKPage() {
