@@ -185,6 +185,7 @@ export default function Viewer({ document }: ViewerProps) {
     ] as const;
   }, [isSigning]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Excluding toolbarItems to prevent reload after signing
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -303,7 +304,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, certificatesLoaded, toolbarItems]);
+  }, [document, certificatesLoaded]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
