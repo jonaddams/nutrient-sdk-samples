@@ -13,7 +13,7 @@ This sample demonstrates how to digitally sign PDF documents using the Nutrient 
 ## File Structure
 
 ```
-app/api/digital-signature/
+app/api/sign-document-web-sdk-dws/
 ├── page.tsx                          # Main page component
 ├── viewer.tsx                        # Viewer component with signing logic
 ├── api/
@@ -28,13 +28,13 @@ app/api/digital-signature/
 
 1. **Custom Toolbar**: The viewer creates a custom toolbar item with a signature icon using the `toolbarItems` configuration
 2. **Certificate Fetching**: On mount, the component fetches CA certificates from the DWS API
-3. **Token Generation**: When the signature button is clicked, a JWT token is requested from `/api/digital-signature/api/token`
+3. **Token Generation**: When the signature button is clicked, a JWT token is requested from `/api/sign-document-web-sdk-dws/api/token`
 4. **Document Signing**: The `instance.signDocument()` method is called with the JWT token and signing configuration
 5. **Certificate Trust**: The `trustedCAsCallback` configuration ensures the signed document is properly validated
 
 ## API Endpoints
 
-### POST `/api/digital-signature/api/token`
+### POST `/api/sign-document-web-sdk-dws/api/token`
 
 Generates a JWT token from the DWS Processor API for digital signature authentication.
 
@@ -61,7 +61,7 @@ The endpoint calls `https://api.nutrient.io/tokens` with:
 }
 ```
 
-### GET `/api/digital-signature/api/certificates`
+### GET `/api/sign-document-web-sdk-dws/api/certificates`
 
 Endpoint for CA certificates for signature validation.
 
@@ -91,7 +91,7 @@ NEXT_PUBLIC_NUTRIENT_LICENSE_KEY=your_web_sdk_license_key
 
 ## Usage
 
-1. Navigate to `/api/digital-signature`
+1. Navigate to `/api/sign-document-web-sdk-dws`
 2. Click the signature button in the toolbar (icon with crossing lines and a dot)
 3. Wait for the signing process to complete
 4. The document will be digitally signed using DWS API
