@@ -58,10 +58,10 @@ export default function APIPage() {
                 <tr>
                   <td className="nutrient-td nutrient-td-bold">
                     <Link
-                      href="/api/digital-signature"
+                      href="/api/sign-document-web-sdk-dws"
                       className="hover:opacity-70 transition-opacity"
                     >
-                      Web SDK Digital Signature
+                      Web SDK Digital Signature (DWS)
                     </Link>
                   </td>
                   <td className="nutrient-td">
