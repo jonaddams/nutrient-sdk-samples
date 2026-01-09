@@ -3,6 +3,7 @@
 import type { Instance } from "@nutrient-sdk/viewer";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import type { DocumentComparisonConfiguration } from "@nutrient-sdk/viewer";
 import "./styles.css";
 
 interface Tool {
@@ -624,13 +625,7 @@ const Viewer = () => {
     const arrayBuffer = await comparisonDocumentB.arrayBuffer();
 
     // Build comparison config with new colors
-    const comparisonConfig: {
-      documentA: { source: string };
-      documentB: { source: ArrayBuffer };
-      autoCompare: boolean;
-      strokeColors?: Record<string, unknown>;
-      blendMode?: string;
-    } = {
+    const comparisonConfig: DocumentComparisonConfiguration = {
       documentA: {
         source: NutrientViewer.DocumentComparisonSourceType.USE_OPEN_DOCUMENT,
       },
@@ -638,27 +633,16 @@ const Viewer = () => {
         source: arrayBuffer,
       },
       autoCompare: true,
+      strokeColors: {
+        documentA: new NutrientViewer.Color(
+          hexToRgb(comparisonColors.documentA) || { r: 255, g: 0, b: 0 },
+        ),
+        documentB: new NutrientViewer.Color(
+          hexToRgb(comparisonColors.documentB) || { r: 0, g: 0, b: 255 },
+        ),
+      },
+      blendMode: blendMode as never,
     };
-
-    // Add stroke colors
-    comparisonConfig.strokeColors = {};
-
-    const colorA = hexToRgb(comparisonColors.documentA);
-    if (colorA) {
-      comparisonConfig.strokeColors.documentA = new NutrientViewer.Color(
-        colorA,
-      );
-    }
-
-    const colorB = hexToRgb(comparisonColors.documentB);
-    if (colorB) {
-      comparisonConfig.strokeColors.documentB = new NutrientViewer.Color(
-        colorB,
-      );
-    }
-
-    // Add blend mode
-    comparisonConfig.blendMode = blendMode;
 
     await instance.setDocumentComparisonMode(null);
     // Re-apply comparison mode with new configuration
@@ -696,13 +680,7 @@ const Viewer = () => {
     const arrayBuffer = await file.arrayBuffer();
 
     // Build comparison config with the selected file
-    const comparisonConfig: {
-      documentA: { source: string };
-      documentB: { source: ArrayBuffer };
-      autoCompare: boolean;
-      strokeColors?: Record<string, unknown>;
-      blendMode?: string;
-    } = {
+    const comparisonConfig: DocumentComparisonConfiguration = {
       documentA: {
         source: NutrientViewer.DocumentComparisonSourceType.USE_OPEN_DOCUMENT,
       },
@@ -710,27 +688,16 @@ const Viewer = () => {
         source: arrayBuffer,
       },
       autoCompare: true,
+      strokeColors: {
+        documentA: new NutrientViewer.Color(
+          hexToRgb(comparisonColors.documentA) || { r: 255, g: 0, b: 0 },
+        ),
+        documentB: new NutrientViewer.Color(
+          hexToRgb(comparisonColors.documentB) || { r: 0, g: 0, b: 255 },
+        ),
+      },
+      blendMode: blendMode as never,
     };
-
-    // Add stroke colors
-    comparisonConfig.strokeColors = {};
-
-    const colorA = hexToRgb(comparisonColors.documentA);
-    if (colorA) {
-      comparisonConfig.strokeColors.documentA = new NutrientViewer.Color(
-        colorA,
-      );
-    }
-
-    const colorB = hexToRgb(comparisonColors.documentB);
-    if (colorB) {
-      comparisonConfig.strokeColors.documentB = new NutrientViewer.Color(
-        colorB,
-      );
-    }
-
-    // Add blend mode
-    comparisonConfig.blendMode = blendMode;
 
     // Set document comparison mode
     instance.setDocumentComparisonMode(comparisonConfig).catch((err: Error) => {
