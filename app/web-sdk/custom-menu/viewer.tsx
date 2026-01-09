@@ -1,9 +1,11 @@
 "use client";
 
-import type { Instance } from "@nutrient-sdk/viewer";
+import type {
+  DocumentComparisonConfiguration,
+  Instance,
+} from "@nutrient-sdk/viewer";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import type { DocumentComparisonConfiguration } from "@nutrient-sdk/viewer";
 import "./styles.css";
 
 interface Tool {
@@ -493,7 +495,8 @@ const Viewer = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal })
+      .NutrientViewer;
 
     if (!container || !NutrientViewer) return;
 
@@ -553,7 +556,8 @@ const Viewer = () => {
   }, []);
 
   const handleToolClick = (toolId: string) => {
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal })
+      .NutrientViewer;
     if (NutrientViewer) {
       toggleTool(
         instanceRef.current,
@@ -567,7 +571,8 @@ const Viewer = () => {
 
   const handleCompareDocuments = () => {
     const instance = instanceRef.current;
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal })
+      .NutrientViewer;
 
     if (!instance || !NutrientViewer) return;
 
@@ -607,7 +612,8 @@ const Viewer = () => {
 
   const applyComparisonColors = async () => {
     const instance = instanceRef.current;
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal })
+      .NutrientViewer;
 
     if (
       !instance ||
@@ -669,7 +675,8 @@ const Viewer = () => {
     if (!file) return;
 
     const instance = instanceRef.current;
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal })
+      .NutrientViewer;
 
     if (!instance || !NutrientViewer) return;
 
