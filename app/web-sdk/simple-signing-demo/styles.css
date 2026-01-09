@@ -4,10 +4,259 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: row;
+  gap: 0;
 }
 
-.signing-demo-viewer {
+/* Sidebar Styles */
+.signing-demo-sidebar {
+  width: 256px;
+  flex-shrink: 0;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+/* User Selector Styles */
+.user-selector {
   width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.user-selector:hover {
+  border-color: #4a90e2;
+}
+
+.user-selector:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* Signers List Styles */
+.signers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.signer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: white;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.signer-item:hover {
+  background-color: #f0f4f8;
+  border-color: #e0e0e0;
+}
+
+.signer-item.selected {
+  border-color: #4a90e2;
+  background-color: #e8f4fd;
+}
+
+.signer-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.signer-color-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.signer-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.signer-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.signer-email {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-signer-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: transparent;
+  color: #999;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.delete-signer-btn:hover {
+  background-color: #fee;
+  color: #e74c3c;
+}
+
+.delete-signer-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.add-signer-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-signer-btn:hover {
+  background-color: #357abd;
+}
+
+.add-signer-btn:active {
+  background-color: #2a6ba8;
+}
+
+.add-signer-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+/* Form Fields Styles */
+.form-fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.draggable-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid;
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.draggable-field:hover {
+  background-color: #f8f9fa;
+  border-color: #c0c0c0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.draggable-field:active {
+  cursor: grabbing;
+  transform: translateY(0);
+}
+
+.field-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+  margin-top: 4px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+/* Viewer Styles */
+.signing-demo-viewer {
+  flex: 1;
   height: 100%;
   min-height: 600px;
+  transition: background-color 0.2s;
+}
+
+.signing-demo-viewer.drop-zone-active {
+  background-color: #f0f8ff;
+  box-shadow: inset 0 0 0 2px #4a90e2;
+}
+
+/* Date field input padding */
+.PSPDFKit-Annotation-Widget-Date-Input,
+input.PSPDFKit-Annotation-Widget-Text.PSPDFKit-Annotation-Widget-Date-Input {
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
 }
