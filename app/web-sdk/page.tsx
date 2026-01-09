@@ -20,6 +20,13 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Custom Menu Interface",
+    category: "User Interface",
+    description:
+      "A completely custom menu interface with custom toolbar, annotation tools, document comparison, and measurement capabilities",
+    path: "/web-sdk/custom-menu",
+  },
+  {
     name: "Form Designer",
     category: "Forms",
     description:
