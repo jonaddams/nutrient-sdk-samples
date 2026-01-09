@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  Color,
   DocumentComparisonConfiguration,
   Instance,
 } from "@nutrient-sdk/viewer";
@@ -70,7 +71,7 @@ interface NutrientViewerGlobal {
   DocumentComparisonSourceType: {
     USE_OPEN_DOCUMENT: string;
   };
-  Color: new (rgb: { r: number; g: number; b: number }) => unknown;
+  Color: new (rgb: { r: number; g: number; b: number }) => Color;
   load: (config: {
     container: HTMLElement;
     document: string;
