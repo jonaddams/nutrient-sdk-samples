@@ -18,7 +18,7 @@ export default function SigningDemoViewer() {
       try {
         const instance = await window.NutrientViewer.load({
           container,
-          document: "/documents/document.pdf",
+          document: "/documents/blank.pdf",
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
           useCDN: true,
         });
