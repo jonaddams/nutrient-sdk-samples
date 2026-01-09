@@ -58,7 +58,7 @@ interface ComparisonConfigModalProps {
   isInComparisonMode: boolean;
 }
 
-interface NutrientViewerType {
+interface NutrientViewerGlobal {
   InteractionMode: Record<string, unknown>;
   Theme: {
     DARK: string;
@@ -75,12 +75,6 @@ interface NutrientViewerType {
     theme: string;
   }) => Promise<Instance>;
   unload: (container: HTMLElement) => void;
-}
-
-declare global {
-  interface Window {
-    NutrientViewer?: NutrientViewerType;
-  }
 }
 
 // Tool configuration
@@ -135,7 +129,7 @@ const TOOLS: Tool[] = [
 ];
 
 // Create mapping from interaction mode to tool ID
-const createModeToToolMap = (NutrientViewer: NutrientViewerType) => {
+const createModeToToolMap = (NutrientViewer: NutrientViewerGlobal) => {
   const map: Record<string, string> = {};
   for (const tool of TOOLS) {
     const mode = NutrientViewer.InteractionMode[tool.mode];
@@ -149,7 +143,7 @@ const createModeToToolMap = (NutrientViewer: NutrientViewerType) => {
 // Toggle tool activation
 const toggleTool = (
   instance: Instance | null,
-  NutrientViewer: NutrientViewerType,
+  NutrientViewer: NutrientViewerGlobal,
   toolId: string,
   setActiveTool: (id: string | null) => void,
   activeTool: string | null,
@@ -498,7 +492,7 @@ const Viewer = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    const NutrientViewer = window.NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
 
     if (!container || !NutrientViewer) return;
 
@@ -558,7 +552,7 @@ const Viewer = () => {
   }, []);
 
   const handleToolClick = (toolId: string) => {
-    const NutrientViewer = window.NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
     if (NutrientViewer) {
       toggleTool(
         instanceRef.current,
@@ -572,7 +566,7 @@ const Viewer = () => {
 
   const handleCompareDocuments = () => {
     const instance = instanceRef.current;
-    const NutrientViewer = window.NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
 
     if (!instance || !NutrientViewer) return;
 
@@ -612,7 +606,7 @@ const Viewer = () => {
 
   const applyComparisonColors = async () => {
     const instance = instanceRef.current;
-    const NutrientViewer = window.NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
 
     if (
       !instance ||
@@ -691,7 +685,7 @@ const Viewer = () => {
     if (!file) return;
 
     const instance = instanceRef.current;
-    const NutrientViewer = window.NutrientViewer;
+    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerGlobal }).NutrientViewer;
 
     if (!instance || !NutrientViewer) return;
 
