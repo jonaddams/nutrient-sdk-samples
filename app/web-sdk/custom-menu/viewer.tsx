@@ -153,7 +153,7 @@ const toggleTool = (
   const tool = TOOLS.find((t) => t.id === toolId);
   if (!tool) return;
 
-  const targetMode = NutrientViewer.InteractionMode[tool.mode];
+  const targetMode = NutrientViewer.InteractionMode[tool.mode] as unknown;
 
   if (activeTool === toolId) {
     // Deactivate current tool
@@ -168,7 +168,7 @@ const toggleTool = (
     }
     // Activate new tool
     instance.setViewState((viewState) =>
-      viewState.set("interactionMode", targetMode),
+      viewState.set("interactionMode", targetMode as never),
     );
     // Manually set the active tool for tools with presets
     setActiveTool(toolId);
