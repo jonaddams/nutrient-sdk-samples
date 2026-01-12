@@ -13,6 +13,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Simple Signing Demo",
+    category: "Signatures",
+    description:
+      "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and digital signatures via DWS API",
+    path: "/web-sdk/simple-signing-demo",
+  },
+  {
     name: "Document Search",
     category: "User Interface",
     description:
