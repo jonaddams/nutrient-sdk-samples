@@ -6,3 +6,47 @@ input.PSPDFKit-Annotation-Widget-Date-Input {
   padding: 0 8px !important;
   box-sizing: border-box !important;
 }
+
+/* PSPDFKit Overrides */
+.PSPDFKit-Form-Creator-Toolbar,
+.PSPDFKit-Form-Creator-Popover {
+  display: none !important;
+}
+
+/* Signed Signature Styling - "By Nutrient" with UUID (DocuSign-style) */
+.signature-box-nutrient {
+  position: relative;
+  display: inline-block;
+  background-color: transparent;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Container for both label and ID on same line */
+.signature-label-nutrient,
+.signature-id-nutrient {
+  position: absolute;
+  top: -20px;
+  font-size: 9px;
+  color: #666;
+  background-color: white;
+  padding: 2px 4px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.signature-label-nutrient {
+  left: 0;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.signature-id-nutrient {
+  left: 64px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 9px;
+  color: #999;
+  font-weight: 400;
+}
+
+/* Decorative corner brackets removed for cleaner look */
