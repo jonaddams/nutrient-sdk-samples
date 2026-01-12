@@ -126,6 +126,7 @@ export default function DocumentEditorViewer() {
 
           // Get page info
           const pageInfo = await instance.pageInfoForIndex(pageIndex);
+          if (!pageInfo) continue;
 
           // Generate thumbnail at native resolution (capped at 800px width for performance)
           // This ensures good quality in the preview pane

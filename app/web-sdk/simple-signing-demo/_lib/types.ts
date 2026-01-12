@@ -24,7 +24,12 @@ export interface FormFieldData {
   type: FieldType;
 }
 
-export type FieldType = "name" | "signature" | "initial" | "date" | "digitalSignature";
+export type FieldType =
+  | "name"
+  | "signature"
+  | "initial"
+  | "date"
+  | "digitalSignature";
 
 export interface DragData {
   name: string;

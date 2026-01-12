@@ -12,13 +12,20 @@
 .signing-demo-sidebar {
   width: 256px;
   flex-shrink: 0;
-  background-color: #f8f9fa;
-  border-right: 1px solid #e0e0e0;
+  background-color: var(--warm-gray-100);
+  border-right: 1px solid var(--warm-gray-400);
   padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .signing-demo-sidebar {
+    background-color: var(--warm-gray-950);
+    border-right-color: var(--warm-gray-800);
+  }
 }
 
 .sidebar-section {
@@ -30,33 +37,56 @@
 .sidebar-label {
   font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: var(--black);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-label {
+    color: var(--warm-gray-400);
+  }
 }
 
 /* User Selector Styles */
 .user-selector {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--warm-gray-400);
   border-radius: 4px;
-  background-color: white;
+  background-color: var(--white);
   font-size: 14px;
-  color: #333;
+  color: var(--black);
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .user-selector:hover {
-  border-color: #4a90e2;
+  border-color: var(--black);
 }
 
 .user-selector:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .user-selector {
+    background-color: var(--warm-gray-900);
+    border-color: var(--warm-gray-600);
+    color: var(--warm-gray-400);
+  }
+
+  .user-selector:hover {
+    border-color: var(--white);
+  }
+
+  .user-selector:focus {
+    border-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Signers List Styles */
@@ -74,7 +104,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background-color: white;
+  background-color: var(--white);
   border: 2px solid transparent;
   border-radius: 6px;
   cursor: pointer;
@@ -84,13 +114,29 @@
 }
 
 .signer-item:hover {
-  background-color: #f0f4f8;
-  border-color: #e0e0e0;
+  background-color: var(--warm-gray-200);
+  border-color: var(--warm-gray-400);
 }
 
 .signer-item.selected {
-  border-color: #4a90e2;
-  background-color: #e8f4fd;
+  border-color: var(--black);
+  background-color: var(--warm-gray-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  .signer-item {
+    background-color: var(--warm-gray-900);
+  }
+
+  .signer-item:hover {
+    background-color: var(--warm-gray-800);
+    border-color: var(--warm-gray-600);
+  }
+
+  .signer-item.selected {
+    border-color: var(--white);
+    background-color: var(--warm-gray-800);
+  }
 }
 
 .signer-info {
@@ -105,8 +151,15 @@
   height: 16px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 2px solid white;
+  border: 2px solid var(--white);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .signer-color-indicator {
+    border-color: var(--warm-gray-900);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
 }
 
 .signer-details {
@@ -119,7 +172,7 @@
 .signer-name {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--black);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,10 +180,20 @@
 
 .signer-email {
   font-size: 12px;
-  color: #666;
+  color: var(--warm-gray-800);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media (prefers-color-scheme: dark) {
+  .signer-name {
+    color: var(--warm-gray-400);
+  }
+
+  .signer-email {
+    color: var(--warm-gray-600);
+  }
 }
 
 .delete-signer-btn {
@@ -138,7 +201,7 @@
   height: 24px;
   border: none;
   background-color: transparent;
-  color: #999;
+  color: var(--warm-gray-600);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -152,13 +215,24 @@
 }
 
 .delete-signer-btn:hover {
-  background-color: #fee;
-  color: #e74c3c;
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .delete-signer-btn:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+  box-shadow: 0 0 0 2px var(--color-error-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  .delete-signer-btn {
+    color: var(--warm-gray-600);
+  }
+
+  .delete-signer-btn:hover {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
 }
 
 .add-signer-btn {
@@ -199,8 +273,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
+  background-color: var(--white);
+  border: 1px solid var(--warm-gray-400);
   border-left: 4px solid;
   border-radius: 4px;
   cursor: grab;
@@ -210,10 +284,10 @@
 }
 
 .draggable-field:hover {
-  background-color: #f8f9fa;
-  border-color: #c0c0c0;
+  background-color: var(--warm-gray-200);
+  border-color: var(--warm-gray-600);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .draggable-field:active {
@@ -221,24 +295,63 @@
   transform: translateY(0);
 }
 
+@media (prefers-color-scheme: dark) {
+  .draggable-field {
+    background-color: var(--warm-gray-900);
+    border-color: var(--warm-gray-600);
+  }
+
+  .draggable-field:hover {
+    background-color: var(--warm-gray-800);
+    border-color: var(--warm-gray-500);
+  }
+}
+
 .field-icon {
   font-size: 18px;
   flex-shrink: 0;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .field-label {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--black);
 }
 
 .field-hint {
   font-size: 12px;
-  color: #666;
+  color: var(--warm-gray-800);
   font-style: italic;
   margin-top: 4px;
-  padding: 8px 0;
+  padding: 8px 0 4px 0;
   text-align: center;
+}
+
+.or-divider {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--warm-gray-700);
+  text-align: center;
+  padding: 8px 0;
+  letter-spacing: 1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .field-label {
+    color: var(--warm-gray-400);
+  }
+
+  .field-hint {
+    color: var(--warm-gray-600);
+  }
+
+  .or-divider {
+    color: var(--warm-gray-500);
+  }
 }
 
 /* Viewer Styles */
@@ -250,11 +363,99 @@
 }
 
 .signing-demo-viewer.drop-zone-active {
-  background-color: #f0f8ff;
-  box-shadow: inset 0 0 0 2px #4a90e2;
+  background-color: var(--warm-gray-200);
+  box-shadow: inset 0 0 0 2px var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+  .signing-demo-viewer.drop-zone-active {
+    background-color: var(--warm-gray-900);
+    box-shadow: inset 0 0 0 2px var(--white);
+  }
+}
+
+/* Nutrient-branded buttons */
+.load-defaults-btn,
+.digital-signature-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.24px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  border: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition-property: opacity, color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+/* Load Defaults Button - Green variant */
+.load-defaults-btn {
+  background: var(--data-green);
+  color: var(--white);
+  width: 100%;
+}
+
+.load-defaults-btn:hover {
+  opacity: 0.7;
+}
+
+@media (prefers-color-scheme: dark) {
+  .load-defaults-btn {
+    background: var(--data-green);
+    color: var(--black);
+  }
+}
+
+/* Digital Signature Section - Visual separation */
+.digital-signature-section {
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 2px solid var(--warm-gray-300);
+}
+
+@media (prefers-color-scheme: dark) {
+  .digital-signature-section {
+    border-top-color: var(--warm-gray-700);
+  }
+}
+
+/* Digital Signature Button - Primary (Black) variant */
+.digital-signature-btn {
+  background: var(--black);
+  color: var(--white);
+}
+
+.digital-signature-btn:hover:not(:disabled) {
+  opacity: 0.7;
+  color: var(--white);
+}
+
+.digital-signature-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .digital-signature-btn {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .digital-signature-btn:hover:not(:disabled) {
+    color: var(--black);
+  }
 }
 
 /* Date field input padding */
+/* biome-ignore lint/complexity/noImportantStyles: Need to override PSPDFKit default styles */
 .PSPDFKit-Annotation-Widget-Date-Input,
 input.PSPDFKit-Annotation-Widget-Text.PSPDFKit-Annotation-Widget-Date-Input {
   padding: 0 8px !important;

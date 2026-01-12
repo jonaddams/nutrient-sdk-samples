@@ -1,5 +1,6 @@
 "use client";
 
+import { read } from "node:fs";
 /**
  * Digital Signature Sample with Nutrient DWS API
  *
@@ -52,9 +53,7 @@ export default function Viewer({ document }: ViewerProps) {
     const fetchCertificates = async () => {
       try {
         // Fetch the CA certificates from DWS API
-        const response = await fetch(
-          "/api/sign-document-web-sdk-dws/api/certificates",
-        );
+        const response = await fetch("/api/digital-signature/api/certificates");
         if (response.ok) {
           const data = await response.json();
           certificatesRef.current = data;
@@ -111,7 +110,7 @@ export default function Viewer({ document }: ViewerProps) {
             setSignStatus("Requesting authentication token...");
 
             const tokenResponse = await fetch(
-              "/api/sign-document-web-sdk-dws/api/token",
+              "/api/digital-signature/api/token",
               {
                 method: "POST",
                 headers: {
@@ -157,15 +156,6 @@ export default function Viewer({ document }: ViewerProps) {
               console.log("Could not get annotations:", e);
             }
 
-            // Force update the view state to ensure signature validation banner appears
-            const currentViewState = instance.viewState;
-            await instance.setViewState(
-              currentViewState.set(
-                "showSignatureValidationStatus",
-                NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
-              ),
-            );
-
             setSignStatus("Document signed successfully!");
             setTimeout(() => setSignStatus(""), 3000);
           } catch (error) {
@@ -185,7 +175,6 @@ export default function Viewer({ document }: ViewerProps) {
     ] as const;
   }, [isSigning]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Excluding toolbarItems to prevent reload after signing
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -304,7 +293,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, certificatesLoaded]);
+  }, [document, certificatesLoaded, toolbarItems]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
