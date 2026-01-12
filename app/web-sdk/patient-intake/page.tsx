@@ -227,7 +227,7 @@ export default function PatientIntakeHome() {
           {/* Check-In Instructions */}
           <div className="mb-8">
             <h3
-              className="font-semibold mb-4"
+              className="font-semibold mb-6"
               style={{ color: "var(--foreground)" }}
             >
               Before Your Appointment
