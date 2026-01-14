@@ -1,0 +1,486 @@
+/* Document Loading Demo - Nutrient Brand Styling */
+
+.document-loading-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================================
+   Controls Panel
+   ========================================================================= */
+
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: white;
+  border: 1px solid var(--warm-gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.control-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.control-section h3 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--warm-gray-800);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.control-section h4 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.control-section p {
+  margin: var(--spacing-2xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--warm-gray-800);
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   Method Selection Buttons
+   ========================================================================= */
+
+.method-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.method-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-sm);
+  background: white;
+  border: 2px solid var(--warm-gray-200);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  font-family: var(--font-mono);
+}
+
+.method-button:hover:not(:disabled) {
+  border-color: var(--black);
+  background: var(--warm-gray-100);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.method-button.active {
+  border-color: var(--black);
+  background: var(--black);
+}
+
+.method-button.active .method-label,
+.method-button.active .method-icon {
+  color: var(--digital-pollen);
+}
+
+.method-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.method-icon {
+  font-size: 2rem;
+}
+
+.method-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--black);
+}
+
+/* ============================================================================
+   File Upload Controls
+   ========================================================================= */
+
+.file-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xs) var(--spacing-sm);
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  min-height: 2rem;
+}
+
+.file-upload-button:hover {
+  background: var(--warm-gray-900);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.uploaded-file-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background: var(--warm-gray-100);
+  border: 1px solid var(--warm-gray-200);
+  border-radius: var(--radius-xs);
+}
+
+.file-name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--black);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reset-button {
+  padding: var(--spacing-3xs) var(--spacing-xs);
+  background: white;
+  border: 1px solid var(--warm-gray-400);
+  border-radius: var(--radius-xxs);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--warm-gray-800);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.reset-button:hover:not(:disabled) {
+  background: var(--warm-gray-100);
+  border-color: var(--black);
+  color: var(--black);
+}
+
+.reset-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Code Example Display
+   ========================================================================= */
+
+.code-toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-toggle-button {
+  padding: var(--spacing-3xs) var(--spacing-xs);
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-xxs);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.code-toggle-button:hover {
+  background: var(--warm-gray-900);
+}
+
+.code-example {
+  margin: 0;
+  padding: var(--spacing-sm);
+  background: var(--black);
+  border-radius: var(--radius-xs);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border: 1px solid var(--warm-gray-900);
+}
+
+.code-example code {
+  color: var(--warm-gray-200);
+}
+
+/* ============================================================================
+   Info Box
+   ========================================================================= */
+
+.info-box {
+  padding: var(--spacing-sm);
+  background: var(--digital-pollen-dark);
+  border: 1px solid var(--digital-pollen);
+  border-radius: var(--radius-xs);
+}
+
+.info-box h4 {
+  color: var(--digital-pollen);
+}
+
+.info-box p {
+  color: var(--warm-gray-200);
+}
+
+/* ============================================================================
+   Error Message
+   ========================================================================= */
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--code-coral-dark);
+  border: 1px solid var(--code-coral);
+  border-radius: var(--radius-xs);
+  color: var(--code-coral);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+}
+
+/* ============================================================================
+   Viewer Container
+   ========================================================================= */
+
+.viewer-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--warm-gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: white;
+}
+
+.viewer-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================================
+   Loading Overlay
+   ========================================================================= */
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--warm-gray-200);
+  border-top-color: var(--black);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-overlay p {
+  margin: 0;
+  font-family: var(--font-mono);
+  color: var(--warm-gray-800);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   Dark Mode
+   ========================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  .controls-panel {
+    background: var(--warm-gray-950);
+    border-color: var(--warm-gray-900);
+  }
+
+  .control-section h3 {
+    color: var(--warm-gray-400);
+  }
+
+  .control-section h4 {
+    color: var(--digital-pollen);
+  }
+
+  .control-section p {
+    color: var(--warm-gray-400);
+  }
+
+  .method-button {
+    background: var(--warm-gray-950);
+    border-color: var(--warm-gray-800);
+  }
+
+  .method-button:hover:not(:disabled) {
+    background: var(--warm-gray-900);
+    border-color: var(--digital-pollen);
+  }
+
+  .method-button.active {
+    background: var(--black);
+    border-color: var(--digital-pollen);
+  }
+
+  .method-label {
+    color: var(--warm-gray-200);
+  }
+
+  .method-button.active .method-label {
+    color: var(--digital-pollen);
+  }
+
+  .file-upload-button {
+    background: var(--digital-pollen);
+    color: var(--black);
+  }
+
+  .file-upload-button:hover {
+    background: var(--digital-pollen);
+    opacity: 0.9;
+  }
+
+  .uploaded-file-info {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-800);
+  }
+
+  .file-name {
+    color: var(--warm-gray-200);
+  }
+
+  .reset-button {
+    background: var(--warm-gray-950);
+    border-color: var(--warm-gray-800);
+    color: var(--warm-gray-400);
+  }
+
+  .reset-button:hover:not(:disabled) {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-600);
+    color: var(--warm-gray-200);
+  }
+
+  .code-toggle-button {
+    background: var(--digital-pollen);
+    color: var(--black);
+  }
+
+  .code-toggle-button:hover {
+    opacity: 0.9;
+  }
+
+  .info-box {
+    background: var(--digital-pollen-dark);
+    border-color: var(--digital-pollen);
+  }
+
+  .info-box p {
+    color: var(--warm-gray-200);
+  }
+
+  .error-message {
+    background: var(--code-coral-dark);
+    border-color: var(--code-coral);
+  }
+
+  .viewer-wrapper {
+    background: var(--warm-gray-950);
+    border-color: var(--warm-gray-900);
+  }
+
+  .loading-overlay {
+    background: rgba(26, 20, 20, 0.95);
+  }
+
+  .loading-spinner {
+    border-color: var(--warm-gray-800);
+    border-top-color: var(--digital-pollen);
+  }
+
+  .loading-overlay p {
+    color: var(--warm-gray-400);
+  }
+}
+
+/* ============================================================================
+   Responsive Design
+   ========================================================================= */
+
+@media (max-width: 768px) {
+  .method-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .method-button {
+    min-width: auto;
+  }
+
+  .uploaded-file-info {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reset-button {
+    width: 100%;
+  }
+
+  .controls-panel {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+}

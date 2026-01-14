@@ -13,6 +13,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Document Loading Methods",
+    category: "User Interface",
+    description:
+      "Demonstrate all supported document loading methods: URL, ArrayBuffer, Blob, and Base64. Includes file upload with method selection",
+    path: "/web-sdk/document-loading",
+  },
+  {
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
