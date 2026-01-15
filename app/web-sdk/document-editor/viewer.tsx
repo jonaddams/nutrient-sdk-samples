@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Instance } from "@nutrient-sdk/viewer";
+import { useEffect, useState } from "react";
 import OperationQueue from "./_components/OperationQueue";
 import PageContextMenu from "./_components/PageContextMenu";
 
@@ -84,7 +84,7 @@ export default function DocumentEditorViewer() {
 
     async function loadDocument(
       documentPath: string,
-      setDocState: React.Dispatch<React.SetStateAction<DocumentState>>
+      setDocState: React.Dispatch<React.SetStateAction<DocumentState>>,
     ) {
       let tempContainer: HTMLDivElement | null = null;
 
@@ -133,7 +133,7 @@ export default function DocumentEditorViewer() {
           const thumbnailWidth = Math.min(pageInfo.width, 800);
           const thumbnailUrl = await instance.renderPageAsImageURL(
             { width: thumbnailWidth },
-            pageIndex
+            pageIndex,
           );
 
           pages.push({
@@ -174,9 +174,7 @@ export default function DocumentEditorViewer() {
             ...prev,
             isLoading: false,
             error:
-              err instanceof Error
-                ? err.message
-                : "Failed to load document",
+              err instanceof Error ? err.message : "Failed to load document",
           }));
         }
 
@@ -201,15 +199,19 @@ export default function DocumentEditorViewer() {
   // Render loading state
   if (sourceDoc.isLoading || targetDoc.isLoading) {
     return (
-      <div className="flex items-center justify-center h-full w-full" style={{ backgroundColor: "var(--background)" }}>
+      <div
+        className="flex items-center justify-center h-full w-full"
+        style={{ backgroundColor: "var(--background)" }}
+      >
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-700 border-t-blue-600 mb-4" />
-          <h3 className="text-lg font-semibold" style={{ color: "var(--foreground)" }}>
+          <h3
+            className="text-lg font-semibold"
+            style={{ color: "var(--foreground)" }}
+          >
             Loading documents...
           </h3>
-          <p style={{ color: "var(--neutral)" }}>
-            Generating page thumbnails
-          </p>
+          <p style={{ color: "var(--neutral)" }}>Generating page thumbnails</p>
         </div>
       </div>
     );
@@ -218,9 +220,15 @@ export default function DocumentEditorViewer() {
   // Render error state
   if (sourceDoc.error || targetDoc.error) {
     return (
-      <div className="flex items-center justify-center h-full w-full" style={{ backgroundColor: "var(--background)" }}>
+      <div
+        className="flex items-center justify-center h-full w-full"
+        style={{ backgroundColor: "var(--background)" }}
+      >
         <div className="text-center max-w-md p-8">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "var(--code-coral)" }}>
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "var(--code-coral)" }}
+          >
             <svg
               className="w-8 h-8"
               style={{ color: "var(--white)" }}
@@ -237,7 +245,10 @@ export default function DocumentEditorViewer() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--foreground)" }}>
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: "var(--foreground)" }}
+          >
             Failed to Load Documents
           </h3>
           <p style={{ color: "var(--neutral)" }}>
@@ -248,19 +259,21 @@ export default function DocumentEditorViewer() {
     );
   }
 
-  const selectedSourcePage = sourceDoc.selectedPageIndex !== null
-    ? sourceDoc.pages[sourceDoc.selectedPageIndex]
-    : null;
+  const selectedSourcePage =
+    sourceDoc.selectedPageIndex !== null
+      ? sourceDoc.pages[sourceDoc.selectedPageIndex]
+      : null;
 
-  const selectedTargetPage = targetDoc.selectedPageIndex !== null
-    ? targetDoc.pages[targetDoc.selectedPageIndex]
-    : null;
+  const selectedTargetPage =
+    targetDoc.selectedPageIndex !== null
+      ? targetDoc.pages[targetDoc.selectedPageIndex]
+      : null;
 
   // Context menu handlers
   const handleContextMenu = (
     e: React.MouseEvent,
     pageIndex: number,
-    documentType: "source" | "target"
+    documentType: "source" | "target",
   ) => {
     e.preventDefault();
     setContextMenu({
@@ -277,7 +290,9 @@ export default function DocumentEditorViewer() {
   };
 
   // Helper to add operation to queue
-  const addOperation = (operation: Omit<QueuedOperation, "id" | "timestamp">) => {
+  const addOperation = (
+    operation: Omit<QueuedOperation, "id" | "timestamp">,
+  ) => {
     const newOp: QueuedOperation = {
       ...operation,
       id: crypto.randomUUID(),
@@ -333,9 +348,7 @@ export default function DocumentEditorViewer() {
     setDoc((prev) => ({
       ...prev,
       pages: prev.pages.map((p) =>
-        p.index === pageIdx
-          ? { ...p, rotation: (p.rotation + 90) % 360 }
-          : p
+        p.index === pageIdx ? { ...p, rotation: (p.rotation + 90) % 360 } : p,
       ),
     }));
   };
@@ -357,9 +370,7 @@ export default function DocumentEditorViewer() {
     setDoc((prev) => ({
       ...prev,
       pages: prev.pages.map((p) =>
-        p.index === pageIdx
-          ? { ...p, rotation: (p.rotation + 270) % 360 }
-          : p
+        p.index === pageIdx ? { ...p, rotation: (p.rotation + 270) % 360 } : p,
       ),
     }));
   };
@@ -470,7 +481,7 @@ export default function DocumentEditorViewer() {
   const handleToggleMenu = (
     e: React.MouseEvent,
     pageIndex: number,
-    documentType: "source" | "target"
+    documentType: "source" | "target",
   ) => {
     e.stopPropagation();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -493,11 +504,14 @@ export default function DocumentEditorViewer() {
   const handleDragStart = (
     e: React.DragEvent,
     pageIndex: number,
-    sourceDoc: "source" | "target"
+    sourceDoc: "source" | "target",
   ) => {
     setDraggedPage({ pageIndex, sourceDoc });
     e.dataTransfer.effectAllowed = "copy";
-    e.dataTransfer.setData("application/json", JSON.stringify({ pageIndex, sourceDoc }));
+    e.dataTransfer.setData(
+      "application/json",
+      JSON.stringify({ pageIndex, sourceDoc }),
+    );
   };
 
   const handleDragEnd = () => {
@@ -582,9 +596,14 @@ export default function DocumentEditorViewer() {
       setTargetDoc((prev) => {
         const otherPages = prev.pages.filter((p) => p.index !== data.pageIndex);
         const newPages = [
-          ...otherPages.slice(0, dropIndex > data.pageIndex ? dropIndex - 1 : dropIndex),
+          ...otherPages.slice(
+            0,
+            dropIndex > data.pageIndex ? dropIndex - 1 : dropIndex,
+          ),
           pageToMove,
-          ...otherPages.slice(dropIndex > data.pageIndex ? dropIndex - 1 : dropIndex),
+          ...otherPages.slice(
+            dropIndex > data.pageIndex ? dropIndex - 1 : dropIndex,
+          ),
         ];
         const reindexedPages = newPages.map((p, idx) => ({ ...p, index: idx }));
         return {
@@ -599,264 +618,378 @@ export default function DocumentEditorViewer() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full" style={{ backgroundColor: "var(--background)" }}>
+    <div
+      className="flex flex-col h-full w-full"
+      style={{ backgroundColor: "var(--background)" }}
+    >
       <div className="flex-1 flex justify-center overflow-hidden">
-      <div className="flex w-full max-w-[1600px]">
-      {/* Source Document Section */}
-      <div className="flex-1 flex border-r" style={{ borderColor: "var(--warm-gray-400)" }}>
-        {/* Thumbnail List */}
-        <div className="w-48 flex flex-col border-r overflow-hidden" style={{ borderColor: "var(--warm-gray-400)", backgroundColor: "var(--warm-gray-100)" }}>
-          <div className="p-3 border-b" style={{ borderColor: "var(--warm-gray-400)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Source
-            </h3>
-            <p className="text-xs" style={{ color: "var(--neutral)" }}>
-              {sourceDoc.pages.length} pages
-            </p>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {sourceDoc.pages.map((page) => (
-              <button
-                key={page.originalIndex}
-                type="button"
-                onClick={() => setSourceDoc(prev => ({ ...prev, selectedPageIndex: page.index }))}
-                draggable={true}
-                onDragStart={(e) => handleDragStart(e, page.index, "source")}
-                onDragEnd={handleDragEnd}
-                className="w-full relative"
-                style={{
-                  backgroundColor: sourceDoc.selectedPageIndex === page.index ? "var(--white)" : "transparent",
-                  border: `2px solid ${sourceDoc.selectedPageIndex === page.index ? "var(--disc-pink)" : "var(--warm-gray-400)"}`,
-                  borderRadius: "4px",
-                  padding: "8px",
-                  cursor: "grab",
-                  opacity: draggedPage?.pageIndex === page.index && draggedPage?.sourceDoc === "source" ? 0.5 : 1,
-                }}
-              >
-                {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
-                <img
-                  src={page.thumbnailUrl}
-                  alt={`Page ${page.index + 1}`}
-                  className="w-full"
-                  style={{
-                    display: "block",
-                    transform: `rotate(${page.rotation}deg)`,
-                    transition: "transform 0.3s ease",
-                  }}
-                />
-                <div className="text-center mt-1">
-                  <span className="text-xs font-medium" style={{ color: "var(--foreground)" }}>
-                    {page.index + 1}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Page Preview */}
-        <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: "var(--warm-gray-200)" }}>
-          <div className="p-3 border-b" style={{ borderColor: "var(--warm-gray-400)", backgroundColor: "var(--white)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Preview
-            </h3>
-            {selectedSourcePage && (
-              <p className="text-xs" style={{ color: "var(--neutral)" }}>
-                Page {selectedSourcePage.index + 1} of {sourceDoc.pages.length}
-              </p>
-            )}
-          </div>
-          <div className="flex-1 overflow-auto p-4 flex justify-center">
-            {selectedSourcePage ? (
-              <div className="shadow-lg" style={{ backgroundColor: "var(--white)" }}>
-                {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
-                <img
-                  src={selectedSourcePage.thumbnailUrl}
-                  alt={`Page ${selectedSourcePage.index + 1}`}
-                  style={{
-                    maxWidth: "100%",
-                    height: "auto",
-                    display: "block",
-                    transform: `rotate(${selectedSourcePage.rotation}deg)`,
-                    transition: "transform 0.3s ease",
-                  }}
-                />
-              </div>
-            ) : (
-              <p style={{ color: "var(--neutral)" }}>Select a page to preview</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Target Document Section */}
-      <div className="flex-1 flex">
-        {/* Thumbnail List */}
-        <div className="w-48 flex flex-col border-r overflow-hidden" style={{ borderColor: "var(--warm-gray-400)", backgroundColor: "var(--warm-gray-100)" }}>
-          <div className="p-3 border-b" style={{ borderColor: "var(--warm-gray-400)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Target
-            </h3>
-            <p className="text-xs" style={{ color: "var(--neutral)" }}>
-              {targetDoc.pages.length} pages
-            </p>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {targetDoc.pages.length === 0 ? (
+        <div className="flex w-full max-w-[1600px]">
+          {/* Source Document Section */}
+          <div
+            className="flex-1 flex border-r"
+            style={{ borderColor: "var(--warm-gray-400)" }}
+          >
+            {/* Thumbnail List */}
+            <div
+              className="w-48 flex flex-col border-r overflow-hidden"
+              style={{
+                borderColor: "var(--warm-gray-400)",
+                backgroundColor: "var(--warm-gray-100)",
+              }}
+            >
               <div
-                role="button"
-                tabIndex={0}
-                onDragOver={(e) => handleDragOver(e, 0)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, 0)}
-                onKeyDown={() => {}}
-                className="h-full flex items-center justify-center border-2 border-dashed rounded-lg"
-                style={{
-                  borderColor: dropTarget === 0 ? "var(--data-green)" : "var(--warm-gray-400)",
-                  backgroundColor: dropTarget === 0 ? "var(--data-green)" : "transparent",
-                  opacity: dropTarget === 0 ? 0.2 : 0.5,
-                  minHeight: "100px",
-                }}
+                className="p-3 border-b"
+                style={{ borderColor: "var(--warm-gray-400)" }}
               >
-                <p className="text-sm" style={{ color: "var(--neutral)" }}>
-                  Drop pages here
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Source
+                </h3>
+                <p className="text-xs" style={{ color: "var(--neutral)" }}>
+                  {sourceDoc.pages.length} pages
                 </p>
               </div>
-            ) : (
-              <>
-                {targetDoc.pages.map((page, idx) => (
-                  <div key={page.originalIndex}>
-                    {/* Drop zone before this thumbnail */}
-                    <div
-                      onDragOver={(e) => handleDragOver(e, idx)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, idx)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      className="-my-1"
+              <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                {sourceDoc.pages.map((page) => (
+                  <button
+                    key={page.originalIndex}
+                    type="button"
+                    onClick={() =>
+                      setSourceDoc((prev) => ({
+                        ...prev,
+                        selectedPageIndex: page.index,
+                      }))
+                    }
+                    draggable={true}
+                    onDragStart={(e) =>
+                      handleDragStart(e, page.index, "source")
+                    }
+                    onDragEnd={handleDragEnd}
+                    className="w-full relative"
+                    style={{
+                      backgroundColor:
+                        sourceDoc.selectedPageIndex === page.index
+                          ? "var(--white)"
+                          : "transparent",
+                      border: `2px solid ${sourceDoc.selectedPageIndex === page.index ? "var(--disc-pink)" : "var(--warm-gray-400)"}`,
+                      borderRadius: "4px",
+                      padding: "8px",
+                      cursor: "grab",
+                      opacity:
+                        draggedPage?.pageIndex === page.index &&
+                        draggedPage?.sourceDoc === "source"
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
+                    <img
+                      src={page.thumbnailUrl}
+                      alt={`Page ${page.index + 1}`}
+                      className="w-full"
                       style={{
-                        height: dropTarget === idx ? "8px" : "4px",
-                        backgroundColor: dropTarget === idx ? "var(--data-green)" : "transparent",
-                        borderRadius: "4px",
-                        transition: "all 0.2s ease",
-                        margin: dropTarget === idx ? "4px 0" : "0",
+                        display: "block",
+                        transform: `rotate(${page.rotation}deg)`,
+                        transition: "transform 0.3s ease",
                       }}
                     />
-
-                    <div className="relative group">
-                      <button
-                        type="button"
-                        onClick={() => setTargetDoc(prev => ({ ...prev, selectedPageIndex: page.index }))}
-                        onContextMenu={(e) => handleContextMenu(e, page.index, "target")}
-                        draggable={true}
-                        onDragStart={(e) => handleDragStart(e, page.index, "target")}
-                        onDragEnd={handleDragEnd}
-                        className="w-full relative"
-                        style={{
-                          backgroundColor: targetDoc.selectedPageIndex === page.index ? "var(--white)" : "transparent",
-                          border: `2px solid ${targetDoc.selectedPageIndex === page.index ? "var(--data-green)" : "var(--warm-gray-400)"}`,
-                          borderRadius: "4px",
-                          padding: "8px",
-                          cursor: "grab",
-                          opacity: draggedPage?.pageIndex === page.index && draggedPage?.sourceDoc === "target" ? 0.5 : 1,
-                        }}
+                    <div className="text-center mt-1">
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: "var(--foreground)" }}
                       >
-                  {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
-                  <img
-                    src={page.thumbnailUrl}
-                    alt={`Page ${page.index + 1}`}
-                    className="w-full"
-                    style={{
-                      display: "block",
-                      transform: `rotate(${page.rotation}deg)`,
-                      transition: "transform 0.3s ease",
-                    }}
-                  />
-                  <div className="text-center mt-1">
-                    <span className="text-xs font-medium" style={{ color: "var(--foreground)" }}>
-                      {page.index + 1}
-                    </span>
-                  </div>
-                </button>
-                {/* Three-dot menu button */}
-                <button
-                  type="button"
-                  onClick={(e) => handleToggleMenu(e, page.index, "target")}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                  style={{
-                    backgroundColor: "var(--white)",
-                    border: "2px solid var(--warm-gray-600)",
-                    borderRadius: "4px",
-                    padding: "4px 6px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    color: "var(--black)",
-                    lineHeight: "1",
-                  }}
-                  title="More options"
-                >
-                  ⋮
-                </button>
+                        {page.index + 1}
+                      </span>
                     </div>
-
-                    {/* Drop zone after last thumbnail */}
-                    {idx === targetDoc.pages.length - 1 && (
-                      <div
-                        onDragOver={(e) => handleDragOver(e, idx + 1)}
-                        onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, idx + 1)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        className="mt-1"
-                        style={{
-                          height: dropTarget === idx + 1 ? "8px" : "4px",
-                          backgroundColor: dropTarget === idx + 1 ? "var(--data-green)" : "transparent",
-                          borderRadius: "4px",
-                          transition: "all 0.2s ease",
-                          margin: dropTarget === idx + 1 ? "4px 0" : "0",
-                        }}
-                      />
-                    )}
-                  </div>
+                  </button>
                 ))}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Page Preview */}
-        <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: "var(--warm-gray-200)" }}>
-          <div className="p-3 border-b" style={{ borderColor: "var(--warm-gray-400)", backgroundColor: "var(--white)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Preview
-            </h3>
-            {selectedTargetPage && (
-              <p className="text-xs" style={{ color: "var(--neutral)" }}>
-                Page {selectedTargetPage.index + 1} of {targetDoc.pages.length}
-              </p>
-            )}
-          </div>
-          <div className="flex-1 overflow-auto p-4 flex justify-center">
-            {selectedTargetPage ? (
-              <div className="shadow-lg" style={{ backgroundColor: "var(--white)" }}>
-                {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
-                <img
-                  src={selectedTargetPage.thumbnailUrl}
-                  alt={`Page ${selectedTargetPage.index + 1}`}
-                  style={{
-                    maxWidth: "100%",
-                    height: "auto",
-                    display: "block",
-                    transform: `rotate(${selectedTargetPage.rotation}deg)`,
-                    transition: "transform 0.3s ease",
-                  }}
-                />
               </div>
-            ) : (
-              <p style={{ color: "var(--neutral)" }}>Select a page to preview</p>
-            )}
+            </div>
+
+            {/* Page Preview */}
+            <div
+              className="flex-1 flex flex-col overflow-hidden"
+              style={{ backgroundColor: "var(--warm-gray-200)" }}
+            >
+              <div
+                className="p-3 border-b"
+                style={{
+                  borderColor: "var(--warm-gray-400)",
+                  backgroundColor: "var(--white)",
+                }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Preview
+                </h3>
+                {selectedSourcePage && (
+                  <p className="text-xs" style={{ color: "var(--neutral)" }}>
+                    Page {selectedSourcePage.index + 1} of{" "}
+                    {sourceDoc.pages.length}
+                  </p>
+                )}
+              </div>
+              <div className="flex-1 overflow-auto p-4 flex justify-center">
+                {selectedSourcePage ? (
+                  <div
+                    className="shadow-lg"
+                    style={{ backgroundColor: "var(--white)" }}
+                  >
+                    {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
+                    <img
+                      src={selectedSourcePage.thumbnailUrl}
+                      alt={`Page ${selectedSourcePage.index + 1}`}
+                      style={{
+                        maxWidth: "100%",
+                        height: "auto",
+                        display: "block",
+                        transform: `rotate(${selectedSourcePage.rotation}deg)`,
+                        transition: "transform 0.3s ease",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <p style={{ color: "var(--neutral)" }}>
+                    Select a page to preview
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Target Document Section */}
+          <div className="flex-1 flex">
+            {/* Thumbnail List */}
+            <div
+              className="w-48 flex flex-col border-r overflow-hidden"
+              style={{
+                borderColor: "var(--warm-gray-400)",
+                backgroundColor: "var(--warm-gray-100)",
+              }}
+            >
+              <div
+                className="p-3 border-b"
+                style={{ borderColor: "var(--warm-gray-400)" }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Target
+                </h3>
+                <p className="text-xs" style={{ color: "var(--neutral)" }}>
+                  {targetDoc.pages.length} pages
+                </p>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                {targetDoc.pages.length === 0 ? (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onDragOver={(e) => handleDragOver(e, 0)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, 0)}
+                    onKeyDown={() => {}}
+                    className="h-full flex items-center justify-center border-2 border-dashed rounded-lg"
+                    style={{
+                      borderColor:
+                        dropTarget === 0
+                          ? "var(--data-green)"
+                          : "var(--warm-gray-400)",
+                      backgroundColor:
+                        dropTarget === 0 ? "var(--data-green)" : "transparent",
+                      opacity: dropTarget === 0 ? 0.2 : 0.5,
+                      minHeight: "100px",
+                    }}
+                  >
+                    <p className="text-sm" style={{ color: "var(--neutral)" }}>
+                      Drop pages here
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {targetDoc.pages.map((page, idx) => (
+                      <div key={page.originalIndex}>
+                        {/* Drop zone before this thumbnail */}
+                        <div
+                          onDragOver={(e) => handleDragOver(e, idx)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, idx)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          className="-my-1"
+                          style={{
+                            height: dropTarget === idx ? "8px" : "4px",
+                            backgroundColor:
+                              dropTarget === idx
+                                ? "var(--data-green)"
+                                : "transparent",
+                            borderRadius: "4px",
+                            transition: "all 0.2s ease",
+                            margin: dropTarget === idx ? "4px 0" : "0",
+                          }}
+                        />
+
+                        <div className="relative group">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setTargetDoc((prev) => ({
+                                ...prev,
+                                selectedPageIndex: page.index,
+                              }))
+                            }
+                            onContextMenu={(e) =>
+                              handleContextMenu(e, page.index, "target")
+                            }
+                            draggable={true}
+                            onDragStart={(e) =>
+                              handleDragStart(e, page.index, "target")
+                            }
+                            onDragEnd={handleDragEnd}
+                            className="w-full relative"
+                            style={{
+                              backgroundColor:
+                                targetDoc.selectedPageIndex === page.index
+                                  ? "var(--white)"
+                                  : "transparent",
+                              border: `2px solid ${targetDoc.selectedPageIndex === page.index ? "var(--data-green)" : "var(--warm-gray-400)"}`,
+                              borderRadius: "4px",
+                              padding: "8px",
+                              cursor: "grab",
+                              opacity:
+                                draggedPage?.pageIndex === page.index &&
+                                draggedPage?.sourceDoc === "target"
+                                  ? 0.5
+                                  : 1,
+                            }}
+                          >
+                            {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
+                            <img
+                              src={page.thumbnailUrl}
+                              alt={`Page ${page.index + 1}`}
+                              className="w-full"
+                              style={{
+                                display: "block",
+                                transform: `rotate(${page.rotation}deg)`,
+                                transition: "transform 0.3s ease",
+                              }}
+                            />
+                            <div className="text-center mt-1">
+                              <span
+                                className="text-xs font-medium"
+                                style={{ color: "var(--foreground)" }}
+                              >
+                                {page.index + 1}
+                              </span>
+                            </div>
+                          </button>
+                          {/* Three-dot menu button */}
+                          <button
+                            type="button"
+                            onClick={(e) =>
+                              handleToggleMenu(e, page.index, "target")
+                            }
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            style={{
+                              backgroundColor: "var(--white)",
+                              border: "2px solid var(--warm-gray-600)",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              fontSize: "16px",
+                              fontWeight: "bold",
+                              color: "var(--black)",
+                              lineHeight: "1",
+                            }}
+                            title="More options"
+                          >
+                            ⋮
+                          </button>
+                        </div>
+
+                        {/* Drop zone after last thumbnail */}
+                        {idx === targetDoc.pages.length - 1 && (
+                          <div
+                            onDragOver={(e) => handleDragOver(e, idx + 1)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, idx + 1)}
+                            onMouseDown={(e) => e.preventDefault()}
+                            className="mt-1"
+                            style={{
+                              height: dropTarget === idx + 1 ? "8px" : "4px",
+                              backgroundColor:
+                                dropTarget === idx + 1
+                                  ? "var(--data-green)"
+                                  : "transparent",
+                              borderRadius: "4px",
+                              transition: "all 0.2s ease",
+                              margin: dropTarget === idx + 1 ? "4px 0" : "0",
+                            }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Page Preview */}
+            <div
+              className="flex-1 flex flex-col overflow-hidden"
+              style={{ backgroundColor: "var(--warm-gray-200)" }}
+            >
+              <div
+                className="p-3 border-b"
+                style={{
+                  borderColor: "var(--warm-gray-400)",
+                  backgroundColor: "var(--white)",
+                }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Preview
+                </h3>
+                {selectedTargetPage && (
+                  <p className="text-xs" style={{ color: "var(--neutral)" }}>
+                    Page {selectedTargetPage.index + 1} of{" "}
+                    {targetDoc.pages.length}
+                  </p>
+                )}
+              </div>
+              <div className="flex-1 overflow-auto p-4 flex justify-center">
+                {selectedTargetPage ? (
+                  <div
+                    className="shadow-lg"
+                    style={{ backgroundColor: "var(--white)" }}
+                  >
+                    {/* biome-ignore lint/performance/noImgElement: Dynamic data URL from PDF rendering */}
+                    <img
+                      src={selectedTargetPage.thumbnailUrl}
+                      alt={`Page ${selectedTargetPage.index + 1}`}
+                      style={{
+                        maxWidth: "100%",
+                        height: "auto",
+                        display: "block",
+                        transform: `rotate(${selectedTargetPage.rotation}deg)`,
+                        transition: "transform 0.3s ease",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <p style={{ color: "var(--neutral)" }}>
+                    Select a page to preview
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      </div>
       </div>
 
       {/* Operation Queue */}

@@ -51,14 +51,21 @@ export default function OperationQueue({
       <div className="max-w-[1600px] mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+            <h3
+              className="text-sm font-semibold"
+              style={{ color: "var(--foreground)" }}
+            >
               Operation Queue
             </h3>
             <span
               className="px-2 py-0.5 rounded text-xs font-medium"
               style={{
-                backgroundColor: operations.length > 0 ? "var(--disc-pink)" : "var(--warm-gray-200)",
-                color: operations.length > 0 ? "var(--white)" : "var(--neutral)",
+                backgroundColor:
+                  operations.length > 0
+                    ? "var(--disc-pink)"
+                    : "var(--warm-gray-200)",
+                color:
+                  operations.length > 0 ? "var(--white)" : "var(--neutral)",
               }}
             >
               {operations.length}
@@ -88,7 +95,8 @@ export default function OperationQueue({
 
         {operations.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--neutral)" }}>
-            No operations queued. Right-click or use the menu on any page thumbnail to add operations.
+            No operations queued. Right-click or use the menu on any page
+            thumbnail to add operations.
           </p>
         ) : (
           <div className="space-y-1">
@@ -103,7 +111,10 @@ export default function OperationQueue({
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">{getOperationIcon(op.type)}</span>
-                  <span className="text-sm" style={{ color: "var(--foreground)" }}>
+                  <span
+                    className="text-sm"
+                    style={{ color: "var(--foreground)" }}
+                  >
                     {index + 1}. {op.description}
                   </span>
                 </div>

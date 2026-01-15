@@ -84,7 +84,8 @@ export default function DigitalSignaturePage() {
               Web SDK Integration
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Sign documents digitally via DWS API directly in the Nutrient Web SDK viewer
+              Sign documents digitally via DWS API directly in the Nutrient Web
+              SDK viewer
             </p>
           </div>
 
@@ -109,7 +110,8 @@ export default function DigitalSignaturePage() {
               DWS API Signing
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Secure digital signatures powered by Nutrient DWS API with token-based authentication
+              Secure digital signatures powered by Nutrient DWS API with
+              token-based authentication
             </p>
           </div>
 
@@ -134,7 +136,8 @@ export default function DigitalSignaturePage() {
               Trusted Certificates
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Configured to trust Nutrient signing certificates for proper signature validation
+              Configured to trust Nutrient signing certificates for proper
+              signature validation
             </p>
           </div>
         </div>
@@ -157,23 +160,40 @@ export default function DigitalSignaturePage() {
             How It Works
           </summary>
           <ol className="mt-4 ml-5 space-y-2 text-gray-600 dark:text-gray-400 list-decimal">
-            <li>Click the signature button in the toolbar to initiate the signing process</li>
-            <li>The app requests an authentication token from the DWS API with signing permissions</li>
-            <li>The Web SDK generates a document hash and sends it to the DWS API for signing</li>
-            <li>The DWS API signs the document hash using its secure signing service</li>
-            <li>The signature is returned and applied to the document in the viewer, maintaining end-to-end document privacy</li>
+            <li>
+              Click the signature button in the toolbar to initiate the signing
+              process
+            </li>
+            <li>
+              The app requests an authentication token from the DWS API with
+              signing permissions
+            </li>
+            <li>
+              The Web SDK generates a document hash and sends it to the DWS API
+              for signing
+            </li>
+            <li>
+              The DWS API signs the document hash using its secure signing
+              service
+            </li>
+            <li>
+              The signature is returned and applied to the document in the
+              viewer, maintaining end-to-end document privacy
+            </li>
           </ol>
         </details>
 
         {/* Footer Note */}
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
           <p>
-            This sample demonstrates digital signature integration with Nutrient DWS API.
-            Requires NUTRIENT_API_KEY environment variable to be configured
+            This sample demonstrates digital signature integration with Nutrient
+            DWS API. Requires NUTRIENT_API_KEY environment variable to be
+            configured
           </p>
           <p>
             Note: Signature validation requires CA certificate configuration.
-            For production use with full validation, contact Nutrient support for certificate setup.
+            For production use with full validation, contact Nutrient support
+            for certificate setup.
           </p>
         </div>
       </main>
