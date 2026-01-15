@@ -164,12 +164,12 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-neutral: var(--neutral);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --color-background: hsla(30, 20%, 92%, 1);
+  --color-foreground: hsla(0, 13%, 9%, 1);
+  --color-accent: hsla(0, 13%, 9%, 1);
+  --color-neutral: hsla(30, 14%, 72%, 1);
+  --font-sans: "ABC Monument Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas", ui-monospace, "Courier New", monospace;
 }
 
 body {
