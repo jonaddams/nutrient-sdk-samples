@@ -32,8 +32,8 @@
  * - **Use Case**: Loading documents from base64-encoded strings
  * - **Benefits**: Easy embedding in JSON, simple data transfer
  * - **Best For**: Embedded documents, email attachments, legacy APIs
- * - **Example**: `document: base64ToArrayBuffer(base64String)`
- * - **Note**: Base64 strings must be decoded to ArrayBuffer before loading
+ * - **Example**: `document: "data:application/pdf;base64,JVBERi0xLjQK..."`
+ * - **Note**: Base64 data must be formatted as a data URL string
  *
  * ## Features:
  * - Switch between loading methods in real-time
@@ -85,37 +85,6 @@ const DEFAULT_DOCUMENT = "/documents/usenix-example-paper.pdf";
 // ============================================================================
 // Utility Functions
 // ============================================================================
-
-/**
- * Converts a base64-encoded string to an ArrayBuffer.
- *
- * This function is necessary because Nutrient Web SDK accepts either URL strings
- * or ArrayBuffer objects, but not base64 strings directly. The conversion process:
- * 1. Decode base64 to binary string using atob()
- * 2. Convert binary string to Uint8Array
- * 3. Extract the underlying ArrayBuffer
- *
- * @param base64 - Base64-encoded string (without data URI prefix)
- * @returns ArrayBuffer containing the decoded binary data
- *
- * @example
- * const base64 = "JVBERi0xLjQKJeLjz9M..."; // PDF data
- * const arrayBuffer = base64ToArrayBuffer(base64);
- * await NutrientViewer.load({ document: arrayBuffer });
- */
-function base64ToArrayBuffer(base64: string): ArrayBuffer {
-  // Decode base64 to binary string
-  const binaryString = atob(base64);
-
-  // Create typed array from binary string
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  // Return the underlying ArrayBuffer
-  return bytes.buffer;
-}
 
 /**
  * Fetches a document from a URL and returns it as an ArrayBuffer.
@@ -188,7 +157,7 @@ async function fetchAsBase64(url: string): Promise<string> {
 async function prepareUploadedFile(
   file: File,
   method: LoadingMethod,
-): Promise<{ data: File | ArrayBuffer }> {
+): Promise<{ data: File | ArrayBuffer | string }> {
   switch (method) {
     case "url":
     case "blob":
@@ -196,12 +165,22 @@ async function prepareUploadedFile(
       // It will be converted to an Object URL in loadDocument()
       return { data: file };
 
-    case "arraybuffer":
-    case "base64": {
-      // For ArrayBuffer and Base64 methods, convert to ArrayBuffer
-      // Base64 encoding would be wasteful since we'll decode it back to ArrayBuffer
+    case "arraybuffer": {
+      // For ArrayBuffer method, convert to ArrayBuffer
       const arrayBuffer = await file.arrayBuffer();
       return { data: arrayBuffer };
+    }
+
+    case "base64": {
+      // For Base64 method, convert to base64 data URL
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64String = btoa(binary);
+      return { data: `data:application/pdf;base64,${base64String}` };
     }
   }
 }
@@ -328,11 +307,11 @@ export default function DocumentLoadingViewer() {
             }
 
             case "base64": {
-              // Fetch, encode as base64, then decode to ArrayBuffer
+              // Fetch and encode as base64, then create data URL
               // This demonstrates the full base64 workflow, though in practice
               // you would receive base64 data from an API rather than encoding it yourself
               const base64String = await fetchAsBase64(source);
-              documentData = base64ToArrayBuffer(base64String);
+              documentData = `data:application/pdf;base64,${base64String}`;
               break;
             }
           }
@@ -541,31 +520,34 @@ URL.revokeObjectURL(blobObjectUrl);`;
       case "base64":
         return `// Method 4: Load from Base64
 // Common for embedded documents, email attachments, and legacy APIs.
-// Base64 strings must be decoded to ArrayBuffer before loading.
-
-// Helper function to convert base64 to ArrayBuffer
-function base64ToArrayBuffer(base64) {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
+// Base64 data is loaded as a data URL string.
 
 // Example: Base64 data from API
 const response = await fetch("/api/documents/123");
 const { base64Data } = await response.json();
 
-// Convert to ArrayBuffer
-const arrayBuffer = base64ToArrayBuffer(base64Data);
+// Create data URL from base64 string
+const dataUrl = \`data:application/pdf;base64,\${base64Data}\`;
 
 // Load into viewer
 const instance = await NutrientViewer.load({
   container: document.getElementById("viewer"),
-  document: arrayBuffer,
+  document: dataUrl,
   licenseKey: "YOUR_LICENSE_KEY"
-});`;
+});
+
+// Alternative: If you have a File object and want base64
+const file = document.getElementById("fileInput").files[0];
+const reader = new FileReader();
+reader.onload = () => {
+  const dataUrl = reader.result; // Already in data URL format
+  NutrientViewer.load({
+    container: document.getElementById("viewer"),
+    document: dataUrl,
+    licenseKey: "YOUR_LICENSE_KEY"
+  });
+};
+reader.readAsDataURL(file);`;
     }
   };
 
@@ -581,7 +563,7 @@ const instance = await NutrientViewer.load({
       case "blob":
         return "Best for file uploads, drag-and-drop functionality, and when working with browser File APIs.";
       case "base64":
-        return "Best for embedded documents in JSON responses, email attachments, or when working with legacy systems.";
+        return "Best for embedded documents in JSON responses, email attachments, or when working with legacy systems. Uses data URL format.";
     }
   };
 
