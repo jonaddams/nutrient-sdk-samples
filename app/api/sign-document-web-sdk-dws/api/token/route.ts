@@ -22,6 +22,7 @@ export async function POST() {
       },
       body: JSON.stringify({
         allowedOperations: ["digital_signatures_api"],
+        allowedOrigins: ["*"], // Allow all origins for development
         expirationTime: 3600, // 1 hour
       }),
     });
