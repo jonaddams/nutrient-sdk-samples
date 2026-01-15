@@ -1,5 +1,5 @@
 /* Google Fonts - JetBrains Mono for code */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
 
@@ -57,7 +57,8 @@
   /* Typography */
   --font-sans: "ABC Monument Grotesk", system-ui, -apple-system, sans-serif;
   --font-mono:
-    "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas", ui-monospace, "Courier New", monospace;
+    "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas",
+    ui-monospace, "Courier New", monospace;
 
   /* Spacing - Nutrient Scale */
   --spacing-4xs: 0.125rem;
@@ -125,8 +126,10 @@
   /* Shadow Scale */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -161,15 +164,6 @@
   }
 
   /* Removed global h1-h6 and p color overrides to allow inline styles to work */
-}
-
-@theme inline {
-  --color-background: hsla(30, 20%, 92%, 1);
-  --color-foreground: hsla(0, 13%, 9%, 1);
-  --color-accent: hsla(0, 13%, 9%, 1);
-  --color-neutral: hsla(30, 14%, 72%, 1);
-  --font-sans: "ABC Monument Grotesk", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "ABC Monument Grotesk Mono", "Fira Code", "Consolas", ui-monospace, "Courier New", monospace;
 }
 
 body {
