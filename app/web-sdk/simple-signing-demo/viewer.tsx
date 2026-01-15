@@ -1103,6 +1103,45 @@ export default function SigningDemoViewer() {
   };
 
   // ========================================
+  // DELETE ALL FORM FIELDS
+  // ========================================
+
+  /**
+   * Deletes all form fields from the document
+   * This removes all signature, initial, and date fields along with their widget annotations
+   * Only available to Admin users in Editor role
+   */
+  const handleDeleteAllFormFields = async () => {
+    const instance = instanceRef.current;
+    if (!instance) {
+      setSignStatus("Error: Viewer not loaded yet");
+      setTimeout(() => setSignStatus(""), 3000);
+      return;
+    }
+
+    try {
+      setSignStatus("Deleting all form fields...");
+
+      // Get all form fields in the document
+      const formFields = await instance.getFormFields();
+
+      // Delete each form field (this also deletes its widget annotations)
+      for (const formField of formFields) {
+        await instance.delete(formField);
+      }
+
+      setSignStatus(
+        `Successfully deleted ${formFields.size} form field${formFields.size === 1 ? "" : "s"}`,
+      );
+      setTimeout(() => setSignStatus(""), 3000);
+    } catch (error) {
+      console.error("Error deleting form fields:", error);
+      setSignStatus("Error: Failed to delete form fields");
+      setTimeout(() => setSignStatus(""), 3000);
+    }
+  };
+
+  // ========================================
   // DIGITAL SIGNATURE - DWS API Integration
   // ========================================
 
@@ -1408,19 +1447,35 @@ export default function SigningDemoViewer() {
           </div>
         )}
 
-        {/* Digital Signature Button - Only for Admin */}
+        {/* Admin Actions - Only for Admin */}
         {currentUser.role === "Editor" && (
-          <div className="sidebar-section digital-signature-section">
-            <div className="sidebar-label">DWS API</div>
-            <button
-              type="button"
-              className="digital-signature-btn"
-              onClick={handleApplyDigitalSignature}
-              disabled={isSigning}
-            >
-              {isSigning ? "Signing..." : "Apply Digital Signature"}
-            </button>
-          </div>
+          <>
+            {/* Delete All Form Fields Button */}
+            <div className="sidebar-section">
+              <div className="sidebar-label">Field Management</div>
+              <button
+                type="button"
+                className="delete-all-fields-btn"
+                onClick={handleDeleteAllFormFields}
+                disabled={isSigning}
+              >
+                Delete All Form Fields
+              </button>
+            </div>
+
+            {/* Digital Signature Button */}
+            <div className="sidebar-section digital-signature-section">
+              <div className="sidebar-label">DWS API</div>
+              <button
+                type="button"
+                className="digital-signature-btn"
+                onClick={handleApplyDigitalSignature}
+                disabled={isSigning}
+              >
+                {isSigning ? "Signing..." : "Apply Digital Signature"}
+              </button>
+            </div>
+          </>
         )}
       </div>
 

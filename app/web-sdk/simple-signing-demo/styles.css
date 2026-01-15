@@ -428,6 +428,35 @@
 }
 
 /* Digital Signature Button - Primary (Black) variant */
+/* Delete All Form Fields Button - Code Coral (destructive action) */
+.delete-all-fields-btn {
+  background: var(--code-coral);
+  color: var(--white);
+}
+
+.delete-all-fields-btn:hover:not(:disabled) {
+  opacity: 0.85;
+  color: var(--white);
+}
+
+.delete-all-fields-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .delete-all-fields-btn {
+    background: var(--code-coral);
+    color: var(--black);
+  }
+
+  .delete-all-fields-btn:hover:not(:disabled) {
+    opacity: 0.85;
+    color: var(--black);
+  }
+}
+
+/* Digital Signature Button - Black/White (primary action) */
 .digital-signature-btn {
   background: var(--black);
   color: var(--white);
