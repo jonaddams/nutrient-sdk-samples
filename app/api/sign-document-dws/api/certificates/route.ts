@@ -6,7 +6,8 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const apiKey = process.env.NUTRIENT_API_KEY;
-    const apiBaseUrl = process.env.NUTRIENT_API_BASE_URL || "https://api.nutrient.io/";
+    const apiBaseUrl =
+      process.env.NUTRIENT_API_BASE_URL || "https://api.nutrient.io/";
 
     if (!apiKey) {
       return NextResponse.json(

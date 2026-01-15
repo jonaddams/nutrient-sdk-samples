@@ -41,7 +41,9 @@ export default function Viewer({ documentUrl }: ViewerProps) {
           certificatesRef.current = data;
           console.log("Certificates loaded:", data);
         } else {
-          console.warn("Failed to fetch certificates - signature validation may be limited");
+          console.warn(
+            "Failed to fetch certificates - signature validation may be limited",
+          );
         }
       } catch (error) {
         console.warn("Error fetching certificates:", error);
@@ -115,10 +117,14 @@ export default function Viewer({ documentUrl }: ViewerProps) {
         if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
           configuration.trustedCAsCallback = async () => {
             return certs.ca_certificates.map((cert: string) =>
-              decodeBase64String(cert)
+              decodeBase64String(cert),
             );
           };
-          console.log("Trusting", certs.ca_certificates.length, "CA certificates");
+          console.log(
+            "Trusting",
+            certs.ca_certificates.length,
+            "CA certificates",
+          );
         }
 
         // Load the instance
@@ -161,7 +167,11 @@ export default function Viewer({ documentUrl }: ViewerProps) {
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
-      <div ref={containerRef} className="h-full w-full" style={{ minHeight: "600px" }} />
+      <div
+        ref={containerRef}
+        className="h-full w-full"
+        style={{ minHeight: "600px" }}
+      />
     </div>
   );
 }

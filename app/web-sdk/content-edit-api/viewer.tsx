@@ -583,16 +583,17 @@ export default function Viewer({ document }: ViewerProps) {
       if (isContentEditingRef.current) {
         // Exit content editing mode - return to default interaction mode
         console.log("Exiting content editing mode");
-        window.viewerInstance?.setViewState(
-          (v: ViewState) =>
-            v.set("interactionMode", NutrientViewer.InteractionMode.PAN),
+        window.viewerInstance?.setViewState((v: ViewState) =>
+          v.set("interactionMode", NutrientViewer.InteractionMode.PAN),
         );
       } else {
         // Enter content editing mode
         console.log("Entering content editing mode");
-        window.viewerInstance?.setViewState(
-          (v: ViewState) =>
-            v.set("interactionMode", NutrientViewer.InteractionMode.CONTENT_EDITOR),
+        window.viewerInstance?.setViewState((v: ViewState) =>
+          v.set(
+            "interactionMode",
+            NutrientViewer.InteractionMode.CONTENT_EDITOR,
+          ),
         );
       }
       // Note: State updates are handled by the interactionMode change event listener

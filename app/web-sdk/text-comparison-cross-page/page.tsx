@@ -12,12 +12,8 @@ const DocumentComparisonViewer = dynamic(
 );
 
 export default function CrossPageTextComparisonPage() {
-  const [doc1, setDoc1] = useState<string>(
-    "/documents/text-comparison-a.pdf",
-  );
-  const [doc2, setDoc2] = useState<string>(
-    "/documents/text-comparison-b.pdf",
-  );
+  const [doc1, setDoc1] = useState<string>("/documents/text-comparison-a.pdf");
+  const [doc2, setDoc2] = useState<string>("/documents/text-comparison-b.pdf");
   const [isComparing, setIsComparing] = useState(false);
 
   const startComparison = () => {

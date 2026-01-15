@@ -18,16 +18,28 @@ const Viewer = dynamic(() => import("./viewer"), {
 
 const AVAILABLE_DOCUMENTS = [
   { path: "/documents/contract-template.pdf", name: "Contract Template" },
-  { path: "/documents/the-wind-in-the-willows.pdf", name: "The Wind in the Willows" },
-  { path: "/documents/jacques-torres-chocolate-chip-cookies.pdf", name: "Chocolate Chip Cookies Recipe" },
+  {
+    path: "/documents/the-wind-in-the-willows.pdf",
+    name: "The Wind in the Willows",
+  },
+  {
+    path: "/documents/jacques-torres-chocolate-chip-cookies.pdf",
+    name: "Chocolate Chip Cookies Recipe",
+  },
   { path: "/documents/usenix-example-paper.pdf", name: "USENIX Example Paper" },
 ];
 
 export default function SignDocumentDWSPage() {
-  const [selectedDocument, setSelectedDocument] = useState<string>(AVAILABLE_DOCUMENTS[0].path);
-  const [signatureType, setSignatureType] = useState<"invisible" | "visible">("invisible");
+  const [selectedDocument, setSelectedDocument] = useState<string>(
+    AVAILABLE_DOCUMENTS[0].path,
+  );
+  const [signatureType, setSignatureType] = useState<"invisible" | "visible">(
+    "invisible",
+  );
   const [isSigning, setIsSigning] = useState(false);
-  const [signedDocumentUrl, setSignedDocumentUrl] = useState<string | null>(null);
+  const [signedDocumentUrl, setSignedDocumentUrl] = useState<string | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   const handleSign = useCallback(async () => {
@@ -45,7 +57,11 @@ export default function SignDocumentDWSPage() {
 
       // Prepare form data
       const formData = new FormData();
-      formData.append("file", documentBlob, selectedDocument.split("/").pop() || "document.pdf");
+      formData.append(
+        "file",
+        documentBlob,
+        selectedDocument.split("/").pop() || "document.pdf",
+      );
       formData.append("signatureType", signatureType);
 
       // Call our API to sign the document
@@ -82,7 +98,10 @@ export default function SignDocumentDWSPage() {
   }, [signedDocumentUrl]);
 
   const selectedDocumentName = useMemo(() => {
-    return AVAILABLE_DOCUMENTS.find((doc) => doc.path === selectedDocument)?.name || "document";
+    return (
+      AVAILABLE_DOCUMENTS.find((doc) => doc.path === selectedDocument)?.name ||
+      "document"
+    );
   }, [selectedDocument]);
 
   return (
@@ -141,7 +160,8 @@ export default function SignDocumentDWSPage() {
               Server-Side Signing
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Send complete documents to DWS API for server-side digital signature processing
+              Send complete documents to DWS API for server-side digital
+              signature processing
             </p>
           </div>
 
@@ -197,7 +217,8 @@ export default function SignDocumentDWSPage() {
               Configurable Signatures
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Choose between visible and invisible signatures with CAdES b-lt validation
+              Choose between visible and invisible signatures with CAdES b-lt
+              validation
             </p>
           </div>
         </div>
@@ -211,7 +232,9 @@ export default function SignDocumentDWSPage() {
 
             {error && (
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
+                <p className="text-sm text-red-800 dark:text-red-300">
+                  {error}
+                </p>
               </div>
             )}
 
@@ -250,7 +273,9 @@ export default function SignDocumentDWSPage() {
                       name="signature-type"
                       value="invisible"
                       checked={signatureType === "invisible"}
-                      onChange={(e) => setSignatureType(e.target.value as "invisible")}
+                      onChange={(e) =>
+                        setSignatureType(e.target.value as "invisible")
+                      }
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
                     <span className="text-sm text-gray-900 dark:text-gray-100">
@@ -263,10 +288,14 @@ export default function SignDocumentDWSPage() {
                       name="signature-type"
                       value="visible"
                       checked={signatureType === "visible"}
-                      onChange={(e) => setSignatureType(e.target.value as "visible")}
+                      onChange={(e) =>
+                        setSignatureType(e.target.value as "visible")
+                      }
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm text-gray-900 dark:text-gray-100">Visible</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                      Visible
+                    </span>
                   </label>
                 </div>
                 <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -376,10 +405,20 @@ export default function SignDocumentDWSPage() {
             <ol className="mt-4 ml-5 space-y-2 text-gray-600 dark:text-gray-400 list-decimal">
               <li>Select a PDF document from the available samples</li>
               <li>Choose between visible or invisible signature types</li>
-              <li>The entire document is sent to the DWS Processor API via POST request</li>
-              <li>DWS API applies a CAdES b-lt digital signature to the document</li>
-              <li>The signed PDF is returned and displayed in the Web SDK viewer</li>
-              <li>Download the signed document with legally binding digital signature</li>
+              <li>
+                The entire document is sent to the DWS Processor API via POST
+                request
+              </li>
+              <li>
+                DWS API applies a CAdES b-lt digital signature to the document
+              </li>
+              <li>
+                The signed PDF is returned and displayed in the Web SDK viewer
+              </li>
+              <li>
+                Download the signed document with legally binding digital
+                signature
+              </li>
             </ol>
           </details>
         )}
@@ -388,8 +427,9 @@ export default function SignDocumentDWSPage() {
         {!signedDocumentUrl && (
           <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 text-center">
             <p>
-              This sample demonstrates server-side document signing using DWS Processor API.
-              Requires NUTRIENT_API_KEY environment variable to be configured
+              This sample demonstrates server-side document signing using DWS
+              Processor API. Requires NUTRIENT_API_KEY environment variable to
+              be configured
             </p>
           </div>
         )}
