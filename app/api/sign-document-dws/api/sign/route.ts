@@ -33,7 +33,9 @@ export async function POST(request: NextRequest) {
 
     // Prepare the request to Nutrient DWS Sign API
     const dwsFormData = new FormData();
-    dwsFormData.append("file", file);
+
+    // Append the file directly - no conversion needed
+    dwsFormData.append("file", file, file.name);
 
     // Build signature configuration
     const signatureData: Record<string, unknown> = {
@@ -43,11 +45,8 @@ export async function POST(request: NextRequest) {
 
     // Add position configuration based on signature type
     if (signatureType === "invisible") {
-      // For invisible signatures, use a zero-size rect to make it invisible
-      signatureData.position = {
-        pageIndex: 0,
-        rect: [0, 0, 0, 0], // [x, y, width, height] - zero size makes it invisible
-      };
+      // For invisible signatures, omit position entirely - API will create invisible signature
+      // No position or appearance needed
     } else {
       // For visible signatures, add position and appearance
       signatureData.position = {

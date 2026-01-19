@@ -1169,27 +1169,39 @@ export default function SigningDemoViewer() {
    *    - Display success message
    */
   const handleApplyDigitalSignature = async () => {
+    console.log("=== DIGITAL SIGNATURE WORKFLOW START ===");
+    console.log("Timestamp:", new Date().toISOString());
+
     const instance = instanceRef.current;
     const NV = window.NutrientViewer;
+
+    console.log("Instance available:", !!instance);
+    console.log("NutrientViewer available:", !!NV);
+
     if (!instance || !NV) {
+      console.error("ERROR: Viewer not loaded");
       setSignStatus("Error: Viewer not loaded yet");
       setTimeout(() => setSignStatus(""), 3000);
       return;
     }
 
     if (isSigning) {
+      console.warn("Already signing - ignoring duplicate request");
       return;
     }
 
     try {
       setIsSigning(true);
       setSignStatus("Finalizing signatures...");
+      console.log("Status: Starting signature finalization");
 
       /**
        * STEP 1: PREPARE SIGNATURES FOR FLATTENING
        * Find all electronic signature ImageAnnotations and add branding labels
        */
+      console.log("--- STEP 1: Preparing signatures for flattening ---");
       const totalPages = await instance.totalPageCount;
+      console.log("Total pages in document:", totalPages);
       const pagesWithSignatures: number[] = [];
 
       for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
@@ -1202,6 +1214,7 @@ export default function SigningDemoViewer() {
         );
 
         if (signatureAnnotations.size > 0) {
+          console.log(`Found ${signatureAnnotations.size} signatures on page ${pageIndex}`);
           pagesWithSignatures.push(pageIndex);
 
           // Create "By Nutrient {ID}" text annotations above each signature
@@ -1244,6 +1257,8 @@ export default function SigningDemoViewer() {
        *
        * Uses instance.applyOperations with "flattenAnnotations" operation
        */
+      console.log("--- STEP 2: Flattening annotations ---");
+      console.log("Pages with signatures to flatten:", pagesWithSignatures);
       if (pagesWithSignatures.length > 0) {
         await instance.applyOperations([
           {
@@ -1251,13 +1266,20 @@ export default function SigningDemoViewer() {
             pageIndexes: pagesWithSignatures,
           },
         ]);
+        console.log("Annotations flattened successfully");
+      } else {
+        console.log("No signatures to flatten");
       }
 
       /**
        * STEP 3: GET AUTHENTICATION TOKEN
        * Request JWT token from DWS API to authorize digital signing
        */
+      console.log("--- STEP 3: Getting authentication token ---");
       setSignStatus("Requesting authentication token...");
+
+      console.log("Requesting token from:", "/api/sign-document-web-sdk-dws/api/token");
+      console.log("Origin:", window.location.origin);
 
       const tokenResponse = await fetch(
         "/api/sign-document-web-sdk-dws/api/token",
@@ -1272,11 +1294,17 @@ export default function SigningDemoViewer() {
         },
       );
 
+      console.log("Token response status:", tokenResponse.status);
+
       if (!tokenResponse.ok) {
-        throw new Error("Failed to get authentication token");
+        const errorText = await tokenResponse.text();
+        console.error("Token request failed:", errorText);
+        throw new Error(`Failed to get authentication token: ${errorText}`);
       }
 
       const { token } = await tokenResponse.json();
+      console.log("Token received successfully");
+      console.log("Token (first 20 chars):", token?.substring(0, 20) + "...");
 
       /**
        * STEP 4: APPLY DIGITAL SIGNATURE
@@ -1287,31 +1315,45 @@ export default function SigningDemoViewer() {
        * - Includes timestamp for long-term validity
        * - Embeds validation information in the PDF
        */
+      console.log("--- STEP 4: Applying digital signature ---");
       setSignStatus("Signing document...");
 
-      await instance.signDocument(
-        {
-          signingData: {
-            signatureType: NV.SignatureType.CAdES,
-            padesLevel: NV.PAdESLevel.b_lt,
-          },
+      const signingConfig = {
+        signingData: {
+          signatureType: NV.SignatureType.CAdES,
+          padesLevel: NV.PAdESLevel.b_lt,
         },
-        {
-          jwt: token,
-        },
-      );
+      };
+
+      const authConfig = {
+        jwt: token,
+      };
+
+      console.log("Signing configuration:", {
+        signatureType: "CAdES",
+        padesLevel: "b_lt",
+        hasToken: !!token,
+      });
+
+      console.log("Calling instance.signDocument()...");
+      await instance.signDocument(signingConfig, authConfig);
+      console.log("Digital signature applied successfully!");
 
       /**
        * STEP 5: UPDATE UI
        * Show signature validation banner and clean up overlays
        */
+      console.log("--- STEP 5: Updating UI ---");
       const currentViewState = instance.viewState;
+      console.log("Current view state:", currentViewState.toJS());
+
       await instance.setViewState(
         currentViewState.set(
           "showSignatureValidationStatus",
           NV.ShowSignatureValidationStatusMode.IF_SIGNED,
         ),
       );
+      console.log("Signature validation banner enabled");
 
       // Hide overlays for signed fields - multiple checks ensure they're hidden
       setTimeout(() => hideSignedFieldOverlays(), 300);
@@ -1319,16 +1361,29 @@ export default function SigningDemoViewer() {
       setTimeout(() => hideSignedFieldOverlays(), 1000);
       setTimeout(() => hideSignedFieldOverlays(), 1500);
 
+      console.log("=== DIGITAL SIGNATURE WORKFLOW COMPLETE ===");
       setSignStatus("Document signed successfully!");
       setTimeout(() => setSignStatus(""), 3000);
     } catch (error) {
-      console.error("Error signing document:", error);
+      console.error("=== DIGITAL SIGNATURE WORKFLOW FAILED ===");
+      console.error("Error type:", error?.constructor?.name);
+      console.error("Error message:", error instanceof Error ? error.message : String(error));
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      console.error("Full error object:", error);
+
+      // Extract more details if it's a PSPDFKitError
+      if (error && typeof error === "object") {
+        console.error("Error properties:", Object.keys(error));
+        console.error("Error details:", JSON.stringify(error, null, 2));
+      }
+
       setSignStatus(
         `Error: ${error instanceof Error ? error.message : String(error)}`,
       );
       setTimeout(() => setSignStatus(""), 5000);
     } finally {
       setIsSigning(false);
+      console.log("Signing flag reset - workflow ended");
     }
   };
 
