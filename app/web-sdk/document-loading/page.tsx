@@ -22,7 +22,7 @@ export default function DocumentLoadingPage() {
 
       {/* Viewer Container */}
       <main className="max-w-7xl mx-auto px-6 pb-8">
-        <div className="h-[calc(100vh-12rem)]">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
           <DocumentLoadingViewer />
         </div>
       </main>
