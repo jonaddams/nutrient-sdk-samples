@@ -817,7 +817,7 @@ export default function Page() {
         title="Text Comparison"
         description="Compare two PDF documents side-by-side with highlighted text changes"
       />
-      <div className="m-4 grid grid-cols-12">
+      <div className="mx-4 mt-6 mb-4 grid grid-cols-12">
         {/* original document viewer */}
         <div className="min-h-fit col-span-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div>

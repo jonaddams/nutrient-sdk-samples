@@ -18,7 +18,7 @@ export default function SearchPage() {
       />
 
       {/* Viewer Container */}
-      <main className="max-w-7xl mx-auto px-6 pb-8">
+      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
           <SearchViewer
             document="/documents/20000-leagues-under-the-sea.pdf"
