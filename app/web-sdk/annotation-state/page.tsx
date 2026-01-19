@@ -20,8 +20,8 @@ export default function AnnotationStatePage() {
         description="Save and restore annotation states locally with version control-like functionality"
       />
 
-      <div className="flex flex-1 overflow-hidden justify-center">
-        <div className="flex-1 overflow-hidden max-w-7xl">
+      <div className="flex flex-1 overflow-hidden justify-center px-6 pb-8">
+        <div className="flex-1 overflow-hidden max-w-7xl bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <AnnotationStateViewer />
         </div>
       </div>

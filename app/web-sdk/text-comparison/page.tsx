@@ -819,7 +819,7 @@ export default function Page() {
       />
       <div className="m-4 grid grid-cols-12">
         {/* original document viewer */}
-        <div className="min-h-fit col-span-5 border">
+        <div className="min-h-fit col-span-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div>
             <p className="text-center p-3">{originalDoc}</p>
           </div>
@@ -830,7 +830,7 @@ export default function Page() {
           />
         </div>
         {/* changed document viewer */}
-        <div className="min-h-fit col-span-5 border">
+        <div className="min-h-fit col-span-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div>
             <p className="text-center p-3">{changedDoc}</p>
           </div>

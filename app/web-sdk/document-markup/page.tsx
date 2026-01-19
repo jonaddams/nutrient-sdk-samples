@@ -24,7 +24,7 @@ export default function DocumentMarkupPage() {
 
       {/* Viewer Container */}
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="h-[calc(100vh-15rem)]">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-15rem)]">
           <DocumentMarkupViewer document="/documents/sample-with-changes-comments.docx" />
         </div>
       </main>
