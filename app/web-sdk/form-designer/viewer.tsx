@@ -353,7 +353,7 @@ export default function FormDesignerViewer() {
     // Load viewer
     NutrientViewer.load({
       container,
-      document: "/documents/text-comparison-a.pdf",
+      document: "/documents/contract-template.pdf",
       allowLinearizedLoading: true,
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
