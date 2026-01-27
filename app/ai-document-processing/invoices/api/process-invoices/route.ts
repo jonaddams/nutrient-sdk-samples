@@ -370,7 +370,7 @@ async function processInvoiceDocument(
 
   // Create an AbortController with timeout
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 second timeout for invoices
+  const timeoutId = setTimeout(() => controller.abort(), 180000); // 180 second timeout for invoices
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/process`, {
