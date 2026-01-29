@@ -18,8 +18,8 @@ export default function CustomMenuPage() {
         description="A completely custom menu interface for the Nutrient Web SDK viewer with custom toolbar, annotation tools, document comparison, and measurement capabilities."
       />
 
-      <main className="max-w-7xl mx-auto px-6 pb-8">
-        <div className="h-[calc(100vh-12rem)]">
+      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
+        <div className="h-[calc(100vh-12rem)] rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <Viewer />
         </div>
       </main>
