@@ -1,6 +1,5 @@
 "use client";
 
-import { read } from "node:fs";
 /**
  * Digital Signature Sample with Nutrient DWS API
  *
@@ -53,7 +52,9 @@ export default function Viewer({ document }: ViewerProps) {
     const fetchCertificates = async () => {
       try {
         // Fetch the CA certificates from DWS API
-        const response = await fetch("/api/sign-document-web-sdk-dws/api/certificates");
+        const response = await fetch(
+          "/api/sign-document-web-sdk-dws/api/certificates",
+        );
         if (response.ok) {
           const data = await response.json();
           certificatesRef.current = data;
@@ -175,6 +176,7 @@ export default function Viewer({ document }: ViewerProps) {
     ] as const;
   }, [isSigning]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: toolbarItems is intentionally excluded to prevent viewer from reloading after signing (which would lose the signature)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -293,7 +295,7 @@ export default function Viewer({ document }: ViewerProps) {
 
       instanceRef.current = null;
     };
-  }, [document, certificatesLoaded, toolbarItems]);
+  }, [document, certificatesLoaded]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "600px" }}>
