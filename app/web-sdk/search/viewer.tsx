@@ -367,21 +367,7 @@ export default function SearchViewer({
                     key={term}
                     type="button"
                     onClick={() => performSearch(term)}
-                    className="px-3 py-1.5 text-sm font-semibold rounded-full border transition-colors cursor-pointer"
-                    style={{
-                      borderColor: "var(--digital-pollen)",
-                      color: "var(--digital-pollen)",
-                      background: "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background =
-                        "var(--digital-pollen)";
-                      e.currentTarget.style.color = "var(--black)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--digital-pollen)";
-                    }}
+                    className="px-3 py-1.5 text-sm font-semibold rounded-full border border-[var(--digital-pollen)] text-gray-800 dark:text-[var(--digital-pollen)] bg-transparent hover:bg-[var(--digital-pollen)] hover:text-[var(--black)] transition-colors cursor-pointer"
                   >
                     {term}
                   </button>

@@ -90,8 +90,8 @@ export default function ContentEditApiPage() {
       />
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto w-full px-6 pb-8">
-        <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-12rem)] border-l border-r border-b border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)]">
+      <div className="max-w-7xl mx-auto w-full px-6 pt-6 pb-8">
+        <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-12rem)] rounded-xl shadow-lg border border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] overflow-hidden">
           {/* Mobile: Top buttons, Desktop: Sidebar */}
           <aside className="bg-white dark:bg-[var(--warm-gray-950)] border-b lg:border-r lg:border-b-0 border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] lg:w-64 shrink-0">
             <div className="px-4 py-3 lg:py-6 lg:h-full">
