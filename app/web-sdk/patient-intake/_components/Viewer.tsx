@@ -7,11 +7,19 @@ type NutrientViewerWindow = Window & {
     load: (config: unknown) => Promise<unknown>;
     unload?: (container: HTMLElement) => void;
     defaultToolbarItems?: Array<{ type: string }>;
+    Annotations?: {
+      toSerializableObject: (annotation: unknown) => unknown;
+      fromSerializableObject: (serialized: unknown) => unknown;
+    };
+    Immutable?: {
+      List: (items: unknown[]) => unknown;
+    };
   };
 };
 
 interface ViewerProps {
   document: string | ArrayBuffer;
+  onInstanceReady?: (instance: ViewerInstance) => void;
 }
 
 interface PatientData {
@@ -75,9 +83,165 @@ interface PatientData {
 interface ViewerInstance {
   getFormFieldValues: () => Promise<Record<string, unknown>>;
   setFormFieldValues: (values: Record<string, string | string[]>) => void;
+  addEventListener: (
+    event: string,
+    callback: (annotation: unknown) => void,
+  ) => void;
+  setStoredSignatures: (signaturesOrCallback: unknown) => void;
+  getAttachment: (id: string) => Promise<Blob>;
+  createAttachment: (blob: Blob) => void;
+  getFormFields: () => Promise<any>;
+  getAnnotations: (pageIndex: number) => Promise<any>;
+  getOverlappingAnnotations: (field: any) => Promise<any>;
+  update: (field: any) => Promise<any>;
+  totalPageCount: number;
 }
 
-export default function Viewer({ document }: ViewerProps) {
+// LocalStorage keys for signature storage
+const STORAGE_KEY = "signatures_storage";
+const ATTACHMENTS_KEY = "attachments_storage";
+
+// Helper function to convert File/Blob to data URL
+const fileToDataURL = (file: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+// Setup signature storage for the viewer instance
+const setupSignatureStorage = async (instance: any, NutrientViewer: any) => {
+  console.log("Setting up signature storage...");
+
+  // Load existing stored signatures from localStorage
+  try {
+    const signaturesString = localStorage.getItem(STORAGE_KEY);
+    if (signaturesString) {
+      const storedSignatures = JSON.parse(signaturesString);
+      const list = NutrientViewer.Immutable.List(
+        storedSignatures.map(NutrientViewer.Annotations.fromSerializableObject),
+      );
+      instance.setStoredSignatures(list);
+      console.log(`Loaded ${storedSignatures.length} stored signatures`);
+    }
+
+    // Retrieve and load attachments
+    const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+    if (attachmentsString) {
+      const attachmentsArray = JSON.parse(attachmentsString);
+      const blobs = await Promise.all(
+        attachmentsArray.map(({ url }: { url: string }) =>
+          fetch(url).then((res) => res.blob()),
+        ),
+      );
+      for (const blob of blobs) {
+        instance.createAttachment(blob);
+      }
+      console.log(`Loaded ${blobs.length} signature attachments`);
+    }
+  } catch (err) {
+    console.error("Error loading stored signatures:", err);
+  }
+
+  // Listen for new signatures being stored
+  instance.addEventListener(
+    "storedSignatures.create",
+    async (annotation: any) => {
+      try {
+        const signaturesString = localStorage.getItem(STORAGE_KEY);
+        const storedSignatures = signaturesString
+          ? JSON.parse(signaturesString)
+          : [];
+
+        const serializedAnnotation =
+          NutrientViewer.Annotations.toSerializableObject(annotation);
+
+        // Handle image attachments if present
+        if (annotation.imageAttachmentId) {
+          const attachment = await instance.getAttachment(
+            annotation.imageAttachmentId,
+          );
+          const url = await fileToDataURL(attachment);
+
+          const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+          const attachmentsArray = attachmentsString
+            ? JSON.parse(attachmentsString)
+            : [];
+          attachmentsArray.push({ url, id: annotation.imageAttachmentId });
+          localStorage.setItem(
+            ATTACHMENTS_KEY,
+            JSON.stringify(attachmentsArray),
+          );
+        }
+
+        storedSignatures.push(serializedAnnotation);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storedSignatures));
+
+        // Update the instance to show the signature in the UI
+        instance.setStoredSignatures((signatures: any) =>
+          signatures.push(annotation),
+        );
+
+        console.log("Signature saved to storage");
+      } catch (err) {
+        console.error("Error saving signature to storage:", err);
+      }
+    },
+  );
+
+  // Listen for signatures being deleted
+  instance.addEventListener("storedSignatures.delete", (annotation: any) => {
+    try {
+      const signaturesString = localStorage.getItem(STORAGE_KEY);
+      const storedSignatures = signaturesString
+        ? JSON.parse(signaturesString)
+        : [];
+      const annotations = storedSignatures.map(
+        NutrientViewer.Annotations.fromSerializableObject,
+      );
+      const updatedAnnotations = annotations.filter(
+        (currentAnnotation: any) => !currentAnnotation.equals(annotation),
+      );
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+          updatedAnnotations.map(
+            NutrientViewer.Annotations.toSerializableObject,
+          ),
+        ),
+      );
+
+      // Update the instance UI
+      instance.setStoredSignatures((signatures: any) =>
+        signatures.filter((signature: any) => !signature.equals(annotation)),
+      );
+
+      // Handle attachment deletion if present
+      if (annotation.imageAttachmentId) {
+        const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+        if (attachmentsString) {
+          let attachmentsArray = JSON.parse(attachmentsString);
+          attachmentsArray = attachmentsArray.filter(
+            (attachment: any) => attachment.id !== annotation.imageAttachmentId,
+          );
+          localStorage.setItem(
+            ATTACHMENTS_KEY,
+            JSON.stringify(attachmentsArray),
+          );
+        }
+      }
+
+      console.log("Signature deleted from storage");
+    } catch (err) {
+      console.error("Error deleting signature from storage:", err);
+    }
+  });
+};
+
+export default function Viewer({ document, onInstanceReady }: ViewerProps) {
   const containerRef = useRef(null);
 
   const getFormFieldValues = useCallback(
@@ -576,6 +740,35 @@ export default function Viewer({ document }: ViewerProps) {
           } catch (error) {
             console.error("Error populating form fields:", error);
           }
+
+          // Set form field permissions (make staff fields readonly)
+          try {
+            const formFields = await (
+              instance as ViewerInstance
+            ).getFormFields();
+
+            for (const field of formFields) {
+              // Make staff signature fields readonly for patients
+              if (field.name?.toLowerCase().includes("staff")) {
+                const currentReadOnly = field.readOnly || false;
+
+                if (!currentReadOnly) {
+                  const updatedField = field.set("readOnly", true);
+                  await (instance as ViewerInstance).update(updatedField);
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error setting field permissions:", error);
+          }
+
+          // Set up signature storage
+          setupSignatureStorage(instance, NutrientViewer);
+
+          // Notify parent that instance is ready
+          if (onInstanceReady) {
+            onInstanceReady(instance as ViewerInstance);
+          }
         });
     }
 
@@ -584,7 +777,7 @@ export default function Viewer({ document }: ViewerProps) {
         NutrientViewer.unload(container);
       }
     };
-  }, [document, getFormFieldValues]);
+  }, [document, getFormFieldValues, onInstanceReady]);
 
   return <div ref={containerRef} style={{ height: "100%", width: "100%" }} />;
 }

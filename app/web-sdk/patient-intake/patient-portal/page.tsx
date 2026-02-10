@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Viewer from "../_components/Viewer";
 
 interface PatientData {
@@ -30,6 +30,7 @@ export default function PatientPortal() {
   const [currentDocument, setCurrentDocument] = useState<string | null>(null);
   const [appointmentDate, setAppointmentDate] = useState<string>("");
   const [appointmentTime, setAppointmentTime] = useState<string>("");
+  const viewerInstanceRef = useRef<any>(null);
 
   const forms = [
     {
@@ -101,7 +102,74 @@ export default function PatientPortal() {
     );
   }, []);
 
-  const handleFormComplete = () => {
+  const checkSignatures = async (): Promise<boolean> => {
+    const instance = viewerInstanceRef.current;
+    if (!instance) {
+      console.error("No viewer instance available");
+      return false;
+    }
+
+    try {
+      // Get NutrientViewer SDK from window
+      const NutrientViewer = (window as any).NutrientViewer;
+      if (!NutrientViewer) {
+        console.error("NutrientViewer SDK not available");
+        return false;
+      }
+
+      // Get all form fields
+      const formFields = await instance.getFormFields();
+
+      // Filter to get only signature fields (excluding staff fields)
+      const signatureFields: any[] = [];
+      for (const field of formFields) {
+        // Use instanceof to check if it's a signature field
+        if (field instanceof NutrientViewer.FormFields.SignatureFormField) {
+          // Exclude staff signature fields - patients should not sign these
+          if (field.name?.toLowerCase().includes("staff")) {
+            continue;
+          }
+          signatureFields.push(field);
+        }
+      }
+
+      if (signatureFields.length === 0) {
+        // No signature fields in this form
+        return true;
+      }
+
+      // Check each signature field to see if it has been signed
+      for (const field of signatureFields) {
+        // Use the built-in method to check for overlapping annotations
+        const overlapping = await instance.getOverlappingAnnotations(field);
+
+        if (overlapping.size === 0) {
+          // Found an unsigned signature field
+          alert(
+            `Please sign all required signature fields before continuing.\n\nMissing signature for: ${field.name.replace(/_/g, " ")}`,
+          );
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error checking signatures:", error);
+      return false;
+    }
+  };
+
+  const handleFormComplete = async () => {
+    // Check if all signatures are present
+    const allSigned = await checkSignatures();
+
+    if (!allSigned) {
+      return; // Don't proceed if signatures are missing
+    }
+
+    // Clear the viewer instance ref when moving to next form
+    viewerInstanceRef.current = null;
+
     if (currentStep < forms.length - 1) {
       setCurrentStep(currentStep + 1);
       setCurrentDocument(null);
@@ -189,7 +257,12 @@ export default function PatientPortal() {
         {/* Document Viewer */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-[calc(100vh-4rem)]">
-            <Viewer document={currentDocument} />
+            <Viewer
+              document={currentDocument}
+              onInstanceReady={(instance) => {
+                viewerInstanceRef.current = instance;
+              }}
+            />
           </div>
         </div>
       </div>
