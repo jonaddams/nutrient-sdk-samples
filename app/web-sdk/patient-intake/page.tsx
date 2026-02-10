@@ -275,7 +275,8 @@ export default function PatientIntakeHome() {
                     We&apos;ve pre-filled your intake forms with information
                     from your previous visits. Please review and update any
                     information as needed, then provide your electronic
-                    signatures. Your signature will not be stored.
+                    signatures. Your signature will be stored securely to
+                    streamline future forms.
                   </p>
                 </div>
               </div>
