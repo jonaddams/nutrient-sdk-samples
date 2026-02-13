@@ -1354,21 +1354,6 @@ export default function SigningDemoViewer() {
       setSignStatus("Finalizing signatures...");
       console.log("Status: Starting signature finalization");
 
-      // Check if document is already signed
-      console.log("Checking if document is already signed...");
-      const viewState = instance.viewState;
-      const hasSignatures = viewState.get("hasDigitalSignatures");
-
-      if (hasSignatures) {
-        console.warn(
-          "Document is already digitally signed. Cannot sign again.",
-        );
-        setSignStatus("Document is already signed");
-        setTimeout(() => setSignStatus(""), 3000);
-        setIsSigning(false);
-        return;
-      }
-
       /**
        * STEP 1: PREPARE SIGNATURES FOR FLATTENING
        * Find all electronic signature ImageAnnotations and add branding labels
