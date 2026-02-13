@@ -132,6 +132,20 @@ export default function Viewer({ document }: ViewerProps) {
             // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types not available
             const NutrientViewer = (window as any).NutrientViewer;
 
+            // Check if document is already signed
+            console.log("Checking if document is already signed...");
+            const viewState = instance.viewState;
+            const hasSignatures = viewState.get("hasDigitalSignatures");
+
+            if (hasSignatures) {
+              console.warn(
+                "Document is already digitally signed. Cannot sign again.",
+              );
+              setSignStatus("Document is already signed");
+              setTimeout(() => setSignStatus(""), 3000);
+              return;
+            }
+
             // Flatten all annotations before signing
             setSignStatus("Preparing document...");
             console.log("Flattening all annotations before signing...");
