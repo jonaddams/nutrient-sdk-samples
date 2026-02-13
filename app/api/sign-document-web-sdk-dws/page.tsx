@@ -22,7 +22,7 @@ export default function DigitalSignaturePage() {
     const timer = setTimeout(() => {
       const link = document.createElement("link");
       link.rel = "prefetch";
-      link.href = "/documents/contract-template.pdf";
+      link.href = "/documents/web-sdk-dws.pdf";
       document.head.appendChild(link);
     }, 1000);
     return () => clearTimeout(timer);
@@ -147,7 +147,7 @@ export default function DigitalSignaturePage() {
           <div className="h-[calc(100vh-32rem)]">
             {useMemo(
               () => (
-                <Viewer document="/documents/contract-template.pdf" />
+                <Viewer document="/documents/web-sdk-dws.pdf" />
               ),
               [],
             )}
