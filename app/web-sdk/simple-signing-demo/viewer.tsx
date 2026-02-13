@@ -1500,19 +1500,25 @@ export default function SigningDemoViewer() {
 
       /**
        * STEP 5: UPDATE UI
-       * Show signature validation banner and clean up overlays
+       * Set viewer to readonly mode and show signature validation banner
        */
       console.log("--- STEP 5: Updating UI ---");
       const currentViewState = instance.viewState;
       console.log("Current view state:", currentViewState.toJS());
 
+      // Set viewer to readonly mode to prevent modifications that would invalidate the signature
+      console.log("Setting viewer to readonly mode...");
       await instance.setViewState(
-        currentViewState.set(
-          "showSignatureValidationStatus",
-          NV.ShowSignatureValidationStatusMode.IF_SIGNED,
-        ),
+        currentViewState
+          .set("interactionMode", NV.InteractionMode.PAN)
+          .set(
+            "showSignatureValidationStatus",
+            NV.ShowSignatureValidationStatusMode.IF_SIGNED,
+          ),
       );
-      console.log("Signature validation banner enabled");
+      console.log(
+        "Viewer set to readonly mode with signature validation banner",
+      );
 
       // Hide overlays for signed fields - multiple checks ensure they're hidden
       setTimeout(() => hideSignedFieldOverlays(), 300);

@@ -159,13 +159,16 @@ export default function Viewer({ document }: ViewerProps) {
             console.log("signDocument result:", result);
             console.log("Document signed successfully with DWS API!");
 
-            // Check if document actually has signatures
-            try {
-              const annotations = await instance.getAnnotations(0);
-              console.log("Annotations on page 0:", annotations.size);
-            } catch (e) {
-              console.log("Could not get annotations:", e);
-            }
+            // Set viewer to readonly mode to prevent any modifications
+            // that would invalidate the digital signature
+            console.log("Setting viewer to readonly mode...");
+            instance.setViewState((viewState: any) =>
+              viewState.set(
+                "interactionMode",
+                NutrientViewer.InteractionMode.PAN,
+              ),
+            );
+            console.log("Viewer set to readonly mode");
 
             setSignStatus("Document signed successfully!");
             setTimeout(() => setSignStatus(""), 3000);
