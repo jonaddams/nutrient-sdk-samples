@@ -39,6 +39,162 @@ import { useEffect, useRef, useState } from "react";
 import type { FieldType, Signer, User } from "./_lib/types";
 import "./styles.css";
 
+// LocalStorage keys for signature storage
+const STORAGE_KEY = "nutrient_signatures_storage";
+const ATTACHMENTS_KEY = "nutrient_attachments_storage";
+
+/**
+ * Helper function to convert File/Blob to data URL
+ * Used for storing signature image attachments in localStorage
+ */
+const fileToDataURL = (file: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+/**
+ * Setup signature storage for the viewer instance
+ * Enables users to save and reuse their signatures across sessions
+ *
+ * @param instance - The Nutrient Viewer instance
+ * @param NutrientViewer - The Nutrient SDK reference
+ */
+const setupSignatureStorage = async (
+  instance: Instance,
+  NutrientViewer: any,
+) => {
+  console.log("Setting up signature storage...");
+
+  // Load existing stored signatures from localStorage
+  try {
+    const signaturesString = localStorage.getItem(STORAGE_KEY);
+    if (signaturesString) {
+      const storedSignatures = JSON.parse(signaturesString);
+      const list = NutrientViewer.Immutable.List(
+        storedSignatures.map(NutrientViewer.Annotations.fromSerializableObject),
+      );
+      instance.setStoredSignatures(list);
+      console.log(`Loaded ${storedSignatures.length} stored signatures`);
+    }
+
+    // Retrieve and load attachments
+    const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+    if (attachmentsString) {
+      const attachmentsArray = JSON.parse(attachmentsString);
+      const blobs = await Promise.all(
+        attachmentsArray.map(({ url }: { url: string }) =>
+          fetch(url).then((res) => res.blob()),
+        ),
+      );
+      for (const blob of blobs) {
+        instance.createAttachment(blob);
+      }
+      console.log(`Loaded ${blobs.length} signature attachments`);
+    }
+  } catch (err) {
+    console.error("Error loading stored signatures:", err);
+  }
+
+  // Listen for new signatures being stored
+  instance.addEventListener(
+    "storedSignatures.create",
+    async (annotation: any) => {
+      try {
+        const signaturesString = localStorage.getItem(STORAGE_KEY);
+        const storedSignatures = signaturesString
+          ? JSON.parse(signaturesString)
+          : [];
+
+        const serializedAnnotation =
+          NutrientViewer.Annotations.toSerializableObject(annotation);
+
+        // Handle image attachments if present
+        if (annotation.imageAttachmentId) {
+          const attachment = await instance.getAttachment(
+            annotation.imageAttachmentId,
+          );
+          const url = await fileToDataURL(attachment);
+
+          const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+          const attachmentsArray = attachmentsString
+            ? JSON.parse(attachmentsString)
+            : [];
+          attachmentsArray.push({ url, id: annotation.imageAttachmentId });
+          localStorage.setItem(
+            ATTACHMENTS_KEY,
+            JSON.stringify(attachmentsArray),
+          );
+        }
+
+        storedSignatures.push(serializedAnnotation);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storedSignatures));
+
+        // Update the instance to show the signature in the UI
+        instance.setStoredSignatures((signatures: any) =>
+          signatures.push(annotation),
+        );
+
+        console.log("Signature saved to storage");
+      } catch (err) {
+        console.error("Error saving signature to storage:", err);
+      }
+    },
+  );
+
+  // Listen for signatures being deleted
+  instance.addEventListener("storedSignatures.delete", (annotation: any) => {
+    try {
+      const signaturesString = localStorage.getItem(STORAGE_KEY);
+      const storedSignatures = signaturesString
+        ? JSON.parse(signaturesString)
+        : [];
+      const annotations = storedSignatures.map(
+        NutrientViewer.Annotations.fromSerializableObject,
+      );
+      const updatedAnnotations = annotations.filter(
+        (currentAnnotation: any) => !currentAnnotation.equals(annotation),
+      );
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+          updatedAnnotations.map(
+            NutrientViewer.Annotations.toSerializableObject,
+          ),
+        ),
+      );
+
+      // Update the instance UI
+      instance.setStoredSignatures((signatures: any) =>
+        signatures.filter((signature: any) => !signature.equals(annotation)),
+      );
+
+      // Handle attachment deletion if present
+      if (annotation.imageAttachmentId) {
+        const attachmentsString = localStorage.getItem(ATTACHMENTS_KEY);
+        if (attachmentsString) {
+          let attachmentsArray = JSON.parse(attachmentsString);
+          attachmentsArray = attachmentsArray.filter(
+            (attachment: any) => attachment.id !== annotation.imageAttachmentId,
+          );
+          localStorage.setItem(
+            ATTACHMENTS_KEY,
+            JSON.stringify(attachmentsArray),
+          );
+        }
+      }
+
+      console.log("Signature deleted from storage");
+    } catch (err) {
+      console.error("Error deleting signature from storage:", err);
+    }
+  });
+};
+
 /**
  * Decodes base64-encoded certificate strings into ArrayBuffer format
  * Required for configuring trusted CA certificates in Nutrient Viewer
@@ -490,6 +646,9 @@ export default function SigningDemoViewer() {
 
         if (!isMounted) return;
         instanceRef.current = instance;
+
+        // Set up signature storage
+        setupSignatureStorage(instance, NV);
 
         /**
          * INTERACTION MODE - Admin vs Signer:
@@ -1214,7 +1373,9 @@ export default function SigningDemoViewer() {
         );
 
         if (signatureAnnotations.size > 0) {
-          console.log(`Found ${signatureAnnotations.size} signatures on page ${pageIndex}`);
+          console.log(
+            `Found ${signatureAnnotations.size} signatures on page ${pageIndex}`,
+          );
           pagesWithSignatures.push(pageIndex);
 
           // Create "By Nutrient {ID}" text annotations above each signature
@@ -1278,7 +1439,10 @@ export default function SigningDemoViewer() {
       console.log("--- STEP 3: Getting authentication token ---");
       setSignStatus("Requesting authentication token...");
 
-      console.log("Requesting token from:", "/api/sign-document-web-sdk-dws/api/token");
+      console.log(
+        "Requesting token from:",
+        "/api/sign-document-web-sdk-dws/api/token",
+      );
       console.log("Origin:", window.location.origin);
 
       const tokenResponse = await fetch(
@@ -1367,8 +1531,14 @@ export default function SigningDemoViewer() {
     } catch (error) {
       console.error("=== DIGITAL SIGNATURE WORKFLOW FAILED ===");
       console.error("Error type:", error?.constructor?.name);
-      console.error("Error message:", error instanceof Error ? error.message : String(error));
-      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      console.error(
+        "Error message:",
+        error instanceof Error ? error.message : String(error),
+      );
+      console.error(
+        "Error stack:",
+        error instanceof Error ? error.stack : "No stack trace",
+      );
       console.error("Full error object:", error);
 
       // Extract more details if it's a PSPDFKitError
