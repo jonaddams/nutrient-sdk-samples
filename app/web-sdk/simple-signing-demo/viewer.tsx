@@ -1413,24 +1413,19 @@ export default function SigningDemoViewer() {
 
       /**
        * STEP 2: FLATTEN ANNOTATIONS
-       * Makes all signature images and labels permanent parts of the PDF
+       * Flattens all annotations on all pages of the document
        * After flattening, they cannot be removed or modified
        *
        * Uses instance.applyOperations with "flattenAnnotations" operation
+       * Omitting pageIndexes flattens all pages in the document
        */
-      console.log("--- STEP 2: Flattening annotations ---");
-      console.log("Pages with signatures to flatten:", pagesWithSignatures);
-      if (pagesWithSignatures.length > 0) {
-        await instance.applyOperations([
-          {
-            type: "flattenAnnotations",
-            pageIndexes: pagesWithSignatures,
-          },
-        ]);
-        console.log("Annotations flattened successfully");
-      } else {
-        console.log("No signatures to flatten");
-      }
+      console.log("--- STEP 2: Flattening annotations on all pages ---");
+      await instance.applyOperations([
+        {
+          type: "flattenAnnotations",
+        },
+      ]);
+      console.log("All annotations flattened successfully");
 
       /**
        * STEP 3: GET AUTHENTICATION TOKEN
