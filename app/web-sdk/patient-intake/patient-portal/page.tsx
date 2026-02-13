@@ -207,25 +207,87 @@ export default function PatientPortal() {
     return (
       <div className="min-h-screen" style={{ background: "var(--background)" }}>
         {/* Header */}
-        <div
+        <header
           className="border-b"
           style={{
             background: "var(--background)",
             borderColor: "var(--neutral)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
-                <h1
-                  className="font-semibold"
+            <div className="flex items-center justify-between py-4">
+              <div className="flex items-center space-x-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{ background: "var(--data-green)" }}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    style={{ color: "var(--background)" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Patient icon"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <div className="py-1">
+                  <h1
+                    className="font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Patient Check-In
+                  </h1>
+                  <p
+                    className="text-xs mt-0.5"
+                    style={{ color: "var(--foreground)", opacity: 0.7 }}
+                  >
+                    Springfield Family Medical Center
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/web-sdk/patient-intake"
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity"
+                style={{
+                  background: "var(--neutral)",
+                  color: "var(--foreground)",
+                }}
+              >
+                ← Back to Demo
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Form Header Card */}
+          <div
+            className="rounded-xl border p-6 mb-6"
+            style={{
+              background: "var(--background)",
+              borderColor: "var(--neutral)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <h2
+                  className="text-xl font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   {forms[currentStep].name}
-                </h1>
+                </h2>
                 <span
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
                   style={{
                     background: "var(--disc-pink)",
                     color: "var(--background)",
@@ -234,29 +296,35 @@ export default function PatientPortal() {
                   Form {currentStep + 1} of {forms.length}
                 </span>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setCurrentDocument(null)}
-                  className="btn btn-secondary"
+                  className="btn btn-secondary flex-1 whitespace-nowrap"
                 >
-                  ← Back to Forms
+                  ← Back
                 </button>
                 <button
                   type="button"
                   onClick={handleFormComplete}
-                  className="btn btn-primary"
+                  className="btn btn-primary flex-1 whitespace-nowrap"
                 >
                   Sign & Continue →
                 </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Document Viewer */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-[calc(100vh-4rem)]">
+          {/* Document Viewer Card */}
+          <div
+            className="rounded-xl border overflow-hidden"
+            style={{
+              background: "var(--background)",
+              borderColor: "var(--neutral)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              height: "calc(100vh - 280px)",
+            }}
+          >
             <Viewer
               document={currentDocument}
               onInstanceReady={(instance) => {
@@ -264,7 +332,7 @@ export default function PatientPortal() {
               }}
             />
           </div>
-        </div>
+        </main>
       </div>
     );
   }
