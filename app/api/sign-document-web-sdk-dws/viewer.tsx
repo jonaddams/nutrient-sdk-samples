@@ -129,10 +129,20 @@ export default function Viewer({ document }: ViewerProps) {
 
             const { token } = await tokenResponse.json();
 
-            setSignStatus("Signing document...");
-
             // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types not available
             const NutrientViewer = (window as any).NutrientViewer;
+
+            // Flatten all annotations before signing
+            setSignStatus("Preparing document...");
+            console.log("Flattening all annotations before signing...");
+            await instance.applyOperations([
+              {
+                type: "flattenAnnotations",
+              },
+            ]);
+            console.log("All annotations flattened successfully");
+
+            setSignStatus("Signing document...");
 
             const result = await instance.signDocument(
               {
