@@ -115,6 +115,7 @@ export default function Viewer({
         const baseConfig = {
           container: container as HTMLElement,
           document: document,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         };
 
         const loadConfig = memoizedToolbarItems
