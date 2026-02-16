@@ -1172,8 +1172,9 @@ function ResultsContent() {
                 <pre
                   className="json-content rounded-lg p-4 text-sm font-mono whitespace-pre-wrap overflow-x-auto"
                   style={{
-                    background: "var(--warm-gray-200)",
-                    color: "var(--foreground)",
+                    background: "var(--black)",
+                    color: "var(--data-green)",
+                    border: "1px solid var(--neutral)",
                   }}
                 >
                   {JSON.stringify(results, null, 2)}
