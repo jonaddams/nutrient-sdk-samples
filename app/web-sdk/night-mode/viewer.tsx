@@ -1,6 +1,6 @@
 "use client";
 
-import type { Instance } from "@nutrient-sdk/viewer";
+import type { Instance, ToolbarItem } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
 
 const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
@@ -51,13 +51,12 @@ export default function NightModeViewer() {
         }
 
         // Update toolbar icon to reflect current state
-        state.instance?.setToolbarItems(
-          (items: Array<Record<string, unknown>>) =>
-            items.map((item) =>
-              item.id === "night-mode-toggle"
-                ? { ...item, icon: state.isDark ? SUN_ICON : MOON_ICON }
-                : item,
-            ),
+        state.instance?.setToolbarItems((items: ToolbarItem[]) =>
+          items.map((item) =>
+            item.id === "night-mode-toggle"
+              ? { ...item, icon: state.isDark ? SUN_ICON : MOON_ICON }
+              : item,
+          ),
         );
       },
     };
