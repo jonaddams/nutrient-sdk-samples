@@ -395,20 +395,20 @@ export default function TextViewerPage() {
               <li>
                 The file content is converted to styled HTML on the
                 server:
-                <ul className="ml-5 mt-1 list-disc space-y-1">
-                  <li>
-                    <strong>.txt</strong> lines are wrapped in
-                    paragraph tags
-                  </li>
-                  <li>
-                    <strong>.csv</strong> data is rendered as a
-                    styled HTML table
-                  </li>
-                  <li>
-                    <strong>.xml</strong> content gets syntax
+                <div className="ml-2 mt-1 space-y-1">
+                  <p>
+                    &mdash; <strong>.txt</strong> lines are wrapped
+                    in paragraph tags
+                  </p>
+                  <p>
+                    &mdash; <strong>.csv</strong> data is rendered as
+                    a styled HTML table
+                  </p>
+                  <p>
+                    &mdash; <strong>.xml</strong> content gets syntax
                     highlighting
-                  </li>
-                </ul>
+                  </p>
+                </div>
               </li>
               <li>
                 The HTML is sent to the Nutrient DWS API /build
