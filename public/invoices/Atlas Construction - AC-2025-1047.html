@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice AC-2025-1047</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-size: 0.75rem;
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: #212529;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      #pspdfkit-header {
+        display: flow-root;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding: 0 2.5rem;
+      }
+
+      .header-columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 1rem;
+        border-bottom: 4px solid #e67e22;
+      }
+
+      .logotype {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .logo-mark {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 900;
+        font-size: 1.25rem;
+      }
+
+      .company-name {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #2c3e50;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .company-sub {
+        font-size: 0.5625rem;
+        color: #7f8c8d;
+        letter-spacing: 1px;
+      }
+
+      .header-badges {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .badge {
+        font-size: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #e67e22;
+        color: #e67e22;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+      }
+
+      #pspdfkit-footer {
+        display: flow-root;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 1.5rem;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0 2.5rem;
+      }
+
+      .footer-columns {
+        display: flex;
+        justify-content: space-between;
+        border-top: 2px solid #e67e22;
+        padding-top: 0.5rem;
+        font-size: 0.5rem;
+        color: #95a5a6;
+      }
+
+      .footer-columns .company-info {
+        max-width: 60%;
+      }
+
+      .page {
+        margin: 0 2.5rem;
+      }
+
+      .invoice-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+      }
+
+      .invoice-type {
+        background: #e67e22;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+
+      .invoice-details {
+        text-align: right;
+        line-height: 1.8;
+      }
+
+      .invoice-details .label {
+        color: #95a5a6;
+        font-size: 0.5625rem;
+        text-transform: uppercase;
+      }
+
+      .invoice-details .value {
+        font-weight: 600;
+      }
+
+      .project-banner {
+        background: #2c3e50;
+        color: white;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .project-banner .proj-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .project-banner .proj-detail {
+        font-size: 0.625rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+      }
+
+      .project-banner .proj-status {
+        background: #27ae60;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.5625rem;
+        font-weight: 600;
+        align-self: center;
+        text-transform: uppercase;
+      }
+
+      .client-info {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .info-card {
+        flex: 1;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+      }
+
+      .info-card h4 {
+        font-size: 0.5625rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #e67e22;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.375rem;
+        border-bottom: 1px solid #e67e22;
+      }
+
+      .info-card p {
+        margin: 2px 0;
+        line-height: 1.5;
+      }
+
+      thead {
+        display: table-header-group;
+        break-inside: avoid;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.625rem;
+      }
+
+      thead th {
+        background: #2c3e50;
+        color: white;
+        padding: 0.5rem;
+        text-align: left;
+        font-size: 0.5625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      thead th:nth-child(n+3) {
+        text-align: right;
+      }
+
+      tbody td {
+        padding: 0.4rem 0.5rem;
+        border-bottom: 1px solid #ecf0f1;
+      }
+
+      tbody td:nth-child(n+3) {
+        text-align: right;
+      }
+
+      .phase-header td {
+        background: #f8f9fa;
+        font-weight: 700;
+        color: #e67e22;
+        font-size: 0.6875rem;
+        padding: 0.5rem;
+        border-bottom: 2px solid #e67e22 !important;
+      }
+
+      .subtotal-row td {
+        font-weight: 600;
+        border-top: 1px solid #2c3e50;
+        background: #f8f9fa;
+      }
+
+      .summary-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+        gap: 2rem;
+      }
+
+      .progress-box {
+        flex: 1;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+      }
+
+      .progress-box h4 {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        color: #e67e22;
+        margin-bottom: 0.75rem;
+      }
+
+      .progress-bar-container {
+        background: #ecf0f1;
+        height: 8px;
+        border-radius: 4px;
+        margin: 0.375rem 0;
+      }
+
+      .progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        background: #e67e22;
+      }
+
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.5625rem;
+        color: #7f8c8d;
+      }
+
+      .amount-box {
+        width: 280px;
+      }
+
+      .amount-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #ecf0f1;
+        font-size: 0.6875rem;
+      }
+
+      .amount-row.total {
+        border-top: 2px solid #2c3e50;
+        border-bottom: 2px solid #2c3e50;
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 0.5rem 0;
+      }
+
+      .amount-row.due {
+        background: #e67e22;
+        color: white;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+      }
+
+      .payment-terms {
+        margin-top: 2rem;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+        font-size: 0.625rem;
+        line-height: 1.7;
+        color: #555;
+      }
+
+      .payment-terms h4 {
+        color: #2c3e50;
+        font-size: 0.6875rem;
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pspdfkit-header">
+      <div class="header-columns">
+        <div class="logotype">
+          <div class="logo-mark">A</div>
+          <div>
+            <div class="company-name">Atlas Construction</div>
+            <div class="company-sub">General Contractors &amp; Project Management</div>
+          </div>
+        </div>
+        <div class="header-badges">
+          <div class="badge">Licensed &amp; Insured</div>
+          <div class="badge">OSHA Certified</div>
+          <div class="badge">LEED Partner</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" style="page-break-after: always">
+      <div class="invoice-header-row">
+        <div class="invoice-type">Progress Invoice</div>
+        <div class="invoice-details">
+          <div><span class="label">Invoice No: </span><span class="value">AC-2025-1047</span></div>
+          <div><span class="label">Date: </span><span class="value">March 1, 2025</span></div>
+          <div><span class="label">Due: </span><span class="value">March 31, 2025</span></div>
+          <div><span class="label">Period: </span><span class="value">Feb 1 – Feb 28, 2025</span></div>
+        </div>
+      </div>
+
+      <div class="project-banner">
+        <div>
+          <div class="proj-name">Riverside Mixed-Use Development — Phase 2</div>
+          <div class="proj-detail">Contract #RMD-2024-003 | Permit #BLD-2024-78945</div>
+        </div>
+        <div class="proj-status">On Schedule</div>
+      </div>
+
+      <div class="client-info">
+        <div class="info-card">
+          <h4>Contractor</h4>
+          <p><strong>Atlas Construction LLC</strong></p>
+          <p>1500 Builder's Way</p>
+          <p>Denver, CO 80202</p>
+          <p>License: CO-GC-2019-44821</p>
+          <p>EIN: 84-3291057</p>
+        </div>
+        <div class="info-card">
+          <h4>Client / Owner</h4>
+          <p><strong>Riverside Development Partners</strong></p>
+          <p>200 Riverwalk Blvd, Suite 800</p>
+          <p>Denver, CO 80211</p>
+          <p>Attn: Michael Torres, VP Development</p>
+        </div>
+        <div class="info-card">
+          <h4>Architect</h4>
+          <p><strong>Sterling &amp; Associates</strong></p>
+          <p>55 Design District</p>
+          <p>Denver, CO 80204</p>
+          <p>Project Architect: Lisa Yamamoto</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Contract Amt</th>
+            <th>Prev. Billed</th>
+            <th>This Period</th>
+            <th>% Complete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="phase-header">
+            <td colspan="6">Phase 2A — Structural</td>
+          </tr>
+          <tr>
+            <td>03-100</td>
+            <td>Concrete Foundation &amp; Footings</td>
+            <td>$185,000</td>
+            <td>$185,000</td>
+            <td>$0</td>
+            <td>100%</td>
+          </tr>
+          <tr>
+            <td>05-100</td>
+            <td>Structural Steel Erection</td>
+            <td>$420,000</td>
+            <td>$336,000</td>
+            <td>$63,000</td>
+            <td>95%</td>
+          </tr>
+          <tr>
+            <td>05-200</td>
+            <td>Metal Decking &amp; Shear Walls</td>
+            <td>$195,000</td>
+            <td>$117,000</td>
+            <td>$48,750</td>
+            <td>85%</td>
+          </tr>
+          <tr class="subtotal-row">
+            <td></td>
+            <td>Structural Subtotal</td>
+            <td>$800,000</td>
+            <td>$638,000</td>
+            <td>$111,750</td>
+            <td></td>
+          </tr>
+          <tr class="phase-header">
+            <td colspan="6">Phase 2B — Building Envelope</td>
+          </tr>
+          <tr>
+            <td>07-100</td>
+            <td>Waterproofing &amp; Vapor Barriers</td>
+            <td>$92,000</td>
+            <td>$46,000</td>
+            <td>$27,600</td>
+            <td>80%</td>
+          </tr>
+          <tr>
+            <td>07-400</td>
+            <td>Curtain Wall System (Floors 1-6)</td>
+            <td>$310,000</td>
+            <td>$93,000</td>
+            <td>$77,500</td>
+            <td>55%</td>
+          </tr>
+          <tr>
+            <td>07-600</td>
+            <td>Roofing — TPO Membrane System</td>
+            <td>$145,000</td>
+            <td>$0</td>
+            <td>$36,250</td>
+            <td>25%</td>
+          </tr>
+          <tr class="subtotal-row">
+            <td></td>
+            <td>Envelope Subtotal</td>
+            <td>$547,000</td>
+            <td>$139,000</td>
+            <td>$141,350</td>
+            <td></td>
+          </tr>
+          <tr class="phase-header">
+            <td colspan="6">Phase 2C — MEP Rough-In</td>
+          </tr>
+          <tr>
+            <td>15-100</td>
+            <td>Plumbing Rough-In (Floors 1-3)</td>
+            <td>$128,000</td>
+            <td>$38,400</td>
+            <td>$32,000</td>
+            <td>55%</td>
+          </tr>
+          <tr>
+            <td>15-500</td>
+            <td>HVAC Ductwork &amp; Equipment</td>
+            <td>$215,000</td>
+            <td>$43,000</td>
+            <td>$53,750</td>
+            <td>45%</td>
+          </tr>
+          <tr>
+            <td>16-100</td>
+            <td>Electrical Rough-In &amp; Panel Install</td>
+            <td>$178,000</td>
+            <td>$35,600</td>
+            <td>$44,500</td>
+            <td>45%</td>
+          </tr>
+          <tr class="subtotal-row">
+            <td></td>
+            <td>MEP Subtotal</td>
+            <td>$521,000</td>
+            <td>$117,000</td>
+            <td>$130,250</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary-section">
+        <div class="progress-box">
+          <h4>Project Completion</h4>
+          <div class="progress-label">
+            <span>Phase 2 Overall</span>
+            <span>62%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 62%"></div>
+          </div>
+          <div class="progress-label" style="margin-top: 0.75rem">
+            <span>Budget Consumed</span>
+            <span>58%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 58%; background: #27ae60"></div>
+          </div>
+        </div>
+
+        <div class="amount-box">
+          <div class="amount-row">
+            <span>Original Contract</span>
+            <span>$1,868,000.00</span>
+          </div>
+          <div class="amount-row">
+            <span>Approved Change Orders</span>
+            <span>$42,500.00</span>
+          </div>
+          <div class="amount-row total">
+            <span>Revised Contract</span>
+            <span>$1,910,500.00</span>
+          </div>
+          <div class="amount-row">
+            <span>Previously Billed</span>
+            <span>$894,000.00</span>
+          </div>
+          <div class="amount-row">
+            <span>This Period</span>
+            <span>$383,350.00</span>
+          </div>
+          <div class="amount-row">
+            <span>Retainage (10%)</span>
+            <span>−$38,335.00</span>
+          </div>
+          <div class="amount-row due">
+            <span>Amount Due</span>
+            <span>$345,015.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-terms">
+        <h4>Payment Terms &amp; Conditions</h4>
+        <p>Payment due within 30 days of invoice date per AIA Document A201-2017, General Conditions. 10% retainage held until substantial completion. Lien waivers provided upon payment. Late payments accrue interest at 1% per month. All work performed in accordance with Contract #RMD-2024-003 and approved shop drawings. Change orders require written approval from Owner and Architect prior to execution.</p>
+      </div>
+    </div>
+
+    <div id="pspdfkit-footer">
+      <div class="footer-columns">
+        <span class="company-info">Atlas Construction LLC | 1500 Builder's Way, Denver, CO 80202 | License CO-GC-2019-44821 | accounting@atlasconstruction.com</span>
+        <span>Page {{ pageNumber }} of {{ pageCount }}</span>
+      </div>
+    </div>
+  </body>
+</html>

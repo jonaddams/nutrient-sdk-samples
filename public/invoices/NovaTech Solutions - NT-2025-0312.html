@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice NT-2025-0312</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-size: 0.75rem;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #1a1a2e;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      #pspdfkit-header {
+        display: flow-root;
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 400;
+        color: #6c63ff;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        width: 100%;
+        border-bottom: 3px solid #6c63ff;
+      }
+
+      .header-columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2.5rem 0.75rem 2.5rem;
+      }
+
+      .logotype {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #1a1a2e;
+        letter-spacing: 1px;
+      }
+
+      .logotype .logo-icon {
+        width: 28px;
+        height: 28px;
+        background: #6c63ff;
+        border-radius: 6px;
+        margin-right: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 700;
+      }
+
+      .header-contact {
+        text-align: right;
+        color: #555;
+        font-size: 0.5625rem;
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      .header-contact p {
+        margin: 2px 0;
+      }
+
+      #pspdfkit-footer {
+        display: flow-root;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 2rem;
+        box-sizing: border-box;
+        width: 100%;
+        font-size: 0.5rem;
+        color: #888;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .footer-columns {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 2.5rem 0;
+      }
+
+      .page {
+        margin: 0 2.5rem;
+      }
+
+      .invoice-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+      }
+
+      .invoice-title h1 {
+        font-size: 1.75rem;
+        font-weight: 300;
+        color: #1a1a2e;
+      }
+
+      .invoice-meta {
+        text-align: right;
+      }
+
+      .invoice-meta .invoice-number {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #6c63ff;
+      }
+
+      .invoice-meta p {
+        margin: 4px 0;
+        color: #666;
+      }
+
+      .addresses {
+        display: flex;
+        justify-content: space-between;
+        margin: 2rem 0;
+        gap: 2rem;
+      }
+
+      .address-block {
+        flex: 1;
+        padding: 1.25rem;
+        background: #f8f8ff;
+        border-radius: 8px;
+        border-left: 3px solid #6c63ff;
+      }
+
+      .address-block h3 {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6c63ff;
+        margin-bottom: 0.5rem;
+      }
+
+      .address-block p {
+        margin: 3px 0;
+        line-height: 1.5;
+      }
+
+      thead {
+        display: table-header-group;
+        break-inside: avoid;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.6875rem;
+      }
+
+      thead th {
+        background: #6c63ff;
+        color: white;
+        padding: 0.625rem 0.75rem;
+        text-align: left;
+        font-weight: 500;
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      thead th:last-child,
+      thead th:nth-child(3),
+      thead th:nth-child(4) {
+        text-align: right;
+      }
+
+      tbody td {
+        padding: 0.625rem 0.75rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      tbody td:last-child,
+      tbody td:nth-child(3),
+      tbody td:nth-child(4) {
+        text-align: right;
+      }
+
+      tbody tr:nth-child(even) {
+        background: #fafafe;
+      }
+
+      .summary {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+
+      .summary-table {
+        width: 280px;
+      }
+
+      .summary-table .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0.75rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .summary-table .row.total {
+        background: #6c63ff;
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        border: none;
+      }
+
+      .notes-section {
+        margin-top: 3rem;
+        padding: 1.25rem;
+        background: #f8f8ff;
+        border-radius: 8px;
+      }
+
+      .notes-section h3 {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #6c63ff;
+      }
+
+      .notes-section p {
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .payment-section {
+        margin-top: 2rem;
+        padding: 1.25rem;
+        border: 1px dashed #6c63ff;
+        border-radius: 8px;
+      }
+
+      .payment-section h3 {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #6c63ff;
+      }
+
+      .payment-grid {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .payment-grid div p {
+        margin: 2px 0;
+        color: #555;
+      }
+
+      .payment-grid div p strong {
+        color: #1a1a2e;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pspdfkit-header">
+      <div class="header-columns">
+        <div class="logotype">
+          <div class="logo-icon">N</div>
+          NovaTech Solutions
+        </div>
+        <div class="header-contact">
+          <p>742 Innovation Drive, San Francisco, CA 94107</p>
+          <p>billing@novatech.io | +1 (415) 555-0198</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" style="page-break-after: always">
+      <div class="invoice-title">
+        <h1>Invoice</h1>
+        <div class="invoice-meta">
+          <div class="invoice-number">NT-2025-0312</div>
+          <p>Date: March 5, 2025</p>
+          <p>Due: April 4, 2025</p>
+        </div>
+      </div>
+
+      <div class="addresses">
+        <div class="address-block">
+          <h3>From</h3>
+          <p><strong>NovaTech Solutions Inc.</strong></p>
+          <p>742 Innovation Drive</p>
+          <p>San Francisco, CA 94107</p>
+          <p>Tax ID: US-87-4521903</p>
+        </div>
+        <div class="address-block">
+          <h3>Bill To</h3>
+          <p><strong>Meridian Healthcare Group</strong></p>
+          <p>1200 Wellness Boulevard, Suite 400</p>
+          <p>Boston, MA 02115</p>
+          <p>Tax ID: US-52-1893047</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cloud Infrastructure Setup &amp; Migration</td>
+            <td>1</td>
+            <td>$12,500.00</td>
+            <td>$12,500.00</td>
+          </tr>
+          <tr>
+            <td>Custom API Development (160 hrs @ $175/hr)</td>
+            <td>160</td>
+            <td>$175.00</td>
+            <td>$28,000.00</td>
+          </tr>
+          <tr>
+            <td>Database Architecture &amp; Optimization</td>
+            <td>1</td>
+            <td>$8,750.00</td>
+            <td>$8,750.00</td>
+          </tr>
+          <tr>
+            <td>Security Audit &amp; Compliance Review</td>
+            <td>1</td>
+            <td>$5,200.00</td>
+            <td>$5,200.00</td>
+          </tr>
+          <tr>
+            <td>Staff Training (3 sessions)</td>
+            <td>3</td>
+            <td>$1,500.00</td>
+            <td>$4,500.00</td>
+          </tr>
+          <tr>
+            <td>Annual SaaS License — Enterprise Tier</td>
+            <td>1</td>
+            <td>$18,000.00</td>
+            <td>$18,000.00</td>
+          </tr>
+          <tr>
+            <td>24/7 Premium Support (12 months)</td>
+            <td>12</td>
+            <td>$850.00</td>
+            <td>$10,200.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <div class="summary-table">
+          <div class="row">
+            <span>Subtotal</span>
+            <span>$87,150.00</span>
+          </div>
+          <div class="row">
+            <span>Discount (5%)</span>
+            <span>−$4,357.50</span>
+          </div>
+          <div class="row">
+            <span>Tax (8.875%)</span>
+            <span>$7,347.83</span>
+          </div>
+          <div class="row total">
+            <span>Total Due</span>
+            <span>$90,140.33</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-section">
+        <h3>Notes</h3>
+        <p>This invoice covers Phase 2 of the Digital Transformation project as outlined in SOW-2024-089. Payment is due within 30 days of invoice date. A late fee of 1.5% per month will be applied to overdue balances.</p>
+      </div>
+
+      <div class="payment-section">
+        <h3>Payment Details</h3>
+        <div class="payment-grid">
+          <div>
+            <p><strong>Bank:</strong> Silicon Valley Bank</p>
+            <p><strong>Account:</strong> 8827-4501-2390</p>
+          </div>
+          <div>
+            <p><strong>Routing:</strong> 121140399</p>
+            <p><strong>SWIFT:</strong> SVBKUS6S</p>
+          </div>
+          <div>
+            <p><strong>PayPal:</strong> pay@novatech.io</p>
+            <p><strong>Wire Ref:</strong> NT-2025-0312</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pspdfkit-footer">
+      <div class="footer-columns">
+        <span>NovaTech Solutions Inc. — Confidential</span>
+        <span>Page {{ pageNumber }} of {{ pageCount }}</span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice GL-2025-0088</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-size: 0.75rem;
+        font-family: Georgia, "Times New Roman", serif;
+        color: #2d3436;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      #pspdfkit-header {
+        display: flow-root;
+        background: #27ae60;
+        color: white;
+        padding: 1.25rem 2.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .header-columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logotype {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .logo-circle {
+        width: 36px;
+        height: 36px;
+        border: 2px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+      }
+
+      .logotype h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .logotype p {
+        font-size: 0.5625rem;
+        opacity: 0.85;
+        font-style: italic;
+      }
+
+      .header-right {
+        text-align: right;
+        font-size: 0.5625rem;
+        line-height: 1.6;
+      }
+
+      #pspdfkit-footer {
+        display: flow-root;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-sizing: border-box;
+        width: 100%;
+        background: #27ae60;
+        color: white;
+        padding: 0.75rem 2.5rem;
+        font-size: 0.5rem;
+      }
+
+      .footer-columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer-columns .tagline {
+        font-style: italic;
+        opacity: 0.85;
+      }
+
+      .page {
+        margin: 0 2.5rem;
+      }
+
+      .invoice-banner {
+        background: #f0faf4;
+        border: 1px solid #27ae60;
+        border-radius: 4px;
+        padding: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .invoice-banner h1 {
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: #27ae60;
+      }
+
+      .invoice-banner .meta {
+        text-align: right;
+        line-height: 1.8;
+      }
+
+      .invoice-banner .meta .number {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #27ae60;
+      }
+
+      .parties {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .party {
+        flex: 1;
+      }
+
+      .party h4 {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #27ae60;
+        border-bottom: 2px solid #27ae60;
+        padding-bottom: 0.375rem;
+        margin-bottom: 0.625rem;
+      }
+
+      .party p {
+        margin: 3px 0;
+        line-height: 1.6;
+      }
+
+      thead {
+        display: table-header-group;
+        break-inside: avoid;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.6875rem;
+      }
+
+      thead th {
+        background: #2d3436;
+        color: white;
+        padding: 0.5rem 0.625rem;
+        text-align: left;
+        font-size: 0.5625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: "Helvetica Neue", Arial, sans-serif;
+      }
+
+      thead th:nth-child(2),
+      thead th:nth-child(3),
+      thead th:nth-child(4),
+      thead th:last-child {
+        text-align: right;
+      }
+
+      tbody td {
+        padding: 0.5rem 0.625rem;
+        border-bottom: 1px solid #dfe6e9;
+      }
+
+      tbody td:nth-child(2),
+      tbody td:nth-child(3),
+      tbody td:nth-child(4),
+      tbody td:last-child {
+        text-align: right;
+      }
+
+      tbody tr:hover {
+        background: #f0faf4;
+      }
+
+      .category-row td {
+        background: #eafaf1;
+        font-weight: 700;
+        font-style: italic;
+        color: #27ae60;
+        border-bottom: 1px solid #27ae60 !important;
+      }
+
+      .totals {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .totals-box {
+        width: 260px;
+        border: 1px solid #dfe6e9;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .totals-box .line {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid #dfe6e9;
+        font-size: 0.6875rem;
+      }
+
+      .totals-box .line:last-child {
+        border-bottom: none;
+      }
+
+      .totals-box .grand-total {
+        background: #27ae60;
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+      }
+
+      .terms {
+        margin-top: 2.5rem;
+        columns: 2;
+        column-gap: 2rem;
+      }
+
+      .terms h3 {
+        font-size: 0.6875rem;
+        color: #27ae60;
+        margin-bottom: 0.5rem;
+        column-span: all;
+      }
+
+      .terms ul {
+        font-size: 0.625rem;
+        color: #555;
+        line-height: 1.8;
+        padding-left: 1rem;
+      }
+
+      .signature-area {
+        margin-top: 3rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 3rem;
+      }
+
+      .sig-block {
+        flex: 1;
+        border-top: 1px solid #2d3436;
+        padding-top: 0.5rem;
+      }
+
+      .sig-block p {
+        font-size: 0.625rem;
+        color: #888;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pspdfkit-header">
+      <div class="header-columns">
+        <div class="logotype">
+          <div class="logo-circle">&#127807;</div>
+          <div>
+            <h2>Greenleaf Organics</h2>
+            <p>Certified Organic &amp; Sustainable</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <p>45 Harvest Lane, Portland, OR 97201</p>
+          <p>orders@greenleaforganics.com | (503) 555-0142</p>
+          <p>USDA Organic Cert: OR-ORG-2024-1587</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" style="page-break-after: always">
+      <div class="invoice-banner">
+        <h1>Purchase Invoice</h1>
+        <div class="meta">
+          <div class="number">GL-2025-0088</div>
+          <p>Issue Date: February 18, 2025</p>
+          <p>Due Date: March 20, 2025</p>
+          <p>PO Ref: WFM-PO-44219</p>
+        </div>
+      </div>
+
+      <div class="parties">
+        <div class="party">
+          <h4>Supplier</h4>
+          <p><strong>Greenleaf Organics Co.</strong></p>
+          <p>45 Harvest Lane</p>
+          <p>Portland, OR 97201</p>
+          <p>EIN: 93-4827165</p>
+        </div>
+        <div class="party">
+          <h4>Customer</h4>
+          <p><strong>Whole Foods Market — Pacific NW</strong></p>
+          <p>2100 Westlake Avenue N</p>
+          <p>Seattle, WA 98109</p>
+          <p>Buyer: Sarah Chen</p>
+        </div>
+        <div class="party">
+          <h4>Ship To</h4>
+          <p><strong>WFM Distribution Center</strong></p>
+          <p>8800 Industrial Way</p>
+          <p>Kent, WA 98032</p>
+          <p>Dock: B-14</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>SKU</th>
+            <th>Cases</th>
+            <th>Price/Case</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="category-row">
+            <td colspan="5">Fresh Produce</td>
+          </tr>
+          <tr>
+            <td>Organic Baby Spinach (5oz clamshell)</td>
+            <td>GL-SP-5OZ</td>
+            <td>48</td>
+            <td>$24.50</td>
+            <td>$1,176.00</td>
+          </tr>
+          <tr>
+            <td>Organic Mixed Greens (5oz clamshell)</td>
+            <td>GL-MG-5OZ</td>
+            <td>36</td>
+            <td>$26.00</td>
+            <td>$936.00</td>
+          </tr>
+          <tr>
+            <td>Organic Kale Bunch</td>
+            <td>GL-KL-BUN</td>
+            <td>24</td>
+            <td>$18.75</td>
+            <td>$450.00</td>
+          </tr>
+          <tr>
+            <td>Organic Heirloom Tomatoes (2lb)</td>
+            <td>GL-HT-2LB</td>
+            <td>30</td>
+            <td>$32.00</td>
+            <td>$960.00</td>
+          </tr>
+          <tr class="category-row">
+            <td colspan="5">Herbs</td>
+          </tr>
+          <tr>
+            <td>Organic Fresh Basil (1oz)</td>
+            <td>GL-BA-1OZ</td>
+            <td>60</td>
+            <td>$15.00</td>
+            <td>$900.00</td>
+          </tr>
+          <tr>
+            <td>Organic Cilantro Bunch</td>
+            <td>GL-CI-BUN</td>
+            <td>40</td>
+            <td>$12.50</td>
+            <td>$500.00</td>
+          </tr>
+          <tr>
+            <td>Organic Rosemary Sprig (0.75oz)</td>
+            <td>GL-RS-075</td>
+            <td>30</td>
+            <td>$14.00</td>
+            <td>$420.00</td>
+          </tr>
+          <tr class="category-row">
+            <td colspan="5">Specialty Items</td>
+          </tr>
+          <tr>
+            <td>Organic Microgreens Assortment (4oz)</td>
+            <td>GL-MR-4OZ</td>
+            <td>20</td>
+            <td>$38.00</td>
+            <td>$760.00</td>
+          </tr>
+          <tr>
+            <td>Organic Edible Flowers Mix (2oz)</td>
+            <td>GL-EF-2OZ</td>
+            <td>12</td>
+            <td>$42.00</td>
+            <td>$504.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-box">
+          <div class="line">
+            <span>Subtotal</span>
+            <span>$6,606.00</span>
+          </div>
+          <div class="line">
+            <span>Volume Discount (3%)</span>
+            <span>−$198.18</span>
+          </div>
+          <div class="line">
+            <span>Refrigerated Shipping</span>
+            <span>$285.00</span>
+          </div>
+          <div class="line">
+            <span>Organic Cert. Surcharge</span>
+            <span>$45.00</span>
+          </div>
+          <div class="line grand-total">
+            <span>Total Due</span>
+            <span>$6,737.82</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page">
+      <div class="terms">
+        <h3>Terms &amp; Conditions</h3>
+        <ul>
+          <li>Net 30 payment terms from invoice date.</li>
+          <li>Claims for damaged or short goods must be filed within 48 hours of delivery.</li>
+          <li>All produce certified USDA Organic and Non-GMO Project Verified.</li>
+          <li>Refrigeration must be maintained at 34–38°F upon receipt.</li>
+          <li>Returns accepted only for quality issues with prior authorization.</li>
+          <li>Prices valid for this order only; subject to seasonal availability.</li>
+        </ul>
+      </div>
+
+      <div class="signature-area">
+        <div class="sig-block">
+          <p>Authorized by — Greenleaf Organics</p>
+        </div>
+        <div class="sig-block">
+          <p>Received by — Whole Foods Market</p>
+        </div>
+        <div class="sig-block">
+          <p>Date</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="pspdfkit-footer">
+      <div class="footer-columns">
+        <span class="tagline">Growing a better tomorrow, naturally.</span>
+        <span>Page {{ pageNumber }} of {{ pageCount }}</span>
+      </div>
+    </div>
+  </body>
+</html>

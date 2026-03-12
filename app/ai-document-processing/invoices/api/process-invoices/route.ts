@@ -21,39 +21,41 @@ const INVOICE_TEMPLATE = {
   name: "Comprehensive Invoice",
   identifier: "comprehensive_invoice",
   semanticDescription:
-    "Comprehensive business invoice with detailed vendor, customer, and transaction information including line items and tax details",
+    "Business invoice in any language or format — standard invoices, progress invoices, purchase invoices, or Rechnungen — with vendor, customer, financial, and line-item details across industries including tech, construction, design, manufacturing, and food supply",
   fields: [
     // Vendor/Supplier Information
     {
       name: "vendorName",
       semanticDescription:
-        "Name of the vendor, supplier, or service provider company issuing the invoice",
+        "Name of the vendor, supplier, contractor, or service provider issuing the invoice (e.g. company name from the header, logo area, or 'From' section)",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "vendorAddress",
       semanticDescription:
-        "Complete business address of the vendor including street, city, state, and postal code",
+        "Complete business address of the vendor including street, city, state/region, country, and postal code",
       format: "Text" as const,
       validationMethod: "PostalAddressIntegrity" as const,
     },
     {
       name: "vendorPhone",
-      semanticDescription: "Phone number or contact number of the vendor",
+      semanticDescription:
+        "Phone number or contact number of the vendor, including international format (e.g. +1, +49)",
       format: "Text" as const,
       validationMethod: "PhoneNumberIntegrity" as const,
     },
     {
       name: "vendorEmail",
-      semanticDescription: "Email address of the vendor or billing contact",
+      semanticDescription:
+        "Email address of the vendor or billing contact (e.g. billing@, info@, hello@, orders@)",
       format: "Text" as const,
       validationMethod: "EmailIntegrity" as const,
     },
     {
       name: "vendorTaxId",
       semanticDescription:
-        "Tax ID, VAT number, or business registration number of the vendor",
+        "Tax identifier of the vendor — Tax ID, EIN, VAT number, USt-IdNr., or business registration number (e.g. DE 287 456 123, US-87-4521903)",
       format: "Text" as const,
       validationMethod: null,
     },
@@ -62,19 +64,21 @@ const INVOICE_TEMPLATE = {
     {
       name: "customerName",
       semanticDescription:
-        "Name of the customer, client, or buyer receiving the invoice",
+        "Name of the customer, client, buyer, or owner receiving the invoice (from the 'Bill To', 'Customer', 'Rechnungsempfänger', or 'To' section)",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "customerAddress",
-      semanticDescription: "Billing or shipping address of the customer",
+      semanticDescription:
+        "Billing or shipping address of the customer including street, city, state/region, and postal code",
       format: "Text" as const,
       validationMethod: "PostalAddressIntegrity" as const,
     },
     {
       name: "customerContact",
-      semanticDescription: "Customer contact person name or department",
+      semanticDescription:
+        "Customer contact person name, department, or attention line (e.g. 'Attn:', 'Ansprechpartner:', 'Buyer:')",
       format: "Text" as const,
       validationMethod: null,
     },
@@ -83,25 +87,35 @@ const INVOICE_TEMPLATE = {
     {
       name: "invoiceNumber",
       semanticDescription:
-        "Unique invoice number or invoice ID (look for labels like 'Invoice #', 'Invoice No.', 'Bill #', or similar)",
+        "Unique invoice number or identifier (look for 'Invoice #', 'Invoice No.', 'Rechnung', 'RE-', 'NT-', 'GL-', 'AC-', 'SD-', or similar alphanumeric codes)",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "invoiceDate",
-      semanticDescription: "Date the invoice was issued or created",
+      semanticDescription:
+        "Date the invoice was issued or created (may appear as 'Date', 'Issue Date', 'Issued', 'Rechnungsdatum', or similar)",
       format: "Date" as const,
       validationMethod: "DateIntegrity" as const,
     },
     {
       name: "dueDate",
-      semanticDescription: "Payment due date or date payment is required",
+      semanticDescription:
+        "Payment due date (may appear as 'Due', 'Due Date', 'Payment Date', 'Fälligkeitsdatum', or similar)",
       format: "Date" as const,
       validationMethod: "DateIntegrity" as const,
     },
     {
       name: "purchaseOrder",
-      semanticDescription: "Purchase order number or PO number if referenced",
+      semanticDescription:
+        "Purchase order number, PO reference, contract number, or project reference (e.g. 'PO Ref', 'Bestellnummer', 'Contract #', 'SOW-')",
+      format: "Text" as const,
+      validationMethod: null,
+    },
+    {
+      name: "invoiceType",
+      semanticDescription:
+        "Type of invoice if stated — e.g. 'Invoice', 'Progress Invoice', 'Purchase Invoice', 'Rechnung', 'Credit Note'",
       format: "Text" as const,
       validationMethod: null,
     },
@@ -110,42 +124,42 @@ const INVOICE_TEMPLATE = {
     {
       name: "subtotal",
       semanticDescription:
-        "Subtotal amount before taxes and additional charges (numeric value without currency symbols)",
+        "Subtotal amount before taxes, discounts, and additional charges (may appear as 'Subtotal', 'Zwischensumme', 'Nettobetrag')",
       format: "Currency" as const,
       validationMethod: "CurrencyIntegrity" as const,
     },
     {
       name: "taxAmount",
       semanticDescription:
-        "Total tax amount including sales tax, VAT, or other taxes (numeric value without currency symbols)",
+        "Total tax amount — sales tax, VAT, MwSt., or other taxes applied to the invoice",
       format: "Currency" as const,
       validationMethod: "CurrencyIntegrity" as const,
     },
     {
       name: "taxRate",
       semanticDescription:
-        "Tax rate percentage (e.g., 8.5% should be extracted as 8.5)",
+        "Tax rate percentage (e.g., 8.875%, 19%, 21% — extract the number without the % symbol)",
       format: "Number" as const,
       validationMethod: "NumberIntegrity" as const,
     },
     {
       name: "discountAmount",
       semanticDescription:
-        "Discount amount applied to the invoice (numeric value without currency symbols)",
+        "Discount, volume discount, Mengenrabatt, or retainer credit amount applied to the invoice",
       format: "Currency" as const,
       validationMethod: "CurrencyIntegrity" as const,
     },
     {
       name: "shippingAmount",
       semanticDescription:
-        "Shipping, delivery, or freight charges (numeric value without currency symbols)",
+        "Shipping, delivery, freight, or handling charges (e.g. 'Refrigerated Shipping', 'Shipping/Handling')",
       format: "Currency" as const,
       validationMethod: "CurrencyIntegrity" as const,
     },
     {
       name: "totalAmount",
       semanticDescription:
-        "Final total amount due including all taxes and charges (numeric value without currency symbols)",
+        "Final total amount due or payable including all taxes and charges (may appear as 'Total Due', 'Amount Due', 'Balance Due', 'Rechnungsbetrag', 'Amount Paid')",
       format: "Currency" as const,
       validationMethod: "CurrencyIntegrity" as const,
     },
@@ -154,13 +168,14 @@ const INVOICE_TEMPLATE = {
     {
       name: "paymentTerms",
       semanticDescription:
-        "Payment terms such as 'Net 30', 'Due on receipt', or payment conditions",
+        "Payment terms — e.g. 'Net 30', 'Due on receipt', '30 Tage netto', retainage percentage, or Skonto conditions",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "paymentMethod",
-      semanticDescription: "Accepted payment methods or instructions",
+      semanticDescription:
+        "Payment method or bank details — bank transfer, wire, PayPal, IBAN, routing number, BIC/SWIFT, or Bankverbindung",
       format: "Text" as const,
       validationMethod: null,
     },
@@ -169,21 +184,21 @@ const INVOICE_TEMPLATE = {
     {
       name: "itemDescriptions",
       semanticDescription:
-        "List of all products or services described on the invoice including item names and descriptions",
+        "List of all line-item descriptions — products, services, project phases, SKUs, or Artikelnummern including any category headers",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "itemQuantities",
       semanticDescription:
-        "Quantities of items or services listed on the invoice",
+        "Quantities for each line item — may be units, hours, cases, days (Tage), or Stück",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "itemPrices",
       semanticDescription:
-        "Unit prices or rates for items listed on the invoice",
+        "Unit prices, rates, or per-item costs for each line item (e.g. hourly rate, price per case, Einzelpreis)",
       format: "Text" as const,
       validationMethod: null,
     },
@@ -191,14 +206,15 @@ const INVOICE_TEMPLATE = {
     // Additional Information
     {
       name: "currency",
-      semanticDescription: "Currency code or type (USD, EUR, GBP, etc.)",
+      semanticDescription:
+        "Currency used in the invoice — USD ($), EUR (€), GBP (£), or other currency codes/symbols",
       format: "Text" as const,
       validationMethod: null,
     },
     {
       name: "notes",
       semanticDescription:
-        "Additional notes, comments, or special instructions on the invoice",
+        "Additional notes, terms and conditions, special instructions, Hinweise, or project references on the invoice",
       format: "Text" as const,
       validationMethod: null,
     },

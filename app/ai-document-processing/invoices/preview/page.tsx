@@ -236,7 +236,7 @@ export default function PreviewInvoices() {
                 </p>
                 <p style={{ color: "var(--foreground)", opacity: 0.7 }}>
                   Please check that PDF files are present in
-                  /public/documents/invoices/
+                  /public/invoices/
                 </p>
               </div>
             ) : invoices.length === 0 ? (
@@ -249,7 +249,7 @@ export default function PreviewInvoices() {
                   No invoice files found
                 </p>
                 <p className="text-sm mt-1" style={{ color: "var(--neutral)" }}>
-                  Add PDF files to /public/documents/invoices/ folder
+                  Add PDF files to /public/invoices/ folder
                 </p>
               </div>
             ) : (

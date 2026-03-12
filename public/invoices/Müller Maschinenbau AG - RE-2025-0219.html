@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rechnung RE-2025-0219</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-size: 0.75rem;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #1a1a1a;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      #pspdfkit-header {
+        display: flow-root;
+        padding: 1.5rem 2.5rem;
+        border-bottom: 2px solid #003366;
+      }
+
+      .header-columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .logotype {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .logo-shield {
+        width: 44px;
+        height: 44px;
+        background: #003366;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 900;
+        font-size: 1rem;
+        letter-spacing: -1px;
+        border-radius: 2px;
+      }
+
+      .company-block .name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #003366;
+        letter-spacing: 0.5px;
+      }
+
+      .company-block .tagline {
+        font-size: 0.5rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 2px;
+      }
+
+      .header-address {
+        text-align: right;
+        font-size: 0.5625rem;
+        line-height: 1.7;
+        color: #444;
+      }
+
+      #pspdfkit-footer {
+        display: flow-root;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-sizing: border-box;
+        width: 100%;
+        border-top: 2px solid #003366;
+        padding: 0.75rem 2.5rem 1.5rem;
+        font-size: 0.5rem;
+        color: #666;
+      }
+
+      .footer-columns {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .footer-legal {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .footer-legal div p {
+        margin: 1px 0;
+      }
+
+      .footer-legal div p:first-child {
+        font-weight: 600;
+        color: #003366;
+      }
+
+      .page {
+        margin: 0 2.5rem;
+        padding-top: 0.5rem;
+      }
+
+      .rechnung-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+      }
+
+      .rechnung-title {
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: #003366;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+      }
+
+      .rechnung-nummer {
+        text-align: right;
+      }
+
+      .rechnung-nummer .big {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #003366;
+      }
+
+      .rechnung-nummer p {
+        font-size: 0.625rem;
+        color: #666;
+        margin: 2px 0;
+      }
+
+      .address-bar {
+        display: flex;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+        padding: 1rem 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .addr-col {
+        flex: 1;
+      }
+
+      .addr-col .label {
+        font-size: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #003366;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .addr-col p {
+        font-size: 0.6875rem;
+        margin: 2px 0;
+        line-height: 1.5;
+      }
+
+      .reference-grid {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .ref-item {
+        flex: 1;
+        background: #f5f7fa;
+        padding: 0.625rem;
+        border-left: 3px solid #003366;
+      }
+
+      .ref-item .ref-label {
+        font-size: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        margin-bottom: 0.25rem;
+      }
+
+      .ref-item .ref-value {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #003366;
+      }
+
+      thead {
+        display: table-header-group;
+        break-inside: avoid;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.625rem;
+      }
+
+      thead th {
+        background: #003366;
+        color: white;
+        padding: 0.5rem 0.5rem;
+        text-align: left;
+        font-size: 0.5625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+
+      thead th:nth-child(n+3) {
+        text-align: right;
+      }
+
+      tbody td {
+        padding: 0.4rem 0.5rem;
+        border-bottom: 1px solid #e8e8e8;
+      }
+
+      tbody td:nth-child(n+3) {
+        text-align: right;
+      }
+
+      tbody tr:nth-child(even) {
+        background: #fafbfc;
+      }
+
+      .item-code {
+        font-family: "Courier New", monospace;
+        font-size: 0.5625rem;
+        color: #888;
+      }
+
+      .summary-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+
+      .summary-table {
+        width: 300px;
+        border: 1px solid #ddd;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0.75rem;
+        border-bottom: 1px solid #eee;
+        font-size: 0.6875rem;
+      }
+
+      .summary-row:last-child {
+        border-bottom: none;
+      }
+
+      .summary-row.mwst {
+        background: #f5f7fa;
+        font-size: 0.625rem;
+        color: #666;
+      }
+
+      .summary-row.total {
+        background: #003366;
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 0.625rem 0.75rem;
+      }
+
+      .zahlungsinfo {
+        margin-top: 2rem;
+        border: 1px solid #ddd;
+        padding: 1rem;
+      }
+
+      .zahlungsinfo h4 {
+        font-size: 0.6875rem;
+        color: #003366;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .zahlungs-grid {
+        display: flex;
+        gap: 2rem;
+        font-size: 0.625rem;
+      }
+
+      .zahlungs-grid div p {
+        margin: 2px 0;
+        line-height: 1.6;
+      }
+
+      .hinweis {
+        margin-top: 1.5rem;
+        font-size: 0.5625rem;
+        color: #888;
+        line-height: 1.7;
+        border-left: 3px solid #ddd;
+        padding-left: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pspdfkit-header">
+      <div class="header-columns">
+        <div class="logotype">
+          <div class="logo-shield">MM</div>
+          <div class="company-block">
+            <div class="name">Müller Maschinenbau AG</div>
+            <div class="tagline">Präzisionstechnik seit 1967</div>
+          </div>
+        </div>
+        <div class="header-address">
+          <p>Industriestraße 42</p>
+          <p>70469 Stuttgart, Deutschland</p>
+          <p>Tel: +49 711 555-4200</p>
+          <p>info@mueller-maschinenbau.de</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" style="page-break-after: always">
+      <div class="rechnung-header">
+        <div class="rechnung-title">Rechnung</div>
+        <div class="rechnung-nummer">
+          <div class="big">RE-2025-0219</div>
+          <p>Rechnungsdatum: 10. März 2025</p>
+          <p>Fälligkeitsdatum: 9. April 2025</p>
+          <p>Kundennummer: K-48721</p>
+        </div>
+      </div>
+
+      <div class="address-bar">
+        <div class="addr-col">
+          <div class="label">Rechnungssteller</div>
+          <p><strong>Müller Maschinenbau AG</strong></p>
+          <p>Industriestraße 42</p>
+          <p>70469 Stuttgart</p>
+          <p>USt-IdNr.: DE 287 456 123</p>
+          <p>HRB 741852 — AG Stuttgart</p>
+        </div>
+        <div class="addr-col">
+          <div class="label">Rechnungsempfänger</div>
+          <p><strong>Autowerk Bayern GmbH</strong></p>
+          <p>Lichtenbergstraße 8</p>
+          <p>85748 Garching bei München</p>
+          <p>USt-IdNr.: DE 198 765 432</p>
+          <p>Ansprechpartner: Thomas Braun</p>
+        </div>
+        <div class="addr-col">
+          <div class="label">Lieferadresse</div>
+          <p><strong>Autowerk Bayern GmbH</strong></p>
+          <p>Werk II — Halle 7</p>
+          <p>Am Werkring 15</p>
+          <p>84030 Landshut</p>
+        </div>
+      </div>
+
+      <div class="reference-grid">
+        <div class="ref-item">
+          <div class="ref-label">Bestellnummer</div>
+          <div class="ref-value">PO-AB-2025-03887</div>
+        </div>
+        <div class="ref-item">
+          <div class="ref-label">Lieferschein-Nr.</div>
+          <div class="ref-value">LS-2025-04412</div>
+        </div>
+        <div class="ref-item">
+          <div class="ref-label">Projekt</div>
+          <div class="ref-value">EV-Antrieb Gen4</div>
+        </div>
+        <div class="ref-item">
+          <div class="ref-label">Zahlungsziel</div>
+          <div class="ref-value">30 Tage netto</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Pos.</th>
+            <th>Artikelnr.</th>
+            <th>Bezeichnung</th>
+            <th>Menge</th>
+            <th>Einheit</th>
+            <th>Einzelpreis</th>
+            <th>Gesamtpreis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td class="item-code">MM-PRZ-4421</td>
+            <td>CNC-Präzisionswelle Ø45mm × 280mm</td>
+            <td>120</td>
+            <td>Stk.</td>
+            <td>€ 187,50</td>
+            <td>€ 22.500,00</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="item-code">MM-GHG-1108</td>
+            <td>Getriebegehäuse Typ G4-EV (Aluguss)</td>
+            <td>60</td>
+            <td>Stk.</td>
+            <td>€ 425,00</td>
+            <td>€ 25.500,00</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="item-code">MM-LGR-2205</td>
+            <td>Lagersitz geschliffen, Toleranz H7</td>
+            <td>240</td>
+            <td>Stk.</td>
+            <td>€ 62,80</td>
+            <td>€ 15.072,00</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="item-code">MM-ZRD-3309</td>
+            <td>Stirnrad Modul 2.5, 48 Zähne, gehärtet</td>
+            <td>180</td>
+            <td>Stk.</td>
+            <td>€ 94,20</td>
+            <td>€ 16.956,00</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="item-code">MM-FLN-0087</td>
+            <td>Flanschverbindung DN80, PN16</td>
+            <td>60</td>
+            <td>Stk.</td>
+            <td>€ 118,00</td>
+            <td>€ 7.080,00</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td class="item-code">MM-MON-SVC</td>
+            <td>Montage- und Einrichtungsservice vor Ort</td>
+            <td>3</td>
+            <td>Tage</td>
+            <td>€ 1.450,00</td>
+            <td>€ 4.350,00</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td class="item-code">MM-QAP-CERT</td>
+            <td>Qualitätsprüfprotokoll + 3.1 Zeugnisse</td>
+            <td>1</td>
+            <td>Pauschal</td>
+            <td>€ 890,00</td>
+            <td>€ 890,00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary-section">
+        <div class="summary-table">
+          <div class="summary-row">
+            <span>Zwischensumme netto</span>
+            <span>€ 92.348,00</span>
+          </div>
+          <div class="summary-row">
+            <span>Mengenrabatt (2%)</span>
+            <span>− € 1.846,96</span>
+          </div>
+          <div class="summary-row">
+            <span>Nettobetrag</span>
+            <span>€ 90.501,04</span>
+          </div>
+          <div class="summary-row mwst">
+            <span>MwSt. 19%</span>
+            <span>€ 17.195,20</span>
+          </div>
+          <div class="summary-row total">
+            <span>Rechnungsbetrag</span>
+            <span>€ 107.696,24</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="zahlungsinfo">
+        <h4>Bankverbindung</h4>
+        <div class="zahlungs-grid">
+          <div>
+            <p><strong>Bank:</strong> Landesbank Baden-Württemberg</p>
+            <p><strong>IBAN:</strong> DE89 6005 0101 0012 3456 78</p>
+          </div>
+          <div>
+            <p><strong>BIC:</strong> SOLADEST600</p>
+            <p><strong>Verwendungszweck:</strong> RE-2025-0219 / K-48721</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hinweis">
+        Bitte überweisen Sie den Rechnungsbetrag innerhalb von 30 Tagen unter Angabe der Rechnungsnummer.
+        Bei Zahlung innerhalb von 10 Tagen gewähren wir 2% Skonto (€ 2.153,92).
+        Es gelten unsere Allgemeinen Geschäftsbedingungen in der Fassung vom 01.01.2024.
+        Erfüllungsort und Gerichtsstand ist Stuttgart.
+      </div>
+    </div>
+
+    <div id="pspdfkit-footer">
+      <div class="footer-columns">
+        <div class="footer-legal">
+          <div>
+            <p>Geschäftsführer</p>
+            <p>Dr. Klaus Müller</p>
+            <p>Ing. Hans Weber</p>
+          </div>
+          <div>
+            <p>Handelsregister</p>
+            <p>AG Stuttgart HRB 741852</p>
+            <p>USt-IdNr. DE 287 456 123</p>
+          </div>
+          <div>
+            <p>Zertifizierungen</p>
+            <p>ISO 9001:2015</p>
+            <p>IATF 16949:2016</p>
+          </div>
+        </div>
+        <span>Seite {{ pageNumber }} von {{ pageCount }}</span>
+      </div>
+    </div>
+  </body>
+</html>
