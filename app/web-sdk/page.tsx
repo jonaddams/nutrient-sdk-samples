@@ -89,6 +89,13 @@ const samples: Sample[] = [
       "View Word documents with tracked changes and comments in different markup modes: no markup, original, simple markup, and all markup",
     path: "/web-sdk/document-markup",
   },
+  {
+    name: "Night Mode",
+    category: "User Interface",
+    description:
+      "Toggle night mode in the PDF viewer with a custom toolbar button using CSS filter inversion",
+    path: "/web-sdk/night-mode",
+  },
 ];
 
 const categories = [
