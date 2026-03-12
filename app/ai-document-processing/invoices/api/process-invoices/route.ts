@@ -94,14 +94,14 @@ const INVOICE_TEMPLATE = {
     {
       name: "invoiceDate",
       semanticDescription:
-        "Date the invoice was issued or created (may appear as 'Date', 'Issue Date', 'Issued', 'Rechnungsdatum', or similar)",
+        "Date the invoice was issued or created — NOT the due date or payment date. Look for labels like 'Date', 'Issue Date', 'Issued', 'Invoice Date', 'Rechnungsdatum', or 'Datum'. This is the earliest date on the invoice, before the due date.",
       format: "Date" as const,
       validationMethod: "DateIntegrity" as const,
     },
     {
       name: "dueDate",
       semanticDescription:
-        "Payment due date (may appear as 'Due', 'Due Date', 'Payment Date', 'Fälligkeitsdatum', or similar)",
+        "Payment due date — NOT the invoice issue date. Look for labels like 'Due', 'Due Date', 'Payment Due', 'Fälligkeitsdatum', or 'Zahlungsziel'. This is the later date by which payment must be made.",
       format: "Date" as const,
       validationMethod: "DateIntegrity" as const,
     },
@@ -419,6 +419,32 @@ async function processInvoiceDocument(
       fieldsCount: result.fields ? result.fields.length : 0,
       hasFields: !!result.fields,
     });
+
+    // Log all field names and date-related values for debugging
+    if (result.fields && result.fields.length > 0) {
+      const allFieldNames = result.fields.map(
+        (f: { fieldName: string }) => f.fieldName,
+      );
+      console.log(`🔍 All field names for ${fileName}:`, allFieldNames);
+
+      // Log any field that looks date-related
+      const dateRelated = result.fields.filter(
+        (f: { fieldName: string; value: { value: string } }) => {
+          const name = f.fieldName.toLowerCase();
+          return (
+            name.includes("date") ||
+            name.includes("due") ||
+            name.includes("invoice") ||
+            name.includes("total") ||
+            name.includes("amount")
+          );
+        },
+      );
+      console.log(
+        `📅 Date/amount fields for ${fileName}:`,
+        JSON.stringify(dateRelated, null, 2),
+      );
+    }
 
     return result;
   } catch (error) {
