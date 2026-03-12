@@ -1,0 +1,30 @@
+2025-03-10 08:01:12 INFO  Server started on port 3000
+2025-03-10 08:01:12 INFO  Database connected (pg://db:5432)
+2025-03-10 08:01:13 INFO  Redis cache initialized
+2025-03-10 08:01:13 INFO  Worker pool: 4 threads active
+2025-03-10 08:02:45 INFO  GET /api/health 200 (2ms)
+2025-03-10 08:03:11 INFO  GET /api/users 200 (34ms)
+2025-03-10 08:03:12 WARN  Rate limit: 80/100 for IP 10.0.1.42
+2025-03-10 08:04:01 INFO  POST /api/auth/login 200 (112ms)
+2025-03-10 08:04:02 INFO  Session created: user_id=1024
+2025-03-10 08:05:30 ERROR Connection timeout to db replica-2
+2025-03-10 08:05:31 WARN  Failover to replica-3 initiated
+2025-03-10 08:05:32 INFO  Replica-3 connection established
+2025-03-10 08:06:00 INFO  GET /api/documents 200 (45ms)
+2025-03-10 08:06:15 INFO  POST /api/documents/upload 201 (890ms)
+2025-03-10 08:06:15 INFO  File stored: doc_8832.pdf (2.4MB)
+2025-03-10 08:07:00 INFO  CRON job: cleanup_temp started
+2025-03-10 08:07:02 INFO  Removed 12 temp files (18MB freed)
+2025-03-10 08:08:45 WARN  Memory usage at 78% (3.1GB/4GB)
+2025-03-10 08:09:10 INFO  GET /api/users/1024/profile 200 (8ms)
+2025-03-10 08:10:00 ERROR 503 Service unavailable: /api/search
+2025-03-10 08:10:01 ERROR Elasticsearch cluster unreachable
+2025-03-10 08:10:05 INFO  Elasticsearch reconnected (node-1)
+2025-03-10 08:10:06 INFO  GET /api/search?q=report 200 (156ms)
+2025-03-10 08:11:30 INFO  WebSocket connections: 42 active
+2025-03-10 08:12:00 INFO  Metrics exported to Prometheus
+2025-03-10 08:12:45 INFO  GET /api/documents/8832 200 (12ms)
+2025-03-10 08:13:20 INFO  PUT /api/users/1024 200 (22ms)
+2025-03-10 08:14:00 INFO  Backup started: daily_snapshot_0310
+2025-03-10 08:14:45 INFO  Backup completed (1.2GB, 45s)
+2025-03-10 08:15:00 INFO  Health check: all systems nominal

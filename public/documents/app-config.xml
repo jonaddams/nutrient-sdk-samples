@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="DocumentManager" version="3.2.1">
+
+  <server>
+    <host>0.0.0.0</host>
+    <port>8080</port>
+    <maxConnections>500</maxConnections>
+    <timeout unit="seconds">30</timeout>
+  </server>
+
+  <database>
+    <primary>
+      <driver>postgresql</driver>
+      <host>db-primary.internal</host>
+      <port>5432</port>
+      <name>docmanager_prod</name>
+      <pool min="5" max="20" />
+    </primary>
+    <replica>
+      <host>db-replica.internal</host>
+      <port>5432</port>
+      <readOnly>true</readOnly>
+    </replica>
+  </database>
+
+  <storage>
+    <provider>s3</provider>
+    <bucket>docmanager-files</bucket>
+    <region>us-east-1</region>
+    <maxFileSize unit="MB">100</maxFileSize>
+    <allowedTypes>
+      <type>application/pdf</type>
+      <type>image/png</type>
+      <type>image/jpeg</type>
+      <type>text/plain</type>
+    </allowedTypes>
+  </storage>
+
+  <auth>
+    <provider>oauth2</provider>
+    <issuer>https://auth.example.com</issuer>
+    <tokenExpiry unit="minutes">60</tokenExpiry>
+    <refreshExpiry unit="days">30</refreshExpiry>
+  </auth>
+
+  <logging>
+    <level>INFO</level>
+    <format>json</format>
+    <output>stdout</output>
+    <rotation maxSize="50MB" maxAge="7d" />
+  </logging>
+
+  <features>
+    <feature name="documentSearch" enabled="true" />
+    <feature name="versionHistory" enabled="true" />
+    <feature name="collaboration" enabled="false" />
+    <feature name="aiProcessing" enabled="true" />
+  </features>
+
+</application>

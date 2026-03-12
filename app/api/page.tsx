@@ -119,6 +119,20 @@ export default function APIPage() {
                     comparison
                   </td>
                 </tr>
+                <tr>
+                  <td className="nutrient-td nutrient-td-bold">
+                    <Link
+                      href="/api/text-viewer"
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      Text File Viewer
+                    </Link>
+                  </td>
+                  <td className="nutrient-td">
+                    View .txt, .csv, and .xml files in the Nutrient viewer by
+                    converting them to styled HTML and then to PDF via DWS API
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
