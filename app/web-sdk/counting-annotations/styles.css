@@ -1,0 +1,239 @@
+/* Counting Annotations Styles */
+
+.counting-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+/* Sidebar */
+.counting-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: var(--warm-gray-100);
+  border-right: 1px solid var(--warm-gray-400);
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .counting-sidebar {
+    background-color: var(--warm-gray-950);
+    border-right-color: var(--warm-gray-800);
+  }
+}
+
+/* Section */
+.counting-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.counting-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .counting-label {
+    color: var(--warm-gray-400);
+  }
+}
+
+/* Count Display */
+.counting-total {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--white);
+  border-radius: 8px;
+  border: 1px solid var(--warm-gray-300);
+}
+
+@media (prefers-color-scheme: dark) {
+  .counting-total {
+    background-color: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+  }
+}
+
+.counting-total-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #4537de;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.counting-total-text {
+  font-size: 14px;
+  color: var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+  .counting-total-text {
+    color: var(--warm-gray-400);
+  }
+}
+
+/* Marker List */
+.marker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.marker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: var(--white);
+  border: 1px solid var(--warm-gray-300);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  text-align: left;
+}
+
+.marker-item:hover {
+  background-color: var(--warm-gray-200);
+  border-color: #4537de;
+}
+
+@media (prefers-color-scheme: dark) {
+  .marker-item {
+    background-color: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+  }
+
+  .marker-item:hover {
+    background-color: var(--warm-gray-800);
+    border-color: #4537de;
+  }
+}
+
+.marker-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #4537de;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.marker-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.marker-page {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--black);
+}
+
+.marker-coords {
+  font-size: 11px;
+  color: var(--warm-gray-800);
+  font-family: var(--font-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  .marker-page {
+    color: var(--warm-gray-400);
+  }
+
+  .marker-coords {
+    color: var(--warm-gray-600);
+  }
+}
+
+/* Empty state */
+.marker-empty {
+  font-size: 13px;
+  color: var(--warm-gray-700);
+  text-align: center;
+  padding: 16px 8px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .marker-empty {
+    color: var(--warm-gray-500);
+  }
+}
+
+/* Reset Button */
+.counting-reset-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.24px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  border: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition-property: opacity, color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
+  cursor: pointer;
+  min-height: 2.5rem;
+  background: var(--code-coral);
+  color: var(--white);
+}
+
+.counting-reset-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.counting-reset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .counting-reset-btn {
+    background: var(--code-coral);
+    color: var(--black);
+  }
+}
+
+/* Viewer */
+.counting-viewer {
+  flex: 1;
+  height: 100%;
+  min-height: 600px;
+}

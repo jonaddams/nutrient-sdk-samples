@@ -96,6 +96,13 @@ const samples: Sample[] = [
       "Toggle night mode in the PDF viewer with a custom toolbar button using CSS filter inversion",
     path: "/web-sdk/night-mode",
   },
+  {
+    name: "Counting Annotations",
+    category: "Annotations",
+    description:
+      "Click anywhere on a document to place numbered markers using custom-rendered annotations with a sidebar tracker",
+    path: "/web-sdk/counting-annotations",
+  },
 ];
 
 const categories = [
