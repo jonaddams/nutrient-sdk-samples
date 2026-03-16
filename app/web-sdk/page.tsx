@@ -9,6 +9,7 @@ type Sample = {
   category: string;
   description: string;
   path: string;
+  wip?: boolean;
 };
 
 const samples: Sample[] = [
@@ -109,6 +110,7 @@ const samples: Sample[] = [
     description:
       "Assemble documents by dragging pages between two panels with multi-select, reorder, rotate, duplicate, delete, upload, and export",
     path: "/web-sdk/document-assembly",
+    wip: true,
   },
 ];
 
@@ -203,6 +205,11 @@ export default function WebSDKPage() {
                       >
                         {sample.name}
                       </Link>
+                      {sample.wip && (
+                        <span className="nutrient-badge nutrient-badge-accent ml-2">
+                          Work in Progress
+                        </span>
+                      )}
                     </td>
                     <td className="nutrient-td">{sample.category}</td>
                     <td className="nutrient-td">{sample.description}</td>
