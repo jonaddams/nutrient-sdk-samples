@@ -235,6 +235,11 @@ export default function FormDesignerViewer() {
                 id: dateUniqueId,
                 pageIndex,
                 name: "Date Signed",
+                additionalActions: {
+                  onFormat: new NutrientViewer.Actions.JavaScriptAction({
+                    script: 'AFDate_FormatEx("mm/dd/yyyy")',
+                  }),
+                },
               });
 
               const formField = new NutrientViewer.FormFields.TextFormField({
@@ -244,7 +249,6 @@ export default function FormDesignerViewer() {
                   ) => List<string>
                 )([dateUniqueId]),
                 name: dateFormFieldName,
-                value: "TBD: Date Signed",
               });
 
               await instance.create([widget, formField]);
