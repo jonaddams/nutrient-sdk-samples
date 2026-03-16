@@ -136,7 +136,7 @@ export default function DownloadStep() {
               document: ArrayBuffer;
               initialViewState?: any;
               licenseKey?: string;
-              pageRendering?: string;
+              pageRendering?: "next" | "legacy";
             } = {
               container: `#${containerId}`, // Use CSS selector as expected by NutrientViewer
               document: pdfDocumentCopy,

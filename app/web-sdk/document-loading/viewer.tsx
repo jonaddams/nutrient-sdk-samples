@@ -64,6 +64,7 @@ interface ViewerLoadConfig {
   container: HTMLElement;
   document: string | ArrayBuffer;
   allowLinearizedLoading?: boolean;
+  pageRendering?: "next" | "legacy";
   useCDN?: boolean;
   licenseKey?: string;
 }

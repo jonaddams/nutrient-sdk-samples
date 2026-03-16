@@ -72,8 +72,7 @@ export function useNutrientSDK({
             : window.NutrientViewer.Theme.LIGHT,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(toolbarItems && { toolbarItems: toolbarItems as any }),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
+      });
 
       setInstance(loadedInstance);
       setLoading(false);

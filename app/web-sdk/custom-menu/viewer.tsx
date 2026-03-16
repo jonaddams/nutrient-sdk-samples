@@ -76,6 +76,7 @@ interface NutrientViewerGlobal {
     container: HTMLElement;
     document: string;
     licenseKey: string | undefined;
+    pageRendering?: "next" | "legacy";
     theme: string;
   }) => Promise<Instance>;
   unload: (container: HTMLElement) => void;

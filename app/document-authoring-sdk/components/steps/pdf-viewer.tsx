@@ -43,7 +43,7 @@ export default function PdfViewer({
           // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types are not available
           initialViewState?: any;
           licenseKey?: string;
-          pageRendering?: string;
+          pageRendering?: "next" | "legacy";
         } = {
           container: `#${containerId}`,
           document: pdfBuffer,
