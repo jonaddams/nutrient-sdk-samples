@@ -206,7 +206,7 @@ export default function WebSDKPage() {
                         {sample.name}
                       </Link>
                       {sample.wip && (
-                        <span className="nutrient-badge nutrient-badge-accent ml-2">
+                        <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full">
                           Work in Progress
                         </span>
                       )}
