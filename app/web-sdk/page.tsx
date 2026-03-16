@@ -103,6 +103,13 @@ const samples: Sample[] = [
       "Click anywhere on a document to place numbered markers using custom-rendered annotations with a sidebar tracker",
     path: "/web-sdk/counting-annotations",
   },
+  {
+    name: "Document Assembly",
+    category: "Document Editor",
+    description:
+      "Assemble documents by dragging pages between two panels with multi-select, reorder, rotate, duplicate, delete, upload, and export",
+    path: "/web-sdk/document-assembly",
+  },
 ];
 
 const categories = [
