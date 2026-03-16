@@ -86,7 +86,7 @@ export default function ContentEditApiPage() {
       {/* Header */}
       <SampleHeader
         title="Content Editing API"
-        description="Detect text blocks, find & replace text, use AI to reword content, and edit text directly in PDF documents"
+        description="Detect text blocks, find & replace text, replace content, and edit text directly in PDF documents"
       />
 
       {/* Main Content Area */}
@@ -227,12 +227,12 @@ export default function ContentEditApiPage() {
                   }`}
                   title={
                     isContentEditing
-                      ? "Cannot use AI Reword while Edit Text is active"
+                      ? "Cannot use Replace Text while Edit Text is active"
                       : !isEditing
                         ? "Enable Content Boxes mode first"
                         : selectedCount === 0
                           ? "Select text blocks first (click on blue boxes to turn them red)"
-                          : `Reword ${selectedCount} selected text block${selectedCount > 1 ? "s" : ""} with AI`
+                          : `Replace ${selectedCount} selected text block${selectedCount > 1 ? "s" : ""}`
                   }
                 >
                   <svg
@@ -243,7 +243,7 @@ export default function ContentEditApiPage() {
                     role="img"
                     aria-labelledby={aiRewordTitleId}
                   >
-                    <title id={aiRewordTitleId}>Reword text with AI</title>
+                    <title id={aiRewordTitleId}>Replace text</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -251,8 +251,8 @@ export default function ContentEditApiPage() {
                       d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                     />
                   </svg>
-                  <span className="hidden sm:inline">Reword with AI</span>
-                  <span className="sm:hidden">AI</span>
+                  <span className="hidden sm:inline">Replace Text</span>
+                  <span className="sm:hidden">Replace</span>
                   {selectedCount > 0 && (
                     <span className="ml-auto bg-white/20 text-xs px-1 lg:px-2 py-1 rounded-full">
                       {selectedCount}
