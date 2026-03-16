@@ -626,6 +626,7 @@ export default function Viewer({ document }: ViewerProps) {
       NutrientViewer.load({
         container,
         document,
+        pageRendering: "next",
         toolbarItems: [
           ...minimalToolbarItems,
           ...(isEditingRef.current ? [] : [{ type: "export-pdf" } as const]),

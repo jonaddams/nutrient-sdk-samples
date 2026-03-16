@@ -48,6 +48,7 @@ export default function SearchViewer({
         container,
         document: document,
         allowLinearizedLoading: true,
+        pageRendering: "next",
         useCDN: true,
         licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       }).then(async (loadedInstance: Instance) => {

@@ -509,6 +509,7 @@ export default function Viewer({ document, onInstanceReady }: ViewerProps) {
       NutrientViewer.load({
         container,
         document: document,
+        pageRendering: "next",
         toolbarItems: NutrientViewer.defaultToolbarItems?.filter(
           (item: { type: string }) =>
             [

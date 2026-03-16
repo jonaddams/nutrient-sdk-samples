@@ -355,6 +355,7 @@ export default function FormDesignerViewer() {
       container,
       document: "/documents/service-agreement.pdf",
       allowLinearizedLoading: true,
+      pageRendering: "next",
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
     })

@@ -334,6 +334,7 @@ export default function DocumentLoadingViewer() {
           // Enable progressive loading for URL-based methods
           // This allows the viewer to display pages before the entire document is downloaded
           allowLinearizedLoading: method === "url" || method === "blob",
+          pageRendering: "next",
           useCDN: true,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         });
@@ -466,6 +467,7 @@ const instance = await NutrientViewer.load({
   document: "/documents/example.pdf",  // Local path
   // document: "https://example.com/document.pdf",  // Remote URL
   allowLinearizedLoading: true,  // Enable streaming
+  pageRendering: "next",
   licenseKey: "YOUR_LICENSE_KEY"
 });`;
 
@@ -486,6 +488,7 @@ const arrayBuffer = await file.arrayBuffer();
 const instance = await NutrientViewer.load({
   container: document.getElementById("viewer"),
   document: arrayBuffer,
+  pageRendering: "next",
   licenseKey: "YOUR_LICENSE_KEY"
 });`;
 
@@ -510,6 +513,7 @@ const instance = await NutrientViewer.load({
   container: document.getElementById("viewer"),
   document: blobObjectUrl,
   allowLinearizedLoading: true,  // Blobs support streaming
+  pageRendering: "next",
   licenseKey: "YOUR_LICENSE_KEY"
 });
 
@@ -533,6 +537,7 @@ const dataUrl = \`data:application/pdf;base64,\${base64Data}\`;
 const instance = await NutrientViewer.load({
   container: document.getElementById("viewer"),
   document: dataUrl,
+  pageRendering: "next",
   licenseKey: "YOUR_LICENSE_KEY"
 });
 
@@ -544,6 +549,7 @@ reader.onload = () => {
   NutrientViewer.load({
     container: document.getElementById("viewer"),
     document: dataUrl,
+    pageRendering: "next",
     licenseKey: "YOUR_LICENSE_KEY"
   });
 };

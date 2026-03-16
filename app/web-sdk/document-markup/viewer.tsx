@@ -82,6 +82,7 @@ export default function DocumentMarkupViewer({ document }: ViewerProps) {
           container,
           document: document,
           useCDN: true,
+          pageRendering: "next",
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
           officeConversionSettings: {
             documentMarkupMode: markupMode,

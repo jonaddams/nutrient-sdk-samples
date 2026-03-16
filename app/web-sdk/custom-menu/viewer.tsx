@@ -513,6 +513,7 @@ const Viewer = () => {
       container,
       document: "/documents/Drawing1.pdf",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+      pageRendering: "next",
       theme: isDarkMode
         ? NutrientViewer.Theme.DARK
         : NutrientViewer.Theme.LIGHT,

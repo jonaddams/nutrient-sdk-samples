@@ -31,6 +31,7 @@ export default function CountingAnnotationsViewer() {
       container,
       document: DOCUMENT,
       useCDN: true,
+      pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       toolbarItems: [
         ...(NutrientViewer.defaultToolbarItems ?? []).filter(

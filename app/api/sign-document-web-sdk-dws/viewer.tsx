@@ -241,6 +241,7 @@ export default function Viewer({ document }: ViewerProps) {
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
           toolbarItems,
           instant: false,
+          pageRendering: "next",
           useCDN: true,
           // Show signature validation status when document is signed
           initialViewState: new NutrientViewer.ViewState({

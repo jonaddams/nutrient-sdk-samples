@@ -43,10 +43,12 @@ export default function PdfViewer({
           // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types are not available
           initialViewState?: any;
           licenseKey?: string;
+          pageRendering?: string;
         } = {
           container: `#${containerId}`,
           document: pdfBuffer,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          pageRendering: "next",
           initialViewState: new window.NutrientViewer.ViewState({
             zoom: {
               zoomMode: window.NutrientViewer.ZoomMode.FIT_TO_WIDTH,

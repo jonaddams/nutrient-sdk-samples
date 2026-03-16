@@ -51,6 +51,7 @@ export default function DocumentComparisonViewer({
           container: tempContainer1,
           document: document1,
           allowLinearizedLoading: false,
+          pageRendering: "next",
           headless: true,
         });
 
@@ -90,6 +91,7 @@ export default function DocumentComparisonViewer({
           container: tempContainer2,
           document: document2,
           allowLinearizedLoading: false,
+          pageRendering: "next",
           headless: true,
         });
 

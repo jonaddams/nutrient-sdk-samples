@@ -65,13 +65,15 @@ export function useNutrientSDK({
         document: documentPath,
         licenseKey,
         useCDN: true,
+        pageRendering: "next",
         theme:
           theme === "DARK"
             ? window.NutrientViewer.Theme.DARK
             : window.NutrientViewer.Theme.LIGHT,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(toolbarItems && { toolbarItems: toolbarItems as any }),
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       setInstance(loadedInstance);
       setLoading(false);
