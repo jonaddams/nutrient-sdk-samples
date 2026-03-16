@@ -2,22 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type NutrientViewerWindow = Window & {
-  NutrientViewer?: {
-    load: (config: unknown) => Promise<unknown>;
-    unload?: (container: HTMLElement) => void;
-    FormFieldValue?: new (config: { name: string; value: string }) => unknown;
-    FormFields?: {
-      TextFormField: new (...args: unknown[]) => unknown;
-      CheckBoxFormField: new (...args: unknown[]) => unknown;
-      RadioButtonFormField: new (...args: unknown[]) => unknown;
-      ComboBoxFormField: new (...args: unknown[]) => unknown;
-      ListBoxFormField: new (...args: unknown[]) => unknown;
-      ButtonFormField: new (...args: unknown[]) => unknown;
-      SignatureFormField: new (...args: unknown[]) => unknown;
-    };
-  } & Record<string, unknown>;
-};
 
 interface FormField {
   name: string;
@@ -67,7 +51,7 @@ export default function Viewer({
 
   const fillFormFieldsWithData = useCallback(
     async (instance: ViewerInstance, fieldData: FieldData[]) => {
-      const { NutrientViewer } = window as NutrientViewerWindow;
+      const { NutrientViewer } = window;
       if (!NutrientViewer?.FormFieldValue) {
         console.error("❌ NutrientViewer.FormFieldValue not available");
         return;
@@ -109,21 +93,21 @@ export default function Viewer({
 
     const tryLoad = () => {
       const container = containerRef.current;
-      const { NutrientViewer } = window as NutrientViewerWindow;
+      const { NutrientViewer } = window;
 
       if (container && NutrientViewer) {
         const baseConfig = {
           container: container as HTMLElement,
           document: document,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-          pageRendering: "next",
+          pageRendering: "next" as const,
         };
 
         const loadConfig = memoizedToolbarItems
           ? { ...baseConfig, toolbarItems: memoizedToolbarItems }
           : baseConfig;
 
-        NutrientViewer.load(loadConfig)
+        NutrientViewer.load(loadConfig as Parameters<typeof NutrientViewer.load>[0])
           .then(async (instance: unknown) => {
             instanceRef.current = instance as ViewerInstance;
             setIsLoading(false);
@@ -134,7 +118,7 @@ export default function Viewer({
               ).getFormFields()) as unknown[];
 
               const getFormFieldType = (formField: unknown) => {
-                const { NutrientViewer } = window as NutrientViewerWindow;
+                const { NutrientViewer } = window;
                 if (!NutrientViewer?.FormFields) return "Unknown";
 
                 try {
@@ -231,7 +215,7 @@ export default function Viewer({
         clearTimeout(timeoutId);
       }
       const container = containerRef.current;
-      const { NutrientViewer } = window as NutrientViewerWindow;
+      const { NutrientViewer } = window;
       if (container && NutrientViewer && NutrientViewer.unload) {
         NutrientViewer.unload(container);
       }

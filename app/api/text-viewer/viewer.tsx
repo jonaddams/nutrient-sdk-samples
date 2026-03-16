@@ -23,8 +23,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
 
     const loadViewer = async () => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-        const NutrientViewer = (window as any).NutrientViewer;
+        const NutrientViewer = window.NutrientViewer;
 
         if (!NutrientViewer) {
           console.error("NutrientViewer is not loaded");
@@ -70,8 +69,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
       isMounted = false;
       hasLoadedRef.current = false;
 
-      // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-      const NutrientViewer = (window as any)?.NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
       if (NutrientViewer && container) {
         try {
           NutrientViewer.unload(container);

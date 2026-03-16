@@ -42,7 +42,7 @@ export default function SearchViewer({
   useEffect(() => {
     const container = containerRef.current;
 
-    const { NutrientViewer } = window as any;
+    const { NutrientViewer } = window;
     if (container && NutrientViewer) {
       NutrientViewer.load({
         container,
@@ -158,7 +158,7 @@ export default function SearchViewer({
     const result = searchResults[index];
     setCurrentResultIndex(index);
 
-    const { NutrientViewer } = window as any;
+    const { NutrientViewer } = window;
 
     // Always try to remove ALL highlight annotations before creating new one
     try {

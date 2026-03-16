@@ -37,18 +37,11 @@ export default function PdfViewer({
         const containerId = "pdf-viewer-container";
         viewerRef.current.id = containerId;
 
-        const viewerConfig: {
-          container: string;
-          document: ArrayBuffer;
-          // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types are not available
-          initialViewState?: any;
-          licenseKey?: string;
-          pageRendering?: "next" | "legacy";
-        } = {
+        const viewerConfig = {
           container: `#${containerId}`,
           document: pdfBuffer,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-          pageRendering: "next",
+          pageRendering: "next" as const,
           initialViewState: new window.NutrientViewer.ViewState({
             zoom: {
               zoomMode: window.NutrientViewer.ZoomMode.FIT_TO_WIDTH,

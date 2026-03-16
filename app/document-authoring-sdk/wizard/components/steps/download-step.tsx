@@ -131,17 +131,11 @@ export default function DownloadStep() {
             // Create a fresh copy of the PDF document to ensure it's not detached
             const pdfDocumentCopy = state.pdfDocument.slice();
 
-            const viewerConfig: {
-              container: string;
-              document: ArrayBuffer;
-              initialViewState?: any;
-              licenseKey?: string;
-              pageRendering?: "next" | "legacy";
-            } = {
+            const viewerConfig = {
               container: `#${containerId}`, // Use CSS selector as expected by NutrientViewer
               document: pdfDocumentCopy,
               licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-              pageRendering: "next",
+              pageRendering: "next" as const,
               initialViewState: new window.NutrientViewer.ViewState({
                 zoom: {
                   zoomMode: window.NutrientViewer.ZoomMode.AUTO,

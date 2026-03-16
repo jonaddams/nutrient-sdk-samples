@@ -55,14 +55,7 @@ export default function DocumentMarkupViewer({ document }: ViewerProps) {
   const loadDocument = useCallback(
     async (markupMode: DocumentMarkupMode) => {
       const container = containerRef.current;
-      const NutrientViewer = (
-        window as typeof window & {
-          NutrientViewer?: {
-            load: (config: unknown) => Promise<Instance>;
-            unload: (container: HTMLElement) => Promise<void>;
-          };
-        }
-      ).NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
 
       if (!container || !NutrientViewer) {
         return;
@@ -87,7 +80,7 @@ export default function DocumentMarkupViewer({ document }: ViewerProps) {
           officeConversionSettings: {
             documentMarkupMode: markupMode,
           },
-        });
+        } as Parameters<typeof NutrientViewer.load>[0]);
 
         (
           window as typeof window & {

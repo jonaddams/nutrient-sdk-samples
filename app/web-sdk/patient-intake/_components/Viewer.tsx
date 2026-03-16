@@ -2,20 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-type NutrientViewerWindow = Window & {
-  NutrientViewer?: {
-    load: (config: unknown) => Promise<unknown>;
-    unload?: (container: HTMLElement) => void;
-    defaultToolbarItems?: Array<{ type: string }>;
-    Annotations?: {
-      toSerializableObject: (annotation: unknown) => unknown;
-      fromSerializableObject: (serialized: unknown) => unknown;
-    };
-    Immutable?: {
-      List: (items: unknown[]) => unknown;
-    };
-  };
-};
 
 interface ViewerProps {
   document: string | ArrayBuffer;
@@ -81,7 +67,7 @@ interface PatientData {
 }
 
 interface ViewerInstance {
-  getFormFieldValues: () => Promise<Record<string, unknown>>;
+  getFormFieldValues: () => Record<string, string | string[] | null>;
   setFormFieldValues: (values: Record<string, string | string[]>) => void;
   addEventListener: (
     event: string,
@@ -504,7 +490,7 @@ export default function Viewer({ document, onInstanceReady }: ViewerProps) {
   useEffect(() => {
     const container = containerRef.current;
 
-    const { NutrientViewer } = window as NutrientViewerWindow;
+    const { NutrientViewer } = window;
     if (container && NutrientViewer) {
       NutrientViewer.load({
         container,

@@ -131,21 +131,6 @@ export interface ComparisonOperation {
   text: string;
 }
 
-// ============================================================================
-// SDK Configuration Types
-// ============================================================================
-
-export interface NutrientLoadConfig {
-  container: HTMLElement | string;
-  document: string;
-  licenseKey?: string;
-  useCDN?: boolean;
-  theme?: "LIGHT" | "DARK" | "AUTO";
-  toolbarItems?: unknown[];
-  baseUrl?: string;
-  instant?: boolean;
-  instantJSON?: unknown;
-}
 
 // ============================================================================
 // Utility Types

@@ -75,8 +75,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
     const loadViewer = async () => {
       try {
         // Load Nutrient Web SDK
-        // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-        const NutrientViewer = (window as any).NutrientViewer;
+        const NutrientViewer = window.NutrientViewer;
 
         if (!NutrientViewer) {
           console.error("NutrientViewer is not loaded");
@@ -98,35 +97,36 @@ export default function Viewer({ documentUrl }: ViewerProps) {
         if (!isMounted) return;
 
         // Prepare configuration
-        // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer configuration type is not available
-        const configuration: any = {
-          container,
-          document: documentUrl,
-          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-          instant: false,
-          pageRendering: "next",
-          useCDN: true,
-          // Show signature validation status for signed documents
-          initialViewState: new NutrientViewer.ViewState({
-            showSignatureValidationStatus:
-              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
-          }),
-        };
-
-        // Add certificate trust callback if certificates are available
         const certs = certificatesRef.current;
-        if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
-          configuration.trustedCAsCallback = async () => {
-            return certs.ca_certificates.map((cert: string) =>
-              decodeBase64String(cert),
-            );
-          };
+        const hasCerts = certs?.ca_certificates && certs.ca_certificates.length > 0;
+
+        if (hasCerts) {
           console.log(
             "Trusting",
             certs.ca_certificates.length,
             "CA certificates",
           );
         }
+
+        const configuration = {
+          container,
+          document: documentUrl,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          instant: false,
+          pageRendering: "next" as const,
+          useCDN: true,
+          // Show signature validation status for signed documents
+          initialViewState: new NutrientViewer.ViewState({
+            showSignatureValidationStatus:
+              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+          }),
+          ...(hasCerts && {
+            trustedCAsCallback: async () =>
+              certs.ca_certificates.map((cert: string) =>
+                decodeBase64String(cert),
+              ),
+          }),
+        };
 
         // Load the instance
         const instance = await NutrientViewer.load(configuration);
@@ -152,8 +152,7 @@ export default function Viewer({ documentUrl }: ViewerProps) {
       isMounted = false;
       hasLoadedRef.current = false; // Reset for potential remount
 
-      // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-      const NutrientViewer = (window as any)?.NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
       if (NutrientViewer && container) {
         try {
           NutrientViewer.unload(container);

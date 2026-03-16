@@ -129,8 +129,8 @@ export default function Viewer({ document }: ViewerProps) {
 
             const { token } = await tokenResponse.json();
 
-            // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer types not available
-            const NutrientViewer = (window as any).NutrientViewer;
+            const NutrientViewer = window.NutrientViewer;
+            if (!NutrientViewer) return;
 
             // Flatten all annotations before signing
             setSignStatus("Preparing document...");
@@ -210,8 +210,7 @@ export default function Viewer({ document }: ViewerProps) {
     const loadViewer = async () => {
       try {
         // Load Nutrient Web SDK
-        // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-        const NutrientViewer = (window as any).NutrientViewer;
+        const NutrientViewer = window.NutrientViewer;
 
         if (!NutrientViewer) {
           console.error("NutrientViewer is not loaded");
@@ -234,30 +233,10 @@ export default function Viewer({ document }: ViewerProps) {
         if (!isMounted) return;
 
         // Prepare configuration
-        // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer configuration type is not available
-        const configuration: any = {
-          container,
-          document,
-          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-          toolbarItems,
-          instant: false,
-          pageRendering: "next",
-          useCDN: true,
-          // Show signature validation status when document is signed
-          initialViewState: new NutrientViewer.ViewState({
-            showSignatureValidationStatus:
-              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
-          }),
-        };
-
-        // Add certificate trust callback if certificates are available
         const certs = certificatesRef.current;
-        if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
-          configuration.trustedCAsCallback = async () => {
-            return certs.ca_certificates.map((cert: string) =>
-              decodeBase64String(cert),
-            );
-          };
+        const hasCerts = certs?.ca_certificates && certs.ca_certificates.length > 0;
+
+        if (hasCerts) {
           console.log(
             "Trusting",
             certs.ca_certificates.length,
@@ -265,8 +244,32 @@ export default function Viewer({ document }: ViewerProps) {
           );
         }
 
+        const configuration = {
+          container,
+          document,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          toolbarItems,
+          instant: false,
+          pageRendering: "next" as const,
+          useCDN: true,
+          // Show signature validation status when document is signed
+          initialViewState: new NutrientViewer.ViewState({
+            showSignatureValidationStatus:
+              NutrientViewer.ShowSignatureValidationStatusMode.IF_SIGNED,
+          }),
+          ...(hasCerts && {
+            trustedCAsCallback: async () =>
+              certs.ca_certificates.map((cert: string) =>
+                decodeBase64String(cert),
+              ),
+          }),
+        };
+
         // Load the instance
-        const instance = await NutrientViewer.load(configuration);
+        const instance = await NutrientViewer.load({
+          ...configuration,
+          toolbarItems: [...configuration.toolbarItems],
+        });
 
         if (!isMounted) {
           // Component unmounted during load, clean up using NutrientViewer.unload
@@ -297,8 +300,7 @@ export default function Viewer({ document }: ViewerProps) {
       hasLoadedRef.current = false; // Reset for potential remount
 
       // Unload using the container reference
-      // biome-ignore lint/suspicious/noExplicitAny: Window.NutrientViewer type is not available
-      const NutrientViewer = (window as any)?.NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
       if (NutrientViewer && container) {
         try {
           NutrientViewer.unload(container);

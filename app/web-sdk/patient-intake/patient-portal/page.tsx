@@ -111,7 +111,7 @@ export default function PatientPortal() {
 
     try {
       // Get NutrientViewer SDK from window
-      const NutrientViewer = (window as any).NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
       if (!NutrientViewer) {
         console.error("NutrientViewer SDK not available");
         return false;

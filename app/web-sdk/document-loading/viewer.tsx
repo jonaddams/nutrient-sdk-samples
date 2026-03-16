@@ -57,26 +57,6 @@ import "./styles.css";
  */
 type LoadingMethod = "url" | "arraybuffer" | "blob" | "base64";
 
-/**
- * Type definition for the Nutrient Viewer load configuration
- */
-interface ViewerLoadConfig {
-  container: HTMLElement;
-  document: string | ArrayBuffer;
-  allowLinearizedLoading?: boolean;
-  pageRendering?: "next" | "legacy";
-  useCDN?: boolean;
-  licenseKey?: string;
-}
-
-/**
- * Type definition for the Nutrient Viewer global object
- * This is attached to the window object when the Nutrient SDK is loaded
- */
-interface NutrientViewerStatic {
-  load: (config: ViewerLoadConfig) => Promise<Instance>;
-  unload: (container: HTMLElement) => Promise<void>;
-}
 
 /**
  * Default document to load when the demo starts
@@ -227,9 +207,7 @@ export default function DocumentLoadingViewer() {
       source: string | File | Blob | ArrayBuffer = DEFAULT_DOCUMENT,
     ) => {
       const container = containerRef.current;
-      const NutrientViewer = (
-        window as { NutrientViewer?: NutrientViewerStatic }
-      ).NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
 
       // Validate prerequisites
       if (!container || !NutrientViewer) {
@@ -430,8 +408,7 @@ export default function DocumentLoadingViewer() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: loadDocument is stable via useCallback, only want to run on mount
   useEffect(() => {
     const container = containerRef.current;
-    const NutrientViewer = (window as { NutrientViewer?: NutrientViewerStatic })
-      .NutrientViewer;
+    const NutrientViewer = window.NutrientViewer;
 
     if (container && NutrientViewer) {
       loadDocument("url");
@@ -439,9 +416,7 @@ export default function DocumentLoadingViewer() {
 
     return () => {
       const container = containerRef.current;
-      const NutrientViewer = (
-        window as { NutrientViewer?: NutrientViewerStatic }
-      ).NutrientViewer;
+      const NutrientViewer = window.NutrientViewer;
       if (container && NutrientViewer) {
         NutrientViewer.unload(container);
       }
