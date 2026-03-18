@@ -5,3 +5,12 @@
 .PSPDFKit-Form-Creator-Popover {
   display: none !important;
 }
+
+/* Change "Sign" badge to "Initial" on initials fields */
+button[data-name^="initials-"] .PSPDFKit-Annotation-Widget-Signature-Badge {
+  font-size: 0 !important;
+}
+button[data-name^="initials-"] .PSPDFKit-Annotation-Widget-Signature-Badge::after {
+  content: "Initial" !important;
+  font-size: 10px !important;
+}

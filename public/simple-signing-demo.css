@@ -13,6 +13,11 @@ input.PSPDFKit-Annotation-Widget-Date-Input {
   display: none !important;
 }
 
+/* Hide "Sign" badge on initials fields — custom renderer shows signer's initials instead */
+button[data-name^="initial-"] .PSPDFKit-Annotation-Widget-Signature-Badge {
+  display: none !important;
+}
+
 /* Signed Signature Styling - "By Nutrient" with UUID (DocuSign-style) */
 .signature-box-nutrient {
   position: relative;
