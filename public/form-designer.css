@@ -1,0 +1,7 @@
+/* Custom styles for Form Designer */
+
+/* PSPDFKit Overrides - hide form creator toolbar and field properties popover */
+.PSPDFKit-Form-Creator-Toolbar,
+.PSPDFKit-Form-Creator-Popover {
+  display: none !important;
+}

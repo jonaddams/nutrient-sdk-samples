@@ -362,6 +362,7 @@ export default function FormDesignerViewer() {
       pageRendering: "next",
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+      styleSheets: ["/form-designer.css"],
     })
       .then((instance: Instance) => {
         viewerInstanceRef.current = instance;
