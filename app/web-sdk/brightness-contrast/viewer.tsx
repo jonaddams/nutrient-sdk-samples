@@ -1,10 +1,10 @@
 "use client";
 
-import type { Instance, ToolbarItem } from "@nutrient-sdk/viewer";
+import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
-const DARK_MODE_STYLE_ID = "night-mode-slider-style";
+const FILTER_STYLE_ID = "brightness-contrast-style";
 
 function MoonIcon() {
   return (
@@ -50,20 +50,32 @@ function SunIcon() {
   );
 }
 
-function getDarkModeCSS(intensity: number): string {
-  // intensity: 0 (day) to 100 (full night)
-  const invert = intensity / 100;
-  const hueRotate = intensity > 0 ? -180 : 0;
-  const bgBrightness = Math.round(255 - (255 - 26) * (intensity / 100));
-  const bg = `rgb(${bgBrightness}, ${bgBrightness}, ${bgBrightness})`;
+function getFilterCSS(intensity: number): string {
+  // intensity: -100 (full brighten) to 0 (normal) to 100 (full night)
+  const absIntensity = Math.abs(intensity);
+  const t = absIntensity / 100;
 
+  if (intensity > 0) {
+    // Night mode: invert colors + darken background
+    const bgBrightness = Math.round(255 - (255 - 26) * t);
+    const bg = `rgb(${bgBrightness}, ${bgBrightness}, ${bgBrightness})`;
+    return `
+      .PSPDFKit-Spread { filter: invert(${t}) hue-rotate(${t > 0 ? -180 : 0}deg); }
+      .PSPDFKit-Viewport { background-color: ${bg}; }
+    `;
+  }
+
+  // Brighten mode: boost brightness + contrast for dark/faded scans
+  // brightness: 1.0 → 2.0, contrast: 1.0 → 1.5
+  const brightness = 1 + t * 1.0;
+  const contrast = 1 + t * 0.5;
   return `
-    .PSPDFKit-Spread { filter: invert(${invert}) hue-rotate(${hueRotate}deg); }
-    .PSPDFKit-Viewport { background-color: ${bg}; }
+    .PSPDFKit-Spread { filter: brightness(${brightness}) contrast(${contrast}); }
+    .PSPDFKit-Viewport { background-color: #fff; }
   `;
 }
 
-export default function NightModeSliderViewer() {
+export default function BrightnessContrastViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
   const [intensity, setIntensity] = useState(0);
@@ -76,7 +88,7 @@ export default function NightModeSliderViewer() {
       container.querySelector(".PSPDFKit-Container")?.shadowRoot ?? container;
 
     let style = root.querySelector(
-      `#${DARK_MODE_STYLE_ID}`,
+      `#${FILTER_STYLE_ID}`,
     ) as HTMLStyleElement | null;
 
     if (value === 0) {
@@ -86,10 +98,10 @@ export default function NightModeSliderViewer() {
 
     if (!style) {
       style = document.createElement("style");
-      style.id = DARK_MODE_STYLE_ID;
+      style.id = FILTER_STYLE_ID;
       root.appendChild(style);
     }
-    style.textContent = getDarkModeCSS(value);
+    style.textContent = getFilterCSS(value);
   }, []);
 
   useEffect(() => {
@@ -147,11 +159,11 @@ export default function NightModeSliderViewer() {
         <SunIcon />
         <input
           type="range"
-          min={0}
+          min={-100}
           max={100}
           value={intensity}
           onChange={handleSliderChange}
-          aria-label="Night mode intensity"
+          aria-label="Document brightness adjustment"
           style={{
             flex: 1,
             maxWidth: "300px",
@@ -164,12 +176,16 @@ export default function NightModeSliderViewer() {
           style={{
             fontSize: "13px",
             color: "#6b7280",
-            minWidth: "36px",
+            minWidth: "80px",
             textAlign: "right",
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          {intensity}%
+          {intensity === 0
+            ? "Normal"
+            : intensity > 0
+              ? `Night ${intensity}%`
+              : `Bright ${Math.abs(intensity)}%`}
         </span>
       </div>
 

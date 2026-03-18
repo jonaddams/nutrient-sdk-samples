@@ -21,6 +21,13 @@ const samples: Sample[] = [
     path: "/web-sdk/annotation-state",
   },
   {
+    name: "Brightness & Contrast",
+    category: "User Interface",
+    description:
+      "Bidirectional slider to brighten dark or poorly-scanned documents, or enable night mode for comfortable dark reading",
+    path: "/web-sdk/brightness-contrast",
+  },
+  {
     name: "Content Editing API",
     category: "Content Editor",
     description:
@@ -90,13 +97,6 @@ const samples: Sample[] = [
     description:
       "Toggle night mode in the PDF viewer with a custom toolbar button using CSS filter inversion",
     path: "/web-sdk/night-mode",
-  },
-  {
-    name: "Night Mode Slider",
-    category: "User Interface",
-    description:
-      "Control night mode intensity with a smooth slider that adjusts CSS filter inversion in real time",
-    path: "/web-sdk/night-mode-slider",
   },
   {
     name: "Patient Intake Forms",

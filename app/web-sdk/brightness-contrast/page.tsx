@@ -9,12 +9,12 @@ const Viewer = dynamic(() => import("./viewer"), {
   loading: () => <LoadingSpinner message="Loading document viewer..." />,
 });
 
-export default function NightModeSliderPage() {
+export default function BrightnessContrastPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       <SampleHeader
-        title="Night Mode Slider"
-        description="Control the night mode intensity with a smooth slider. Adjusts CSS filter inversion and viewport background in real time for a customizable dark reading experience."
+        title="Brightness & Contrast"
+        description="Bidirectional slider: slide right for night mode (dark reading), slide left to brighten dark or poorly-scanned documents. Uses CSS filters for real-time brightness, contrast, and inversion adjustment."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
