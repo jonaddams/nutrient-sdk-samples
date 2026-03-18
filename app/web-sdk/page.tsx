@@ -14,67 +14,11 @@ type Sample = {
 
 const samples: Sample[] = [
   {
-    name: "Document Loading Methods",
-    category: "User Interface",
-    description:
-      "Demonstrate all supported document loading methods: URL, ArrayBuffer, Blob, and Base64. Includes file upload with method selection",
-    path: "/web-sdk/document-loading",
-  },
-  {
-    name: "Simple Signing Demo",
-    category: "Signatures",
-    description:
-      "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and digital signatures via DWS API",
-    path: "/web-sdk/simple-signing-demo",
-  },
-  {
-    name: "Document Search",
-    category: "User Interface",
-    description:
-      "Search through PDF documents with context-aware results, instant highlighting, and automatic navigation to matches",
-    path: "/web-sdk/search",
-  },
-  {
-    name: "Custom Menu Interface",
-    category: "User Interface",
-    description:
-      "A completely custom menu interface with custom toolbar, annotation tools, document comparison, and measurement capabilities",
-    path: "/web-sdk/custom-menu",
-  },
-  {
-    name: "Form Designer",
-    category: "Forms",
-    description:
-      "Drag and drop form fields onto PDF documents with an intuitive form creator mode for building interactive forms",
-    path: "/web-sdk/form-designer",
-  },
-  {
-    name: "Patient Intake Forms",
-    category: "Forms",
-    description:
-      "Digital patient check-in with smart form pre-population, progressive form completion, and HIPAA-compliant data handling",
-    path: "/web-sdk/patient-intake",
-  },
-  {
     name: "Annotation State Management",
     category: "Annotations",
     description:
       "Save and restore annotation states locally with version control-like functionality for managing document changes",
     path: "/web-sdk/annotation-state",
-  },
-  {
-    name: "Text Comparison",
-    category: "Document Comparison",
-    description:
-      "Side-by-side PDF comparison with synchronized viewing and interactive change tracking",
-    path: "/web-sdk/text-comparison",
-  },
-  {
-    name: "Cross-Page Text Comparison",
-    category: "Document Comparison",
-    description:
-      "Extract and compare full document text across page boundaries with visual diff highlighting and change navigation",
-    path: "/web-sdk/text-comparison-cross-page",
   },
   {
     name: "Content Editing API",
@@ -84,11 +28,61 @@ const samples: Sample[] = [
     path: "/web-sdk/content-edit-api",
   },
   {
+    name: "Counting Annotations",
+    category: "Annotations",
+    description:
+      "Click anywhere on a document to place numbered markers using custom-rendered annotations with a sidebar tracker",
+    path: "/web-sdk/counting-annotations",
+  },
+  {
+    name: "Cross-Page Text Comparison",
+    category: "Document Comparison",
+    description:
+      "Extract and compare full document text across page boundaries with visual diff highlighting and change navigation",
+    path: "/web-sdk/text-comparison-cross-page",
+  },
+  {
+    name: "Custom Menu Interface",
+    category: "User Interface",
+    description:
+      "A completely custom menu interface with custom toolbar, annotation tools, document comparison, and measurement capabilities",
+    path: "/web-sdk/custom-menu",
+  },
+  {
+    name: "Document Assembly",
+    category: "Document Editor",
+    description:
+      "Assemble documents by dragging pages between two panels with multi-select, reorder, rotate, duplicate, delete, upload, and export",
+    path: "/web-sdk/document-assembly",
+    wip: true,
+  },
+  {
+    name: "Document Loading Methods",
+    category: "User Interface",
+    description:
+      "Demonstrate all supported document loading methods: URL, ArrayBuffer, Blob, and Base64. Includes file upload with method selection",
+    path: "/web-sdk/document-loading",
+  },
+  {
     name: "Document Markup Modes",
     category: "Document Conversion",
     description:
       "View Word documents with tracked changes and comments in different markup modes: no markup, original, simple markup, and all markup",
     path: "/web-sdk/document-markup",
+  },
+  {
+    name: "Document Search",
+    category: "User Interface",
+    description:
+      "Search through PDF documents with context-aware results, instant highlighting, and automatic navigation to matches",
+    path: "/web-sdk/search",
+  },
+  {
+    name: "Form Designer",
+    category: "Forms",
+    description:
+      "Drag and drop form fields onto PDF documents with an intuitive form creator mode for building interactive forms",
+    path: "/web-sdk/form-designer",
   },
   {
     name: "Night Mode",
@@ -98,19 +92,32 @@ const samples: Sample[] = [
     path: "/web-sdk/night-mode",
   },
   {
-    name: "Counting Annotations",
-    category: "Annotations",
+    name: "Night Mode Slider",
+    category: "User Interface",
     description:
-      "Click anywhere on a document to place numbered markers using custom-rendered annotations with a sidebar tracker",
-    path: "/web-sdk/counting-annotations",
+      "Control night mode intensity with a smooth slider that adjusts CSS filter inversion in real time",
+    path: "/web-sdk/night-mode-slider",
   },
   {
-    name: "Document Assembly",
-    category: "Document Editor",
+    name: "Patient Intake Forms",
+    category: "Forms",
     description:
-      "Assemble documents by dragging pages between two panels with multi-select, reorder, rotate, duplicate, delete, upload, and export",
-    path: "/web-sdk/document-assembly",
-    wip: true,
+      "Digital patient check-in with smart form pre-population, progressive form completion, and HIPAA-compliant data handling",
+    path: "/web-sdk/patient-intake",
+  },
+  {
+    name: "Simple Signing Demo",
+    category: "Signatures",
+    description:
+      "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and digital signatures via DWS API",
+    path: "/web-sdk/simple-signing-demo",
+  },
+  {
+    name: "Text Comparison",
+    category: "Document Comparison",
+    description:
+      "Side-by-side PDF comparison with synchronized viewing and interactive change tracking",
+    path: "/web-sdk/text-comparison",
   },
 ];
 
