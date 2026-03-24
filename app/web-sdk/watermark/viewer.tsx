@@ -60,14 +60,15 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
 
           const id = NutrientViewer.generateInstantId();
 
-          // Create annotation with a generous initial bounding box
+          // Start with a very wide single-line box so text doesn't wrap
+          const initialWidth = width * 3;
           let annotation = new NutrientViewer.Annotations.TextAnnotation({
             id,
             pageIndex: p,
             boundingBox: new NutrientViewer.Geometry.Rect({
               left: 0,
               top: 0,
-              width,
+              width: initialWidth,
               height: cfg.fontSize * 1.5,
             }),
             text: { format: "plain", value: cfg.text },
