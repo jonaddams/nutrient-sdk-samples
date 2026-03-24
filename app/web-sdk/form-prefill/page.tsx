@@ -249,10 +249,10 @@ export default function FormPrefillPage() {
             <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
               {/* Presets */}
               <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Data Presets
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-3">
                   {Object.keys(PRESETS).map((name) => (
                     <button
                       key={name}
