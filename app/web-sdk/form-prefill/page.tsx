@@ -11,6 +11,37 @@ const Viewer = dynamic(() => import("./viewer"), {
   loading: () => <LoadingSpinner message="Loading document viewer..." />,
 });
 
+// Checkbox groups: multiple checkboxes that represent a single-choice field
+// The key suffix (after _) groups them; only one should be "Yes" at a time
+interface CheckboxGroup {
+  label: string;
+  suffix: string;
+  options: { label: string; prefix: string }[];
+}
+
+const CHECKBOX_GROUPS: CheckboxGroup[] = [
+  {
+    label: "Gender",
+    suffix: "_gender",
+    options: [
+      { label: "Female", prefix: "genderFemale" },
+      { label: "Male", prefix: "genderMale" },
+      { label: "Other", prefix: "genderOther" },
+      { label: "Prefer Not to Say", prefix: "genderPreferNot" },
+    ],
+  },
+  {
+    label: "Marital Status",
+    suffix: "_maritalStatus",
+    options: [
+      { label: "Single", prefix: "maritalSingle" },
+      { label: "Married", prefix: "maritalMarried" },
+      { label: "Divorced", prefix: "maritalDivorced" },
+      { label: "Widowed", prefix: "maritalWidowed" },
+    ],
+  },
+];
+
 // Sample data presets that can be loaded into form fields
 const PRESETS: Record<string, Record<string, string>> = {
   "Sarah Johnson": {
@@ -27,10 +58,8 @@ const PRESETS: Record<string, Record<string, string>> = {
     zipCode: "62701",
     employer: "Springfield General Hospital",
     occupation: "Registered Nurse",
-    genderFemale: "Yes",
-    genderMale: "",
-    maritalMarried: "Yes",
-    maritalSingle: "",
+    gender: "Female",
+    maritalStatus: "Married",
   },
   "John Smith": {
     firstName: "John",
@@ -46,10 +75,8 @@ const PRESETS: Record<string, Record<string, string>> = {
     zipCode: "97201",
     employer: "TechCorp Inc.",
     occupation: "Software Engineer",
-    genderMale: "Yes",
-    genderFemale: "",
-    maritalSingle: "Yes",
-    maritalMarried: "",
+    gender: "Male",
+    maritalStatus: "Single",
   },
 };
 
@@ -61,58 +88,97 @@ export default function FormPrefillPage() {
   const handleFieldsDiscovered = useCallback(
     (discoveredFields: FormFieldInfo[]) => {
       setFields(discoveredFields);
-      // Initialize values from current form state
       const initial: Record<string, string> = {};
       for (const f of discoveredFields) {
-        initial[f.name] = f.value;
+        if (f.type !== "checkbox") {
+          initial[f.name] = f.value;
+        }
+      }
+      // Initialize virtual group fields
+      for (const group of CHECKBOX_GROUPS) {
+        initial[group.label] = "";
       }
       setFieldValues(initial);
     },
     [],
   );
 
-  const applyValues = async (values: Record<string, string>) => {
+  // Check if a field belongs to a checkbox group
+  const isGroupedCheckbox = (field: FormFieldInfo): boolean => {
+    if (field.type !== "checkbox") return false;
+    return CHECKBOX_GROUPS.some((g) =>
+      field.name.toLowerCase().endsWith(g.suffix.toLowerCase()),
+    );
+  };
+
+  // Non-checkbox fields for sidebar display
+  const textFields = fields.filter((f) => !isGroupedCheckbox(f) && f.type !== "checkbox");
+
+  const applyValues = async () => {
     const inst = (window as any).__formPrefillInstance;
     const { NutrientViewer } = window;
     if (!inst || !NutrientViewer) return;
 
     let filled = 0;
-    for (const field of fields) {
-      const matchingKey = Object.keys(values).find((key) =>
+
+    // Apply text fields
+    for (const field of textFields) {
+      const matchingKey = Object.keys(fieldValues).find((key) =>
         field.name.toLowerCase().includes(key.toLowerCase()),
       );
-
-      if (matchingKey != null) {
+      if (matchingKey && fieldValues[matchingKey]) {
         try {
-          // Checkboxes need ["Yes"] to check or [] to uncheck
-          const rawValue = values[matchingKey];
-          const value =
-            field.type === "checkbox"
-              ? rawValue === "Yes"
-                ? ["Yes"]
-                : []
-              : rawValue;
-
           const formFieldValue = new NutrientViewer.FormFieldValue({
             name: field.name,
-            value,
+            value: fieldValues[matchingKey],
           });
           await inst.update(formFieldValue);
-          if (rawValue) filled++;
+          filled++;
         } catch (error) {
           console.error("Error filling field " + field.name + ":", error);
         }
       }
     }
+
+    // Apply checkbox groups
+    for (const group of CHECKBOX_GROUPS) {
+      const selectedLabel = fieldValues[group.label] ?? "";
+      const checkboxFields = fields.filter(
+        (f) =>
+          f.type === "checkbox" &&
+          f.name.toLowerCase().endsWith(group.suffix.toLowerCase()),
+      );
+
+      for (const cbField of checkboxFields) {
+        // Check if this checkbox matches the selected option
+        const matchingOption = group.options.find((opt) =>
+          cbField.name.toLowerCase().includes(opt.prefix.toLowerCase()),
+        );
+        const shouldCheck = matchingOption?.label === selectedLabel;
+
+        try {
+          const formFieldValue = new NutrientViewer.FormFieldValue({
+            name: cbField.name,
+            value: shouldCheck ? ["Yes"] : [],
+          });
+          await inst.update(formFieldValue);
+          if (shouldCheck) filled++;
+        } catch (error) {
+          console.error("Error filling checkbox " + cbField.name + ":", error);
+        }
+      }
+    }
+
     setFilledCount(filled);
   };
 
   const handleApplyPreset = (presetName: string) => {
     const values = PRESETS[presetName];
     if (!values) return;
-    // Only populate the sidebar inputs — user clicks "Apply All" to fill the PDF
     const updated: Record<string, string> = { ...fieldValues };
-    for (const field of fields) {
+
+    // Fill text fields
+    for (const field of textFields) {
       const matchingKey = Object.keys(values).find((key) =>
         field.name.toLowerCase().includes(key.toLowerCase()),
       );
@@ -120,6 +186,17 @@ export default function FormPrefillPage() {
         updated[field.name] = values[matchingKey];
       }
     }
+
+    // Fill group dropdowns
+    for (const group of CHECKBOX_GROUPS) {
+      const presetKey = Object.keys(values).find(
+        (k) => k.toLowerCase() === group.label.toLowerCase().replace(/\s+/g, ""),
+      );
+      if (presetKey && values[presetKey]) {
+        updated[group.label] = values[presetKey];
+      }
+    }
+
     setFieldValues(updated);
     setFilledCount(0);
   };
@@ -129,7 +206,7 @@ export default function FormPrefillPage() {
   };
 
   const handleApplyAll = () => {
-    applyValues(fieldValues);
+    applyValues();
   };
 
   const handleClearAll = async () => {
@@ -140,15 +217,22 @@ export default function FormPrefillPage() {
     const cleared: Record<string, string> = {};
     for (const field of fields) {
       try {
+        const value = field.type === "checkbox" ? [] : "";
         const formFieldValue = new NutrientViewer.FormFieldValue({
           name: field.name,
-          value: "",
+          value,
         });
         await inst.update(formFieldValue);
-        cleared[field.name] = "";
       } catch {
         // Some fields may not be clearable
       }
+    }
+    // Reset sidebar values
+    for (const field of textFields) {
+      cleared[field.name] = "";
+    }
+    for (const group of CHECKBOX_GROUPS) {
+      cleared[group.label] = "";
     }
     setFieldValues(cleared);
     setFilledCount(0);
@@ -207,50 +291,53 @@ export default function FormPrefillPage() {
                     Discovering form fields...
                   </p>
                 ) : (
-                  fields.map((field) => (
-                    <div key={field.name}>
-                      {field.type === "checkbox" ? (
+                  <>
+                    {textFields.map((field) => (
+                      <div key={field.name}>
                         <label
-                          htmlFor={"ff-" + field.name}
-                          className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer"
+                          htmlFor={`ff-${field.name}`}
+                          className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
                         >
-                          <input
-                            id={"ff-" + field.name}
-                            type="checkbox"
-                            checked={fieldValues[field.name] === "Yes"}
-                            onChange={(e) =>
-                              handleUpdateField(
-                                field.name,
-                                e.target.checked ? "Yes" : "",
-                              )
-                            }
-                            className="rounded border-gray-300 dark:border-gray-600"
-                            style={{ accentColor: "var(--digital-pollen)" }}
-                          />
                           {friendlyLabel(field.name)}
                         </label>
-                      ) : (
-                        <>
-                          <label
-                            htmlFor={"ff-" + field.name}
-                            className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
-                          >
-                            {friendlyLabel(field.name)}
-                          </label>
-                          <input
-                            id={"ff-" + field.name}
-                            type="text"
-                            value={fieldValues[field.name] ?? ""}
-                            onChange={(e) =>
-                              handleUpdateField(field.name, e.target.value)
-                            }
-                            placeholder={field.name}
-                            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
-                          />
-                        </>
-                      )}
-                    </div>
-                  ))
+                        <input
+                          id={`ff-${field.name}`}
+                          type="text"
+                          value={fieldValues[field.name] ?? ""}
+                          onChange={(e) =>
+                            handleUpdateField(field.name, e.target.value)
+                          }
+                          placeholder={field.name}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+                        />
+                      </div>
+                    ))}
+                    {CHECKBOX_GROUPS.map((group) => (
+                      <div key={group.label}>
+                        <label
+                          htmlFor={`ff-${group.label}`}
+                          className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                        >
+                          {group.label}
+                        </label>
+                        <select
+                          id={`ff-${group.label}`}
+                          value={fieldValues[group.label] ?? ""}
+                          onChange={(e) =>
+                            handleUpdateField(group.label, e.target.value)
+                          }
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+                        >
+                          <option value="">— Select —</option>
+                          {group.options.map((opt) => (
+                            <option key={opt.label} value={opt.label}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </>
                 )}
               </div>
 
