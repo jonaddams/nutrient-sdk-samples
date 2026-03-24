@@ -148,6 +148,13 @@ const samples: Sample[] = [
     path: "/web-sdk/text-extraction",
   },
   {
+    name: "Watermark",
+    category: "Document Editor",
+    description:
+      "Add configurable text watermarks to every page with customizable text, font size, color, opacity, and rotation",
+    path: "/web-sdk/watermark",
+  },
+  {
     name: "Zoom Level Display",
     category: "User Interface",
     description:
