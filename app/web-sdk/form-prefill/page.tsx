@@ -119,7 +119,7 @@ export default function FormPrefillPage() {
     if (!inst) return;
 
     // Build a single values object for setFormFieldValues
-    const formValues: Record<string, string> = {};
+    const formValues: Record<string, string | string[]> = {};
     let filled = 0;
 
     // Text fields
@@ -147,7 +147,7 @@ export default function FormPrefillPage() {
           cbField.name.toLowerCase().includes(opt.prefix.toLowerCase()),
         );
         const shouldCheck = matchingOption?.label === selectedLabel;
-        formValues[cbField.name] = shouldCheck ? "1" : "Off";
+        formValues[cbField.name] = shouldCheck ? ["1"] : [];
         if (shouldCheck) filled++;
       }
     }
@@ -202,9 +202,9 @@ export default function FormPrefillPage() {
     const inst = (window as any).__formPrefillInstance;
     if (!inst) return;
 
-    const formValues: Record<string, string> = {};
+    const formValues: Record<string, string | string[]> = {};
     for (const field of fields) {
-      formValues[field.name] = field.type === "checkbox" ? "Off" : "";
+      formValues[field.name] = field.type === "checkbox" ? [] : "";
     }
 
     try {
