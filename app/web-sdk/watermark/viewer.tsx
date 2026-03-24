@@ -20,14 +20,13 @@ interface WatermarkViewerProps {
 export default function WatermarkViewer({ config }: WatermarkViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
-  const configRef = useRef(config);
-  configRef.current = config;
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !window.NutrientViewer) return;
 
     const { NutrientViewer } = window;
+    const { text, fontSize, color, opacity, rotation } = config;
 
     NutrientViewer.load({
       container,
@@ -39,11 +38,12 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
         (item: { type: string }) =>
           ["pager", "zoom-out", "zoom-in", "zoom-mode"].includes(item.type),
       ),
-      renderPageCallback(ctx: CanvasRenderingContext2D, _pageIndex: number, pageSize: { width: number; height: number }) {
-        const cfg = configRef.current;
-        if (!cfg.text.trim()) return;
-
-        const { r, g, b } = cfg.color;
+      renderPageCallback(
+        ctx: CanvasRenderingContext2D,
+        _pageIndex: number,
+        pageSize: { width: number; height: number },
+      ) {
+        if (!text.trim()) return;
 
         ctx.save();
 
@@ -51,17 +51,17 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
         ctx.translate(pageSize.width / 2, pageSize.height / 2);
 
         // Apply rotation (convert degrees to radians)
-        ctx.rotate((cfg.rotation * Math.PI) / 180);
+        ctx.rotate((rotation * Math.PI) / 180);
 
         // Set text style
-        ctx.globalAlpha = cfg.opacity;
-        ctx.font = `bold ${cfg.fontSize}px Helvetica, Arial, sans-serif`;
-        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.globalAlpha = opacity;
+        ctx.font = `bold ${fontSize}px Helvetica, Arial, sans-serif`;
+        ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
         // Draw the watermark text at center
-        ctx.fillText(cfg.text, 0, 0);
+        ctx.fillText(text, 0, 0);
 
         ctx.restore();
       },
@@ -73,15 +73,7 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
       instanceRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, []);
-
-  // Re-render pages when config changes to update the watermark
-  useEffect(() => {
-    const inst = instanceRef.current;
-    if (!inst) return;
-
-    // Force re-render all pages by toggling a no-op view state update
-    inst.setViewState((vs: any) => vs);
+    // Reload viewer when any config value changes so renderPageCallback picks it up
   }, [config]);
 
   return <div ref={containerRef} style={{ height: "100%" }} />;

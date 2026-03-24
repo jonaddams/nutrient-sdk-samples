@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 import type { WatermarkConfig } from "./viewer";
@@ -48,6 +48,13 @@ const PRESET_TEXTS = [
 
 export default function WatermarkPage() {
   const [config, setConfig] = useState<WatermarkConfig>(DEFAULT_CONFIG);
+
+  // Debounce config to avoid reloading the viewer on every slider tick
+  const [debouncedConfig, setDebouncedConfig] = useState(config);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedConfig(config), 300);
+    return () => clearTimeout(timer);
+  }, [config]);
 
   const update = <K extends keyof WatermarkConfig>(
     key: K,
@@ -230,7 +237,7 @@ export default function WatermarkPage() {
 
             {/* Viewer */}
             <div className="flex-1 min-w-0">
-              <Viewer config={config} />
+              <Viewer config={debouncedConfig} />
             </div>
           </div>
         </div>
