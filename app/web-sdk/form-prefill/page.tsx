@@ -27,6 +27,10 @@ const PRESETS: Record<string, Record<string, string>> = {
     zipCode: "62701",
     employer: "Springfield General Hospital",
     occupation: "Registered Nurse",
+    genderFemale: "Yes",
+    genderMale: "",
+    maritalMarried: "Yes",
+    maritalSingle: "",
   },
   "John Smith": {
     firstName: "John",
@@ -42,6 +46,10 @@ const PRESETS: Record<string, Record<string, string>> = {
     zipCode: "97201",
     employer: "TechCorp Inc.",
     occupation: "Software Engineer",
+    genderMale: "Yes",
+    genderFemale: "",
+    maritalSingle: "Yes",
+    maritalMarried: "",
   },
 };
 
@@ -70,19 +78,27 @@ export default function FormPrefillPage() {
 
     let filled = 0;
     for (const field of fields) {
-      // Match field by checking if the field name ends with any of our keys
       const matchingKey = Object.keys(values).find((key) =>
         field.name.toLowerCase().includes(key.toLowerCase()),
       );
 
-      if (matchingKey && values[matchingKey]) {
+      if (matchingKey != null) {
         try {
+          // Checkboxes need ["Yes"] to check or [] to uncheck
+          const rawValue = values[matchingKey];
+          const value =
+            field.type === "checkbox"
+              ? rawValue === "Yes"
+                ? ["Yes"]
+                : []
+              : rawValue;
+
           const formFieldValue = new NutrientViewer.FormFieldValue({
             name: field.name,
-            value: values[matchingKey],
+            value,
           });
           await inst.update(formFieldValue);
-          filled++;
+          if (rawValue) filled++;
         } catch (error) {
           console.error("Error filling field " + field.name + ":", error);
         }
@@ -193,22 +209,46 @@ export default function FormPrefillPage() {
                 ) : (
                   fields.map((field) => (
                     <div key={field.name}>
-                      <label
-                        htmlFor={"ff-" + field.name}
-                        className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
-                      >
-                        {friendlyLabel(field.name)}
-                      </label>
-                      <input
-                        id={"ff-" + field.name}
-                        type="text"
-                        value={fieldValues[field.name] ?? ""}
-                        onChange={(e) =>
-                          handleUpdateField(field.name, e.target.value)
-                        }
-                        placeholder={field.name}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
-                      />
+                      {field.type === "checkbox" ? (
+                        <label
+                          htmlFor={"ff-" + field.name}
+                          className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer"
+                        >
+                          <input
+                            id={"ff-" + field.name}
+                            type="checkbox"
+                            checked={fieldValues[field.name] === "Yes"}
+                            onChange={(e) =>
+                              handleUpdateField(
+                                field.name,
+                                e.target.checked ? "Yes" : "",
+                              )
+                            }
+                            className="rounded border-gray-300 dark:border-gray-600"
+                            style={{ accentColor: "var(--digital-pollen)" }}
+                          />
+                          {friendlyLabel(field.name)}
+                        </label>
+                      ) : (
+                        <>
+                          <label
+                            htmlFor={"ff-" + field.name}
+                            className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                          >
+                            {friendlyLabel(field.name)}
+                          </label>
+                          <input
+                            id={"ff-" + field.name}
+                            type="text"
+                            value={fieldValues[field.name] ?? ""}
+                            onChange={(e) =>
+                              handleUpdateField(field.name, e.target.value)
+                            }
+                            placeholder={field.name}
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+                          />
+                        </>
+                      )}
                     </div>
                   ))
                 )}

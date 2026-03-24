@@ -64,6 +64,14 @@ export default function FormPrefillViewer({
             type,
             value: field.value ?? "",
           });
+        } else if (type === "checkbox") {
+          // Checkbox value is an array — checked if non-empty
+          const checked = Array.isArray(field.value) && field.value.length > 0;
+          fields.push({
+            name: field.name,
+            type,
+            value: checked ? "Yes" : "",
+          });
         }
       });
 
