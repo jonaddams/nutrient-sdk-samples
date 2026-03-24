@@ -85,6 +85,13 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Keyword Highlight",
+    category: "Annotations",
+    description:
+      "Automatically search and highlight configurable keywords in a document with color-coded annotations",
+    path: "/web-sdk/keyword-highlight",
+  },
+  {
     name: "Form Designer",
     category: "Forms",
     description:
