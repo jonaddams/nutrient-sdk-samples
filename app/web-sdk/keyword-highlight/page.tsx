@@ -112,13 +112,13 @@ export default function KeywordHighlightPage() {
                   </p>
                 ) : (
                   <div className="space-y-2">
-                    {keywords.map((keyword, index) => {
+                    {keywords.map((keyword) => {
                       const result = highlightResults.find(
                         (r) => r.keyword === keyword,
                       );
                       return (
                         <div
-                          key={`${keyword}-${index}`}
+                          key={keyword}
                           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#1a1414] border border-gray-200 dark:border-gray-700 group"
                         >
                           {result && (
@@ -137,7 +137,7 @@ export default function KeywordHighlightPage() {
                           )}
                           <button
                             type="button"
-                            onClick={() => handleRemoveKeyword(index)}
+                            onClick={() => handleRemoveKeyword(keywords.indexOf(keyword))}
                             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
                             aria-label={`Remove "${keyword}"`}
                           >
@@ -151,6 +151,7 @@ export default function KeywordHighlightPage() {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             >
+                              <title>Remove</title>
                               <line x1="18" y1="6" x2="6" y2="18" />
                               <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
