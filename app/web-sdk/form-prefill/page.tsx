@@ -147,7 +147,7 @@ export default function FormPrefillPage() {
           cbField.name.toLowerCase().includes(opt.prefix.toLowerCase()),
         );
         const shouldCheck = matchingOption?.label === selectedLabel;
-        formValues[cbField.name] = shouldCheck ? ["1"] : [];
+        formValues[cbField.name] = shouldCheck ? ["Yes"] : [];
         if (shouldCheck) filled++;
       }
     }
