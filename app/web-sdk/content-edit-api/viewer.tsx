@@ -42,6 +42,13 @@ interface UpdatedTextBlock {
   maxWidth?: number;
 }
 
+interface HistoryEntry {
+  type: "find-replace";
+  findText: string;
+  replaceText: string;
+  description: string;
+}
+
 interface ContentEditingSession {
   getTextBlocks(pageIndex: number): Promise<TextBlock[]>;
   updateTextBlocks(updates: UpdatedTextBlock[]): Promise<void>;
@@ -81,6 +88,8 @@ export default function Viewer({ document }: ViewerProps) {
   const isContentEditingRef = useRef<boolean>(false);
   const activeSessionRef = useRef<ContentEditingSession | null>(null);
   const nutrientViewerRef = useRef<typeof window.NutrientViewer>(null);
+  const undoStackRef = useRef<HistoryEntry[]>([]);
+  const redoStackRef = useRef<HistoryEntry[]>([]);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [selected, setSelected] = useState<
     (TextBlock & { pageIndex: number })[]
@@ -132,6 +141,89 @@ export default function Viewer({ document }: ViewerProps) {
       ] as const,
     [],
   );
+
+  const dispatchHistoryState = useCallback(() => {
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("historyStateChange", {
+          detail: {
+            canUndo: undoStackRef.current.length > 0,
+            canRedo: redoStackRef.current.length > 0,
+          },
+        }),
+      );
+    }, 0);
+  }, []);
+
+  const pushHistory = useCallback(
+    (entry: HistoryEntry) => {
+      undoStackRef.current = [...undoStackRef.current, entry];
+      redoStackRef.current = []; // Clear redo stack on new action
+      dispatchHistoryState();
+    },
+    [dispatchHistoryState],
+  );
+
+  const applyFindReplace = useCallback(
+    async (searchTerm: string, replacement: string, action: string) => {
+      if (!window.viewerInstance) return;
+
+      setIsProcessing(true);
+      try {
+        const session =
+          await window.viewerInstance.beginContentEditingSession();
+        const totalPages = window.viewerInstance.totalPageCount;
+        const allUpdates: UpdatedTextBlock[] = [];
+
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+          const blocks = await session.getTextBlocks(pageIndex);
+          for (const block of blocks) {
+            if (block.text.includes(searchTerm)) {
+              const newText = block.text.replaceAll(searchTerm, replacement);
+              allUpdates.push({ id: block.id, text: newText });
+            }
+          }
+        }
+
+        if (allUpdates.length === 0) {
+          await session.discard();
+          return;
+        }
+
+        await session.updateTextBlocks(allUpdates);
+        await session.commit();
+      } catch (error) {
+        console.error(`Error applying ${action}:`, error);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [],
+  );
+
+  const handleUndo = useCallback(async () => {
+    if (undoStackRef.current.length === 0 || isProcessingRef.current) return;
+
+    const entry = undoStackRef.current[undoStackRef.current.length - 1];
+    undoStackRef.current = undoStackRef.current.slice(0, -1);
+    redoStackRef.current = [...redoStackRef.current, entry];
+    dispatchHistoryState();
+
+    // Undo = swap the terms: replace "replaceText" back to "findText"
+    await applyFindReplace(entry.replaceText, entry.findText, "undo");
+  }, [dispatchHistoryState, applyFindReplace]);
+
+  const handleRedo = useCallback(async () => {
+    if (redoStackRef.current.length === 0 || isProcessingRef.current) return;
+
+    const entry = redoStackRef.current[redoStackRef.current.length - 1];
+    redoStackRef.current = redoStackRef.current.slice(0, -1);
+    undoStackRef.current = [...undoStackRef.current, entry];
+    dispatchHistoryState();
+
+    // Redo = re-apply the original: replace "findText" with "replaceText"
+    await applyFindReplace(entry.findText, entry.replaceText, "redo");
+  }, [dispatchHistoryState, applyFindReplace]);
 
   const handleContentBoxesPress = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -380,10 +472,22 @@ export default function Viewer({ document }: ViewerProps) {
     [isEditing],
   );
 
-  // Create ref for stable function reference
+  // Create refs for stable function references
+  const pushHistoryRef = useRef(pushHistory);
+  const handleUndoRef = useRef(handleUndo);
+  const handleRedoRef = useRef(handleRedo);
   const handleContentBoxesPressRef = useRef(handleContentBoxesPress);
 
-  // Update ref when function changes
+  // Update refs when functions change
+  React.useEffect(() => {
+    pushHistoryRef.current = pushHistory;
+  }, [pushHistory]);
+  React.useEffect(() => {
+    handleUndoRef.current = handleUndo;
+  }, [handleUndo]);
+  React.useEffect(() => {
+    handleRedoRef.current = handleRedo;
+  }, [handleRedo]);
   React.useEffect(() => {
     handleContentBoxesPressRef.current = handleContentBoxesPress;
   }, [handleContentBoxesPress]);
@@ -401,6 +505,26 @@ export default function Viewer({ document }: ViewerProps) {
         setShowFindReplace(false);
 
         handleContentBoxesPress(event as unknown as Event);
+      }
+
+      // Ctrl+Z / Cmd+Z for undo
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === "z" &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        handleUndoRef.current();
+      }
+
+      // Ctrl+Shift+Z / Cmd+Shift+Z for redo
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === "z" &&
+        event.shiftKey
+      ) {
+        event.preventDefault();
+        handleRedoRef.current();
       }
     };
 
@@ -503,6 +627,15 @@ export default function Viewer({ document }: ViewerProps) {
         // Commit the changes to make them persistent
         await session.commit();
 
+        // Push to undo history — store search terms, not absolute text
+        // (blocks reflow across pages after commit, so absolute text is unreliable)
+        pushHistory({
+          type: "find-replace",
+          findText,
+          replaceText,
+          description: `Find & Replace: "${findText}" → "${replaceText}"`,
+        });
+
         console.log("Find/Replace completed and committed");
 
         // Create detailed statistics message
@@ -557,7 +690,7 @@ export default function Viewer({ document }: ViewerProps) {
     } finally {
       setIsProcessing(false);
     }
-  }, [findText, replaceText, isEditing, isProcessing]);
+  }, [findText, replaceText, isEditing, isProcessing, pushHistory]);
 
   const toggleContentEditor = useCallback(async () => {
     console.log(
@@ -668,6 +801,13 @@ export default function Viewer({ document }: ViewerProps) {
               console.log("Already processing, ignoring AI request");
               return;
             }
+
+            // Warn that Replace Text cannot be undone
+            const blockCount = selectedRef.current.length;
+            const confirmed = window.confirm(
+              `Replace text in ${blockCount} selected block${blockCount > 1 ? "s" : ""}?\n\nThis action cannot be undone.`,
+            );
+            if (!confirmed) return;
 
             setIsProcessing(true);
 
@@ -889,6 +1029,8 @@ export default function Viewer({ document }: ViewerProps) {
             }
           };
           window.viewerInstance.toggleContentEditor = toggleContentEditor;
+          window.viewerInstance.handleUndo = () => handleUndoRef.current();
+          window.viewerInstance.handleRedo = () => handleRedoRef.current();
 
           console.log("Nutrient Viewer loaded successfully");
 

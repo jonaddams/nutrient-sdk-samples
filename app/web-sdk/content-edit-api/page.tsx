@@ -15,12 +15,16 @@ export default function ContentEditApiPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isContentEditing, setIsContentEditing] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // Generate stable IDs for SVG titles
   const detectTextTitleId = useId();
   const findReplaceTitleId = useId();
   const aiRewordTitleId = useId();
   const editTextTitleId = useId();
+  const undoTitleId = useId();
+  const redoTitleId = useId();
 
   // Delayed PDF prefetch after initial render
   useEffect(() => {
@@ -51,6 +55,11 @@ export default function ContentEditApiPage() {
       setIsContentEditing(event.detail.isContentEditing);
     };
 
+    const handleHistoryStateChange = (event: CustomEvent) => {
+      setCanUndo(event.detail.canUndo);
+      setCanRedo(event.detail.canRedo);
+    };
+
     // Set up global event listeners
     window.addEventListener(
       "editingStateChange",
@@ -63,6 +72,10 @@ export default function ContentEditApiPage() {
     window.addEventListener(
       "contentEditingStateChange",
       handleContentEditingStateChange as EventListener,
+    );
+    window.addEventListener(
+      "historyStateChange",
+      handleHistoryStateChange as EventListener,
     );
 
     return () => {
@@ -77,6 +90,10 @@ export default function ContentEditApiPage() {
       window.removeEventListener(
         "contentEditingStateChange",
         handleContentEditingStateChange as EventListener,
+      );
+      window.removeEventListener(
+        "historyStateChange",
+        handleHistoryStateChange as EventListener,
       );
     };
   }, []);
@@ -299,6 +316,77 @@ export default function ContentEditApiPage() {
                   <span className="hidden sm:inline">Edit Text</span>
                   <span className="sm:hidden">Edit</span>
                 </button>
+
+                {/* Separator */}
+                <div className="hidden lg:block border-t border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] my-2" />
+
+                {/* Undo / Redo */}
+                <div className="flex flex-row lg:flex-col gap-2 lg:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => window.viewerInstance?.handleUndo?.()}
+                    disabled={!canUndo}
+                    className={`flex-1 lg:flex-none lg:w-full flex items-center justify-center lg:justify-start px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
+                      canUndo
+                        ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                    }`}
+                    title={
+                      canUndo ? "Undo last change (Ctrl+Z)" : "Nothing to undo"
+                    }
+                  >
+                    <svg
+                      className="mr-1 lg:mr-3 h-4 lg:h-5 w-4 lg:w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      role="img"
+                      aria-labelledby={undoTitleId}
+                    >
+                      <title id={undoTitleId}>Undo</title>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 10h10a5 5 0 015 5v2M3 10l5-5M3 10l5 5"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">Undo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.viewerInstance?.handleRedo?.()}
+                    disabled={!canRedo}
+                    className={`flex-1 lg:flex-none lg:w-full flex items-center justify-center lg:justify-start px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
+                      canRedo
+                        ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                    }`}
+                    title={
+                      canRedo
+                        ? "Redo last change (Ctrl+Shift+Z)"
+                        : "Nothing to redo"
+                    }
+                  >
+                    <svg
+                      className="mr-1 lg:mr-3 h-4 lg:h-5 w-4 lg:w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      role="img"
+                      aria-labelledby={redoTitleId}
+                    >
+                      <title id={redoTitleId}>Redo</title>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 10H11a5 5 0 00-5 5v2M21 10l-5-5M21 10l-5 5"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">Redo</span>
+                  </button>
+                </div>
               </nav>
             </div>
           </aside>
