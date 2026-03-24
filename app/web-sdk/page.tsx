@@ -134,6 +134,13 @@ const samples: Sample[] = [
     path: "/web-sdk/text-comparison",
   },
   {
+    name: "Text Extraction",
+    category: "Content Editor",
+    description:
+      "Extract text from PDF pages with current-page or full-document view, copy to clipboard, and download as plain text",
+    path: "/web-sdk/text-extraction",
+  },
+  {
     name: "Zoom Level Display",
     category: "User Interface",
     description:
