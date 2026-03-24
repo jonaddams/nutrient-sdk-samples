@@ -14,6 +14,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Annotation Presets",
+    category: "Annotations",
+    description:
+      "Customize default properties for annotation tools including colors, sizes, fonts, and line styles with live preview",
+    path: "/web-sdk/annotation-presets",
+  },
+  {
     name: "Annotation State Management",
     category: "Annotations",
     description:
