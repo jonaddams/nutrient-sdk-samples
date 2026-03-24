@@ -94,8 +94,18 @@ export default function FormPrefillPage() {
   const handleApplyPreset = (presetName: string) => {
     const values = PRESETS[presetName];
     if (!values) return;
-    setFieldValues((prev) => ({ ...prev, ...values }));
-    applyValues(values);
+    // Only populate the sidebar inputs — user clicks "Apply All" to fill the PDF
+    const updated: Record<string, string> = { ...fieldValues };
+    for (const field of fields) {
+      const matchingKey = Object.keys(values).find((key) =>
+        field.name.toLowerCase().includes(key.toLowerCase()),
+      );
+      if (matchingKey && values[matchingKey]) {
+        updated[field.name] = values[matchingKey];
+      }
+    }
+    setFieldValues(updated);
+    setFilledCount(0);
   };
 
   const handleUpdateField = (fieldName: string, value: string) => {
