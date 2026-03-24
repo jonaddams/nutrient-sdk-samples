@@ -294,7 +294,6 @@ export default function FormPrefillPage() {
                           onChange={(e) =>
                             handleUpdateField(field.name, e.target.value)
                           }
-                          placeholder={field.name}
                           className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
                         />
                       </div>
