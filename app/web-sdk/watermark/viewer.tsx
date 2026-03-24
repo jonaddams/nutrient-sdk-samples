@@ -58,11 +58,10 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
 
           const { width, height } = pageInfo;
 
-          // Center the watermark on the page
-          const boxWidth = Math.min(width * 0.8, 500);
-          const boxHeight = cfg.fontSize * 2;
-          const left = (width - boxWidth) / 2;
-          const top = (height - boxHeight) / 2;
+          // Use a large centered box so the text has room even when rotated
+          const boxSize = Math.min(width, height) * 0.7;
+          const left = (width - boxSize) / 2;
+          const top = (height - boxSize) / 2;
 
           const id = NutrientViewer.generateInstantId();
           const annotation = new NutrientViewer.Annotations.TextAnnotation({
@@ -71,8 +70,8 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
             boundingBox: new NutrientViewer.Geometry.Rect({
               left,
               top,
-              width: boxWidth,
-              height: boxHeight,
+              width: boxSize,
+              height: boxSize,
             }),
             text: { format: "plain", value: cfg.text },
             font: "Helvetica",
