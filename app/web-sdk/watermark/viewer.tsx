@@ -60,16 +60,22 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
 
           const id = NutrientViewer.generateInstantId();
 
-          // Start with a very wide single-line box so text doesn't wrap
-          const initialWidth = width * 3;
-          let annotation = new NutrientViewer.Annotations.TextAnnotation({
+          // Estimate text width: ~0.6 × fontSize per character for Helvetica
+          const estTextWidth = cfg.text.length * cfg.fontSize * 0.65;
+          // Box must be wide enough that text never wraps
+          const boxWidth = Math.max(estTextWidth, width);
+          const boxHeight = cfg.fontSize * 2;
+          const centeredLeft = (width - boxWidth) / 2;
+          const centeredTop = (height - boxHeight) / 2;
+
+          const annotation = new NutrientViewer.Annotations.TextAnnotation({
             id,
             pageIndex: p,
             boundingBox: new NutrientViewer.Geometry.Rect({
-              left: 0,
-              top: 0,
-              width: initialWidth,
-              height: cfg.fontSize * 1.5,
+              left: centeredLeft,
+              top: centeredTop,
+              width: boxWidth,
+              height: boxHeight,
             }),
             text: { format: "plain", value: cfg.text },
             font: "Helvetica",
@@ -81,22 +87,7 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
             opacity: cfg.opacity,
             rotation: cfg.rotation,
             isEditable: false,
-            isFitting: false,
           });
-
-          // Let the SDK calculate the correct bounding box for the text
-          annotation = inst.calculateFittingTextAnnotationBoundingBox(annotation);
-
-          // Re-center the fitted box on the page
-          const bbox = annotation.boundingBox;
-          const centeredLeft = (width - bbox.width) / 2;
-          const centeredTop = (height - bbox.height) / 2;
-          annotation = annotation.set("boundingBox", new NutrientViewer.Geometry.Rect({
-            left: centeredLeft,
-            top: centeredTop,
-            width: bbox.width,
-            height: bbox.height,
-          }));
 
           newIds.push(id);
           await inst.create(annotation);
