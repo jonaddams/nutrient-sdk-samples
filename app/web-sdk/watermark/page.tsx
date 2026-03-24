@@ -125,11 +125,12 @@ export default function WatermarkPage() {
 
                 {/* Font size */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label htmlFor="wm-fontsize" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Font Size
                   </label>
                   <div className="flex items-center gap-2">
                     <input
+                      id="wm-fontsize"
                       type="range"
                       min={16}
                       max={120}
@@ -147,11 +148,12 @@ export default function WatermarkPage() {
 
                 {/* Color */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label htmlFor="wm-color" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color
                   </label>
                   <div className="flex items-center gap-2">
                     <input
+                      id="wm-color"
                       type="color"
                       value={rgbToHex(config.color)}
                       onChange={(e) => update("color", hexToRgb(e.target.value))}
@@ -165,11 +167,12 @@ export default function WatermarkPage() {
 
                 {/* Opacity */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label htmlFor="wm-opacity" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Opacity
                   </label>
                   <div className="flex items-center gap-2">
                     <input
+                      id="wm-opacity"
                       type="range"
                       min={0.05}
                       max={1}
@@ -189,11 +192,12 @@ export default function WatermarkPage() {
 
                 {/* Rotation */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label htmlFor="wm-rotation" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Rotation
                   </label>
                   <div className="flex items-center gap-2">
                     <input
+                      id="wm-rotation"
                       type="range"
                       min={-90}
                       max={90}
