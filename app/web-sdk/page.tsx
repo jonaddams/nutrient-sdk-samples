@@ -21,6 +21,13 @@ const samples: Sample[] = [
     path: "/web-sdk/annotation-presets",
   },
   {
+    name: "Bookmark & Outline Navigation",
+    category: "User Interface",
+    description:
+      "Browse the document's table of contents and bookmarks in a custom sidebar with click-to-navigate",
+    path: "/web-sdk/bookmark-navigation",
+  },
+  {
     name: "Annotation State Management",
     category: "Annotations",
     description:
