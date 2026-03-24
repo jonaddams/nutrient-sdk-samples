@@ -113,6 +113,13 @@ const samples: Sample[] = [
     path: "/web-sdk/keyword-highlight",
   },
   {
+    name: "Form Data Pre-Fill",
+    category: "Forms",
+    description:
+      "Programmatically populate PDF form fields from JSON data presets with editable field values and apply/clear controls",
+    path: "/web-sdk/form-prefill",
+  },
+  {
     name: "Form Designer",
     category: "Forms",
     description:
