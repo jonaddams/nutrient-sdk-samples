@@ -58,20 +58,17 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
 
           const { width, height } = pageInfo;
 
-          // Use a large centered box so the text has room even when rotated
-          const boxSize = Math.min(width, height) * 0.7;
-          const left = (width - boxSize) / 2;
-          const top = (height - boxSize) / 2;
-
           const id = NutrientViewer.generateInstantId();
-          const annotation = new NutrientViewer.Annotations.TextAnnotation({
+
+          // Create annotation with a generous initial bounding box
+          let annotation = new NutrientViewer.Annotations.TextAnnotation({
             id,
             pageIndex: p,
             boundingBox: new NutrientViewer.Geometry.Rect({
-              left,
-              top,
-              width: boxSize,
-              height: boxSize,
+              left: 0,
+              top: 0,
+              width,
+              height: cfg.fontSize * 1.5,
             }),
             text: { format: "plain", value: cfg.text },
             font: "Helvetica",
@@ -83,7 +80,22 @@ export default function WatermarkViewer({ config }: WatermarkViewerProps) {
             opacity: cfg.opacity,
             rotation: cfg.rotation,
             isEditable: false,
+            isFitting: false,
           });
+
+          // Let the SDK calculate the correct bounding box for the text
+          annotation = inst.calculateFittingTextAnnotationBoundingBox(annotation);
+
+          // Re-center the fitted box on the page
+          const bbox = annotation.boundingBox;
+          const centeredLeft = (width - bbox.width) / 2;
+          const centeredTop = (height - bbox.height) / 2;
+          annotation = annotation.set("boundingBox", new NutrientViewer.Geometry.Rect({
+            left: centeredLeft,
+            top: centeredTop,
+            width: bbox.width,
+            height: bbox.height,
+          }));
 
           newIds.push(id);
           await inst.create(annotation);
