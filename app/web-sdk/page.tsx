@@ -126,6 +126,13 @@ const samples: Sample[] = [
       "Side-by-side PDF comparison with synchronized viewing and interactive change tracking",
     path: "/web-sdk/text-comparison",
   },
+  {
+    name: "Zoom Level Display",
+    category: "User Interface",
+    description:
+      "Display the current zoom level as a percentage in a custom toolbar button with click-to-reset functionality",
+    path: "/web-sdk/zoom-level-display",
+  },
 ];
 
 const categories = [
