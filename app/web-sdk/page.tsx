@@ -99,6 +99,13 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Multi-Document Tabs",
+    category: "User Interface",
+    description:
+      "View multiple PDF documents in a tabbed interface with page position memory, closeable tabs, and file upload",
+    path: "/web-sdk/multi-document-tabs",
+  },
+  {
     name: "Keyword Highlight",
     category: "Annotations",
     description:
