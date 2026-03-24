@@ -60,6 +60,7 @@ const PRESETS: Record<string, Record<string, string>> = {
     occupation: "Registered Nurse",
     gender: "Female",
     maritalStatus: "Married",
+    signatureDate: new Date().toLocaleDateString("en-US"),
   },
   "John Smith": {
     firstName: "John",
@@ -77,6 +78,7 @@ const PRESETS: Record<string, Record<string, string>> = {
     occupation: "Software Engineer",
     gender: "Male",
     maritalStatus: "Single",
+    signatureDate: new Date().toLocaleDateString("en-US"),
   },
 };
 
