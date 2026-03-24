@@ -116,31 +116,24 @@ export default function FormPrefillPage() {
 
   const applyValues = async () => {
     const inst = (window as any).__formPrefillInstance;
-    const { NutrientViewer } = window;
-    if (!inst || !NutrientViewer) return;
+    if (!inst) return;
 
+    // Build a single values object for setFormFieldValues
+    const formValues: Record<string, string> = {};
     let filled = 0;
 
-    // Apply text fields
+    // Text fields
     for (const field of textFields) {
       const matchingKey = Object.keys(fieldValues).find((key) =>
         field.name.toLowerCase().includes(key.toLowerCase()),
       );
       if (matchingKey && fieldValues[matchingKey]) {
-        try {
-          const formFieldValue = new NutrientViewer.FormFieldValue({
-            name: field.name,
-            value: fieldValues[matchingKey],
-          });
-          await inst.update(formFieldValue);
-          filled++;
-        } catch (error) {
-          console.error("Error filling field " + field.name + ":", error);
-        }
+        formValues[field.name] = fieldValues[matchingKey];
+        filled++;
       }
     }
 
-    // Apply checkbox groups
+    // Checkbox groups: use "1" to check, "Off" to uncheck
     for (const group of CHECKBOX_GROUPS) {
       const selectedLabel = fieldValues[group.label] ?? "";
       const checkboxFields = fields.filter(
@@ -150,23 +143,19 @@ export default function FormPrefillPage() {
       );
 
       for (const cbField of checkboxFields) {
-        // Check if this checkbox matches the selected option
         const matchingOption = group.options.find((opt) =>
           cbField.name.toLowerCase().includes(opt.prefix.toLowerCase()),
         );
         const shouldCheck = matchingOption?.label === selectedLabel;
-
-        try {
-          const formFieldValue = new NutrientViewer.FormFieldValue({
-            name: cbField.name,
-            value: shouldCheck ? ["Yes"] : [],
-          });
-          await inst.update(formFieldValue);
-          if (shouldCheck) filled++;
-        } catch (error) {
-          console.error("Error filling checkbox " + cbField.name + ":", error);
-        }
+        formValues[cbField.name] = shouldCheck ? "1" : "Off";
+        if (shouldCheck) filled++;
       }
+    }
+
+    try {
+      await inst.setFormFieldValues(formValues);
+    } catch (error) {
+      console.error("Error applying form values:", error);
     }
 
     setFilledCount(filled);
@@ -211,23 +200,21 @@ export default function FormPrefillPage() {
 
   const handleClearAll = async () => {
     const inst = (window as any).__formPrefillInstance;
-    const { NutrientViewer } = window;
-    if (!inst || !NutrientViewer) return;
+    if (!inst) return;
 
-    const cleared: Record<string, string> = {};
+    const formValues: Record<string, string> = {};
     for (const field of fields) {
-      try {
-        const value = field.type === "checkbox" ? [] : "";
-        const formFieldValue = new NutrientViewer.FormFieldValue({
-          name: field.name,
-          value,
-        });
-        await inst.update(formFieldValue);
-      } catch {
-        // Some fields may not be clearable
-      }
+      formValues[field.name] = field.type === "checkbox" ? "Off" : "";
     }
+
+    try {
+      await inst.setFormFieldValues(formValues);
+    } catch {
+      // Some fields may not be clearable
+    }
+
     // Reset sidebar values
+    const cleared: Record<string, string> = {};
     for (const field of textFields) {
       cleared[field.name] = "";
     }
