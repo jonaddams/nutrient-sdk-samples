@@ -103,6 +103,24 @@ export default function FormPrefillPage() {
     [],
   );
 
+  // Logical display order for text fields (by keyword in field name)
+  const FIELD_ORDER = [
+    "firstName",
+    "lastName",
+    "middleName",
+    "dateOfBirth",
+    "ssn",
+    "address",
+    "city",
+    "state",
+    "zipCode",
+    "phone",
+    "email",
+    "employer",
+    "occupation",
+    "signatureDate",
+  ];
+
   // Check if a field belongs to a checkbox group
   const isGroupedCheckbox = (field: FormFieldInfo): boolean => {
     if (field.type !== "checkbox") return false;
@@ -111,8 +129,14 @@ export default function FormPrefillPage() {
     );
   };
 
-  // Non-checkbox fields for sidebar display
-  const textFields = fields.filter((f) => !isGroupedCheckbox(f) && f.type !== "checkbox");
+  // Non-checkbox fields for sidebar display, sorted by logical order
+  const textFields = fields
+    .filter((f) => !isGroupedCheckbox(f) && f.type !== "checkbox")
+    .sort((a, b) => {
+      const aIdx = FIELD_ORDER.findIndex((k) => a.name.toLowerCase().includes(k.toLowerCase()));
+      const bIdx = FIELD_ORDER.findIndex((k) => b.name.toLowerCase().includes(k.toLowerCase()));
+      return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+    });
 
   const applyValues = async () => {
     const inst = (window as any).__formPrefillInstance;
