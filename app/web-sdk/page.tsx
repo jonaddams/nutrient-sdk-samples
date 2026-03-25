@@ -148,6 +148,13 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
+    name: "Stamp Annotations",
+    category: "Annotations",
+    description:
+      "Place grouped stamp annotations with image backgrounds and interactive form fields (checkboxes, text). Moving or deleting any element affects the entire stamp group.",
+    path: "/web-sdk/stamp-annotations",
+  },
+  {
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
