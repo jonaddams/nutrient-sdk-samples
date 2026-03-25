@@ -265,12 +265,6 @@ export default function SigningDemoViewer() {
   const instanceRef = useRef<Instance | null>(null);
 
   /**
-   * Reference to CA certificates for digital signature validation
-   * Fetched from DWS API and used in trustedCAsCallback
-   */
-  const certificatesRef = useRef<{ ca_certificates: string[] } | null>(null);
-
-  /**
    * Prevents double-loading in React strict mode
    * React strict mode mounts components twice in development
    */
@@ -283,8 +277,8 @@ export default function SigningDemoViewer() {
   /** Current active user - determines permissions and field visibility */
   const [currentUser, setCurrentUser] = useState<User>(ADMIN_USER);
 
-  /** List of signers in the workflow - can be dynamically added/removed by Admin */
-  const [signers, setSigners] = useState<Signer[]>(DEFAULT_SIGNERS);
+  /** List of signers in the workflow */
+  const signers = DEFAULT_SIGNERS;
 
   /** Currently selected signer for field placement (Admin only) */
   const [selectedSignerId, setSelectedSignerId] = useState<string>(
@@ -299,47 +293,6 @@ export default function SigningDemoViewer() {
 
   /** Status message displayed to user during signing operations */
   const [signStatus, setSignStatus] = useState<string>("");
-
-  /**
-   * Tracks if CA certificates have been loaded
-   * Viewer initialization waits for this to prevent race conditions
-   */
-  const [certificatesLoaded, setCertificatesLoaded] = useState(false);
-
-  // ========================================
-  // CERTIFICATE LOADING - DWS API Integration
-  // ========================================
-
-  /**
-   * Fetches CA certificates from Document Signing Service (DWS) API
-   * These certificates are used to validate digital signatures
-   *
-   * The trustedCAsCallback will use these certificates to determine
-   * if a digital signature was signed by a trusted authority
-   */
-  useEffect(() => {
-    const fetchCertificates = async () => {
-      try {
-        const response = await fetch(
-          "/api/sign-document-web-sdk-dws/api/certificates",
-        );
-        if (response.ok) {
-          const data = await response.json();
-          certificatesRef.current = data;
-        } else {
-          console.warn(
-            "Failed to fetch certificates - signature validation may be limited",
-          );
-        }
-      } catch (error) {
-        console.warn("Error fetching certificates:", error);
-      } finally {
-        setCertificatesLoaded(true);
-      }
-    };
-
-    fetchCertificates();
-  }, []);
 
   // ========================================
   // CUSTOM OVERLAY MANAGEMENT
@@ -452,12 +405,6 @@ export default function SigningDemoViewer() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !window.NutrientViewer) return;
-
-    // Wait for certificates to be loaded before initializing viewer
-    // This prevents race conditions where viewer loads before certificates are available
-    if (!certificatesLoaded) {
-      return;
-    }
 
     // Prevent double-loading in React strict mode
     // React strict mode intentionally mounts/unmounts components twice in development
@@ -624,22 +571,28 @@ export default function SigningDemoViewer() {
 
         /**
          * CERTIFICATE TRUST CONFIGURATION:
-         * Configures which Certificate Authorities (CAs) the viewer should trust
-         * when validating digital signatures.
-         *
-         * This is critical for signature validation - without trusted CAs,
-         * the viewer cannot verify that a digital signature is legitimate.
-         *
-         * The certificates are fetched from the DWS API and decoded from base64.
+         * Fetches CA certificates on demand from the DWS API when the viewer
+         * needs to validate a digital signature. This keeps certificates fresh
+         * since they are only valid for a short period.
          */
-        const certs = certificatesRef.current;
-        if (certs?.ca_certificates && certs.ca_certificates.length > 0) {
-          configuration.trustedCAsCallback = async () => {
-            return certs.ca_certificates.map((cert: string) =>
-              decodeBase64String(cert),
+        configuration.trustedCAsCallback = async () => {
+          try {
+            const response = await fetch(
+              "/api/sign-document-web-sdk-dws/api/certificates",
             );
-          };
-        }
+            if (response.ok) {
+              const data = await response.json();
+              if (data?.ca_certificates?.length > 0) {
+                return data.ca_certificates.map((cert: string) =>
+                  decodeBase64String(cert),
+                );
+              }
+            }
+          } catch (error) {
+            console.warn("Error fetching certificates for validation:", error);
+          }
+          return [];
+        };
 
         // Load the Nutrient Viewer instance with all configuration
         const instance = await NV.load(configuration);
@@ -702,7 +655,7 @@ export default function SigningDemoViewer() {
         NV.unload(container);
       }
     };
-  }, [certificatesLoaded]);
+  }, []);
 
   // ========================================
   // DYNAMIC PERMISSION UPDATES
@@ -823,17 +776,6 @@ export default function SigningDemoViewer() {
           role: "Signer",
         });
       }
-    }
-  };
-
-  /**
-   * Removes a signer from the workflow
-   * Also updates selected signer if the deleted one was selected
-   */
-  const handleDeleteSigner = (signerId: string) => {
-    setSigners(signers.filter((s) => s.id !== signerId));
-    if (selectedSignerId === signerId && signers.length > 0) {
-      setSelectedSignerId(signers[0].id);
     }
   };
 
@@ -1412,14 +1354,35 @@ export default function SigningDemoViewer() {
       }
 
       /**
-       * STEP 2: FLATTEN ANNOTATIONS
+       * STEP 2: REMOVE DATE FIELD BORDERS
+       * Date field WidgetAnnotations have colored borders for visual identification.
+       * Remove these before flattening so they don't persist in the final document.
+       */
+      console.log("--- STEP 2: Removing date field borders ---");
+      for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        const annotations = await instance.getAnnotations(pageIndex);
+        for (const ann of annotations) {
+          if (
+            ann instanceof NV.Annotations.WidgetAnnotation &&
+            ann.customData?.type === "date" &&
+            ann.borderWidth
+          ) {
+            await instance.update(
+              ann.set("borderWidth", 0).set("borderColor", null),
+            );
+          }
+        }
+      }
+
+      /**
+       * STEP 3: FLATTEN ANNOTATIONS
        * Flattens all annotations on all pages of the document
        * After flattening, they cannot be removed or modified
        *
        * Uses instance.applyOperations with "flattenAnnotations" operation
        * Omitting pageIndexes flattens all pages in the document
        */
-      console.log("--- STEP 2: Flattening annotations on all pages ---");
+      console.log("--- STEP 3: Flattening annotations on all pages ---");
       await instance.applyOperations([
         {
           type: "flattenAnnotations",
@@ -1428,10 +1391,10 @@ export default function SigningDemoViewer() {
       console.log("All annotations flattened successfully");
 
       /**
-       * STEP 3: GET AUTHENTICATION TOKEN
+       * STEP 4: GET AUTHENTICATION TOKEN
        * Request JWT token from DWS API to authorize digital signing
        */
-      console.log("--- STEP 3: Getting authentication token ---");
+      console.log("--- STEP 4: Getting authentication token ---");
       setSignStatus("Requesting authentication token...");
 
       console.log(
@@ -1466,7 +1429,7 @@ export default function SigningDemoViewer() {
       console.log("Token (first 20 chars):", token?.substring(0, 20) + "...");
 
       /**
-       * STEP 4: APPLY DIGITAL SIGNATURE
+       * STEP 5: APPLY DIGITAL SIGNATURE
        * Signs the document using cryptographic digital signature
        *
        * Signature Type: CAdES (CMS Advanced Electronic Signatures)
@@ -1474,7 +1437,7 @@ export default function SigningDemoViewer() {
        * - Includes timestamp for long-term validity
        * - Embeds validation information in the PDF
        */
-      console.log("--- STEP 4: Applying digital signature ---");
+      console.log("--- STEP 5: Applying digital signature ---");
       setSignStatus("Signing document...");
 
       const signingConfig = {
@@ -1499,10 +1462,10 @@ export default function SigningDemoViewer() {
       console.log("Digital signature applied successfully!");
 
       /**
-       * STEP 5: UPDATE UI
+       * STEP 6: UPDATE UI
        * Set viewer to readonly mode and show signature validation banner
        */
-      console.log("--- STEP 5: Updating UI ---");
+      console.log("--- STEP 6: Updating UI ---");
       const currentViewState = instance.viewState;
       console.log("Current view state:", currentViewState.toJS());
 
@@ -1586,54 +1549,27 @@ export default function SigningDemoViewer() {
           </select>
         </div>
 
-        {/* Signers List */}
-        {currentUser.role === "Editor" && (
-          <div className="sidebar-section">
-            <div className="sidebar-label">Signers</div>
-            <ul className="signers-list">
-              {signers.map((signer) => (
-                <li
-                  key={signer.id}
-                  className={`signer-item ${selectedSignerId === signer.id ? "selected" : ""}`}
-                  onClick={() => setSelectedSignerId(signer.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelectedSignerId(signer.id);
-                    }
-                  }}
-                >
-                  <div className="signer-info">
-                    <div
-                      className="signer-color-indicator"
-                      style={{ backgroundColor: signer.color }}
-                    />
-                    <div className="signer-details">
-                      <div className="signer-name">{signer.name}</div>
-                      <div className="signer-email">{signer.email}</div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="delete-signer-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteSigner(signer.id);
-                    }}
-                    aria-label="Delete signer"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {/* Draggable Form Fields */}
         {currentUser.role === "Editor" && (
           <div className="sidebar-section">
             <div className="sidebar-label">Form Fields</div>
+            <div className="assign-to-row">
+              <label htmlFor="assign-to-selector" className="assign-to-label">
+                Assign to
+              </label>
+              <select
+                id="assign-to-selector"
+                className="assign-to-selector"
+                value={selectedSignerId}
+                onChange={(e) => setSelectedSignerId(e.target.value)}
+              >
+                {signers.map((signer) => (
+                  <option key={signer.id} value={signer.id}>
+                    {signer.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="form-fields-list">
               {FIELD_TYPES.map((field) => {
                 const selectedSigner = signers.find(

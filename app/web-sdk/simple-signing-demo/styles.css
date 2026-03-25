@@ -89,176 +89,62 @@
   }
 }
 
-/* Signers List Styles */
-.signers-list {
+/* Assign To Selector */
+.assign-to-row {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  margin-bottom: 4px;
 }
 
-.signer-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  background-color: var(--white);
-  border: 2px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
-  text-align: left;
-}
-
-.signer-item:hover {
-  background-color: var(--warm-gray-200);
-  border-color: var(--warm-gray-400);
-}
-
-.signer-item.selected {
-  border-color: var(--black);
-  background-color: var(--warm-gray-200);
-}
-
-@media (prefers-color-scheme: dark) {
-  .signer-item {
-    background-color: var(--warm-gray-900);
-  }
-
-  .signer-item:hover {
-    background-color: var(--warm-gray-800);
-    border-color: var(--warm-gray-600);
-  }
-
-  .signer-item.selected {
-    border-color: var(--white);
-    background-color: var(--warm-gray-800);
-  }
-}
-
-.signer-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-}
-
-.signer-color-indicator {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 2px solid var(--white);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .signer-color-indicator {
-    border-color: var(--warm-gray-900);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-}
-
-.signer-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-}
-
-.signer-name {
-  font-size: 14px;
+.assign-to-label {
+  font-size: 13px;
   font-weight: 500;
   color: var(--black);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.signer-email {
-  font-size: 12px;
-  color: var(--warm-gray-800);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.assign-to-selector {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--warm-gray-400);
+  border-radius: 4px;
+  background-color: var(--white);
+  font-size: 13px;
+  color: var(--black);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.assign-to-selector:hover {
+  border-color: var(--black);
+}
+
+.assign-to-selector:focus {
+  outline: none;
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
-  .signer-name {
+  .assign-to-label {
     color: var(--warm-gray-400);
   }
 
-  .signer-email {
-    color: var(--warm-gray-600);
-  }
-}
-
-.delete-signer-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background-color: transparent;
-  color: var(--warm-gray-600);
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-.delete-signer-btn:hover {
-  background-color: var(--color-error-bg);
-  color: var(--color-error-text);
-}
-
-.delete-signer-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-error-border);
-}
-
-@media (prefers-color-scheme: dark) {
-  .delete-signer-btn {
-    color: var(--warm-gray-600);
+  .assign-to-selector {
+    background-color: var(--warm-gray-900);
+    border-color: var(--warm-gray-600);
+    color: var(--warm-gray-400);
   }
 
-  .delete-signer-btn:hover {
-    background-color: var(--color-error-bg);
-    color: var(--color-error-text);
+  .assign-to-selector:hover {
+    border-color: var(--white);
   }
-}
 
-.add-signer-btn {
-  width: 100%;
-  padding: 10px 16px;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.add-signer-btn:hover {
-  background-color: #357abd;
-}
-
-.add-signer-btn:active {
-  background-color: #2a6ba8;
-}
-
-.add-signer-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+  .assign-to-selector:focus {
+    border-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Form Fields Styles */
