@@ -21,18 +21,18 @@ const samples: Sample[] = [
     path: "/web-sdk/annotation-presets",
   },
   {
-    name: "Bookmark & Outline Navigation",
-    category: "User Interface",
-    description:
-      "Browse the document's table of contents and bookmarks in a custom sidebar with click-to-navigate",
-    path: "/web-sdk/bookmark-navigation",
-  },
-  {
     name: "Annotation State Management",
     category: "Annotations",
     description:
       "Save and restore annotation states locally with version control-like functionality for managing document changes",
     path: "/web-sdk/annotation-state",
+  },
+  {
+    name: "Bookmark & Outline Navigation",
+    category: "User Interface",
+    description:
+      "Browse the document's table of contents and bookmarks in a custom sidebar with click-to-navigate",
+    path: "/web-sdk/bookmark-navigation",
   },
   {
     name: "Brightness & Contrast",
@@ -99,27 +99,6 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
-    name: "Multi-Document Tabs",
-    category: "User Interface",
-    description:
-      "View multiple PDF documents in a tabbed interface with page position memory, closeable tabs, and file upload",
-    path: "/web-sdk/multi-document-tabs",
-  },
-  {
-    name: "Layer Management",
-    category: "User Interface",
-    description:
-      "Toggle PDF layer groups (OCGs) to show or hide building systems on a construction floor plan with quick presets",
-    path: "/web-sdk/layer-management",
-  },
-  {
-    name: "Keyword Highlight",
-    category: "Annotations",
-    description:
-      "Automatically search and highlight configurable keywords in a document with color-coded annotations",
-    path: "/web-sdk/keyword-highlight",
-  },
-  {
     name: "Form Data Pre-Fill",
     category: "Forms",
     description:
@@ -134,6 +113,34 @@ const samples: Sample[] = [
     path: "/web-sdk/form-designer",
   },
   {
+    name: "Grouped Form Stamps",
+    category: "Forms",
+    description:
+      "Drag and drop grouped form stamps with image backgrounds, company logos, checkboxes, signatures, and date fields. Moving or deleting any element affects the entire group.",
+    path: "/web-sdk/stamp-annotations",
+  },
+  {
+    name: "Keyword Highlight",
+    category: "Annotations",
+    description:
+      "Automatically search and highlight configurable keywords in a document with color-coded annotations",
+    path: "/web-sdk/keyword-highlight",
+  },
+  {
+    name: "Layer Management",
+    category: "User Interface",
+    description:
+      "Toggle PDF layer groups (OCGs) to show or hide building systems on a construction floor plan with quick presets",
+    path: "/web-sdk/layer-management",
+  },
+  {
+    name: "Multi-Document Tabs",
+    category: "User Interface",
+    description:
+      "View multiple PDF documents in a tabbed interface with page position memory, closeable tabs, and file upload",
+    path: "/web-sdk/multi-document-tabs",
+  },
+  {
     name: "Night Mode",
     category: "User Interface",
     description:
@@ -146,13 +153,6 @@ const samples: Sample[] = [
     description:
       "Digital patient check-in with smart form pre-population, progressive form completion, and HIPAA-compliant data handling",
     path: "/web-sdk/patient-intake",
-  },
-  {
-    name: "Grouped Form Stamps",
-    category: "Forms",
-    description:
-      "Drag and drop grouped form stamps with image backgrounds, company logos, checkboxes, signatures, and date fields. Moving or deleting any element affects the entire group.",
-    path: "/web-sdk/stamp-annotations",
   },
   {
     name: "Simple Signing Demo",
