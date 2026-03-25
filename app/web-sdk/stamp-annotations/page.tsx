@@ -45,8 +45,8 @@ export default function StampAnnotationsPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       <SampleHeader
-        title="Stamp Annotations"
-        description="Toggle Stamp Creator Mode to drag and drop grouped stamp annotations onto a document. Each stamp contains an image background with interactive form fields. Toggle off to lock stamps in place — form fields remain interactive."
+        title="Grouped Form Stamps"
+        description="Toggle Stamp Creator Mode to drag and drop grouped form stamps onto a document. Each stamp contains an image background, company logo, signature, checkboxes, and date field. Toggle off to lock stamps in place — form fields remain interactive."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
