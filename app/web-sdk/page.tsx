@@ -106,6 +106,13 @@ const samples: Sample[] = [
     path: "/web-sdk/multi-document-tabs",
   },
   {
+    name: "Layer Management",
+    category: "User Interface",
+    description:
+      "Toggle PDF layer groups (OCGs) to show or hide building systems on a construction floor plan with quick presets",
+    path: "/web-sdk/layer-management",
+  },
+  {
     name: "Keyword Highlight",
     category: "Annotations",
     description:
