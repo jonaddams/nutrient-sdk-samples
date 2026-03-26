@@ -202,38 +202,11 @@ export default function FormValidationViewer({
   const onValidationChangeRef = useRef(onValidationChange);
   onValidationChangeRef.current = onValidationChange;
 
+  // The SDK only visually applies backgroundColor/borderColor when a
+  // text field is focused, so in-PDF coloring is not reliable across
+  // field types. We rely on the sidebar for all validation feedback.
   const updateFieldColor = useCallback(
-    async (fieldName: string, isValid: boolean | null) => {
-      const instance = instanceRef.current;
-      const { NutrientViewer } = window;
-      if (!instance || !NutrientViewer) return;
-
-      // Find widget annotations by formFieldName (reliable across all field types)
-      const annotations = await instance.getAnnotations(0);
-      const widgets = annotations.filter(
-        (a: any) => a.formFieldName === fieldName,
-      );
-
-      if (widgets.size === 0) return;
-
-      // The SDK only visually applies backgroundColor/borderColor when a field
-      // is focused, so in-PDF coloring is not reliable for unfocused fields.
-      // We skip field coloring and rely on the sidebar for validation feedback.
-      // Signature fields are the exception — they render backgroundColor immediately.
-      if (fieldName === "signature") {
-        let color = null;
-        if (isValid === false) color = NutrientViewer.Color.RED;
-        else if (isValid === true) color = NutrientViewer.Color.GREEN;
-
-        for (const widget of widgets) {
-          try {
-            await instance.update(widget.set("backgroundColor", color));
-          } catch {
-            // Annotation may not support backgroundColor
-          }
-        }
-      }
-    },
+    async (_fieldName: string, _isValid: boolean | null) => {},
     [],
   );
 
