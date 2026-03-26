@@ -40,6 +40,7 @@ export default function FormValidationPage() {
 
   const validateAllRef = useRef<(() => Promise<void>) | null>(null);
   const resetRef = useRef<(() => Promise<void>) | null>(null);
+  const resetFormRef = useRef<(() => Promise<void>) | null>(null);
   const navigateToFieldRef = useRef<((fieldName: string) => Promise<void>) | null>(null);
 
   const handleValidationChange = useCallback((state: ValidationState) => {
@@ -160,7 +161,14 @@ export default function FormValidationPage() {
                   className="validation-btn-secondary"
                   onClick={() => resetRef.current?.()}
                 >
-                  Reset
+                  Reset Validation
+                </button>
+                <button
+                  type="button"
+                  className="validation-btn-secondary"
+                  onClick={() => resetFormRef.current?.()}
+                >
+                  Reset Form Fields
                 </button>
               </div>
             </div>
@@ -171,6 +179,7 @@ export default function FormValidationPage() {
                 onValidationChange={handleValidationChange}
                 validateAllRef={validateAllRef}
                 resetRef={resetRef}
+                resetFormRef={resetFormRef}
                 navigateToFieldRef={navigateToFieldRef}
               />
             </div>

@@ -183,12 +183,14 @@ interface FormValidationViewerProps {
   onValidationChange: (state: ValidationState) => void;
   validateAllRef: React.MutableRefObject<(() => Promise<void>) | null>;
   resetRef: React.MutableRefObject<(() => Promise<void>) | null>;
+  resetFormRef: React.MutableRefObject<(() => Promise<void>) | null>;
   navigateToFieldRef: React.MutableRefObject<((fieldName: string) => Promise<void>) | null>;
 }
 
 export default function FormValidationViewer({
   onValidationChange,
   validateAllRef,
+  resetFormRef,
   resetRef,
   navigateToFieldRef,
 }: FormValidationViewerProps) {
@@ -294,6 +296,37 @@ export default function FormValidationViewer({
     emitState();
   }, [updateFieldColor, emitState]);
 
+  const handleResetForm = useCallback(async () => {
+    const instance = instanceRef.current;
+    if (!instance) return;
+
+    // Clear all form field values
+    const formFields = await instance.getFormFields();
+    const clearValues: Record<string, string | string[]> = {};
+    for (const field of formFields as any[]) {
+      if (field.name === "submit") continue; // Skip button
+      const meta = fieldMetaRef.current.find((m) => m.name === field.name);
+      if (!meta) continue;
+      if (meta.type === "checkbox") {
+        clearValues[field.name] = [];
+      } else if (meta.type === "listbox") {
+        clearValues[field.name] = [];
+      } else if (meta.type === "signature") {
+        // Signatures can't be cleared via setFormFieldValues
+        continue;
+      } else {
+        clearValues[field.name] = "";
+      }
+    }
+    await instance.setFormFieldValues(clearValues);
+
+    // Also reset validation state
+    const state = validationStateRef.current;
+    state.errors = {};
+    state.validatedFields = new Set();
+    emitState();
+  }, [emitState]);
+
   const handleNavigateToField = useCallback(async (fieldName: string) => {
     const instance = instanceRef.current;
     if (!instance) return;
@@ -362,6 +395,7 @@ export default function FormValidationViewer({
       // Wire up refs
       validateAllRef.current = handleValidateAll;
       resetRef.current = handleReset;
+      resetFormRef.current = handleResetForm;
       navigateToFieldRef.current = handleNavigateToField;
 
       // Real-time field validation
@@ -389,10 +423,11 @@ export default function FormValidationViewer({
       instanceRef.current = null;
       validateAllRef.current = null;
       resetRef.current = null;
+      resetFormRef.current = null;
       navigateToFieldRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, [handleValidateAll, handleReset, handleNavigateToField, validateAndUpdateField]);
+  }, [handleValidateAll, handleReset, handleResetForm, handleNavigateToField, validateAndUpdateField]);
 
   return <div ref={containerRef} className="validation-viewer" />;
 }
