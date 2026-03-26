@@ -81,7 +81,9 @@ export default function CollaborationViewer({
       document: DOCUMENT,
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: NutrientViewer.Theme.DARK,
+      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? NutrientViewer.Theme.DARK
+        : NutrientViewer.Theme.AUTO,
       pageRendering: "next",
       mentionableUsers,
       customRenderers: {
