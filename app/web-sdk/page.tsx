@@ -42,6 +42,13 @@ const samples: Sample[] = [
     path: "/web-sdk/brightness-contrast",
   },
   {
+    name: "Collaboration Comments",
+    category: "Annotations",
+    description:
+      "Threaded comment replies with author tracking, @mentions, and configurable display modes (Fitting, Floating, Popover)",
+    path: "/web-sdk/collaboration-comments",
+  },
+  {
     name: "Content Editing API",
     category: "Content Editor",
     description:
