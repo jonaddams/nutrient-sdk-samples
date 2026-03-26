@@ -71,7 +71,7 @@ export default function CollaborationViewer({
       const initial = name.charAt(0).toUpperCase();
 
       const el = document.createElement("div");
-      el.style.cssText = `width:100%;height:100%;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;`;
+      el.style.cssText = `width:24px;height:24px;min-width:24px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:11px;`;
       el.textContent = initial;
       return { node: el, append: false };
     };
