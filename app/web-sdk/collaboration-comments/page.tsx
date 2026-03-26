@@ -41,18 +41,11 @@ export default function CollaborationCommentsPage() {
   const [activeAuthor, setActiveAuthor] = useState<Author>(PRESET_AUTHORS[0]);
   const [displayMode, setDisplayMode] = useState<string>("FITTING");
   const [threads, setThreads] = useState<CommentThread[]>([]);
-  const [customName, setCustomName] = useState("");
   const navigateToThreadRef = useRef<((rootId: string) => void) | null>(null);
 
   const handleThreadsChanged = useCallback((newThreads: CommentThread[]) => {
     setThreads(newThreads);
   }, []);
-
-  const handleCustomNameSubmit = () => {
-    const name = customName.trim();
-    if (!name) return;
-    setActiveAuthor({ id: "custom", name, email: "", color: "#888" });
-  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
@@ -80,13 +73,8 @@ export default function CollaborationCommentsPage() {
                     className="collab-author-select"
                     value={activeAuthor.id}
                     onChange={(e) => {
-                      const id = e.target.value;
-                      if (id === "custom") return;
-                      const author = PRESET_AUTHORS.find((a) => a.id === id);
-                      if (author) {
-                        setActiveAuthor(author);
-                        setCustomName("");
-                      }
+                      const author = PRESET_AUTHORS.find((a) => a.id === e.target.value);
+                      if (author) setActiveAuthor(author);
                     }}
                   >
                     {PRESET_AUTHORS.map((author) => (
@@ -94,22 +82,8 @@ export default function CollaborationCommentsPage() {
                         {author.name}
                       </option>
                     ))}
-                    {activeAuthor.id === "custom" && (
-                      <option value="custom">{activeAuthor.name}</option>
-                    )}
                   </select>
                 </div>
-                <input
-                  type="text"
-                  className="collab-custom-input"
-                  placeholder="Or type a custom name..."
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleCustomNameSubmit();
-                  }}
-                  onBlur={handleCustomNameSubmit}
-                />
               </div>
 
               {/* Display Mode */}

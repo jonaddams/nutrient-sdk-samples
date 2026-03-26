@@ -99,30 +99,6 @@
   }
 }
 
-.collab-custom-input {
-  width: 100%;
-  padding: 6px 10px;
-  background: var(--white);
-  border: 1px solid var(--warm-gray-300);
-  border-radius: 6px;
-  color: var(--black);
-  font-size: 12px;
-  margin-top: 8px;
-  box-sizing: border-box;
-}
-
-.collab-custom-input::placeholder {
-  color: var(--warm-gray-500);
-}
-
-@media (prefers-color-scheme: dark) {
-  .collab-custom-input {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-    color: var(--warm-gray-200);
-  }
-}
-
 /* Display Mode Toggle */
 .collab-display-modes {
   display: flex;
