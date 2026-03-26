@@ -160,6 +160,10 @@ function validateAll(
   return errors;
 }
 
+// --- Exported constants ---
+
+export const TOTAL_RULE_FIELDS = Object.keys(validationRules).length;
+
 // --- Exported types ---
 
 export interface ValidationState {
@@ -286,10 +290,11 @@ export default function FormValidationViewer({
     state.errors = { ...errors };
     state.validatedFields = new Set(Object.keys(validationRules));
 
-    for (const fieldName of Object.keys(validationRules)) {
-      if (fieldName === "signature") continue;
-      await updateFieldColor(fieldName, !errors[fieldName]);
-    }
+    await Promise.all(
+      Object.keys(validationRules)
+        .filter((name) => name !== "signature")
+        .map((name) => updateFieldColor(name, !errors[name])),
+    );
 
     await validateSignature();
     emitState();
@@ -300,9 +305,9 @@ export default function FormValidationViewer({
     state.errors = {};
     state.validatedFields = new Set();
 
-    for (const meta of fieldMetaRef.current) {
-      await updateFieldColor(meta.name, null);
-    }
+    await Promise.all(
+      fieldMetaRef.current.map((meta) => updateFieldColor(meta.name, null)),
+    );
 
     emitState();
   }, [updateFieldColor, emitState]);

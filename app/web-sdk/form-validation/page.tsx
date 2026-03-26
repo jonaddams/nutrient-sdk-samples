@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useState, useRef, useCallback } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
-import type { ValidationState } from "./viewer";
+import { type ValidationState, TOTAL_RULE_FIELDS } from "./viewer";
 import "./styles.css";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -30,8 +30,7 @@ const FIELD_LABELS: Record<string, string> = {
   signature: "Signature",
 };
 
-// Total number of fields with validation rules
-const TOTAL_RULES = 12; // Excludes newsletter (no rules) and submit (button)
+// TOTAL_RULE_FIELDS is imported from viewer.tsx — derived from the rule map, no magic constant
 
 export default function FormValidationPage() {
   const [validationState, setValidationState] = useState<ValidationState>({
@@ -50,7 +49,7 @@ export default function FormValidationPage() {
   const errorCount = Object.keys(validationState.errors).length;
   const validatedCount = validationState.validatedFields.size;
   const validCount = validatedCount - errorCount;
-  const pendingCount = TOTAL_RULES - validatedCount;
+  const pendingCount = TOTAL_RULE_FIELDS - validatedCount;
 
   const errorEntries = Object.entries(validationState.errors);
   const validFields = Array.from(validationState.validatedFields).filter(
@@ -73,7 +72,7 @@ export default function FormValidationPage() {
               <div className="validation-header">
                 <div className="validation-title">Validation Rules</div>
                 <div className="validation-subtitle">
-                  {TOTAL_RULES} rules active · {errorCount} error{errorCount !== 1 ? "s" : ""}
+                  {TOTAL_RULE_FIELDS} rules active · {errorCount} error{errorCount !== 1 ? "s" : ""}
                 </div>
               </div>
 
