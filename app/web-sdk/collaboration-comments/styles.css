@@ -50,55 +50,52 @@
   }
 }
 
-/* Author Switcher */
-.collab-authors {
+/* Author Picker (dropdown) */
+.collab-author-picker {
   display: flex;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
-.collab-avatar {
-  width: 36px;
-  height: 36px;
+.collab-avatar-sm {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
   color: white;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 2px solid transparent;
-  opacity: 0.5;
+  flex-shrink: 0;
 }
 
-.collab-avatar:hover {
-  opacity: 0.8;
-}
-
-.collab-avatar-active {
-  opacity: 1;
-  border-color: currentColor;
-}
-
-.collab-author-name {
-  font-weight: 600;
-  font-size: 14px;
+.collab-author-select {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--white);
+  border: 1px solid var(--warm-gray-300);
+  border-radius: 6px;
   color: var(--black);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: auto;
 }
 
-.collab-author-email {
-  font-size: 11px;
-  color: var(--warm-gray-700);
+.collab-author-select:hover {
+  border-color: var(--warm-gray-500);
 }
 
 @media (prefers-color-scheme: dark) {
-  .collab-author-name {
+  .collab-author-select {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
     color: var(--warm-gray-200);
   }
-  .collab-author-email {
-    color: var(--warm-gray-500);
+
+  .collab-author-select:hover {
+    border-color: var(--warm-gray-500);
   }
 }
 
