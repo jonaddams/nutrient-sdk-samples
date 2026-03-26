@@ -142,12 +142,11 @@ export default function CollaborationCommentsPage() {
                             {formatTimeAgo(thread.createdAt)}
                           </span>
                         </div>
-                        <div className="collab-thread-text">{thread.text}</div>
-                        {thread.replyCount > 0 && (
-                          <div className="collab-thread-replies">
-                            {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
-                          </div>
-                        )}
+                        <div className="collab-thread-replies">
+                          {thread.replyCount > 0
+                            ? `${thread.replyCount} ${thread.replyCount === 1 ? "reply" : "replies"}`
+                            : "No replies yet"}
+                        </div>
                       </button>
                     ))}
                   </div>
