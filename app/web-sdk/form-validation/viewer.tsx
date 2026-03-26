@@ -307,13 +307,10 @@ export default function FormValidationViewer({
       if (field.name === "submit") continue; // Skip button
       const meta = fieldMetaRef.current.find((m) => m.name === field.name);
       if (!meta) continue;
-      if (meta.type === "checkbox") {
+      if (meta.type === "checkbox" || meta.type === "listbox" || meta.type === "combobox") {
         clearValues[field.name] = [];
-      } else if (meta.type === "listbox") {
-        clearValues[field.name] = [];
-      } else if (meta.type === "signature") {
-        // Signatures can't be cleared via setFormFieldValues
-        continue;
+      } else if (meta.type === "signature" || meta.type === "button") {
+        // Signatures and buttons can't be cleared via setFormFieldValues
       } else {
         clearValues[field.name] = "";
       }
