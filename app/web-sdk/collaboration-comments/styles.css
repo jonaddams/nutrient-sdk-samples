@@ -1,0 +1,336 @@
+/* Collaboration Comments Styles */
+
+.collab-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+/* Sidebar */
+.collab-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: var(--warm-gray-100);
+  border-right: 1px solid var(--warm-gray-400);
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-sidebar {
+    background-color: var(--warm-gray-950);
+    border-right-color: var(--warm-gray-800);
+  }
+}
+
+/* Section */
+.collab-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.collab-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-label {
+    color: var(--warm-gray-400);
+  }
+}
+
+/* Author Switcher */
+.collab-authors {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.collab-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+  opacity: 0.5;
+}
+
+.collab-avatar:hover {
+  opacity: 0.8;
+}
+
+.collab-avatar-active {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.collab-author-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--black);
+}
+
+.collab-author-email {
+  font-size: 11px;
+  color: var(--warm-gray-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-author-name {
+    color: var(--warm-gray-200);
+  }
+  .collab-author-email {
+    color: var(--warm-gray-500);
+  }
+}
+
+.collab-custom-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--white);
+  border: 1px solid var(--warm-gray-300);
+  border-radius: 6px;
+  color: var(--black);
+  font-size: 12px;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
+.collab-custom-input::placeholder {
+  color: var(--warm-gray-500);
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-custom-input {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+    color: var(--warm-gray-200);
+  }
+}
+
+/* Display Mode Toggle */
+.collab-display-modes {
+  display: flex;
+  gap: 4px;
+}
+
+.collab-display-btn {
+  flex: 1;
+  padding: 6px;
+  text-align: center;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--warm-gray-300);
+  background: var(--white);
+  color: var(--black);
+  transition: all 0.15s;
+}
+
+.collab-display-btn:hover {
+  border-color: var(--warm-gray-500);
+}
+
+.collab-display-btn-active {
+  background: var(--digital-pollen);
+  border-color: var(--digital-pollen);
+  color: var(--black);
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-display-btn {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+    color: var(--warm-gray-300);
+  }
+
+  .collab-display-btn:hover {
+    border-color: var(--warm-gray-500);
+  }
+
+  .collab-display-btn-active {
+    background: var(--digital-pollen);
+    color: var(--black);
+  }
+}
+
+/* Toolbar Hint */
+.collab-hint {
+  font-size: 12px;
+  color: var(--warm-gray-700);
+  text-align: center;
+  padding: 12px 8px;
+  line-height: 1.5;
+  background: var(--white);
+  border: 1px solid var(--warm-gray-300);
+  border-radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-hint {
+    color: var(--warm-gray-500);
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+  }
+}
+
+/* Thread List */
+.collab-threads {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.collab-thread-card {
+  padding: 12px;
+  background: var(--white);
+  border: 1px solid var(--warm-gray-300);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+}
+
+.collab-thread-card:hover {
+  border-color: var(--warm-gray-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-thread-card {
+    background: var(--warm-gray-900);
+    border-color: var(--warm-gray-700);
+  }
+
+  .collab-thread-card:hover {
+    border-color: var(--warm-gray-500);
+  }
+}
+
+.collab-thread-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.collab-thread-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.collab-thread-author {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--black);
+}
+
+.collab-thread-time {
+  font-size: 10px;
+  color: var(--warm-gray-600);
+  margin-left: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-thread-author {
+    color: var(--warm-gray-200);
+  }
+  .collab-thread-time {
+    color: var(--warm-gray-600);
+  }
+}
+
+.collab-thread-text {
+  font-size: 12px;
+  color: var(--warm-gray-800);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collab-thread-replies {
+  font-size: 11px;
+  color: var(--warm-gray-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-thread-text {
+    color: var(--warm-gray-400);
+  }
+  .collab-thread-replies {
+    color: var(--warm-gray-600);
+  }
+}
+
+.collab-empty {
+  font-size: 13px;
+  color: var(--warm-gray-700);
+  text-align: center;
+  padding: 16px 8px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-empty {
+    color: var(--warm-gray-500);
+  }
+}
+
+/* Thread count badge */
+.collab-count {
+  background: var(--warm-gray-300);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--warm-gray-800);
+  margin-left: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .collab-count {
+    background: var(--warm-gray-800);
+    color: var(--warm-gray-400);
+  }
+}
+
+/* Viewer */
+.collab-viewer-container {
+  flex: 1;
+  height: 100%;
+  min-height: 600px;
+}
