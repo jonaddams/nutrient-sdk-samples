@@ -142,7 +142,9 @@ export default function KeywordHighlightViewer({
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: NutrientViewer.Theme.DARK,
+      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? NutrientViewer.Theme.DARK
+        : NutrientViewer.Theme.AUTO,
       toolbarItems: (NutrientViewer.defaultToolbarItems ?? []).filter(
         (item: { type: string }) =>
           ["pager", "zoom-out", "zoom-in", "zoom-mode"].includes(item.type),
