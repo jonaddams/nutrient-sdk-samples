@@ -113,6 +113,13 @@ const samples: Sample[] = [
     path: "/web-sdk/form-designer",
   },
   {
+    name: "Form Validation",
+    category: "Forms",
+    description:
+      "Client-side validation rules with visual feedback on PDF form fields using a declarative rule engine",
+    path: "/web-sdk/form-validation",
+  },
+  {
     name: "Grouped Form Stamps",
     category: "Forms",
     description:
