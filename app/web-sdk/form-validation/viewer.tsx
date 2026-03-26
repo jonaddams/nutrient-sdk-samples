@@ -303,7 +303,7 @@ export default function FormValidationViewer({
     // Clear all form field values
     const formFields = await instance.getFormFields();
     const clearValues: Record<string, string | string[]> = {};
-    for (const field of formFields as any[]) {
+    for (const field of formFields as unknown as any[]) {
       if (field.name === "submit") continue; // Skip button
       const meta = fieldMetaRef.current.find((m) => m.name === field.name);
       if (!meta) continue;
@@ -424,7 +424,7 @@ export default function FormValidationViewer({
       navigateToFieldRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, [handleValidateAll, handleReset, handleResetForm, handleNavigateToField, validateAndUpdateField]);
+  }, [handleValidateAll, handleReset, handleResetForm, handleNavigateToField, validateAndUpdateField, navigateToFieldRef]);
 
   return <div ref={containerRef} className="validation-viewer" />;
 }
