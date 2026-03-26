@@ -29,6 +29,7 @@ const validationRules: Record<string, ValidationRule[]> = {
     { type: "pattern", regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email format" },
   ],
   phone: [
+    { type: "required" },
     { type: "pattern", regex: /^\+?[\d\s\-()]{7,15}$/, message: "Invalid phone number" },
   ],
   date_of_birth: [
@@ -207,21 +208,29 @@ export default function FormValidationViewer({
       const { NutrientViewer } = window;
       if (!instance || !NutrientViewer) return;
 
-      const meta = fieldMetaRef.current.find((f) => f.name === fieldName);
-      if (!meta) return;
+      // Find widget annotations by formFieldName (reliable across all field types)
+      const annotations = await instance.getAnnotations(0);
+      const widgets = annotations.filter(
+        (a: any) => a.formFieldName === fieldName,
+      );
 
-      for (const annotationId of meta.annotationIds) {
-        try {
-          const annotation = await instance.getAnnotation(meta.pageIndex, annotationId);
-          if (!annotation) continue;
+      if (widgets.size === 0) return;
 
-          let color = null;
-          if (isValid === true) color = NutrientViewer.Color.GREEN;
-          else if (isValid === false) color = NutrientViewer.Color.RED;
+      // The SDK only visually applies backgroundColor/borderColor when a field
+      // is focused, so in-PDF coloring is not reliable for unfocused fields.
+      // We skip field coloring and rely on the sidebar for validation feedback.
+      // Signature fields are the exception — they render backgroundColor immediately.
+      if (fieldName === "signature") {
+        let color = null;
+        if (isValid === false) color = NutrientViewer.Color.RED;
+        else if (isValid === true) color = NutrientViewer.Color.GREEN;
 
-          await instance.update(annotation.set("backgroundColor", color));
-        } catch {
-          // Annotation may not support backgroundColor
+        for (const widget of widgets) {
+          try {
+            await instance.update(widget.set("backgroundColor", color));
+          } catch {
+            // Annotation may not support backgroundColor
+          }
         }
       }
     },
@@ -320,7 +329,8 @@ export default function FormValidationViewer({
     if (!meta || meta.annotationIds.length === 0) return;
 
     try {
-      const annotation = await instance.getAnnotation(meta.pageIndex, meta.annotationIds[0]);
+      const annotations = await instance.getAnnotations(meta.pageIndex);
+      const annotation = annotations.find((a: any) => a.id === meta.annotationIds[0]);
       if (annotation) {
         instance.jumpToRect(meta.pageIndex, annotation.boundingBox);
       }
@@ -340,6 +350,13 @@ export default function FormValidationViewer({
       document: DOCUMENT,
       useCDN: true,
       pageRendering: "next",
+      toolbarItems: [
+        { type: "zoom-out" },
+        { type: "zoom-in" },
+        { type: "zoom-mode" },
+        { type: "search" },
+        { type: "export-pdf" },
+      ],
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
     }).then(async (instance: Instance) => {
       instanceRef.current = instance;
@@ -387,13 +404,10 @@ export default function FormValidationViewer({
         }
       });
 
-      // Wire submit button
-      instance.addEventListener("annotations.press", async (event: any) => {
-        const meta = fieldMetaRef.current.find(
-          (f) => f.type === "button" && f.annotationIds.includes(event?.annotationId),
-        );
-        if (meta?.name === "submit") {
-          await handleValidateAll();
+      // Wire submit button via annotations.focus event
+      instance.addEventListener("annotations.focus", (event: any) => {
+        if (event?.annotation?.formFieldName === "submit") {
+          handleValidateAll();
         }
       });
     });
