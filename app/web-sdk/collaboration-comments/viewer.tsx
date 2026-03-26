@@ -64,8 +64,8 @@ export default function CollaborationViewer({
     }));
 
     // Custom avatar renderer: colored initials matching author color
-    const commentAvatarRenderer = (comment: any) => {
-      const name = comment.creatorName ?? "?";
+    const commentAvatarRenderer = ({ comment }: any) => {
+      const name = comment?.creatorName ?? "?";
       const preset = PRESET_AUTHORS.find((a) => a.name === name);
       const color = preset?.color ?? "#888";
       const initial = name.charAt(0).toUpperCase();
