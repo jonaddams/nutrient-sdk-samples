@@ -243,7 +243,7 @@ export default function FormValidationViewer({
     if (!instance || !NutrientViewer) return false;
 
     const formFields = await instance.getFormFields();
-    const sigField = (formFields as any[]).find(
+    const sigField = (formFields as unknown as any[]).find(
       (f: any) => f instanceof NutrientViewer.FormFields.SignatureFormField && f.name === "signature",
     );
     if (!sigField) return true;
@@ -368,7 +368,7 @@ export default function FormValidationViewer({
       const formFields = await instance.getFormFields();
       const metas: FormFieldMeta[] = [];
 
-      (formFields as any[]).forEach((field: any) => {
+      (formFields as unknown as any[]).forEach((field: any) => {
         let type = "unknown";
         if (field instanceof NutrientViewer.FormFields.TextFormField) type = "text";
         else if (field instanceof NutrientViewer.FormFields.CheckBoxFormField) type = "checkbox";
