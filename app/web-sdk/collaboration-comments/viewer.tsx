@@ -87,6 +87,13 @@ export default function CollaborationViewer({
       customRenderers: {
         CommentAvatar: commentAvatarRenderer,
       },
+      toolbarItems: [
+        ...(NutrientViewer.defaultToolbarItems ?? []).filter(
+          (item: { type: string }) =>
+            ["pager", "pan", "zoom-out", "zoom-in", "zoom-mode", "spacer"].includes(item.type),
+        ),
+        { type: "comment" },
+      ],
       initialViewState: new NutrientViewer.ViewState({
         commentDisplay: NutrientViewer.CommentDisplay.FITTING,
       }),
