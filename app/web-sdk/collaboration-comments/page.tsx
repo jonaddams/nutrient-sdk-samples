@@ -124,9 +124,9 @@ export default function CollaborationCommentsPage() {
 
               {/* Toolbar Hint */}
               <div className="collab-hint">
-                Use the <strong>comment tool</strong> (💬) in the toolbar to add
-                comments. Type <strong>@</strong> in a comment to mention another
-                author.
+                Click the <strong>💬 comment tool</strong> in the toolbar, or{" "}
+                <strong>select text</strong> and use the inline menu to add a
+                comment. Type <strong>@</strong> to mention another author.
               </div>
 
               {/* Comment Threads */}
