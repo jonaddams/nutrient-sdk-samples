@@ -69,29 +69,36 @@ export default function CollaborationCommentsPage() {
               {/* Author Switcher */}
               <div className="collab-section">
                 <div className="collab-label">Active Author</div>
-                <div className="collab-authors">
-                  {PRESET_AUTHORS.map((author) => (
-                    <button
-                      key={author.id}
-                      type="button"
-                      className={`collab-avatar ${activeAuthor.id === author.id ? "collab-avatar-active" : ""}`}
-                      style={{ backgroundColor: author.color, color: author.color }}
-                      onClick={() => {
+                <div className="collab-author-picker">
+                  <div
+                    className="collab-avatar-sm"
+                    style={{ backgroundColor: activeAuthor.color }}
+                  >
+                    {activeAuthor.name.charAt(0).toUpperCase()}
+                  </div>
+                  <select
+                    className="collab-author-select"
+                    value={activeAuthor.id}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      if (id === "custom") return;
+                      const author = PRESET_AUTHORS.find((a) => a.id === id);
+                      if (author) {
                         setActiveAuthor(author);
                         setCustomName("");
-                      }}
-                      title={author.name}
-                    >
-                      <span style={{ color: "white" }}>{author.name.charAt(0)}</span>
-                    </button>
-                  ))}
+                      }
+                    }}
+                  >
+                    {PRESET_AUTHORS.map((author) => (
+                      <option key={author.id} value={author.id}>
+                        {author.name}
+                      </option>
+                    ))}
+                    {activeAuthor.id === "custom" && (
+                      <option value="custom">{activeAuthor.name}</option>
+                    )}
+                  </select>
                 </div>
-                <div className="collab-author-name" style={{ color: activeAuthor.color }}>
-                  {activeAuthor.name}
-                </div>
-                {activeAuthor.email && (
-                  <div className="collab-author-email">{activeAuthor.email}</div>
-                )}
                 <input
                   type="text"
                   className="collab-custom-input"
