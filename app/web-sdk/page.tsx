@@ -127,11 +127,11 @@ const samples: Sample[] = [
     path: "/web-sdk/form-validation",
   },
   {
-    name: "Grouped Form Stamps",
+    name: "Grouped Form Fields",
     category: "Forms",
     description:
-      "Drag and drop grouped form stamps with image backgrounds, company logos, checkboxes, signatures, and date fields. Moving or deleting any element affects the entire group.",
-    path: "/web-sdk/stamp-annotations",
+      "Drag and drop grouped form fields with image backgrounds, company logos, checkboxes, signatures, and date fields. Moving or deleting any element affects the entire group.",
+    path: "/web-sdk/grouped-form-fields",
   },
   {
     name: "Keyword Highlight",
@@ -184,7 +184,7 @@ const samples: Sample[] = [
   },
   {
     name: "Text Extraction",
-    category: "Content Editor",
+    category: "Content",
     description:
       "Extract text from PDF pages with current-page or full-document view, copy to clipboard, and download as plain text",
     path: "/web-sdk/text-extraction",
