@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { JavaSampleHeader } from "../_components/JavaSampleHeader";
 import { PdfViewer } from "../_components/PdfViewer";
 
@@ -14,11 +14,25 @@ const SAMPLE_FILES = [
 
 export default function MdToPdfPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [markdown, setMarkdown] = useState("");
+  const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [resultBuffer, setResultBuffer] = useState<ArrayBuffer | null>(null);
   const [downloadBytes, setDownloadBytes] = useState<ArrayBuffer | null>(null);
   const [resultSize, setResultSize] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Load sample markdown content
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/documents/${SAMPLE_FILES[selectedIndex].name}`)
+      .then((res) => res.text())
+      .then((text) => {
+        setMarkdown(text);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [selectedIndex]);
 
   const handleConvert = async () => {
     setProcessing(true);
@@ -26,10 +40,8 @@ export default function MdToPdfPage() {
     setResultBuffer(null);
 
     try {
-      const sample = SAMPLE_FILES[selectedIndex];
-      const response = await fetch(`/documents/${sample.name}`);
-      const blob = await response.blob();
-      const file = new File([blob], sample.name);
+      const blob = new Blob([markdown], { type: "text/markdown" });
+      const file = new File([blob], SAMPLE_FILES[selectedIndex].name);
 
       const formData = new FormData();
       formData.append("file", file);
@@ -59,6 +71,14 @@ export default function MdToPdfPage() {
     setError(null);
   }, []);
 
+  const handleDocumentChange = useCallback((index: number) => {
+    setSelectedIndex(index);
+    setResultBuffer(null);
+    setDownloadBytes(null);
+    setResultSize(0);
+    setError(null);
+  }, []);
+
   const handleDownload = () => {
     if (!downloadBytes) return;
     const blob = new Blob([downloadBytes], { type: "application/pdf" });
@@ -74,22 +94,19 @@ export default function MdToPdfPage() {
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       <JavaSampleHeader
         title="Markdown to PDF"
-        description="Convert Markdown documents to PDF using the Nutrient Java SDK."
+        description="Convert Markdown documents to PDF using the Nutrient Java SDK. Edit the source before converting."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
-            {/* Left Panel */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)] flex flex-col gap-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Source Document
-                </h3>
+            {/* Left Panel — Editor */}
+            <div className="w-1/2 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--warm-gray-400)] flex items-center gap-3">
                 <select
                   value={selectedIndex}
-                  onChange={(e) => setSelectedIndex(Number(e.target.value))}
-                  className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+                  onChange={(e) => handleDocumentChange(Number(e.target.value))}
+                  className="flex-1 px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
                 >
                   {SAMPLE_FILES.map((file, i) => (
                     <option key={file.name} value={i}>
@@ -97,14 +114,12 @@ export default function MdToPdfPage() {
                     </option>
                   ))}
                 </select>
-              </div>
 
-              <div className="p-4 space-y-2">
                 <button
                   type="button"
                   onClick={handleConvert}
-                  disabled={processing}
-                  className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={processing || loading}
+                  className="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   style={{
                     background: "var(--digital-pollen)",
                     color: "var(--black)",
@@ -114,27 +129,28 @@ export default function MdToPdfPage() {
                 </button>
 
                 {downloadBytes && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleDownload}
-                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
-                      Download PDF ({(resultSize / 1024).toFixed(1)} KB)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleClear}
-                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer text-[var(--digital-pollen)] border border-[var(--digital-pollen)] bg-transparent hover:bg-[var(--digital-pollen)] hover:text-[var(--black)]"
-                    >
-                      Clear
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 whitespace-nowrap"
+                  >
+                    Download ({(resultSize / 1024).toFixed(1)} KB)
+                  </button>
                 )}
               </div>
+
+              {/* Markdown Editor */}
+              <textarea
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                disabled={loading}
+                spellCheck={false}
+                className="flex-1 w-full p-4 text-sm font-mono leading-relaxed bg-white dark:bg-[#1a1414] text-gray-800 dark:text-gray-200 border-0 outline-none resize-none placeholder:text-gray-400"
+                placeholder={loading ? "Loading..." : "Enter Markdown here..."}
+              />
             </div>
 
-            {/* Right Panel — Viewer */}
+            {/* Right Panel — PDF Viewer */}
             <div className="flex-1 min-w-0 relative">
               {error && (
                 <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
@@ -157,7 +173,7 @@ export default function MdToPdfPage() {
                 <div className="flex-1 h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
                   <div className="text-center space-y-2">
                     <p className="text-sm">
-                      Select a document and click &quot;Convert to PDF&quot;
+                      Edit the Markdown and click &quot;Convert to PDF&quot;
                     </p>
                     <p className="text-xs">
                       The converted PDF will be displayed here
@@ -166,7 +182,18 @@ export default function MdToPdfPage() {
                 </div>
               )}
 
-              {resultBuffer && <PdfViewer document={resultBuffer} />}
+              {resultBuffer && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="absolute top-3 right-3 z-10 px-2.5 py-1 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                  <PdfViewer document={resultBuffer} />
+                </>
+              )}
             </div>
           </div>
         </div>
