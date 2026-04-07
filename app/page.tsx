@@ -118,6 +118,31 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Python SDK */}
+          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
+            <h2 className="!mb-4">Python SDK</h2>
+            <p className="!mb-6">
+              Server-side Python library for PDF conversion, editing, form
+              filling, signatures, and text extraction.
+            </p>
+            <div className="flex gap-4 flex-wrap">
+              <Link
+                href="/python-sdk"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                View Samples
+              </Link>
+              <a
+                href="https://www.nutrient.io/sdk/python/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-yellow-outline no-underline"
+              >
+                Documentation
+              </a>
+            </div>
+          </div>
+
           {/* .NET SDK */}
           <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
             <h2 className="!mb-4">.NET SDK</h2>

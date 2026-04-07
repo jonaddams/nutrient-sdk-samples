@@ -1,24 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { JavaSampleHeader } from "./JavaSampleHeader";
+import { PythonSampleHeader } from "./PythonSampleHeader";
 
-const API_BASE = process.env.NEXT_PUBLIC_JAVA_SDK_API_URL || "http://localhost:8080";
+const API_BASE = process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
 
-interface JavaSampleLayoutProps {
+interface PythonSampleLayoutProps {
   title: string;
   description: string;
   apiEndpoint: string;
   sampleFile: string;
   sampleFileName: string;
   resultType: "pdf" | "download" | "html" | "json" | "text";
-  /** Additional form fields beyond the file */
   extraFields?: React.ReactNode;
-  /** Build FormData with extra fields */
   buildFormData?: (file: File, formData: FormData) => void;
 }
 
-export function JavaSampleLayout({
+export function PythonSampleLayout({
   title,
   description,
   apiEndpoint,
@@ -27,28 +25,20 @@ export function JavaSampleLayout({
   resultType,
   extraFields,
   buildFormData,
-}: JavaSampleLayoutProps) {
+}: PythonSampleLayoutProps) {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultSize, setResultSize] = useState<number>(0);
-  const [useCustomFile, setUseCustomFile] = useState(false);
-  const [customFile, setCustomFile] = useState<File | null>(null);
-
   const processDocument = async () => {
     setProcessing(true);
     setError(null);
     setResult(null);
 
     try {
-      let file: File;
-      if (useCustomFile && customFile) {
-        file = customFile;
-      } else {
-        const response = await fetch(sampleFile);
-        const blob = await response.blob();
-        file = new File([blob], sampleFileName);
-      }
+      const response = await fetch(sampleFile);
+      const blob = await response.blob();
+      const file = new File([blob], sampleFileName);
 
       const formData = new FormData();
       formData.append("file", file);
@@ -74,7 +64,6 @@ export function JavaSampleLayout({
         setResult(html);
         setResultSize(html.length);
       } else {
-        // PDF or download — create blob URL
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         setResult(url);
@@ -97,7 +86,7 @@ export function JavaSampleLayout({
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <JavaSampleHeader title={title} description={description} />
+      <PythonSampleHeader title={title} description={description} />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
@@ -111,51 +100,16 @@ export function JavaSampleLayout({
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* File source toggle */}
-                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#1a1414] rounded-lg">
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(false)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      !useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Sample File
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(true)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Upload File
-                  </button>
+                <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
+                  <span className="font-mono text-xs">{sampleFileName}</span>
                 </div>
-
-                {useCustomFile ? (
-                  <input
-                    type="file"
-                    onChange={(e) => setCustomFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm text-gray-600 dark:text-gray-400"
-                  />
-                ) : (
-                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
-                    <span className="font-mono text-xs">{sampleFileName}</span>
-                  </div>
-                )}
 
                 {extraFields}
 
-                {/* Process button */}
                 <button
                   type="button"
                   onClick={processDocument}
-                  disabled={processing || (useCustomFile && !customFile)}
+                  disabled={processing}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: "var(--digital-pollen)",
