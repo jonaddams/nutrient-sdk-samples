@@ -18,12 +18,13 @@ const samples: Sample[] = [
     description: "Convert Word, Excel, and PowerPoint documents to PDF format",
     path: "/java-sdk/office-to-pdf",
   },
-  {
-    name: "HTML to PDF",
-    category: "Conversion",
-    description: "Convert HTML documents to PDF format",
-    path: "/java-sdk/html-to-pdf",
-  },
+  // HTML-to-PDF hidden — SDK's native HTML renderer crashes on Linux (NullReferenceException in ExportAsPdfStringNative)
+  // {
+  //   name: "HTML to PDF",
+  //   category: "Conversion",
+  //   description: "Convert HTML documents to PDF format",
+  //   path: "/java-sdk/html-to-pdf",
+  // },
   {
     name: "PDF to HTML",
     category: "Conversion",
