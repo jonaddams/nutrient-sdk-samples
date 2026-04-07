@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>W-4 Employee's Withholding Certificate (Sample)</title>
+        <style>
+            @page {
+            size: letter;
+            margin: 0.75in;
+            }
+            * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            }
+            html, body {
+            width: 8.5in;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            color: #000;
+            background: #fff;
+            line-height: 1.35;
+            }
+            .sample-banner {
+            background: #c00;
+            color: #fff;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            padding: 6pt 0;
+            letter-spacing: 3pt;
+            margin-bottom: 10pt;
+            }
+            .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border: 2px solid #000;
+            padding: 8pt;
+            margin-bottom: 0;
+            }
+            .form-header-left {
+            width: 18%;
+            }
+            .form-header-left .form-number {
+            font-size: 22pt;
+            font-weight: bold;
+            }
+            .form-header-left .form-rev {
+            font-size: 7.5pt;
+            color: #333;
+            margin-top: 2pt;
+            }
+            .form-header-center {
+            width: 54%;
+            text-align: center;
+            }
+            .form-header-center .form-title {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 2pt;
+            }
+            .form-header-center .form-agency {
+            font-size: 8pt;
+            color: #333;
+            }
+            .form-header-right {
+            width: 25%;
+            text-align: right;
+            }
+            .form-header-right .omb {
+            font-size: 8pt;
+            color: #333;
+            }
+            .step {
+            border: 1px solid #000;
+            border-top: none;
+            padding: 8pt 10pt;
+            }
+            .step-label {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6pt;
+            }
+            .step-badge {
+            background: #000;
+            color: #fff;
+            font-size: 9pt;
+            font-weight: bold;
+            padding: 2pt 8pt;
+            margin-right: 8pt;
+            white-space: nowrap;
+            flex-shrink: 0;
+            }
+            .step-title {
+            font-size: 10pt;
+            font-weight: bold;
+            }
+            .step-subtitle {
+            font-size: 8pt;
+            color: #333;
+            font-weight: normal;
+            }
+            .field-row {
+            display: flex;
+            gap: 10pt;
+            margin-bottom: 6pt;
+            align-items: flex-end;
+            }
+            .field {
+            display: flex;
+            flex-direction: column;
+            }
+            .field label {
+            font-size: 8pt;
+            color: #333;
+            margin-bottom: 2pt;
+            }
+            /* Real form field styles */
+            input[type="text"] {
+            border: 1px solid #999;
+            background: #fafafa;
+            height: 20pt;
+            padding: 2pt 4pt;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            min-width: 80pt;
+            }
+            input[type="text"].wide {
+            min-width: 200pt;
+            }
+            input[type="text"].medium {
+            min-width: 140pt;
+            }
+            input[type="text"].narrow {
+            min-width: 60pt;
+            }
+            input[type="text"].ssn {
+            min-width: 110pt;
+            letter-spacing: 2pt;
+            }
+            input[type="text"].dollar-input {
+            border: 1px solid #999;
+            border-bottom: 1px solid #000;
+            background: #fafafa;
+            height: 18pt;
+            width: 100pt;
+            min-width: 100pt;
+            padding: 2pt 4pt;
+            font-size: 9pt;
+            }
+            input[type="text"].sig-input {
+            border: none;
+            border-bottom: 1px solid #000;
+            background: transparent;
+            height: 22pt;
+            width: 100%;
+            padding: 2pt 4pt;
+            font-size: 9pt;
+            margin-bottom: 3pt;
+            }
+            input[type="text"].employer-input {
+            border: none;
+            border-bottom: 1px solid #999;
+            background: transparent;
+            height: 16pt;
+            width: 100%;
+            padding: 2pt 4pt;
+            font-size: 9pt;
+            margin-bottom: 2pt;
+            }
+            /* Radio and checkbox styles */
+            input[type="radio"],
+            input[type="checkbox"] {
+            width: 12pt;
+            height: 12pt;
+            flex-shrink: 0;
+            margin: 0;
+            }
+            .checkbox-group {
+            display: flex;
+            gap: 16pt;
+            margin-top: 4pt;
+            margin-bottom: 4pt;
+            flex-wrap: wrap;
+            }
+            .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4pt;
+            font-size: 9pt;
+            }
+            .instructions-note {
+            font-size: 8pt;
+            color: #333;
+            margin-top: 4pt;
+            font-style: italic;
+            }
+            .substep {
+            margin-bottom: 6pt;
+            }
+            .substep-header {
+            display: flex;
+            align-items: baseline;
+            gap: 6pt;
+            margin-bottom: 3pt;
+            }
+            .substep-letter {
+            font-weight: bold;
+            font-size: 9.5pt;
+            }
+            .dollar-field {
+            display: flex;
+            align-items: center;
+            gap: 4pt;
+            }
+            .dollar-sign {
+            font-size: 10pt;
+            font-weight: bold;
+            }
+            .line-ref {
+            font-size: 8pt;
+            color: #555;
+            margin-left: 4pt;
+            }
+            .signature-section {
+            border: 1px solid #000;
+            border-top: 2px solid #000;
+            padding: 8pt 10pt;
+            margin-top: 0;
+            }
+            .signature-section .section-title {
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 8pt;
+            }
+            .sig-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16pt;
+            }
+            .sig-field {
+            flex: 1;
+            }
+            .sig-field.date-field {
+            flex: 0 0 140pt;
+            }
+            .sig-label {
+            font-size: 8pt;
+            color: #333;
+            }
+            .employer-section {
+            border: 1px solid #000;
+            border-top: none;
+            padding: 8pt 10pt;
+            background: #f5f5f5;
+            }
+            .employer-section .section-title {
+            font-size: 9pt;
+            font-weight: bold;
+            margin-bottom: 6pt;
+            }
+            .employer-row {
+            display: flex;
+            gap: 10pt;
+            margin-bottom: 4pt;
+            }
+            .employer-field {
+            flex: 1;
+            }
+            .employer-label {
+            font-size: 7.5pt;
+            color: #555;
+            }
+            .step p {
+            font-size: 9pt;
+            margin-bottom: 4pt;
+            }
+            .step-2-note {
+            font-size: 8.5pt;
+            margin-bottom: 4pt;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="page-break-after: always">
+            <div class="sample-banner">SAMPLE &mdash; NOT FOR OFFICIAL USE</div>
+            <div class="form-header">
+                <div class="form-header-left">
+                    <div class="form-number">Form W-4</div>
+                    <div class="form-rev">Department of the Treasury<br>Internal Revenue Service</div>
+                </div>
+                <div class="form-header-center">
+                    <div class="form-title">Employee's Withholding Certificate</div>
+                    <div class="form-agency">Complete Form W-4 so that your employer can withhold the correct federal income tax from your pay.</div>
+                </div>
+                <div class="form-header-right">
+                    <div class="omb">OMB No. 1545-0074</div>
+                    <div class="omb" style="margin-top: 4pt; font-size: 10pt; font-weight: bold;">2024</div>
+                </div>
+            </div>
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="step-label">
+                    <div class="step-badge">Step 1:</div>
+                    <div>
+                        <span class="step-title">Enter Personal Information</span>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="first_name">First name and middle initial</label>
+                        <input type="text" name="first_name" id="first_name" class="wide">
+                    </div>
+                    <div class="field">
+                        <label for="last_name">Last name</label>
+                        <input type="text" name="last_name" id="last_name" class="wide">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="ssn">Social security number</label>
+                        <input type="text" name="ssn" id="ssn" class="ssn" placeholder="XXX-XX-XXXX">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="address">Address</label>
+                        <input type="text" name="address" id="address" class="wide">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="city">City or town</label>
+                        <input type="text" name="city" id="city" class="medium">
+                    </div>
+                    <div class="field">
+                        <label for="state">State</label>
+                        <input type="text" name="state" id="state" class="narrow">
+                    </div>
+                    <div class="field">
+                        <label for="zip">ZIP code</label>
+                        <input type="text" name="zip" id="zip" class="narrow">
+                    </div>
+                </div>
+                <div style="margin-top: 6pt; margin-bottom: 2pt; font-size: 9pt; font-weight: bold;">Filing status:</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="radio" name="filing_status" id="filing_single" value="single">
+                        <label for="filing_single">Single or Married filing separately</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" name="filing_status" id="filing_joint" value="joint">
+                        <label for="filing_joint">Married filing jointly (or Qualifying surviving spouse)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" name="filing_status" id="filing_hoh" value="head_of_household">
+                        <label for="filing_hoh">Head of household</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="step-label">
+                    <div class="step-badge">Step 2:</div>
+                    <div>
+                        <span class="step-title">Multiple Jobs or Spouse Works</span><br>
+                        <span class="step-subtitle">Complete this step if you (1) hold more than one job at a time, or (2) are married filing jointly and your spouse also works.</span>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-left: 16pt;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="use_estimator" id="use_estimator">
+                        <label for="use_estimator">Use the estimator at www.irs.gov/W4App for most accurate withholding; or</label>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-left: 16pt;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="two_jobs_only" id="two_jobs_only">
+                        <label for="two_jobs_only">If there are only two jobs total, check this box. Do the same on Form W-4 for the other job.</label>
+                    </div>
+                </div>
+                <p class="instructions-note">This option is generally more accurate than the worksheet on page 3.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="step-label">
+                    <div class="step-badge">Step 3:</div>
+                    <div>
+                        <span class="step-title">Claim Dependents</span><br>
+                        <span class="step-subtitle">If your total income will be $200,000 or less ($400,000 or less if married filing jointly):</span>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span>Multiply the number of qualifying children under age 17 by $2,000</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="qualifying_children_amount" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span>Multiply the number of other dependents by $500</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="other_dependents_amount" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span style="font-weight: bold;">Total amount of dependents claimed</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="total_dependents_amount" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="step-label">
+                    <div class="step-badge">Step 4:</div>
+                    <div>
+                        <span class="step-title">Other Adjustments</span>
+                        <span class="step-subtitle">(Optional)</span>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span class="substep-letter">(a)</span>
+                        <span>Other income (not from jobs). If you want tax withheld for other income</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="other_income" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span class="substep-letter">(b)</span>
+                        <span>Deductions. If you expect to claim deductions other than the standard deduction</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="deductions" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="substep" style="margin-left: 16pt;">
+                    <div class="substep-header">
+                        <span class="substep-letter">(c)</span>
+                        <span>Extra withholding. Any additional tax you want withheld each pay period</span>
+                        <span class="line-ref">&raquo;</span>
+                        <div class="dollar-field">
+                            <span class="dollar-sign">$</span>
+                            <input type="text" name="extra_withholding" class="dollar-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Signature -->
+        <div style="page-break-after: always">
+            <div class="signature-section">
+                <div class="section-title">Sign Here</div>
+                <p style="font-size: 8.5pt; margin-bottom: 10pt;">Under penalties of perjury, I declare that this certificate, to the best of my knowledge and belief, is true, correct, and complete.</p>
+                <div class="sig-row">
+                    <div class="sig-field">
+                        <div style="border-bottom: 1px solid #000; height: 50pt; margin-bottom: 3pt;"></div>
+                        <div class="sig-label">Employee's signature (This form is not valid unless you sign it.)</div>
+                    </div>
+                    <div class="sig-field date-field">
+                        <input type="text" name="signature_date" class="sig-input">
+                        <div class="sig-label">Date</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Employer section -->
+            <div class="employer-section">
+                <div class="section-title">Employers Only</div>
+                <div class="employer-row">
+                    <div class="employer-field">
+                        <input type="text" name="employer_name_address" class="employer-input">
+                        <div class="employer-label">Employer's name and address</div>
+                    </div>
+                    <div class="employer-field" style="flex: 0 0 140pt;">
+                        <input type="text" name="first_date_employment" class="employer-input">
+                        <div class="employer-label">First date of employment</div>
+                    </div>
+                    <div class="employer-field" style="flex: 0 0 120pt;">
+                        <input type="text" name="employer_ein" class="employer-input">
+                        <div class="employer-label">Employer identification number (EIN)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
