@@ -43,12 +43,20 @@ const samples: Sample[] = [
       "Apply digital signatures to PDF documents with certificates",
     path: "/python-sdk/digital-signature",
   },
+  {
+    name: "Word Template Generation",
+    category: "Templates",
+    description:
+      "Generate PDF documents from Word templates populated with JSON data",
+    path: "/python-sdk/word-template",
+  },
 ];
 
 const categories = [
   "All",
   "Conversion",
   "Signatures",
+  "Templates",
 ];
 
 export default function PythonSDKPage() {
