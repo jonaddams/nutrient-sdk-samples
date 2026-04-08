@@ -44,6 +44,13 @@ const samples: Sample[] = [
     path: "/python-sdk/digital-signature",
   },
   {
+    name: "PDF Redaction",
+    category: "Editor",
+    description:
+      "Permanently remove sensitive content from PDF documents",
+    path: "/python-sdk/redaction",
+  },
+  {
     name: "PDF Form Fill",
     category: "Forms",
     description:
@@ -62,6 +69,7 @@ const samples: Sample[] = [
 const categories = [
   "All",
   "Conversion",
+  "Editor",
   "Signatures",
   "Forms",
   "Templates",
