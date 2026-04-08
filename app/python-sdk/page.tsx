@@ -44,6 +44,13 @@ const samples: Sample[] = [
     path: "/python-sdk/digital-signature",
   },
   {
+    name: "PDF Form Fill",
+    category: "Forms",
+    description:
+      "Programmatically fill PDF form fields with data and generate a filled PDF",
+    path: "/python-sdk/form-fill",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
@@ -56,6 +63,7 @@ const categories = [
   "All",
   "Conversion",
   "Signatures",
+  "Forms",
   "Templates",
 ];
 
