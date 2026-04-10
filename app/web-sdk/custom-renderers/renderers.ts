@@ -384,6 +384,270 @@ function renderRetroPixel(annotation: any): RendererResult | null {
   return { node, append: true };
 }
 
+// --- Creative ---
+
+function renderComicBubble(annotation: any): RendererResult | null {
+  const text = annotation.customData?.text || "Looks great!";
+
+  const node = document.createElement("div");
+  node.className = "renderer-comic";
+
+  const bubble = document.createElement("div");
+  bubble.className = "comic-bubble";
+  bubble.textContent = text;
+
+  const tail = document.createElement("div");
+  tail.className = "comic-tail";
+  bubble.appendChild(tail);
+
+  const tailInner = document.createElement("div");
+  tailInner.className = "comic-tail-inner";
+  bubble.appendChild(tailInner);
+
+  node.appendChild(bubble);
+
+  return { node, append: true };
+}
+
+function renderScratchOff(annotation: any): RendererResult | null {
+  const revealText = annotation.customData?.revealText || "You found a secret!";
+
+  const node = document.createElement("div");
+  node.className = "renderer-scratch";
+
+  const reveal = document.createElement("div");
+  reveal.className = "scratch-reveal";
+  reveal.textContent = "\uD83C\uDF1F " + revealText;
+  node.appendChild(reveal);
+
+  const canvas = document.createElement("canvas");
+  node.appendChild(canvas);
+
+  let isScratching = false;
+
+  requestAnimationFrame(() => {
+    const rect = node.getBoundingClientRect();
+    canvas.width = rect.width || 200;
+    canvas.height = rect.height || 80;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, "#c0c0c0");
+    gradient.addColorStop(0.3, "#d4d4d4");
+    gradient.addColorStop(0.6, "#a8a8a8");
+    gradient.addColorStop(1, "#b8b8b8");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#888";
+    ctx.font = "bold 12px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("\u25A0 SCRATCH TO REVEAL \u25A0", canvas.width / 2, canvas.height / 2);
+
+    ctx.globalCompositeOperation = "destination-out";
+
+    const scratch = (e: PointerEvent) => {
+      if (!isScratching) return;
+      const canvasRect = canvas.getBoundingClientRect();
+      const x = e.clientX - canvasRect.left;
+      const y = e.clientY - canvasRect.top;
+      ctx.beginPath();
+      ctx.arc(x, y, 15, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    canvas.addEventListener("pointerdown", (e) => {
+      e.stopImmediatePropagation();
+      isScratching = true;
+      scratch(e);
+    }, { capture: true });
+    canvas.addEventListener("pointermove", scratch);
+    canvas.addEventListener("pointerup", () => { isScratching = false; });
+    canvas.addEventListener("pointerleave", () => { isScratching = false; });
+  });
+
+  return { node, append: false };
+}
+
+function renderRichMedia(annotation: any): RendererResult | null {
+  const title = annotation.customData?.title || "Training Video";
+
+  const node = document.createElement("div");
+  node.className = "renderer-media";
+
+  let isPlaying = false;
+
+  const display = document.createElement("div");
+  display.className = "media-display";
+
+  const titleEl = document.createElement("div");
+  titleEl.style.cssText = "position:absolute;top:8px;left:10px;color:#94a3b8;font-size:11px;";
+  titleEl.textContent = title;
+  display.appendChild(titleEl);
+
+  const playBtn = document.createElement("div");
+  playBtn.className = "media-play-btn";
+  const triangle = document.createElement("div");
+  triangle.className = "play-triangle";
+  playBtn.appendChild(triangle);
+  display.appendChild(playBtn);
+
+  node.appendChild(display);
+
+  const controls = document.createElement("div");
+  controls.className = "media-controls";
+
+  const progress = document.createElement("div");
+  progress.className = "media-progress";
+  const progressFill = document.createElement("div");
+  progressFill.className = "media-progress-fill";
+  progress.appendChild(progressFill);
+  controls.appendChild(progress);
+
+  const time = document.createElement("div");
+  time.className = "media-time";
+  time.textContent = "1:23 / 3:45";
+  controls.appendChild(time);
+
+  node.appendChild(controls);
+
+  node.addEventListener("pointerdown", (e) => {
+    e.stopImmediatePropagation();
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      triangle.style.cssText = `
+        width: 12px; height: 16px; border: none; margin: 0;
+        border-left: 4px solid white; border-right: 4px solid white;
+      `;
+    } else {
+      triangle.style.cssText = `
+        width: 0; height: 0;
+        border-left: 16px solid white; border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent; margin-left: 4px;
+      `;
+    }
+  }, { capture: true });
+
+  return { node, append: false };
+}
+
+function renderMiniGame(annotation: any): RendererResult | null {
+  const node = document.createElement("div");
+  node.className = "renderer-game";
+
+  const canvas = document.createElement("canvas");
+  node.appendChild(canvas);
+
+  let animFrameId: number | null = null;
+
+  requestAnimationFrame(() => {
+    const rect = node.getBoundingClientRect();
+    const W = rect.width || 200;
+    const H = rect.height || 120;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const paddleW = 40, paddleH = 6;
+    let paddleX = W / 2 - paddleW / 2;
+    const ballR = 4;
+    let bx = W / 2, by = H * 0.6;
+    let bdx = 1.5, bdy = -1.5;
+
+    const cols = 6, rows = 3, brickW = (W - 20) / cols, brickH = 8, brickPad = 2;
+    const brickColors = ["#f87171", "#fbbf24", "#34d399", "#60a5fa", "#a78bfa", "#f472b6"];
+    const bricks: { x: number; y: number; w: number; h: number; color: string; alive: boolean }[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        bricks.push({
+          x: 10 + c * brickW + brickPad / 2,
+          y: 8 + r * (brickH + brickPad),
+          w: brickW - brickPad,
+          h: brickH,
+          color: brickColors[(r * cols + c) % brickColors.length],
+          alive: true,
+        });
+      }
+    }
+
+    canvas.addEventListener("pointermove", (e) => {
+      const canvasRect = canvas.getBoundingClientRect();
+      paddleX = Math.max(0, Math.min(W - paddleW, e.clientX - canvasRect.left - paddleW / 2));
+    });
+    canvas.addEventListener("pointerdown", (e) => {
+      e.stopImmediatePropagation();
+    }, { capture: true });
+
+    function draw() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, W, H);
+
+      for (const b of bricks) {
+        if (!b.alive) continue;
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+      }
+
+      ctx.fillStyle = "#60a5fa";
+      ctx.beginPath();
+      ctx.roundRect(paddleX, H - 12, paddleW, paddleH, 3);
+      ctx.fill();
+
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.arc(bx, by, ballR, 0, Math.PI * 2);
+      ctx.fill();
+
+      bx += bdx;
+      by += bdy;
+
+      if (bx <= ballR || bx >= W - ballR) bdx = -bdx;
+      if (by <= ballR) bdy = -bdy;
+
+      if (by + ballR >= H - 12 && bx >= paddleX && bx <= paddleX + paddleW) {
+        bdy = -Math.abs(bdy);
+      }
+
+      if (by > H + 10) {
+        bx = W / 2;
+        by = H * 0.6;
+        bdx = 1.5 * (Math.random() > 0.5 ? 1 : -1);
+        bdy = -1.5;
+      }
+
+      for (const b of bricks) {
+        if (!b.alive) continue;
+        if (bx + ballR > b.x && bx - ballR < b.x + b.w && by + ballR > b.y && by - ballR < b.y + b.h) {
+          b.alive = false;
+          bdy = -bdy;
+          break;
+        }
+      }
+
+      if (bricks.every((b) => !b.alive)) {
+        for (const b of bricks) b.alive = true;
+      }
+
+      animFrameId = requestAnimationFrame(draw);
+    }
+
+    animFrameId = requestAnimationFrame(draw);
+  });
+
+  return {
+    node,
+    append: false,
+    onDisappear: () => {
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
+    },
+  };
+}
+
 // --- Renderer Map (will grow in subsequent tasks) ---
 
 export const rendererMap: Record<string, RenderFunction> = {
@@ -399,4 +663,8 @@ export const rendererMap: Record<string, RenderFunction> = {
   "approval-badge": renderApprovalBadge,
   "interactive-widget": renderInteractiveWidget,
   "retro-pixel": renderRetroPixel,
+  "comic-bubble": renderComicBubble,
+  "scratch-off": renderScratchOff,
+  "rich-media": renderRichMedia,
+  "mini-game": renderMiniGame,
 };
