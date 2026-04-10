@@ -193,6 +193,197 @@ function renderAquarium(annotation: any): RendererResult | null {
   return { node, append: true };
 }
 
+// --- Data & Status ---
+
+function renderDataViz(annotation: any): RendererResult | null {
+  const values: number[] = annotation.customData?.values || [40, 60, 35, 80, 55, 90];
+  const label: string = annotation.customData?.label || "Q1-Q4 Revenue";
+
+  const maxVal = Math.max(...values);
+  const node = document.createElement("div");
+  node.className = "renderer-dataviz";
+
+  const labelEl = document.createElement("div");
+  labelEl.className = "dataviz-label";
+  labelEl.textContent = label;
+  node.appendChild(labelEl);
+
+  const barsContainer = document.createElement("div");
+  barsContainer.className = "dataviz-bars";
+  values.forEach((val, i) => {
+    const bar = document.createElement("div");
+    bar.className = "dataviz-bar" + (i === values.length - 1 ? " highlight" : "");
+    bar.style.height = `${(val / maxVal) * 100}%`;
+    barsContainer.appendChild(bar);
+  });
+  node.appendChild(barsContainer);
+
+  const lastVal = values[values.length - 1];
+  const prevVal = values[values.length - 2];
+  const trendEl = document.createElement("div");
+  trendEl.className = "dataviz-trend";
+  if (lastVal >= prevVal) {
+    trendEl.style.color = "#10b981";
+    trendEl.textContent = "\u25B2 " + Math.round(((lastVal - prevVal) / prevVal) * 100) + "%";
+  } else {
+    trendEl.style.color = "#ef4444";
+    trendEl.textContent = "\u25BC " + Math.round(((prevVal - lastVal) / prevVal) * 100) + "%";
+  }
+  node.appendChild(trendEl);
+
+  return { node, append: true };
+}
+
+function renderApprovalBadge(annotation: any): RendererResult | null {
+  const name: string = annotation.customData?.name || "Jane Doe";
+  const status: string = annotation.customData?.status || "approved";
+  const timestamp: string = annotation.customData?.timestamp || "2m ago";
+
+  const statusConfig: Record<string, { bg: string; border: string; icon: string; iconColor: string }> = {
+    approved: { bg: "#f0fdf4", border: "#86efac", icon: "\u2713", iconColor: "#22c55e" },
+    pending: { bg: "#fffbeb", border: "#fde68a", icon: "\u23F3", iconColor: "#f59e0b" },
+    rejected: { bg: "#fef2f2", border: "#fca5a5", icon: "\u2717", iconColor: "#ef4444" },
+  };
+  const cfg = statusConfig[status] || statusConfig.approved;
+
+  const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase();
+
+  const node = document.createElement("div");
+  node.className = "renderer-badge";
+  node.style.cssText = `background: ${cfg.bg}; border-color: ${cfg.border};`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "badge-avatar";
+  avatar.style.background = cfg.iconColor;
+  avatar.textContent = initials;
+  node.appendChild(avatar);
+
+  const info = document.createElement("div");
+  info.className = "badge-info";
+  const nameEl = document.createElement("div");
+  nameEl.className = "badge-name";
+  nameEl.textContent = name;
+  const meta = document.createElement("div");
+  meta.className = "badge-meta";
+  meta.textContent = status.charAt(0).toUpperCase() + status.slice(1) + " \u00B7 " + timestamp;
+  info.appendChild(nameEl);
+  info.appendChild(meta);
+  node.appendChild(info);
+
+  const icon = document.createElement("div");
+  icon.className = "badge-icon";
+  icon.style.color = cfg.iconColor;
+  icon.textContent = cfg.icon;
+  node.appendChild(icon);
+
+  return { node, append: true };
+}
+
+function renderInteractiveWidget(annotation: any): RendererResult | null {
+  const initialRating: number = annotation.customData?.rating || 3;
+  const deadlineMs: number = annotation.customData?.deadlineMs || (Date.now() + 14 * 24 * 60 * 60 * 1000);
+
+  const node = document.createElement("div");
+  node.className = "renderer-widget";
+
+  let currentRating = initialRating;
+  const starsContainer = document.createElement("div");
+  starsContainer.className = "widget-stars";
+
+  function updateStars() {
+    starsContainer.replaceChildren();
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement("span");
+      star.className = "star " + (i <= currentRating ? "filled" : "empty");
+      star.textContent = "\u2605";
+      star.addEventListener("click", (e) => {
+        e.stopPropagation();
+        currentRating = i;
+        updateStars();
+      });
+      starsContainer.appendChild(star);
+    }
+  }
+  updateStars();
+  node.appendChild(starsContainer);
+
+  const timerEl = document.createElement("div");
+  timerEl.className = "widget-timer";
+  node.appendChild(timerEl);
+
+  function updateTimer() {
+    const remaining = deadlineMs - Date.now();
+    if (remaining <= 0) {
+      timerEl.textContent = "\u23F0 Expired";
+      return;
+    }
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    timerEl.textContent = "\u23F0 " + days + "d " + hours + "h remaining";
+  }
+  updateTimer();
+  const intervalId = setInterval(updateTimer, 60000);
+
+  node.addEventListener("pointerdown", (e) => {
+    e.stopImmediatePropagation();
+  }, { capture: true });
+
+  return {
+    node,
+    append: false,
+    onDisappear: () => clearInterval(intervalId),
+  };
+}
+
+function renderRetroPixel(annotation: any): RendererResult | null {
+  const progress: number = annotation.customData?.progress ?? 5;
+  const total = 7;
+  const text = annotation.customData?.text || "COMPLETE!";
+
+  const node = document.createElement("div");
+  node.className = "renderer-retro";
+
+  const checkmarkPixels = [
+    [0,0,0,0,1],
+    [0,0,0,1,0],
+    [1,0,1,0,0],
+    [0,1,0,0,0],
+    [0,0,0,0,0],
+  ];
+  const iconGrid = document.createElement("div");
+  iconGrid.className = "retro-icon";
+  iconGrid.style.gridTemplateColumns = "repeat(5, 5px)";
+  for (const row of checkmarkPixels) {
+    for (const px of row) {
+      const pixel = document.createElement("div");
+      pixel.className = "pixel";
+      pixel.style.background = px ? "#4ade80" : "transparent";
+      iconGrid.appendChild(pixel);
+    }
+  }
+  node.appendChild(iconGrid);
+
+  const info = document.createElement("div");
+  info.className = "retro-info";
+
+  const textEl = document.createElement("div");
+  textEl.className = "retro-text";
+  textEl.textContent = text;
+  info.appendChild(textEl);
+
+  const bar = document.createElement("div");
+  bar.className = "retro-bar";
+  for (let i = 0; i < total; i++) {
+    const seg = document.createElement("div");
+    seg.className = "bar-segment " + (i < progress ? "filled" : "empty");
+    bar.appendChild(seg);
+  }
+  info.appendChild(bar);
+  node.appendChild(info);
+
+  return { node, append: true };
+}
+
 // --- Renderer Map (will grow in subsequent tasks) ---
 
 export const rendererMap: Record<string, RenderFunction> = {
@@ -204,4 +395,8 @@ export const rendererMap: Record<string, RenderFunction> = {
   "confetti": renderConfetti,
   "matrix": renderMatrix,
   "aquarium": renderAquarium,
+  "data-viz": renderDataViz,
+  "approval-badge": renderApprovalBadge,
+  "interactive-widget": renderInteractiveWidget,
+  "retro-pixel": renderRetroPixel,
 };
