@@ -446,7 +446,8 @@
 .renderer-comic .comic-bubble {
   position: relative;
   background: white;
-  background-image: radial-gradient(circle, #ccc 1px, transparent 1px);
+  background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+  color: #000;
   background-size: 8px 8px;
   border: 3px solid black;
   border-radius: 20px;
