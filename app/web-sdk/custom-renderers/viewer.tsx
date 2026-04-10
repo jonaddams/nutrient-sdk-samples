@@ -256,7 +256,7 @@ export default function CustomRenderersViewer() {
       {/* Sidebar */}
       <div className="w-72 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
         <div className="p-5">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+          <p className="text-sm text-gray-600 dark:text-gray-400 pb-5 mb-4 border-b border-[var(--warm-gray-400)]">
             Select a category to see different custom annotation renderers
             applied to the document.
           </p>
