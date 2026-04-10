@@ -1,3 +1,5 @@
+/* biome-ignore-all lint/suspicious/noExplicitAny: Nutrient SDK annotation types not fully exported */
+
 // Types
 type RendererResult = {
   node: HTMLElement;
@@ -27,7 +29,7 @@ function renderNeonSign(annotation: any): RendererResult | null {
   return { node, append: true };
 }
 
-function renderHologram(annotation: any): RendererResult | null {
+function renderHologram(_annotation: any): RendererResult | null {
   const node = document.createElement("div");
   node.className = "renderer-hologram";
   const span = document.createElement("span");
@@ -42,12 +44,12 @@ function renderGlassmorphism(annotation: any): RendererResult | null {
 
   const node = document.createElement("div");
   node.className = "renderer-glass";
-  node.textContent = "\uD83D\uDCAC " + text;
+  node.textContent = `\uD83D\uDCAC ${text}`;
 
   return { node, append: true };
 }
 
-function render3DStamp(annotation: any): RendererResult | null {
+function render3DStamp(_annotation: any): RendererResult | null {
   const node = document.createElement("div");
   node.className = "renderer-3d-stamp-wrapper";
   const stamp = document.createElement("div");
@@ -66,7 +68,7 @@ function renderCallout(annotation: any): RendererResult | null {
   const node = document.createElement("div");
   node.className = "renderer-callout";
   const span = document.createElement("span");
-  span.textContent = "\u270E " + text;
+  span.textContent = `\u270E ${text}`;
   node.appendChild(span);
 
   return { node, append: true };
@@ -74,7 +76,14 @@ function renderCallout(annotation: any): RendererResult | null {
 
 function renderConfetti(annotation: any): RendererResult | null {
   const text = annotation.customData?.text || "MILESTONE REACHED";
-  const colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#ff6ec7", "#a78bfa"];
+  const colors = [
+    "#ff6b6b",
+    "#ffd93d",
+    "#6bcb77",
+    "#4d96ff",
+    "#ff6ec7",
+    "#a78bfa",
+  ];
   const shapes = ["\u25A0", "\u25B2", "\u25CF", "\u2666", "\u2736"];
 
   const node = document.createElement("div");
@@ -96,7 +105,7 @@ function renderConfetti(annotation: any): RendererResult | null {
 
   const label = document.createElement("div");
   label.className = "confetti-text";
-  label.textContent = "\uD83C\uDF89 " + text;
+  label.textContent = `\uD83C\uDF89 ${text}`;
   node.appendChild(label);
 
   return { node, append: true };
@@ -104,7 +113,8 @@ function renderConfetti(annotation: any): RendererResult | null {
 
 function renderMatrix(annotation: any): RendererResult | null {
   const text = annotation.customData?.text || "CLASSIFIED";
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*";
 
   const node = document.createElement("div");
   node.className = "renderer-matrix";
@@ -132,21 +142,43 @@ function renderMatrix(annotation: any): RendererResult | null {
   overlay.textContent = text;
   node.appendChild(overlay);
 
-  node.addEventListener("pointerdown", (e) => {
-    e.stopImmediatePropagation();
-  }, { capture: true });
+  node.addEventListener(
+    "pointerdown",
+    (e) => {
+      e.stopImmediatePropagation();
+    },
+    { capture: true },
+  );
 
   return { node, append: false };
 }
 
-function renderAquarium(annotation: any): RendererResult | null {
+function renderAquarium(_annotation: any): RendererResult | null {
   const node = document.createElement("div");
   node.className = "renderer-aquarium";
 
   const seaweedConfigs = [
-    { left: "10%", width: "8px", height: "30px", color: "#1a6b3a", duration: "2s" },
-    { left: "18%", width: "6px", height: "40px", color: "#2d8b4e", duration: "2.5s" },
-    { left: "75%", width: "7px", height: "35px", color: "#1a6b3a", duration: "3s" },
+    {
+      left: "10%",
+      width: "8px",
+      height: "30px",
+      color: "#1a6b3a",
+      duration: "2s",
+    },
+    {
+      left: "18%",
+      width: "6px",
+      height: "40px",
+      color: "#2d8b4e",
+      duration: "2.5s",
+    },
+    {
+      left: "75%",
+      width: "7px",
+      height: "35px",
+      color: "#1a6b3a",
+      duration: "3s",
+    },
   ];
   for (const cfg of seaweedConfigs) {
     const sw = document.createElement("div");
@@ -196,7 +228,9 @@ function renderAquarium(annotation: any): RendererResult | null {
 // --- Data & Status ---
 
 function renderDataViz(annotation: any): RendererResult | null {
-  const values: number[] = annotation.customData?.values || [40, 60, 35, 80, 55, 90];
+  const values: number[] = annotation.customData?.values || [
+    40, 60, 35, 80, 55, 90,
+  ];
   const label: string = annotation.customData?.label || "Q1-Q4 Revenue";
 
   const maxVal = Math.max(...values);
@@ -212,7 +246,7 @@ function renderDataViz(annotation: any): RendererResult | null {
   barsContainer.className = "dataviz-bars";
   values.forEach((val, i) => {
     const bar = document.createElement("div");
-    bar.className = "dataviz-bar" + (i === values.length - 1 ? " highlight" : "");
+    bar.className = `dataviz-bar${i === values.length - 1 ? " highlight" : ""}`;
     bar.style.height = `${(val / maxVal) * 100}%`;
     barsContainer.appendChild(bar);
   });
@@ -224,10 +258,10 @@ function renderDataViz(annotation: any): RendererResult | null {
   trendEl.className = "dataviz-trend";
   if (lastVal >= prevVal) {
     trendEl.style.color = "#10b981";
-    trendEl.textContent = "\u25B2 " + Math.round(((lastVal - prevVal) / prevVal) * 100) + "%";
+    trendEl.textContent = `\u25B2 ${Math.round(((lastVal - prevVal) / prevVal) * 100)}%`;
   } else {
     trendEl.style.color = "#ef4444";
-    trendEl.textContent = "\u25BC " + Math.round(((prevVal - lastVal) / prevVal) * 100) + "%";
+    trendEl.textContent = `\u25BC ${Math.round(((prevVal - lastVal) / prevVal) * 100)}%`;
   }
   node.appendChild(trendEl);
 
@@ -239,14 +273,36 @@ function renderApprovalBadge(annotation: any): RendererResult | null {
   const status: string = annotation.customData?.status || "approved";
   const timestamp: string = annotation.customData?.timestamp || "2m ago";
 
-  const statusConfig: Record<string, { bg: string; border: string; icon: string; iconColor: string }> = {
-    approved: { bg: "#f0fdf4", border: "#86efac", icon: "\u2713", iconColor: "#22c55e" },
-    pending: { bg: "#fffbeb", border: "#fde68a", icon: "\u23F3", iconColor: "#f59e0b" },
-    rejected: { bg: "#fef2f2", border: "#fca5a5", icon: "\u2717", iconColor: "#ef4444" },
+  const statusConfig: Record<
+    string,
+    { bg: string; border: string; icon: string; iconColor: string }
+  > = {
+    approved: {
+      bg: "#f0fdf4",
+      border: "#86efac",
+      icon: "\u2713",
+      iconColor: "#22c55e",
+    },
+    pending: {
+      bg: "#fffbeb",
+      border: "#fde68a",
+      icon: "\u23F3",
+      iconColor: "#f59e0b",
+    },
+    rejected: {
+      bg: "#fef2f2",
+      border: "#fca5a5",
+      icon: "\u2717",
+      iconColor: "#ef4444",
+    },
   };
   const cfg = statusConfig[status] || statusConfig.approved;
 
-  const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase();
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 
   const node = document.createElement("div");
   node.className = "renderer-badge";
@@ -265,7 +321,7 @@ function renderApprovalBadge(annotation: any): RendererResult | null {
   nameEl.textContent = name;
   const meta = document.createElement("div");
   meta.className = "badge-meta";
-  meta.textContent = status.charAt(0).toUpperCase() + status.slice(1) + " \u00B7 " + timestamp;
+  meta.textContent = `${status.charAt(0).toUpperCase() + status.slice(1)} \u00B7 ${timestamp}`;
   info.appendChild(nameEl);
   info.appendChild(meta);
   node.appendChild(info);
@@ -281,7 +337,8 @@ function renderApprovalBadge(annotation: any): RendererResult | null {
 
 function renderInteractiveWidget(annotation: any): RendererResult | null {
   const initialRating: number = annotation.customData?.rating || 3;
-  const deadlineMs: number = annotation.customData?.deadlineMs || (Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const deadlineMs: number =
+    annotation.customData?.deadlineMs || Date.now() + 14 * 24 * 60 * 60 * 1000;
 
   const node = document.createElement("div");
   node.className = "renderer-widget";
@@ -294,7 +351,7 @@ function renderInteractiveWidget(annotation: any): RendererResult | null {
     starsContainer.replaceChildren();
     for (let i = 1; i <= 5; i++) {
       const star = document.createElement("span");
-      star.className = "star " + (i <= currentRating ? "filled" : "empty");
+      star.className = `star ${i <= currentRating ? "filled" : "empty"}`;
       star.textContent = "\u2605";
       star.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -318,15 +375,21 @@ function renderInteractiveWidget(annotation: any): RendererResult | null {
       return;
     }
     const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    timerEl.textContent = "\u23F0 " + days + "d " + hours + "h remaining";
+    const hours = Math.floor(
+      (remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    timerEl.textContent = `\u23F0 ${days}d ${hours}h remaining`;
   }
   updateTimer();
   const intervalId = setInterval(updateTimer, 60000);
 
-  node.addEventListener("pointerdown", (e) => {
-    e.stopImmediatePropagation();
-  }, { capture: true });
+  node.addEventListener(
+    "pointerdown",
+    (e) => {
+      e.stopImmediatePropagation();
+    },
+    { capture: true },
+  );
 
   return {
     node,
@@ -344,11 +407,11 @@ function renderRetroPixel(annotation: any): RendererResult | null {
   node.className = "renderer-retro";
 
   const checkmarkPixels = [
-    [0,0,0,0,1],
-    [0,0,0,1,0],
-    [1,0,1,0,0],
-    [0,1,0,0,0],
-    [0,0,0,0,0],
+    [0, 0, 0, 0, 1],
+    [0, 0, 0, 1, 0],
+    [1, 0, 1, 0, 0],
+    [0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0],
   ];
   const iconGrid = document.createElement("div");
   iconGrid.className = "retro-icon";
@@ -375,7 +438,7 @@ function renderRetroPixel(annotation: any): RendererResult | null {
   bar.className = "retro-bar";
   for (let i = 0; i < total; i++) {
     const seg = document.createElement("div");
-    seg.className = "bar-segment " + (i < progress ? "filled" : "empty");
+    seg.className = `bar-segment ${i < progress ? "filled" : "empty"}`;
     bar.appendChild(seg);
   }
   info.appendChild(bar);
@@ -417,7 +480,7 @@ function renderScratchOff(annotation: any): RendererResult | null {
 
   const reveal = document.createElement("div");
   reveal.className = "scratch-reveal";
-  reveal.textContent = "\uD83C\uDF1F " + revealText;
+  reveal.textContent = `\uD83C\uDF1F ${revealText}`;
   node.appendChild(reveal);
 
   const canvas = document.createElement("canvas");
@@ -432,7 +495,12 @@ function renderScratchOff(annotation: any): RendererResult | null {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    const gradient = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
     gradient.addColorStop(0, "#c0c0c0");
     gradient.addColorStop(0.3, "#d4d4d4");
     gradient.addColorStop(0.6, "#a8a8a8");
@@ -444,7 +512,11 @@ function renderScratchOff(annotation: any): RendererResult | null {
     ctx.font = "bold 12px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("\u25A0 SCRATCH TO REVEAL \u25A0", canvas.width / 2, canvas.height / 2);
+    ctx.fillText(
+      "\u25A0 SCRATCH TO REVEAL \u25A0",
+      canvas.width / 2,
+      canvas.height / 2,
+    );
 
     ctx.globalCompositeOperation = "destination-out";
 
@@ -458,14 +530,22 @@ function renderScratchOff(annotation: any): RendererResult | null {
       ctx.fill();
     };
 
-    canvas.addEventListener("pointerdown", (e) => {
-      e.stopImmediatePropagation();
-      isScratching = true;
-      scratch(e);
-    }, { capture: true });
+    canvas.addEventListener(
+      "pointerdown",
+      (e) => {
+        e.stopImmediatePropagation();
+        isScratching = true;
+        scratch(e);
+      },
+      { capture: true },
+    );
     canvas.addEventListener("pointermove", scratch);
-    canvas.addEventListener("pointerup", () => { isScratching = false; });
-    canvas.addEventListener("pointerleave", () => { isScratching = false; });
+    canvas.addEventListener("pointerup", () => {
+      isScratching = false;
+    });
+    canvas.addEventListener("pointerleave", () => {
+      isScratching = false;
+    });
   });
 
   return { node, append: false };
@@ -483,7 +563,8 @@ function renderRichMedia(annotation: any): RendererResult | null {
   display.className = "media-display";
 
   const titleEl = document.createElement("div");
-  titleEl.style.cssText = "position:absolute;top:8px;left:10px;color:#94a3b8;font-size:11px;";
+  titleEl.style.cssText =
+    "position:absolute;top:8px;left:10px;color:#94a3b8;font-size:11px;";
   titleEl.textContent = title;
   display.appendChild(titleEl);
 
@@ -513,27 +594,31 @@ function renderRichMedia(annotation: any): RendererResult | null {
 
   node.appendChild(controls);
 
-  node.addEventListener("pointerdown", (e) => {
-    e.stopImmediatePropagation();
-    isPlaying = !isPlaying;
-    if (isPlaying) {
-      triangle.style.cssText = `
+  node.addEventListener(
+    "pointerdown",
+    (e) => {
+      e.stopImmediatePropagation();
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        triangle.style.cssText = `
         width: 12px; height: 16px; border: none; margin: 0;
         border-left: 4px solid white; border-right: 4px solid white;
       `;
-    } else {
-      triangle.style.cssText = `
+      } else {
+        triangle.style.cssText = `
         width: 0; height: 0;
         border-left: 16px solid white; border-top: 10px solid transparent;
         border-bottom: 10px solid transparent; margin-left: 4px;
       `;
-    }
-  }, { capture: true });
+      }
+    },
+    { capture: true },
+  );
 
   return { node, append: false };
 }
 
-function renderMiniGame(annotation: any): RendererResult | null {
+function renderMiniGame(_annotation: any): RendererResult | null {
   const node = document.createElement("div");
   node.className = "renderer-game";
 
@@ -551,15 +636,36 @@ function renderMiniGame(annotation: any): RendererResult | null {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const paddleW = 40, paddleH = 6;
+    const paddleW = 40,
+      paddleH = 6;
     let paddleX = W / 2 - paddleW / 2;
     const ballR = 4;
-    let bx = W / 2, by = H * 0.6;
-    let bdx = 1.5, bdy = -1.5;
+    let bx = W / 2,
+      by = H * 0.6;
+    let bdx = 1.5,
+      bdy = -1.5;
 
-    const cols = 6, rows = 3, brickW = (W - 20) / cols, brickH = 8, brickPad = 2;
-    const brickColors = ["#f87171", "#fbbf24", "#34d399", "#60a5fa", "#a78bfa", "#f472b6"];
-    const bricks: { x: number; y: number; w: number; h: number; color: string; alive: boolean }[] = [];
+    const cols = 6,
+      rows = 3,
+      brickW = (W - 20) / cols,
+      brickH = 8,
+      brickPad = 2;
+    const brickColors = [
+      "#f87171",
+      "#fbbf24",
+      "#34d399",
+      "#60a5fa",
+      "#a78bfa",
+      "#f472b6",
+    ];
+    const bricks: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      color: string;
+      alive: boolean;
+    }[] = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         bricks.push({
@@ -575,11 +681,18 @@ function renderMiniGame(annotation: any): RendererResult | null {
 
     canvas.addEventListener("pointermove", (e) => {
       const canvasRect = canvas.getBoundingClientRect();
-      paddleX = Math.max(0, Math.min(W - paddleW, e.clientX - canvasRect.left - paddleW / 2));
+      paddleX = Math.max(
+        0,
+        Math.min(W - paddleW, e.clientX - canvasRect.left - paddleW / 2),
+      );
     });
-    canvas.addEventListener("pointerdown", (e) => {
-      e.stopImmediatePropagation();
-    }, { capture: true });
+    canvas.addEventListener(
+      "pointerdown",
+      (e) => {
+        e.stopImmediatePropagation();
+      },
+      { capture: true },
+    );
 
     function draw() {
       if (!ctx) return;
@@ -622,7 +735,12 @@ function renderMiniGame(annotation: any): RendererResult | null {
 
       for (const b of bricks) {
         if (!b.alive) continue;
-        if (bx + ballR > b.x && bx - ballR < b.x + b.w && by + ballR > b.y && by - ballR < b.y + b.h) {
+        if (
+          bx + ballR > b.x &&
+          bx - ballR < b.x + b.w &&
+          by + ballR > b.y &&
+          by - ballR < b.y + b.h
+        ) {
           b.alive = false;
           bdy = -bdy;
           break;
@@ -652,13 +770,13 @@ function renderMiniGame(annotation: any): RendererResult | null {
 
 export const rendererMap: Record<string, RenderFunction> = {
   "neon-sign": renderNeonSign,
-  "hologram": renderHologram,
-  "glassmorphism": renderGlassmorphism,
+  hologram: renderHologram,
+  glassmorphism: renderGlassmorphism,
   "3d-stamp": render3DStamp,
-  "callout": renderCallout,
-  "confetti": renderConfetti,
-  "matrix": renderMatrix,
-  "aquarium": renderAquarium,
+  callout: renderCallout,
+  confetti: renderConfetti,
+  matrix: renderMatrix,
+  aquarium: renderAquarium,
   "data-viz": renderDataViz,
   "approval-badge": renderApprovalBadge,
   "interactive-widget": renderInteractiveWidget,

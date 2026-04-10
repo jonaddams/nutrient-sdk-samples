@@ -37,7 +37,9 @@ const categories: Category[] = [
         rendererType: "glassmorphism",
         label: "Glassmorphism",
         rect: { left: 50, top: 160, width: 250, height: 50 },
-        props: { text: "This section needs review \u2014 see comments from legal" },
+        props: {
+          text: "This section needs review \u2014 see comments from legal",
+        },
       },
       {
         rendererType: "3d-stamp",
@@ -81,7 +83,10 @@ const categories: Category[] = [
         rendererType: "data-viz",
         label: "Data Visualization",
         rect: { left: 50, top: 60, width: 200, height: 90 },
-        props: { values: [40, 60, 35, 80, 55, 95], label: "Q1\u2013Q4 Revenue" },
+        props: {
+          values: [40, 60, 35, 80, 55, 95],
+          label: "Q1\u2013Q4 Revenue",
+        },
       },
       {
         rendererType: "approval-badge",
@@ -153,42 +158,51 @@ export default function CustomRenderersViewer() {
     createdAnnotationIdsRef.current = [];
   }, []);
 
-  const loadCategory = useCallback(async (categoryIndex: number) => {
-    const instance = instanceRef.current;
-    const NV = window.NutrientViewer;
-    if (!instance || !NV) return;
+  const loadCategory = useCallback(
+    async (categoryIndex: number) => {
+      const instance = instanceRef.current;
+      const NV = window.NutrientViewer;
+      if (!instance || !NV) return;
 
-    await clearCustomAnnotations();
+      await clearCustomAnnotations();
 
-    const category = categories[categoryIndex];
-    const ids: string[] = [];
+      const category = categories[categoryIndex];
+      const ids: string[] = [];
 
-    for (const config of category.renderers) {
-      const annotation = new NV.Annotations.NoteAnnotation({
-        pageIndex: 0,
-        boundingBox: new NV.Geometry.Rect(config.rect),
-        text: { format: "plain" as const, value: config.label },
-        color: NV.Color.TRANSPARENT,
-        customData: {
-          rendererType: config.rendererType,
-          category: category.name,
-          ...(config.props || {}),
-        },
-      });
+      for (const config of category.renderers) {
+        const annotation = new NV.Annotations.NoteAnnotation({
+          pageIndex: 0,
+          boundingBox: new NV.Geometry.Rect(config.rect),
+          text: { format: "plain" as const, value: config.label },
+          color: NV.Color.TRANSPARENT,
+          customData: {
+            rendererType: config.rendererType,
+            category: category.name,
+            ...(config.props || {}),
+          },
+        });
 
-      try {
-        const created = await instance.create(annotation);
-        const createdAnnotation = Array.isArray(created) ? created[0] : created;
-        if (createdAnnotation?.id) {
-          ids.push(createdAnnotation.id as string);
+        try {
+          // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK create() returns a union type
+          const created: any = await instance.create(annotation);
+          const createdAnnotation = Array.isArray(created)
+            ? created[0]
+            : created;
+          if (createdAnnotation?.id) {
+            ids.push(createdAnnotation.id as string);
+          }
+        } catch (err) {
+          console.error(
+            `Failed to create ${config.rendererType} annotation:`,
+            err,
+          );
         }
-      } catch (err) {
-        console.error(`Failed to create ${config.rendererType} annotation:`, err);
       }
-    }
 
-    createdAnnotationIdsRef.current = ids;
-  }, [clearCustomAnnotations]);
+      createdAnnotationIdsRef.current = ids;
+    },
+    [clearCustomAnnotations],
+  );
 
   const handleTabClick = useCallback(
     (index: number) => {
@@ -213,6 +227,7 @@ export default function CustomRenderersViewer() {
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       styleSheets: ["/custom-renderers.css"],
       customRenderers: {
+        // biome-ignore lint/suspicious/noExplicitAny: annotation type not fully available
         Annotation: ({ annotation }: any) => {
           const rendererType = annotation.customData?.rendererType;
           if (!rendererType) return null;
@@ -242,7 +257,8 @@ export default function CustomRenderersViewer() {
       <div className="w-72 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
         <div className="p-5">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-            Select a category to see different custom annotation renderers applied to the document.
+            Select a category to see different custom annotation renderers
+            applied to the document.
           </p>
 
           {/* Category Tabs */}
