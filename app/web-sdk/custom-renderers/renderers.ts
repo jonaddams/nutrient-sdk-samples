@@ -26,7 +26,7 @@ function renderNeonSign(annotation: any): RendererResult | null {
   `;
   node.appendChild(span);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderHologram(_annotation: any): RendererResult | null {
@@ -36,7 +36,7 @@ function renderHologram(_annotation: any): RendererResult | null {
   span.textContent = "\u2713 VERIFIED AUTHENTIC";
   node.appendChild(span);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderGlassmorphism(annotation: any): RendererResult | null {
@@ -46,7 +46,7 @@ function renderGlassmorphism(annotation: any): RendererResult | null {
   node.className = "renderer-glass";
   node.textContent = `\uD83D\uDCAC ${text}`;
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function render3DStamp(_annotation: any): RendererResult | null {
@@ -57,7 +57,7 @@ function render3DStamp(_annotation: any): RendererResult | null {
   stamp.textContent = "CONFIDENTIAL";
   node.appendChild(stamp);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 // --- Animated ---
@@ -71,7 +71,7 @@ function renderCallout(annotation: any): RendererResult | null {
   span.textContent = `\u270E ${text}`;
   node.appendChild(span);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderConfetti(annotation: any): RendererResult | null {
@@ -108,7 +108,7 @@ function renderConfetti(annotation: any): RendererResult | null {
   label.textContent = `\uD83C\uDF89 ${text}`;
   node.appendChild(label);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderMatrix(annotation: any): RendererResult | null {
@@ -222,7 +222,7 @@ function renderAquarium(_annotation: any): RendererResult | null {
     node.appendChild(bubble);
   }
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 // --- Data & Status ---
@@ -265,7 +265,7 @@ function renderDataViz(annotation: any): RendererResult | null {
   }
   node.appendChild(trendEl);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderApprovalBadge(annotation: any): RendererResult | null {
@@ -332,7 +332,7 @@ function renderApprovalBadge(annotation: any): RendererResult | null {
   icon.textContent = cfg.icon;
   node.appendChild(icon);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderInteractiveWidget(annotation: any): RendererResult | null {
@@ -444,7 +444,7 @@ function renderRetroPixel(annotation: any): RendererResult | null {
   info.appendChild(bar);
   node.appendChild(info);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 // --- Creative ---
@@ -469,7 +469,7 @@ function renderComicBubble(annotation: any): RendererResult | null {
 
   node.appendChild(bubble);
 
-  return { node, append: true };
+  return { node, append: false };
 }
 
 function renderScratchOff(annotation: any): RendererResult | null {
