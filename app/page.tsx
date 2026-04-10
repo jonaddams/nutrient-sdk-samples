@@ -5,8 +5,16 @@ export default function Home() {
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       {/* Header */}
       <header className="border-b border-[var(--warm-gray-400)] bg-white dark:bg-[#1a1414]">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="!mb-0">Nutrient SDK Samples</h1>
+          <a
+            href="https://github.com/jonaddams/nutrient-sdk-samples"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--warm-gray-300)] hover:text-[var(--digital-pollen)] transition-colors no-underline"
+          >
+            GitHub
+          </a>
         </div>
       </header>
 
