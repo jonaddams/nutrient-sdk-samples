@@ -77,6 +77,13 @@ const samples: Sample[] = [
     path: "/web-sdk/custom-menu",
   },
   {
+    name: "Custom Renderers",
+    category: "Annotations",
+    description:
+      "Creative custom annotation renderers showcasing visual effects, animations, interactive widgets, and more",
+    path: "/web-sdk/custom-renderers",
+  },
+  {
     name: "Document Assembly",
     category: "Document Editor",
     description:
