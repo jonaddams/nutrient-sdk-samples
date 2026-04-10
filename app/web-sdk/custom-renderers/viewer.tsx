@@ -67,7 +67,7 @@ const categories: Category[] = [
         rendererType: "matrix",
         label: "Matrix Rain",
         rect: { left: 50, top: 160, width: 220, height: 80 },
-        props: { text: "FOLLOW THE WHITE RABBIT" },
+        props: { text: "FOLLOW THE WHITE RABBIT \uD83D\uDC07" },
       },
       {
         rendererType: "aquarium",
