@@ -4,7 +4,7 @@ import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { rendererMap } from "./renderers";
 
-const DOCUMENT = "/documents/20000-leagues-under-the-sea.pdf";
+const DOCUMENT = "/documents/blank.pdf";
 
 type AnnotationConfig = {
   rendererType: string;
