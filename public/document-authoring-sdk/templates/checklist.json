@@ -150,6 +150,16 @@
             "elements": [
               {
                 "type": "p",
+                "pPr": {
+                  "styleId": "Normal",
+                  "alignment": "left",
+                  "spaceBefore": 0,
+                  "spaceAfter": 8
+                },
+                "elements": [{ "type": "r", "text": "{{%company_logo}}" }]
+              },
+              {
+                "type": "p",
                 "pPr": { "styleId": "Title" },
                 "elements": [
                   {

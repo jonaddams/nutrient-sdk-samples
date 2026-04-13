@@ -169,6 +169,9 @@ export default function DataStep() {
       });
       console.log("✅ CodeMirror data editor created");
 
+      // Make CodeMirror fill its container
+      editor.setSize("100%", "100%");
+
       // Validate JSON on change
       editor.on("change", (instance: CodeMirrorInstance) => {
         const value = instance.getValue();

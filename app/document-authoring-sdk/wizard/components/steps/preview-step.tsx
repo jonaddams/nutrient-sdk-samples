@@ -150,10 +150,32 @@ export default function PreviewStep() {
         );
 
         console.log("🔧 Populating template with data...");
-        console.log("Data to populate:", state.dataJson);
+        // Resolve relative image URLs to absolute URLs for PSPDFKit
+        const dataJson = structuredClone(state.dataJson);
+        if (dataJson?.model) {
+          for (const value of Object.values(dataJson.model)) {
+            if (
+              value &&
+              typeof value === "object" &&
+              "_type" in value &&
+              (value as Record<string, unknown>)._type === "image" &&
+              "source" in value &&
+              (value as Record<string, unknown>).source === "url" &&
+              "url" in value &&
+              typeof (value as Record<string, unknown>).url === "string" &&
+              !(value as Record<string, string>).url.startsWith("http")
+            ) {
+              (value as Record<string, string>).url = new URL(
+                (value as Record<string, string>).url,
+                window.location.origin,
+              ).href;
+            }
+          }
+        }
+        console.log("Data to populate:", dataJson);
         const docxBuffer = await window.PSPDFKit.populateDocumentTemplate(
           { document: templateBuffer },
-          state.dataJson,
+          dataJson,
         );
         console.log(
           "✅ Template populated, result size:",

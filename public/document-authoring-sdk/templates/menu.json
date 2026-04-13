@@ -151,6 +151,17 @@
               {
                 "type": "p",
                 "pPr": {
+                  "styleId": "Normal",
+                  "alignment": "center",
+                  "lineSpacingFactor": 1.15,
+                  "spaceBefore": 0,
+                  "spaceAfter": 8
+                },
+                "elements": [{ "type": "r", "text": "{{%%restaurant_logo}}" }]
+              },
+              {
+                "type": "p",
+                "pPr": {
                   "styleId": "Title",
                   "alignment": "left",
                   "lineSpacingFactor": 1.15,

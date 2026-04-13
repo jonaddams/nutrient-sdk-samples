@@ -6,6 +6,14 @@
     }
   },
   "model": {
+    "company_logo": {
+      "_type": "image",
+      "source": "url",
+      "url": "/document-authoring-sdk/images/startup-logo.png",
+      "sizing": "fit-width",
+      "width": 160,
+      "altText": "Launchpad Ventures logo"
+    },
     "title": "BUSINESS STARTUP CHECKLIST",
     "sections": [
       {
