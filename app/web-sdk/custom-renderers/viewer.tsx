@@ -267,7 +267,7 @@ export default function CustomRenderersViewer() {
               <button
                 key={category.name}
                 type="button"
-                className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all cursor-pointer ${
                   activeCategory === index
                     ? "border-[var(--digital-pollen)] bg-[var(--digital-pollen)]/10 font-semibold"
                     : "border-[var(--warm-gray-400)] hover:border-[var(--warm-gray-600)]"
