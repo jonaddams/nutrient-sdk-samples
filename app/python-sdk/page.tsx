@@ -106,11 +106,35 @@ export default function PythonSDKPage() {
             >
               Guides
             </a>
+            <a
+              href="https://github.com/jonaddams/python-fast-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Backend API Repo
+            </a>
           </>
         }
       />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-6">
+          <h2 className="text-lg font-semibold mb-2">How These Samples Work</h2>
+          <p className="text-sm text-[var(--text-secondary)]">
+            This Next.js frontend sends requests to a{" "}
+            <a
+              href="https://github.com/jonaddams/python-fast-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:opacity-70"
+            >
+              FastAPI backend
+            </a>{" "}
+            that uses the Nutrient Python SDK for document processing. The frontend handles file uploads and result display, while the backend performs the actual PDF conversions, signing, redaction, and other operations.
+          </p>
+        </div>
+
         <div className="mb-16">
           <div className="mb-6 flex flex-wrap gap-2">
             {categories.map((category) => (
