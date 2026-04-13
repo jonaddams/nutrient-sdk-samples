@@ -6,6 +6,14 @@
     }
   },
   "model": {
+    "company_logo": {
+      "_type": "image",
+      "source": "url",
+      "url": "/document-authoring-sdk/images/farm-logo.png",
+      "sizing": "fit-width",
+      "width": 200,
+      "altText": "Happiest Valley Farms logo"
+    },
     "invoice_date": "November 30, 2022",
     "invoice_number": "1234",
     "customer_name": "Henry Ross",

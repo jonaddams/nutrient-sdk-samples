@@ -6,6 +6,14 @@
     }
   },
   "model": {
+    "restaurant_logo": {
+      "_type": "image",
+      "source": "url",
+      "url": "/document-authoring-sdk/images/restaurant-logo.png",
+      "sizing": "fit-width",
+      "width": 120,
+      "altText": "La Estrella restaurant logo"
+    },
     "title": "New Year’s",
     "subtitle": "Celebration",
     "sections": [

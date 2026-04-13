@@ -115,13 +115,35 @@ export default function DocxEditor({
         );
 
         console.log("🔧 Populating template with data...");
-        console.log("Data to populate:", appState.dataJson);
+        // Resolve relative image URLs to absolute URLs for PSPDFKit
+        const dataJson = structuredClone(appState.dataJson);
+        if (dataJson?.model) {
+          for (const value of Object.values(dataJson.model)) {
+            if (
+              value &&
+              typeof value === "object" &&
+              "_type" in value &&
+              (value as Record<string, unknown>)._type === "image" &&
+              "source" in value &&
+              (value as Record<string, unknown>).source === "url" &&
+              "url" in value &&
+              typeof (value as Record<string, unknown>).url === "string" &&
+              !(value as Record<string, string>).url.startsWith("http")
+            ) {
+              (value as Record<string, string>).url = new URL(
+                (value as Record<string, string>).url,
+                window.location.origin,
+              ).href;
+            }
+          }
+        }
+        console.log("Data to populate:", dataJson);
         // biome-ignore lint/suspicious/noExplicitAny: PSPDFKit global API has flexible type signature
         const docxBuffer = await (
           window.PSPDFKit as any
         ).populateDocumentTemplate(
           { document: templateBuffer },
-          appState.dataJson,
+          dataJson,
         );
         console.log(
           "✅ Template populated, result size:",
