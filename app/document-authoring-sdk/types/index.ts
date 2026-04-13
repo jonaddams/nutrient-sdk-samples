@@ -54,6 +54,7 @@ export interface CodeMirrorInstance {
   toTextArea(): void;
   on(event: string, handler: (instance: CodeMirrorInstance) => void): void;
   refresh(): void;
+  setSize(width: string | number, height: string | number): void;
 }
 
 // Application State Types
