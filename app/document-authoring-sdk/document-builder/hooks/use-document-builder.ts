@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type {
-  DocAuthDocument,
-  ProgrammaticFormatting,
-  ProgrammaticSectionContent,
-} from "../../types";
+import type { DocAuthEditor, DocAuthSystem } from "../../types";
 
 export interface ReportSection {
   heading: string;
@@ -50,60 +46,192 @@ export const DEFAULT_FORM_STATE: ReportFormState = {
     "Q4 2025 demonstrated strong execution across all key metrics. The team is well-positioned entering 2026, with a robust pipeline and improving unit economics.",
 };
 
-const HEADING_STYLE: Partial<ProgrammaticFormatting> = {
-  bold: true,
-  fontSize: 14,
-  color: "#1F4E79",
+// --- DocJSON helpers ---
+
+type DocJsonRun = {
+  type: "r";
+  text: string;
+  rPr?: Record<string, unknown>;
 };
 
-const TITLE_STYLE: Partial<ProgrammaticFormatting> = {
-  bold: true,
-  fontSize: 24,
-  color: "#1a1a2e",
+type DocJsonParagraph = {
+  type: "p";
+  pPr?: Record<string, unknown>;
+  elements: DocJsonRun[];
 };
 
-const SUBTITLE_STYLE: Partial<ProgrammaticFormatting> = {
-  italic: true,
-  fontSize: 11,
-  color: "#666666",
+type DocJsonTableCell = {
+  elements: DocJsonParagraph[];
+  tcPr?: Record<string, unknown>;
 };
 
-const TABLE_HEADER_STYLE: Partial<ProgrammaticFormatting> = {
-  bold: true,
-  fontSize: 11,
+type DocJsonTableRow = {
+  cells: DocJsonTableCell[];
 };
 
-function addStyledParagraph(
-  content: ProgrammaticSectionContent,
-  index: number,
+type DocJsonTable = {
+  type: "t";
+  rows: DocJsonTableRow[];
+};
+
+type DocJsonElement = DocJsonParagraph | DocJsonTable;
+
+function styledParagraph(
   text: string,
-  style: Partial<ProgrammaticFormatting>,
-): void {
-  const paragraph = content.addParagraph(index);
-  const textView = paragraph.asTextView();
-  const range = textView.setText(text);
-  textView.setFormatting(style, range);
+  runProps?: Record<string, unknown>,
+  paraProps?: Record<string, unknown>,
+): DocJsonParagraph {
+  return {
+    type: "p",
+    ...(paraProps ? { pPr: paraProps } : {}),
+    elements: [
+      {
+        type: "r",
+        text,
+        ...(runProps ? { rPr: runProps } : {}),
+      },
+    ],
+  };
 }
 
-function addPlainParagraph(
-  content: ProgrammaticSectionContent,
-  index: number,
-  text: string,
-): void {
-  const paragraph = content.addParagraph(index);
-  paragraph.asTextView().setText(text);
+function plainParagraph(text: string): DocJsonParagraph {
+  return { type: "p", elements: [{ type: "r", text }] };
 }
 
-function addEmptyParagraph(
-  content: ProgrammaticSectionContent,
-  index: number,
-): void {
-  const paragraph = content.addParagraph(index);
-  paragraph.asTextView().setText("");
+function emptyParagraph(): DocJsonParagraph {
+  return { type: "p", elements: [] };
+}
+
+function buildDocJson(state: ReportFormState): object {
+  const elements: DocJsonElement[] = [];
+
+  // Title
+  elements.push(
+    styledParagraph(state.title, {
+      bold: true,
+      pointSize: 24,
+      color: "#1a1a2e",
+    }),
+  );
+
+  // Author and date
+  const today = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  elements.push(
+    styledParagraph(`Prepared by ${state.author} \u2022 ${today}`, {
+      italic: true,
+      pointSize: 11,
+      color: "#666666",
+    }),
+  );
+
+  elements.push(emptyParagraph());
+
+  // Executive Summary
+  if (state.executiveSummary) {
+    elements.push(
+      styledParagraph("Executive Summary", {
+        bold: true,
+        pointSize: 14,
+        color: "#1F4E79",
+      }),
+    );
+    elements.push(plainParagraph(state.executiveSummary));
+    elements.push(emptyParagraph());
+  }
+
+  // Dynamic sections
+  for (const sec of state.sections) {
+    if (sec.heading) {
+      elements.push(
+        styledParagraph(sec.heading, {
+          bold: true,
+          pointSize: 14,
+          color: "#1F4E79",
+        }),
+      );
+    }
+    if (sec.body) {
+      elements.push(plainParagraph(sec.body));
+    }
+    elements.push(emptyParagraph());
+  }
+
+  // Key Metrics table
+  if (state.metrics.length > 0) {
+    elements.push(
+      styledParagraph("Key Metrics", {
+        bold: true,
+        pointSize: 14,
+        color: "#1F4E79",
+      }),
+    );
+
+    const headerRow: DocJsonTableRow = {
+      cells: [
+        {
+          elements: [
+            styledParagraph("Metric", { bold: true, pointSize: 11 }),
+          ],
+        },
+        {
+          elements: [
+            styledParagraph("Value", { bold: true, pointSize: 11 }),
+          ],
+        },
+      ],
+    };
+
+    const dataRows: DocJsonTableRow[] = state.metrics.map((row) => ({
+      cells: [
+        { elements: [plainParagraph(row.metric)] },
+        { elements: [plainParagraph(row.value)] },
+      ],
+    }));
+
+    elements.push({
+      type: "t",
+      rows: [headerRow, ...dataRows],
+    });
+
+    elements.push(emptyParagraph());
+  }
+
+  // Conclusion
+  if (state.conclusion) {
+    elements.push(
+      styledParagraph("Conclusion", {
+        bold: true,
+        pointSize: 14,
+        color: "#1F4E79",
+      }),
+    );
+    elements.push(plainParagraph(state.conclusion));
+  }
+
+  return {
+    type: "https://pspdfkit.com/document-authoring/persistence/container",
+    version: 1,
+    container: {
+      document: {
+        body: {
+          sections: [
+            {
+              elements,
+            },
+          ],
+        },
+      },
+    },
+  };
 }
 
 export function useDocumentBuilder(
-  document: DocAuthDocument | null,
+  docAuthSystem: DocAuthSystem | null,
+  editor: DocAuthEditor | null,
   formState: ReportFormState,
 ) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -111,123 +239,25 @@ export function useDocumentBuilder(
 
   const buildDocument = useCallback(
     async (state: ReportFormState) => {
-      if (!document || isBuilding.current) return;
+      if (!docAuthSystem || !editor || isBuilding.current) return;
       isBuilding.current = true;
 
       try {
-        await document.transaction((draft) => {
-          const section = draft.body().sections()[0];
-          if (!section) return;
-          const content = section.content();
-
-          // Clear all existing content
-          const blocks = content.blocklevels();
-          for (let i = blocks.length - 1; i >= 0; i--) {
-            content.removeElement(i);
-          }
-
-          let idx = 0;
-
-          // Title
-          addStyledParagraph(content, idx++, state.title, TITLE_STYLE);
-
-          // Author and date
-          const today = new Date().toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-          addStyledParagraph(
-            content,
-            idx++,
-            `Prepared by ${state.author} \u2022 ${today}`,
-            SUBTITLE_STYLE,
-          );
-
-          // Spacer
-          addEmptyParagraph(content, idx++);
-
-          // Executive Summary
-          if (state.executiveSummary) {
-            addStyledParagraph(
-              content,
-              idx++,
-              "Executive Summary",
-              HEADING_STYLE,
-            );
-            addPlainParagraph(content, idx++, state.executiveSummary);
-            addEmptyParagraph(content, idx++);
-          }
-
-          // Dynamic sections
-          for (const sec of state.sections) {
-            if (sec.heading) {
-              addStyledParagraph(content, idx++, sec.heading, HEADING_STYLE);
-            }
-            if (sec.body) {
-              addPlainParagraph(content, idx++, sec.body);
-            }
-            addEmptyParagraph(content, idx++);
-          }
-
-          // Key Metrics table
-          if (state.metrics.length > 0) {
-            addStyledParagraph(content, idx++, "Key Metrics", HEADING_STYLE);
-
-            const table = content.addTable(idx++);
-            // Header row (already exists as first row)
-            const headerRow = table.rows()[0] ?? table.addRow();
-            const headerCell0 = headerRow.cells()[0] ?? headerRow.addCell();
-            const headerCell1 = headerRow.cells()[1] ?? headerRow.addCell();
-
-            const h0 = headerCell0.blocklevels()[0];
-            if (h0 && h0.type === "paragraph") {
-              const range = h0.asTextView().setText("Metric");
-              h0.asTextView().setFormatting(TABLE_HEADER_STYLE, range);
-            }
-            const h1 = headerCell1.blocklevels()[0];
-            if (h1 && h1.type === "paragraph") {
-              const range = h1.asTextView().setText("Value");
-              h1.asTextView().setFormatting(TABLE_HEADER_STYLE, range);
-            }
-
-            // Data rows
-            for (const row of state.metrics) {
-              const tableRow = table.addRow();
-              const cell0 = tableRow.cells()[0] ?? tableRow.addCell();
-              const cell1 = tableRow.cells()[1] ?? tableRow.addCell();
-
-              const p0 = cell0.blocklevels()[0];
-              if (p0 && p0.type === "paragraph") {
-                p0.asTextView().setText(row.metric);
-              }
-              const p1 = cell1.blocklevels()[0];
-              if (p1 && p1.type === "paragraph") {
-                p1.asTextView().setText(row.value);
-              }
-            }
-
-            addEmptyParagraph(content, idx++);
-          }
-
-          // Conclusion
-          if (state.conclusion) {
-            addStyledParagraph(content, idx++, "Conclusion", HEADING_STYLE);
-            addPlainParagraph(content, idx++, state.conclusion);
-          }
-        });
+        const docJson = buildDocJson(state);
+        const newDoc = await docAuthSystem.loadDocument(docJson);
+        editor.setCurrentDocument(newDoc);
       } catch (error) {
         console.error("❌ Error building document:", error);
       } finally {
         isBuilding.current = false;
       }
     },
-    [document],
+    [docAuthSystem, editor],
   );
 
   // Debounced rebuild on form state changes
   useEffect(() => {
-    if (!document) return;
+    if (!docAuthSystem || !editor) return;
 
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -242,7 +272,7 @@ export function useDocumentBuilder(
         clearTimeout(debounceRef.current);
       }
     };
-  }, [document, formState, buildDocument]);
+  }, [docAuthSystem, editor, formState, buildDocument]);
 
   return { buildDocument };
 }
