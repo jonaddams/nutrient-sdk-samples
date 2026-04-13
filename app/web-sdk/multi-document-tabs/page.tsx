@@ -18,24 +18,30 @@ interface TabInfo {
 
 const DEFAULT_TABS: TabInfo[] = [
   {
-    id: "cookies",
-    label: "Chocolate Chip Cookies",
-    document: "/documents/jacques-torres-chocolate-chip-cookies.pdf",
+    id: "jacques-torres",
+    label: "Jacques Torres Chocolate Chip Cookies",
+    document: "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf",
   },
   {
-    id: "macaques",
-    label: "Macaques",
-    document: "/documents/macaques.pdf",
+    id: "nyt-best",
+    label: "NYT Best Chocolate Chip Cookies",
+    document: "/documents/NYT Best Chocolate Chip Cookies Recipe.pdf",
   },
   {
-    id: "contract",
-    label: "Contract Template",
-    document: "/documents/contract-template.pdf",
+    id: "lemon-cake",
+    label: "One-Bowl Lemon and Olive Oil Cake",
+    document: "/documents/One-Bowl Lemon and Olive Oil Cake Recipe.pdf",
   },
   {
-    id: "usenix",
-    label: "USENIX Paper",
-    document: "/documents/usenix-example-paper.pdf",
+    id: "butterscotch",
+    label: "Salted Butterscotch Chocolate Chunk Cookies",
+    document:
+      "/documents/Salted Butterscotch Chocolate Chunk Cookies Recipe (with Video).pdf",
+  },
+  {
+    id: "tiny-salty",
+    label: "Tiny, Salty, Chocolaty Cookies",
+    document: "/documents/Tiny, Salty, Chocolaty Cookies Recipe.pdf",
   },
 ];
 
