@@ -15,6 +15,8 @@ export interface DocAuthSystem {
 
 export interface DocAuthEditor {
   destroy: () => void;
+  currentDocument: () => DocAuthDocument;
+  setCurrentDocument: (doc: DocAuthDocument) => void;
 }
 
 export interface DocAuthViewer {

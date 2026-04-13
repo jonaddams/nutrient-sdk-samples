@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { DocAuthDocument, DocAuthEditor, DocAuthSystem } from "../../types";
+import type { DocAuthEditor, DocAuthSystem } from "../../types";
 
 interface DocumentPreviewProps {
   docAuthSystem: DocAuthSystem | null;
-  document: DocAuthDocument | null;
-  onDocumentReady: (doc: DocAuthDocument) => void;
+  onEditorReady: (editor: DocAuthEditor) => void;
 }
 
 export default function DocumentPreview({
   docAuthSystem,
-  document: doc,
-  onDocumentReady,
+  onEditorReady,
 }: DocumentPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<DocAuthEditor | null>(null);
@@ -33,7 +31,6 @@ export default function DocumentPreview({
       try {
         // Create a blank document to seed the editor
         const blankDoc = await docAuthSystem.createDocumentFromPlaintext("");
-        onDocumentReady(blankDoc);
 
         // Wait for DOM to settle
         await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -56,6 +53,7 @@ export default function DocumentPreview({
           document: blankDoc,
         });
         editorRef.current = editor;
+        onEditorReady(editor);
         setIsLoading(false);
       } catch (error) {
         console.error("❌ Error initializing document preview:", error);
@@ -77,7 +75,7 @@ export default function DocumentPreview({
         editorRef.current = null;
       }
     };
-  }, [docAuthSystem, onDocumentReady]);
+  }, [docAuthSystem, onEditorReady]);
 
   return (
     <div className="h-full flex flex-col bg-gray-100 dark:bg-gray-200">

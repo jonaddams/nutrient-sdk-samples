@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/app/_components/PageHeader";
-import type { DocAuthDocument, DocAuthSystem } from "../types";
+import type { DocAuthEditor, DocAuthSystem } from "../types";
 import DocumentPreview from "./components/document-preview";
 import ReportForm from "./components/report-form";
 import {
@@ -15,7 +15,7 @@ export default function DocumentBuilderPage() {
   const [docAuthSystem, setDocAuthSystem] = useState<DocAuthSystem | null>(
     null,
   );
-  const [document, setDocument] = useState<DocAuthDocument | null>(null);
+  const [editor, setEditor] = useState<DocAuthEditor | null>(null);
   const [formState, setFormState] =
     useState<ReportFormState>(DEFAULT_FORM_STATE);
   const sdkInitialized = useRef(false);
@@ -25,7 +25,6 @@ export default function DocumentBuilderPage() {
     if (sdkInitialized.current) return;
 
     const init = async () => {
-      // Wait for SDK to load
       let attempts = 0;
       while (!window.DocAuth && attempts < 50) {
         await new Promise((resolve) => setTimeout(resolve, 200));
@@ -118,12 +117,15 @@ export default function DocumentBuilderPage() {
     };
   }, []);
 
-  const handleDocumentReady = useCallback((doc: DocAuthDocument) => {
-    setDocument(doc);
+  const handleEditorReady = useCallback((ed: DocAuthEditor) => {
+    setEditor(ed);
   }, []);
 
   // Hook that rebuilds the document on form state changes
-  useDocumentBuilder(document, formState);
+  useDocumentBuilder(docAuthSystem, editor, formState);
+
+  // Get the current document from the editor for exports
+  const currentDocument = editor?.currentDocument() ?? null;
 
   return (
     <div
@@ -148,7 +150,7 @@ export default function DocumentBuilderPage() {
           <ReportForm
             formState={formState}
             onChange={setFormState}
-            document={document}
+            document={currentDocument}
           />
         </div>
 
@@ -156,8 +158,7 @@ export default function DocumentBuilderPage() {
         <div className="relative overflow-hidden">
           <DocumentPreview
             docAuthSystem={docAuthSystem}
-            document={document}
-            onDocumentReady={handleDocumentReady}
+            onEditorReady={handleEditorReady}
           />
         </div>
       </div>
