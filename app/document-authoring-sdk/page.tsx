@@ -18,6 +18,13 @@ const samples: Sample[] = [
       "Create professional documents from templates using an intuitive wizard interface with template selection, visual customization, and data integration",
     path: "/document-authoring-sdk/document-generator",
   },
+  {
+    name: "Document Builder",
+    category: "Programmatic API",
+    description:
+      "Build documents programmatically from form data using the transaction() API with live preview",
+    path: "/document-authoring-sdk/document-builder",
+  },
 ];
 
 export default function DocumentAuthoringSdkSamplesPage() {
