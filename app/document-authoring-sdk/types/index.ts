@@ -10,6 +10,7 @@ export interface DocAuthSystem {
   ) => Promise<DocAuthViewer>;
   importDOCX: (buffer: ArrayBuffer) => Promise<DocAuthDocument>;
   loadDocument: (docJson: unknown) => Promise<DocAuthDocument>;
+  createDocumentFromPlaintext: (text: string) => Promise<DocAuthDocument>;
 }
 
 export interface DocAuthEditor {
@@ -24,6 +25,10 @@ export interface DocAuthViewer {
 export interface DocAuthDocument {
   exportDOCX: () => Promise<ArrayBuffer>;
   exportPDF: () => Promise<ArrayBuffer>;
+  transaction: <T = void>(
+    callback: (draft: ProgrammaticDocument) => Promise<T> | T,
+  ) => Promise<T>;
+  saveDocumentJSONString: () => Promise<string>;
 }
 
 // PSPDFKit Types
@@ -124,6 +129,78 @@ export interface StepProps {
 export interface TransitionProps {
   isVisible: boolean;
   message: string;
+}
+
+// Programmatic API types (used inside transaction() callbacks)
+export interface ProgrammaticDocument {
+  body: () => ProgrammaticBody;
+}
+
+export interface ProgrammaticBody {
+  sections: () => ProgrammaticSection[];
+  addSection: (index: number) => ProgrammaticSection;
+}
+
+export interface ProgrammaticSection {
+  content: () => ProgrammaticSectionContent;
+}
+
+export interface ProgrammaticSectionContent {
+  blocklevels: () => ProgrammaticBlockLevel[];
+  addParagraph: (index: number) => ProgrammaticParagraph;
+  addTable: (index: number) => ProgrammaticTable;
+  removeElement: (index: number) => void;
+}
+
+export interface ProgrammaticTextView {
+  getPlainText: () => string;
+  setText: (text: string) => ProgrammaticRange;
+  setFormatting: (
+    style: Partial<ProgrammaticFormatting>,
+    range?: ProgrammaticRange,
+  ) => void;
+}
+
+export interface ProgrammaticRange {
+  start: number;
+  end: number;
+}
+
+export interface ProgrammaticFormatting {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strikeout: boolean;
+  color: string;
+  highlight: string;
+  font: string;
+  fontSize: number;
+}
+
+export type ProgrammaticBlockLevel = ProgrammaticParagraph | ProgrammaticTable;
+
+export interface ProgrammaticParagraph {
+  type: "paragraph";
+  asTextView: () => ProgrammaticTextView;
+}
+
+export interface ProgrammaticTable {
+  type: "table";
+  rows: () => ProgrammaticTableRow[];
+  addRow: () => ProgrammaticTableRow;
+  removeRow: (index: number) => void;
+}
+
+export interface ProgrammaticTableRow {
+  cells: () => ProgrammaticTableCell[];
+  addCell: () => ProgrammaticTableCell;
+  removeCell: (index: number) => void;
+}
+
+export interface ProgrammaticTableCell {
+  blocklevels: () => ProgrammaticBlockLevel[];
+  addParagraph: (index: number) => ProgrammaticParagraph;
+  removeElement: (index: number) => void;
 }
 
 // Global declarations for external libraries
