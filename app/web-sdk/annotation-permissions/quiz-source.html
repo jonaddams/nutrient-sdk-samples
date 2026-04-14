@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Solar System — Science Quiz</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 0.75in;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      line-height: 1.4;
+      background: #fff;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .quiz-header h1 {
+      font-size: 17pt;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .name-date-line {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      font-size: 10.5pt;
+      color: #444;
+    }
+
+    .name-date-line span {
+      border-bottom: 1px solid #555;
+      padding-bottom: 1px;
+      min-width: 160px;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1.5px solid #1a1a1a;
+      margin: 10px 0 14px;
+    }
+
+    /* ── Section layout ──────────────────────────────────── */
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-header {
+      font-size: 10.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #2c5f8a;
+      border-bottom: 1.5px solid #2c5f8a;
+      padding-bottom: 3px;
+      margin-bottom: 5px;
+    }
+
+    .section-instruction {
+      font-size: 9.5pt;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    /* ── Section 1: Multiple Choice ─────────────────────── */
+    .mc-question {
+      margin-bottom: 10px;
+    }
+
+    .mc-question .question-text {
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-size: 10.5pt;
+    }
+
+    .mc-choices {
+      display: flex;
+      gap: 32px;
+      padding-left: 16px;
+    }
+
+    .mc-choice {
+      font-size: 10.5pt;
+      /* Extra padding so ink circles have room to surround the label */
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    /* ── Section 2: Diagram ─────────────────────────────── */
+    .diagram-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 8px 0 4px;
+      justify-content: center;
+    }
+
+    .planet-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .planet-circle {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7pt;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Sun */
+    .planet-circle.sun {
+      width: 50px;
+      height: 50px;
+      background: #f5c518;
+      color: #6b4c00;
+      font-size: 8pt;
+    }
+
+    /* Mercury */
+    .planet-circle.mercury {
+      width: 22px;
+      height: 22px;
+      background: #aaa;
+    }
+
+    /* Venus */
+    .planet-circle.venus {
+      width: 30px;
+      height: 30px;
+      background: #c8a87a;
+    }
+
+    /* Earth */
+    .planet-circle.earth {
+      width: 32px;
+      height: 32px;
+      background: #3a7abf;
+    }
+
+    /* Mars */
+    .planet-circle.mars {
+      width: 26px;
+      height: 26px;
+      background: #c1440e;
+    }
+
+    .planet-label-line {
+      width: 56px;
+      border-bottom: 1px solid #555;
+      text-align: center;
+      font-size: 8.5pt;
+      color: #444;
+      padding-bottom: 1px;
+      min-height: 14px;
+    }
+
+    .planet-label-line.filled {
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    /* ── Section 3: Short Answer ─────────────────────────── */
+    .answer-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    .answer-line {
+      border-bottom: 1px solid #888;
+      min-height: 18px;
+    }
+
+    /* ── Section 4: Reading Comprehension ────────────────── */
+    .passage-box {
+      background: #f4f4f4;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 10pt;
+      line-height: 1.55;
+      color: #222;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="quiz-header">
+    <h1>The Solar System &mdash; Science Quiz</h1>
+    <div class="name-date-line">
+      <span>Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span>Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── Section 1: Multiple Choice ─────────────────────── -->
+  <div class="section">
+    <div class="section-header">Section 1: Multiple Choice</div>
+    <div class="section-instruction">Circle the correct answer.</div>
+
+    <div class="mc-question">
+      <div class="question-text">1. Which planet is closest to the Sun?</div>
+      <div class="mc-choices">
+        <span class="mc-choice">A)&nbsp;Venus</span>
+        <span class="mc-choice">B)&nbsp;Mercury</span>
+        <span class="mc-choice">C)&nbsp;Earth</span>
+        <span class="mc-choice">D)&nbsp;Mars</span>
+      </div>
+    </div>
+
+    <div class="mc-question">
+      <div class="question-text">2. What is the largest planet in our solar system?</div>
+      <div class="mc-choices">
+        <span class="mc-choice">A)&nbsp;Saturn</span>
+        <span class="mc-choice">B)&nbsp;Neptune</span>
+        <span class="mc-choice">C)&nbsp;Jupiter</span>
+        <span class="mc-choice">D)&nbsp;Uranus</span>
+      </div>
+    </div>
+
+    <div class="mc-question">
+      <div class="question-text">3. Which planet is known as the Red Planet?</div>
+      <div class="mc-choices">
+        <span class="mc-choice">A)&nbsp;Jupiter</span>
+        <span class="mc-choice">B)&nbsp;Mars</span>
+        <span class="mc-choice">C)&nbsp;Venus</span>
+        <span class="mc-choice">D)&nbsp;Saturn</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Label the Diagram ───────────────────── -->
+  <div class="section">
+    <div class="section-header">Section 2: Label the Diagram</div>
+    <div class="section-instruction">Write the name of each planet on the line below it.</div>
+
+    <div class="diagram-row">
+
+      <div class="planet-item">
+        <div class="planet-circle sun">Sun</div>
+        <div class="planet-label-line filled">Sun</div>
+      </div>
+
+      <div class="planet-item">
+        <div class="planet-circle mercury"></div>
+        <div class="planet-label-line"></div>
+      </div>
+
+      <div class="planet-item">
+        <div class="planet-circle venus"></div>
+        <div class="planet-label-line"></div>
+      </div>
+
+      <div class="planet-item">
+        <div class="planet-circle earth"></div>
+        <div class="planet-label-line"></div>
+      </div>
+
+      <div class="planet-item">
+        <div class="planet-circle mars"></div>
+        <div class="planet-label-line"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Section 3: Short Answer ────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Section 3: Short Answer</div>
+    <p style="font-size:10.5pt; margin-bottom:6px;">
+      In your own words, explain why Pluto is no longer classified as a planet.
+    </p>
+    <div class="answer-lines">
+      <div class="answer-line"></div>
+      <div class="answer-line"></div>
+      <div class="answer-line"></div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Reading Comprehension ──────────────── -->
+  <div class="section">
+    <div class="section-header">Section 4: Reading Comprehension</div>
+    <div class="section-instruction">
+      Read the passage below, then highlight the key facts about Jupiter.
+    </div>
+    <div class="passage-box">
+      Jupiter is the largest planet in our solar system, with a diameter of about 143,000 kilometers.
+      It is a gas giant made mostly of hydrogen and helium. Jupiter&rsquo;s Great Red Spot is a massive
+      storm that has been raging for hundreds of years. The planet has at least 95 known moons,
+      including the four large Galilean moons: Io, Europa, Ganymede, and Callisto.
+    </div>
+  </div>
+
+</body>
+</html>
