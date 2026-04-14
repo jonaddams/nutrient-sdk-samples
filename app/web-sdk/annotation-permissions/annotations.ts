@@ -61,7 +61,7 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   {
@@ -76,7 +76,7 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   {
@@ -91,7 +91,7 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   // Section 2: Label Diagram — all 4 correct
@@ -105,6 +105,7 @@ const alexAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mercury" },
     fontSize: 12,
     fontColor: "#f97316",
+    horizontalAlign: "left",
     customData: makeCustomData("alex"),
   },
   {
@@ -117,6 +118,7 @@ const alexAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Venus" },
     fontSize: 12,
     fontColor: "#f97316",
+    horizontalAlign: "left",
     customData: makeCustomData("alex"),
   },
   {
@@ -129,6 +131,7 @@ const alexAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Earth" },
     fontSize: 12,
     fontColor: "#f97316",
+    horizontalAlign: "left",
     customData: makeCustomData("alex"),
   },
   {
@@ -141,6 +144,7 @@ const alexAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mars" },
     fontSize: 12,
     fontColor: "#f97316",
+    horizontalAlign: "left",
     customData: makeCustomData("alex"),
   },
   // Section 3: Short Answer — thorough response
@@ -151,7 +155,7 @@ const alexAnnotations: AnnotationJSON[] = [
     pageIndex: 0,
     bbox: [72, 470, 32, 32],
     opacity: 1,
-    text: { format: "plain", value: "Pluto was reclassified as a dwarf planet in 2006 by the International Astronomical Union because it has not cleared the neighborhood around its orbit, which is one of the three criteria for a full planet." },
+    text: "Pluto was reclassified as a dwarf planet in 2006 by the International Astronomical Union because it has not cleared the neighborhood around its orbit, which is one of the three criteria for a full planet.",
     color: "#f97316",
     customData: makeCustomData("alex"),
   },
@@ -196,7 +200,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   {
@@ -211,7 +215,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   {
@@ -226,7 +230,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   // Section 2: Label Diagram — 3 of 4 correct (puts "Mars" for Venus)
@@ -240,6 +244,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mercury" },
     fontSize: 12,
     fontColor: "#22c55e",
+    horizontalAlign: "left",
     customData: makeCustomData("jordan"),
   },
   {
@@ -252,6 +257,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mars" },
     fontSize: 12,
     fontColor: "#22c55e",
+    horizontalAlign: "left",
     customData: makeCustomData("jordan"),
   },
   {
@@ -264,6 +270,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Earth" },
     fontSize: 12,
     fontColor: "#22c55e",
+    horizontalAlign: "left",
     customData: makeCustomData("jordan"),
   },
   {
@@ -276,6 +283,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mars" },
     fontSize: 12,
     fontColor: "#22c55e",
+    horizontalAlign: "left",
     customData: makeCustomData("jordan"),
   },
   // Section 3: Short Answer — partial
@@ -286,7 +294,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     pageIndex: 0,
     bbox: [72, 470, 32, 32],
     opacity: 1,
-    text: { format: "plain", value: "Pluto is too small and hasn't cleared its orbit so it's a dwarf planet now." },
+    text: "Pluto is too small and hasn't cleared its orbit so it's a dwarf planet now.",
     color: "#22c55e",
     customData: makeCustomData("jordan"),
   },
@@ -320,7 +328,7 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   {
@@ -335,7 +343,7 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   {
@@ -350,7 +358,7 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   // Section 2: Label Diagram — 2 of 4 correct (Jupiter for Venus, Venus for Mars)
@@ -364,6 +372,7 @@ const samAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Mercury" },
     fontSize: 12,
     fontColor: "#3b82f6",
+    horizontalAlign: "left",
     customData: makeCustomData("sam"),
   },
   {
@@ -376,6 +385,7 @@ const samAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Jupiter" },
     fontSize: 12,
     fontColor: "#3b82f6",
+    horizontalAlign: "left",
     customData: makeCustomData("sam"),
   },
   {
@@ -388,6 +398,7 @@ const samAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Earth" },
     fontSize: 12,
     fontColor: "#3b82f6",
+    horizontalAlign: "left",
     customData: makeCustomData("sam"),
   },
   {
@@ -400,6 +411,7 @@ const samAnnotations: AnnotationJSON[] = [
     text: { format: "plain", value: "Venus" },
     fontSize: 12,
     fontColor: "#3b82f6",
+    horizontalAlign: "left",
     customData: makeCustomData("sam"),
   },
   // Section 3: Short Answer — brief/incomplete
@@ -410,7 +422,7 @@ const samAnnotations: AnnotationJSON[] = [
     pageIndex: 0,
     bbox: [72, 470, 32, 32],
     opacity: 1,
-    text: { format: "plain", value: "Because it's really small I think." },
+    text: "Because it's really small I think.",
     color: "#3b82f6",
     customData: makeCustomData("sam"),
   },
