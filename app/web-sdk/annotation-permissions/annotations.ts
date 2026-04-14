@@ -24,36 +24,17 @@ export function getUserById(id: string): UserRole | undefined {
 }
 
 // Annotation JSON type matching the InstantJSON annotations array format
-interface AnnotationJSON {
-  v: number;
-  id: string;
-  type: string;
-  pageIndex: number;
-  bbox: [number, number, number, number];
-  opacity: number;
-  customData: { creatorName: string; color: string };
-  [key: string]: unknown;
-}
+// biome-ignore lint/suspicious/noExplicitAny: InstantJSON annotations have varied shapes per type
+type AnnotationJSON = any;
 
-// Helper to generate deterministic IDs
-function annId(student: string, section: string, index: number): string {
-  return `${student}-${section}-${index}`;
-}
+// Pre-seeded annotations exported from the viewer for each student
+import alexData from "./alex.json";
+import jordanData from "./jordan.json";
+import samData from "./sam.json";
 
-function makeCustomData(userId: string): { creatorName: string; color: string } {
-  const user = getUserById(userId);
-  return { creatorName: userId, color: user?.color ?? "#888888" };
-}
-
-// --- Student annotations ---
-// These will be populated from exported InstantJSON after manually
-// creating annotations in the viewer for each student.
-
-const alexAnnotations: AnnotationJSON[] = [];
-
-const jordanAnnotations: AnnotationJSON[] = [];
-
-const samAnnotations: AnnotationJSON[] = [];
+const alexAnnotations: AnnotationJSON[] = alexData.annotations;
+const jordanAnnotations: AnnotationJSON[] = jordanData.annotations;
+const samAnnotations: AnnotationJSON[] = samData.annotations;
 
 // All annotations keyed by student ID
 const ALL_ANNOTATIONS: Record<string, AnnotationJSON[]> = {
