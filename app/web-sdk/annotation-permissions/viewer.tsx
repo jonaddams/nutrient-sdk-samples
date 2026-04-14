@@ -78,13 +78,16 @@ export default function AnnotationPermissionsViewer() {
 
     const { NutrientViewer } = window;
 
-    // Unload existing instance
+    // Unload existing instance and clear container
     try {
       NutrientViewer.unload(container);
     } catch {
       // Ignore if no instance
     }
     instanceRef.current = null;
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
 
     const studentIds = getVisibleStudentIds();
     // Read from the live store (which includes session-created annotations)
