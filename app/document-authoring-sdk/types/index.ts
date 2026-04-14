@@ -17,6 +17,7 @@ export interface DocAuthEditor {
   destroy: () => void;
   currentDocument: () => DocAuthDocument;
   setCurrentDocument: (doc: DocAuthDocument) => void;
+  insertTextAtCursor: (text: string) => void;
 }
 
 export interface DocAuthViewer {
