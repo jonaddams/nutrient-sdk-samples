@@ -95,7 +95,7 @@ export default function AnnotationPermissionsViewer() {
       (id) => annotationStoreRef.current[id] ?? [],
     );
     const instantJSON = {
-      format: "https://pspdfkit.com/instant-json/v1",
+      format: "https://pspdfkit.com/instant-json/v1" as const,
       annotations,
     };
     const roleRef = currentRole;
