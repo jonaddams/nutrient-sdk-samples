@@ -223,7 +223,7 @@ export default function AnnotationPermissionsViewer() {
           <select
             value={currentRole}
             onChange={(e) => handleRoleChange(e.target.value)}
-            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] cursor-pointer"
             style={{
               borderLeftColor: currentUser?.color,
               borderLeftWidth: "3px",
@@ -246,7 +246,7 @@ export default function AnnotationPermissionsViewer() {
                 <button
                   key={student.id}
                   onClick={() => toggleStudentVisibility(student.id)}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                   style={{
                     backgroundColor: isVisible ? student.color : "transparent",
                     color: isVisible ? "white" : student.color,
