@@ -52,9 +52,6 @@ export default function VariableSidebar({
     <div className="h-full flex flex-col overflow-hidden p-5">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-gray-100 mb-1">
-          Template Variables
-        </h2>
         <p className="text-xs text-gray-400">
           Click a variable to insert it at the cursor position in the document.
         </p>
