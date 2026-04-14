@@ -53,7 +53,8 @@ export default function VariableSidebar({
       {/* Header */}
       <div className="mb-4">
         <p className="text-xs text-gray-400">
-          Click a variable to insert it at the cursor position in the document.
+          Select text in the document, then click a variable to replace it. To
+          insert at a specific position, place your cursor first.
         </p>
       </div>
 
