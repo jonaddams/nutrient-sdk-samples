@@ -72,17 +72,19 @@ const smallGray = { pointSize: 9, color: "#666666" };
 export function buildInvoiceTemplate(): object {
   const elements: DocJsonElement[] = [];
 
-  // --- Header ---
+  // --- Header (mocked data — user replaces with variables) ---
   elements.push(
-    textPara("{{companyName}}", {
+    textPara("Acme Corp", {
       bold: true,
       pointSize: 22,
       color: "#1a1a2e",
     }),
   );
-  elements.push(textPara("{{companyAddress}}", smallGray));
-  elements.push(textPara("{{companyCity}}", smallGray));
-  elements.push(textPara("{{companyEmail}}  |  {{companyPhone}}", smallGray));
+  elements.push(textPara("123 Business Ave, Suite 100", smallGray));
+  elements.push(textPara("San Francisco, CA 94105", smallGray));
+  elements.push(
+    textPara("billing@acmecorp.com  |  (555) 123-4567", smallGray),
+  );
 
   elements.push(emptyPara());
 
@@ -93,7 +95,7 @@ export function buildInvoiceTemplate(): object {
 
   elements.push(emptyPara());
 
-  // --- Invoice details (as a 2-column table) ---
+  // --- Invoice details (mocked data — user replaces with variables) ---
   elements.push({
     type: "t",
     rows: [
@@ -101,20 +103,23 @@ export function buildInvoiceTemplate(): object {
         cells: [
           cell([
             textPara("Invoice Number", label),
-            textPara("{{invoiceNumber}}", value),
+            textPara("1234567", value),
           ]),
           cell([
             textPara("Invoice Date", label),
-            textPara("{{invoiceDate}}", value),
+            textPara("April 14, 2026", value),
           ]),
         ],
       },
       {
         cells: [
-          cell([textPara("Due Date", label), textPara("{{dueDate}}", value)]),
+          cell([
+            textPara("Due Date", label),
+            textPara("May 14, 2026", value),
+          ]),
           cell([
             textPara("Payment Terms", label),
-            textPara("{{paymentTerms}}", value),
+            textPara("Net 30", value),
           ]),
         ],
       },
