@@ -25,6 +25,13 @@ const samples: Sample[] = [
       "Build documents programmatically from form data using the transaction() API with live preview",
     path: "/document-authoring-sdk/document-builder",
   },
+  {
+    name: "Template Variables",
+    category: "Templates",
+    description:
+      "Insert template variables from a browsable sidebar instead of typing them manually, with search, categories, and sample data preview",
+    path: "/document-authoring-sdk/template-variables",
+  },
 ];
 
 export default function DocumentAuthoringSdkSamplesPage() {
