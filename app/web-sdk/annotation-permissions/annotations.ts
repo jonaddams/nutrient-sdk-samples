@@ -25,6 +25,7 @@ export function getUserById(id: string): UserRole | undefined {
 
 // Annotation JSON type matching the InstantJSON annotations array format
 interface AnnotationJSON {
+  v: number;
   id: string;
   type: string;
   pageIndex: number;
@@ -49,40 +50,53 @@ function makeCustomData(userId: string): { creatorName: string; color: string } 
 const alexAnnotations: AnnotationJSON[] = [
   // Section 1: Multiple Choice — circles B (Q1), C (Q2), B (Q3) — all correct
   {
+    v: 1,
     id: annId("alex", "mc", 1),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [193, 178, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[193, 189], [195, 180], [215, 178], [230, 182], [235, 192], [230, 198], [215, 200], [195, 198], [193, 189]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[193, 189], [195, 180], [215, 178], [230, 182], [235, 192], [230, 198], [215, 200], [195, 198], [193, 189]]] },
     lineWidth: 2,
     strokeColor: "#f97316",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "mc", 2),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [293, 218, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[293, 229], [295, 220], [315, 218], [330, 222], [335, 232], [330, 238], [315, 240], [295, 238], [293, 229]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[293, 229], [295, 220], [315, 218], [330, 222], [335, 232], [330, 238], [315, 240], [295, 238], [293, 229]]] },
     lineWidth: 2,
     strokeColor: "#f97316",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "mc", 3),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [193, 258, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[193, 269], [195, 260], [215, 258], [230, 262], [235, 272], [230, 278], [215, 280], [195, 278], [193, 269]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[193, 269], [195, 260], [215, 258], [230, 262], [235, 272], [230, 278], [215, 280], [195, 278], [193, 269]]] },
     lineWidth: 2,
     strokeColor: "#f97316",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("alex"),
   },
   // Section 2: Label Diagram — all 4 correct
   {
+    v: 1,
     id: annId("alex", "label", 1),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -94,6 +108,7 @@ const alexAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "label", 2),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -105,6 +120,7 @@ const alexAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "label", 3),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -116,6 +132,7 @@ const alexAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "label", 4),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -128,6 +145,7 @@ const alexAnnotations: AnnotationJSON[] = [
   },
   // Section 3: Short Answer — thorough response
   {
+    v: 1,
     id: annId("alex", "short", 1),
     type: "pspdfkit/note",
     pageIndex: 0,
@@ -139,6 +157,7 @@ const alexAnnotations: AnnotationJSON[] = [
   },
   // Section 4: Highlight — 2 key facts
   {
+    v: 1,
     id: annId("alex", "hl", 1),
     type: "pspdfkit/markup/highlight",
     pageIndex: 0,
@@ -149,6 +168,7 @@ const alexAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("alex"),
   },
   {
+    v: 1,
     id: annId("alex", "hl", 2),
     type: "pspdfkit/markup/highlight",
     pageIndex: 0,
@@ -165,40 +185,53 @@ const alexAnnotations: AnnotationJSON[] = [
 const jordanAnnotations: AnnotationJSON[] = [
   // Section 1: Multiple Choice — circles B (Q1 ✓), A (Q2 ✗), B (Q3 ✓)
   {
+    v: 1,
     id: annId("jordan", "mc", 1),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [193, 178, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[195, 189], [197, 181], [214, 179], [229, 183], [233, 192], [229, 198], [214, 200], [197, 197], [195, 189]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[195, 189], [197, 181], [214, 179], [229, 183], [233, 192], [229, 198], [214, 200], [197, 197], [195, 189]]] },
     lineWidth: 2,
     strokeColor: "#22c55e",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("jordan"),
   },
   {
+    v: 1,
     id: annId("jordan", "mc", 2),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [93, 218, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[95, 229], [97, 221], [114, 219], [129, 223], [133, 232], [129, 238], [114, 240], [97, 237], [95, 229]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[95, 229], [97, 221], [114, 219], [129, 223], [133, 232], [129, 238], [114, 240], [97, 237], [95, 229]]] },
     lineWidth: 2,
     strokeColor: "#22c55e",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("jordan"),
   },
   {
+    v: 1,
     id: annId("jordan", "mc", 3),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [193, 258, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[195, 269], [197, 261], [214, 259], [229, 263], [233, 272], [229, 278], [214, 280], [197, 277], [195, 269]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[195, 269], [197, 261], [214, 259], [229, 263], [233, 272], [229, 278], [214, 280], [197, 277], [195, 269]]] },
     lineWidth: 2,
     strokeColor: "#22c55e",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("jordan"),
   },
   // Section 2: Label Diagram — 3 of 4 correct (puts "Mars" for Venus)
   {
+    v: 1,
     id: annId("jordan", "label", 1),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -210,6 +243,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("jordan"),
   },
   {
+    v: 1,
     id: annId("jordan", "label", 2),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -221,6 +255,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("jordan"),
   },
   {
+    v: 1,
     id: annId("jordan", "label", 3),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -232,6 +267,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("jordan"),
   },
   {
+    v: 1,
     id: annId("jordan", "label", 4),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -244,6 +280,7 @@ const jordanAnnotations: AnnotationJSON[] = [
   },
   // Section 3: Short Answer — partial
   {
+    v: 1,
     id: annId("jordan", "short", 1),
     type: "pspdfkit/note",
     pageIndex: 0,
@@ -255,6 +292,7 @@ const jordanAnnotations: AnnotationJSON[] = [
   },
   // Section 4: Highlight — 1 fact
   {
+    v: 1,
     id: annId("jordan", "hl", 1),
     type: "pspdfkit/markup/highlight",
     pageIndex: 0,
@@ -271,40 +309,53 @@ const jordanAnnotations: AnnotationJSON[] = [
 const samAnnotations: AnnotationJSON[] = [
   // Section 1: Multiple Choice — circles A (Q1 ✗), C (Q2 ✓), A (Q3 ✗)
   {
+    v: 1,
     id: annId("sam", "mc", 1),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [93, 178, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[95, 189], [97, 181], [114, 179], [129, 183], [133, 192], [129, 198], [114, 200], [97, 197], [95, 189]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[95, 189], [97, 181], [114, 179], [129, 183], [133, 192], [129, 198], [114, 200], [97, 197], [95, 189]]] },
     lineWidth: 2,
     strokeColor: "#3b82f6",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("sam"),
   },
   {
+    v: 1,
     id: annId("sam", "mc", 2),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [293, 218, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[295, 229], [297, 221], [314, 219], [329, 223], [333, 232], [329, 238], [314, 240], [297, 237], [295, 229]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[295, 229], [297, 221], [314, 219], [329, 223], [333, 232], [329, 238], [314, 240], [297, 237], [295, 229]]] },
     lineWidth: 2,
     strokeColor: "#3b82f6",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("sam"),
   },
   {
+    v: 1,
     id: annId("sam", "mc", 3),
     type: "pspdfkit/ink",
     pageIndex: 0,
     bbox: [93, 258, 45, 22],
     opacity: 1,
-    lines: { intensities: [[1, 1, 1, 1]], points: [[95, 269], [97, 261], [114, 259], [129, 263], [133, 272], [129, 278], [114, 280], [97, 277], [95, 269]] },
+    lines: { intensities: [[1, 1, 1, 1, 1, 1, 1, 1, 1]], points: [[[95, 269], [97, 261], [114, 259], [129, 263], [133, 272], [129, 278], [114, 280], [97, 277], [95, 269]]] },
     lineWidth: 2,
     strokeColor: "#3b82f6",
+    isDrawnNaturally: false,
+    isSignature: false,
+    backgroundColor: null,
     customData: makeCustomData("sam"),
   },
   // Section 2: Label Diagram — 2 of 4 correct (Jupiter for Venus, Venus for Mars)
   {
+    v: 1,
     id: annId("sam", "label", 1),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -316,6 +367,7 @@ const samAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("sam"),
   },
   {
+    v: 1,
     id: annId("sam", "label", 2),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -327,6 +379,7 @@ const samAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("sam"),
   },
   {
+    v: 1,
     id: annId("sam", "label", 3),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -338,6 +391,7 @@ const samAnnotations: AnnotationJSON[] = [
     customData: makeCustomData("sam"),
   },
   {
+    v: 1,
     id: annId("sam", "label", 4),
     type: "pspdfkit/text",
     pageIndex: 0,
@@ -350,6 +404,7 @@ const samAnnotations: AnnotationJSON[] = [
   },
   // Section 3: Short Answer — brief/incomplete
   {
+    v: 1,
     id: annId("sam", "short", 1),
     type: "pspdfkit/note",
     pageIndex: 0,
