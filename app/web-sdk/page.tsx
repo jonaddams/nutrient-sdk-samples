@@ -14,6 +14,13 @@ type Sample = {
 
 const samples: Sample[] = [
   {
+    name: "Annotation Permissions",
+    category: "Annotations",
+    description:
+      "Role-based annotation permissions with a teacher/student classroom model — toggle visibility per student",
+    path: "/web-sdk/annotation-permissions",
+  },
+  {
     name: "Annotation Presets",
     category: "Annotations",
     description:
