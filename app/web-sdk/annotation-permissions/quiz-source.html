@@ -40,16 +40,28 @@
 
     .name-date-line {
       display: flex;
-      justify-content: center;
-      gap: 48px;
+      justify-content: flex-start;
+      gap: 36px;
       font-size: 10.5pt;
       color: #444;
     }
 
-    .name-date-line span {
+    .name-date-field {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .name-date-field label {
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .name-date-field .blank {
       border-bottom: 1px solid #555;
-      padding-bottom: 1px;
-      min-width: 160px;
+      min-width: 180px;
+      display: inline-block;
+      height: 1.2em;
     }
 
     hr.divider {
@@ -60,7 +72,7 @@
 
     /* ── Section layout ──────────────────────────────────── */
     .section {
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
 
     .section-header {
@@ -216,8 +228,8 @@
   <div class="quiz-header">
     <h1>The Solar System &mdash; Science Quiz</h1>
     <div class="name-date-line">
-      <span>Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-      <span>Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <div class="name-date-field"><label>Name:</label><span class="blank"></span></div>
+      <div class="name-date-field"><label>Date:</label><span class="blank" style="min-width:120px;"></span></div>
     </div>
   </div>
 
