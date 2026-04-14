@@ -85,6 +85,25 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
     ],
   },
   {
+    name: "Items (Loop)",
+    variables: [
+      { label: "Loop Start", token: "#items", sampleValue: "" },
+      {
+        label: "Description",
+        token: "description",
+        sampleValue: "Website Redesign",
+      },
+      { label: "Quantity", token: "quantity", sampleValue: "1" },
+      {
+        label: "Unit Price",
+        token: "unitPrice",
+        sampleValue: "$3,000.00",
+      },
+      { label: "Amount", token: "amount", sampleValue: "$3,000.00" },
+      { label: "Loop End", token: "/items", sampleValue: "" },
+    ],
+  },
+  {
     name: "Totals",
     variables: [
       { label: "Subtotal", token: "subtotal", sampleValue: "$4,500.00" },

@@ -147,18 +147,10 @@ export function buildInvoiceTemplate(): object {
       },
       {
         cells: [
-          cell([textPara("Website Redesign", value)]),
-          cell([textPara("1", value)]),
-          cell([textPara("$3,000.00", value)]),
-          cell([textPara("$3,000.00", value)]),
-        ],
-      },
-      {
-        cells: [
-          cell([textPara("SEO Optimization", value)]),
-          cell([textPara("1", value)]),
-          cell([textPara("$1,500.00", value)]),
-          cell([textPara("$1,500.00", value)]),
+          cell([textPara("{{#items}}{{description}}", value)]),
+          cell([textPara("{{quantity}}", value)]),
+          cell([textPara("{{unitPrice}}", value)]),
+          cell([textPara("{{amount}}{{/items}}", value)]),
         ],
       },
     ],
