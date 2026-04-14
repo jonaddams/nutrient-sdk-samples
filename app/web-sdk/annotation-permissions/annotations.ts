@@ -61,7 +61,6 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   {
@@ -76,7 +75,6 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   {
@@ -91,7 +89,6 @@ const alexAnnotations: AnnotationJSON[] = [
     strokeColor: "#f97316",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("alex"),
   },
   // Section 2: Label Diagram — all 4 correct
@@ -204,7 +201,6 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   {
@@ -219,7 +215,6 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   {
@@ -234,7 +229,6 @@ const jordanAnnotations: AnnotationJSON[] = [
     strokeColor: "#22c55e",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("jordan"),
   },
   // Section 2: Label Diagram — 3 of 4 correct (puts "Mars" for Venus)
@@ -336,7 +330,6 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   {
@@ -351,7 +344,6 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   {
@@ -366,7 +358,6 @@ const samAnnotations: AnnotationJSON[] = [
     strokeColor: "#3b82f6",
     isDrawnNaturally: false,
     isSignature: false,
-    backgroundColor: "#ffffff",
     customData: makeCustomData("sam"),
   },
   // Section 2: Label Diagram — 2 of 4 correct (Jupiter for Venus, Venus for Mars)
