@@ -122,8 +122,6 @@ export default function AnnotationPermissionsViewer() {
     })
       .then((instance: Instance) => {
         instanceRef.current = instance;
-        // Expose instance for console export: await window.__nutrientInstance.exportInstantJSON()
-        (window as any).__nutrientInstance = instance;
         setIsLoading(false);
 
         // Stamp new annotations with current user's identity
