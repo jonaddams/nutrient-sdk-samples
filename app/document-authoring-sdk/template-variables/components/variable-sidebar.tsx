@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  VARIABLE_CATEGORIES,
   type TemplateVariable,
+  VARIABLE_CATEGORIES,
   type VariableCategory,
 } from "../data/variables";
 

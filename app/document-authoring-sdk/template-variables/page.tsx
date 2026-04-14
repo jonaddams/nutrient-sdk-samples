@@ -3,15 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/app/_components/PageHeader";
 import type { DocAuthEditor, DocAuthSystem } from "../types";
+import EditorPanel from "./components/editor-panel";
+import ExportBar from "./components/export-bar";
+import VariableSidebar from "./components/variable-sidebar";
+import { buildInvoiceTemplate } from "./data/invoice-template";
 import type { TemplateVariable } from "./data/variables";
 import { SAMPLE_VALUES } from "./data/variables";
-import { buildInvoiceTemplate } from "./data/invoice-template";
-import EditorPanel from "./components/editor-panel";
-import VariableSidebar from "./components/variable-sidebar";
-import ExportBar from "./components/export-bar";
 
 export default function TemplateVariablesPage() {
-  const [docAuthSystem, setDocAuthSystem] = useState<DocAuthSystem | null>(null);
+  const [docAuthSystem, setDocAuthSystem] = useState<DocAuthSystem | null>(
+    null,
+  );
   const [editor, setEditor] = useState<DocAuthEditor | null>(null);
   const [lastInserted, setLastInserted] = useState<string | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -168,7 +170,9 @@ export default function TemplateVariablesPage() {
     } else {
       // Save current state, replace tokens with sample values, reload
       try {
-        const jsonString = await editor.currentDocument().saveDocumentJSONString();
+        const jsonString = await editor
+          .currentDocument()
+          .saveDocumentJSONString();
         prePreviewJson.current = jsonString;
         let replaced = jsonString;
         for (const [token, sampleValue] of Object.entries(SAMPLE_VALUES)) {
@@ -225,7 +229,9 @@ export default function TemplateVariablesPage() {
                   : "bg-gray-700 hover:bg-gray-600 text-gray-200 border border-gray-600"
               }`}
             >
-              {isPreviewing ? "\u2190 Back to Template" : "Preview with Sample Data"}
+              {isPreviewing
+                ? "\u2190 Back to Template"
+                : "Preview with Sample Data"}
             </button>
 
             {/* Export */}

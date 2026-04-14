@@ -74,13 +74,15 @@ export function buildInvoiceTemplate(): object {
 
   // --- Header ---
   elements.push(
-    textPara("{{companyName}}", { bold: true, pointSize: 22, color: "#1a1a2e" }),
+    textPara("{{companyName}}", {
+      bold: true,
+      pointSize: 22,
+      color: "#1a1a2e",
+    }),
   );
   elements.push(textPara("{{companyAddress}}", smallGray));
   elements.push(textPara("{{companyCity}}", smallGray));
-  elements.push(
-    textPara("{{companyEmail}}  |  {{companyPhone}}", smallGray),
-  );
+  elements.push(textPara("{{companyEmail}}  |  {{companyPhone}}", smallGray));
 
   elements.push(emptyPara());
 
@@ -109,10 +111,7 @@ export function buildInvoiceTemplate(): object {
       },
       {
         cells: [
-          cell([
-            textPara("Due Date", label),
-            textPara("{{dueDate}}", value),
-          ]),
+          cell([textPara("Due Date", label), textPara("{{dueDate}}", value)]),
           cell([
             textPara("Payment Terms", label),
             textPara("{{paymentTerms}}", value),
@@ -186,10 +185,18 @@ export function buildInvoiceTemplate(): object {
       {
         cells: [
           cell([
-            textPara("Total Due", { bold: true, pointSize: 12, color: "#1F4E79" }),
+            textPara("Total Due", {
+              bold: true,
+              pointSize: 12,
+              color: "#1F4E79",
+            }),
           ]),
           cell([
-            textPara("{{total}}", { bold: true, pointSize: 12, color: "#1F4E79" }),
+            textPara("{{total}}", {
+              bold: true,
+              pointSize: 12,
+              color: "#1F4E79",
+            }),
           ]),
         ],
       },
