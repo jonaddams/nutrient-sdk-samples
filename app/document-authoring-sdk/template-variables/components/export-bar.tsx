@@ -22,9 +22,7 @@ function triggerDownload(blob: Blob, filename: string): void {
 export default function ExportBar({ document: doc }: ExportBarProps) {
   const [exporting, setExporting] = useState<string | null>(null);
 
-  const handleExport = async (
-    format: "pdf" | "docx" | "json",
-  ) => {
+  const handleExport = async (format: "pdf" | "docx" | "json") => {
     if (!doc) return;
     setExporting(format);
     try {
