@@ -133,7 +133,9 @@ export function buildInvoiceTemplate(): object {
   elements.push(textPara("{{clientName}}", value));
   elements.push(textPara("{{clientCompany}}", value));
   elements.push(textPara("{{clientAddress}}", value));
-  elements.push(textPara("{{clientCity}}", value));
+  elements.push(
+    textPara("{{clientCity}}, {{clientState}} {{clientZip}}", value),
+  );
 
   elements.push(emptyPara());
 

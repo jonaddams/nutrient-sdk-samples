@@ -53,8 +53,9 @@ export default function VariableSidebar({
       {/* Header */}
       <div className="mb-4">
         <p className="text-xs text-gray-400">
-          Select text in the document, then click a variable to replace it. To
-          insert at a specific position, place your cursor first.
+          Select text in the document, then click a variable to replace it.
+          E.g. highlight &ldquo;Acme Corp&rdquo;, then click{" "}
+          <code className="text-gray-300">{"{{companyName}}"}</code> below.
         </p>
       </div>
 

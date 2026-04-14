@@ -27,7 +27,17 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
       {
         label: "Company City",
         token: "companyCity",
-        sampleValue: "San Francisco, CA 94105",
+        sampleValue: "San Francisco",
+      },
+      {
+        label: "Company State",
+        token: "companyState",
+        sampleValue: "CA",
+      },
+      {
+        label: "Company Zip",
+        token: "companyZip",
+        sampleValue: "94105",
       },
       {
         label: "Company Email",
@@ -58,7 +68,17 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
       {
         label: "Client City",
         token: "clientCity",
-        sampleValue: "Portland, OR 97201",
+        sampleValue: "Portland",
+      },
+      {
+        label: "Client State",
+        token: "clientState",
+        sampleValue: "OR",
+      },
+      {
+        label: "Client Zip",
+        token: "clientZip",
+        sampleValue: "97201",
       },
       {
         label: "Client Email",
