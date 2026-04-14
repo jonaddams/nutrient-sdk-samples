@@ -103,18 +103,14 @@ export default function TextViewerPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to convert file",
-        );
+        throw new Error(errorData.error || "Failed to convert file");
       }
 
       const pdfBlob = await response.blob();
       const url = URL.createObjectURL(pdfBlob);
       setPdfUrl(url);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Conversion failed",
-      );
+      setError(err instanceof Error ? err.message : "Conversion failed");
     } finally {
       setIsConverting(false);
     }
@@ -173,8 +169,8 @@ export default function TextViewerPage() {
               Text to HTML
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              Wraps plain text lines in styled HTML with
-              readability-focused formatting
+              Wraps plain text lines in styled HTML with readability-focused
+              formatting
             </p>
           </div>
 
@@ -199,8 +195,8 @@ export default function TextViewerPage() {
               CSV Tables
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              CSV files are rendered as styled HTML tables for clear,
-              structured data presentation
+              CSV files are rendered as styled HTML tables for clear, structured
+              data presentation
             </p>
           </div>
 
@@ -225,8 +221,8 @@ export default function TextViewerPage() {
               DWS PDF Conversion
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              HTML is converted to PDF using the Nutrient DWS API
-              /build endpoint
+              HTML is converted to PDF using the Nutrient DWS API /build
+              endpoint
             </p>
           </div>
         </div>
@@ -298,7 +294,12 @@ export default function TextViewerPage() {
                   ) : (
                     <pre
                       className="text-sm text-gray-800 dark:text-gray-100 font-mono whitespace-pre overflow-x-auto leading-relaxed"
-                      style={{ background: "transparent", border: "none", padding: 0, color: "inherit" }}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        padding: 0,
+                        color: "inherit",
+                      }}
                     >
                       {previewContent}
                     </pre>
@@ -312,7 +313,10 @@ export default function TextViewerPage() {
                   onClick={handleConvert}
                   disabled={isConverting}
                   className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ background: "var(--color-blue-600)", color: "white" }}
+                  style={{
+                    background: "var(--color-blue-600)",
+                    color: "white",
+                  }}
                 >
                   {isConverting ? (
                     <>
@@ -393,16 +397,15 @@ export default function TextViewerPage() {
             <ol className="mt-4 ml-5 space-y-2 text-gray-600 dark:text-gray-400 list-decimal">
               <li>Select a text-based file (.txt, .csv, or .xml)</li>
               <li>
-                The file content is converted to styled HTML on the
-                server:
+                The file content is converted to styled HTML on the server:
                 <div className="ml-2 mt-1 space-y-1">
                   <p>
-                    &mdash; <strong>.txt</strong> lines are wrapped
-                    in paragraph tags
+                    &mdash; <strong>.txt</strong> lines are wrapped in paragraph
+                    tags
                   </p>
                   <p>
-                    &mdash; <strong>.csv</strong> data is rendered as
-                    a styled HTML table
+                    &mdash; <strong>.csv</strong> data is rendered as a styled
+                    HTML table
                   </p>
                   <p>
                     &mdash; <strong>.xml</strong> content gets syntax
@@ -411,12 +414,11 @@ export default function TextViewerPage() {
                 </div>
               </li>
               <li>
-                The HTML is sent to the Nutrient DWS API /build
-                endpoint for PDF conversion
+                The HTML is sent to the Nutrient DWS API /build endpoint for PDF
+                conversion
               </li>
               <li>
-                The resulting PDF is displayed in the Nutrient Web
-                SDK viewer
+                The resulting PDF is displayed in the Nutrient Web SDK viewer
               </li>
             </ol>
           </details>
@@ -426,9 +428,9 @@ export default function TextViewerPage() {
         {!pdfUrl && (
           <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 text-center">
             <p>
-              This sample demonstrates converting text-based files to
-              PDF using the Nutrient DWS API. Requires NUTRIENT_API_KEY
-              environment variable.
+              This sample demonstrates converting text-based files to PDF using
+              the Nutrient DWS API. Requires NUTRIENT_API_KEY environment
+              variable.
             </p>
           </div>
         )}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useEffect, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -118,7 +118,10 @@ export default function MdToPdfPage() {
                   onClick={handleConvert}
                   disabled={processing || loading}
                   className="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                  style={{ background: "var(--digital-pollen)", color: "var(--black)" }}
+                  style={{
+                    background: "var(--digital-pollen)",
+                    color: "var(--black)",
+                  }}
                 >
                   {processing ? "Converting..." : "Convert to PDF"}
                 </button>
@@ -155,7 +158,9 @@ export default function MdToPdfPage() {
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
                     <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Converting to PDF...</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Converting to PDF...
+                    </p>
                   </div>
                 </div>
               )}
@@ -163,8 +168,12 @@ export default function MdToPdfPage() {
               {!resultBuffer && !processing && !error && (
                 <div className="flex-1 h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
                   <div className="text-center space-y-2">
-                    <p className="text-sm">Edit the Markdown and click &quot;Convert to PDF&quot;</p>
-                    <p className="text-xs">The converted PDF will be displayed here</p>
+                    <p className="text-sm">
+                      Edit the Markdown and click &quot;Convert to PDF&quot;
+                    </p>
+                    <p className="text-xs">
+                      The converted PDF will be displayed here
+                    </p>
                   </div>
                 </div>
               )}

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 import type { WatermarkConfig } from "./viewer";
@@ -125,7 +125,10 @@ export default function WatermarkPage() {
 
                 {/* Font size */}
                 <div>
-                  <label htmlFor="wm-fontsize" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label
+                    htmlFor="wm-fontsize"
+                    className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
                     Font Size
                   </label>
                   <div className="flex items-center gap-2">
@@ -136,7 +139,9 @@ export default function WatermarkPage() {
                       max={120}
                       step={2}
                       value={config.fontSize}
-                      onChange={(e) => update("fontSize", Number(e.target.value))}
+                      onChange={(e) =>
+                        update("fontSize", Number(e.target.value))
+                      }
                       className="flex-1"
                       style={{ accentColor: "var(--digital-pollen)" }}
                     />
@@ -148,7 +153,10 @@ export default function WatermarkPage() {
 
                 {/* Color */}
                 <div>
-                  <label htmlFor="wm-color" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label
+                    htmlFor="wm-color"
+                    className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
                     Color
                   </label>
                   <div className="flex items-center gap-2">
@@ -156,7 +164,9 @@ export default function WatermarkPage() {
                       id="wm-color"
                       type="color"
                       value={rgbToHex(config.color)}
-                      onChange={(e) => update("color", hexToRgb(e.target.value))}
+                      onChange={(e) =>
+                        update("color", hexToRgb(e.target.value))
+                      }
                       className="w-8 h-8 rounded cursor-pointer border border-gray-300 dark:border-gray-600"
                     />
                     <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -167,7 +177,10 @@ export default function WatermarkPage() {
 
                 {/* Opacity */}
                 <div>
-                  <label htmlFor="wm-opacity" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label
+                    htmlFor="wm-opacity"
+                    className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
                     Opacity
                   </label>
                   <div className="flex items-center gap-2">
@@ -192,7 +205,10 @@ export default function WatermarkPage() {
 
                 {/* Rotation */}
                 <div>
-                  <label htmlFor="wm-rotation" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  <label
+                    htmlFor="wm-rotation"
+                    className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
                     Rotation
                   </label>
                   <div className="flex items-center gap-2">

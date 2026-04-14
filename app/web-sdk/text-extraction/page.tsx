@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
@@ -37,12 +37,12 @@ export default function TextExtractionPage() {
   const currentPageText = pageTexts.find((p) => p.pageIndex === currentPage);
   const displayText =
     viewMode === "current"
-      ? currentPageText?.text ?? ""
-      : pageTexts.map((p) => `--- Page ${p.pageIndex + 1} ---\n${p.text}`).join("\n\n");
+      ? (currentPageText?.text ?? "")
+      : pageTexts
+          .map((p) => `--- Page ${p.pageIndex + 1} ---\n${p.text}`)
+          .join("\n\n");
 
-  const wordCount = displayText
-    .split(/\s+/)
-    .filter((w) => w.length > 0).length;
+  const wordCount = displayText.split(/\s+/).filter((w) => w.length > 0).length;
 
   const handleCopy = async () => {
     try {
@@ -127,9 +127,7 @@ export default function TextExtractionPage() {
                     disabled={!displayText}
                     className="flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: copied
-                        ? "#22c55e"
-                        : "var(--digital-pollen)",
+                      background: copied ? "#22c55e" : "var(--digital-pollen)",
                       color: "var(--black)",
                     }}
                   >

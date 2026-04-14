@@ -10,7 +10,8 @@
 button[data-name^="initials-"] .PSPDFKit-Annotation-Widget-Signature-Badge {
   font-size: 0 !important;
 }
-button[data-name^="initials-"] .PSPDFKit-Annotation-Widget-Signature-Badge::after {
+button[data-name^="initials-"]
+  .PSPDFKit-Annotation-Widget-Signature-Badge::after {
   content: "Initial" !important;
   font-size: 10px !important;
 }

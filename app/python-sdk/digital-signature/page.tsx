@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -90,7 +90,9 @@ export default function DigitalSignaturePage() {
                   Document
                 </h3>
                 <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
-                  <span className="font-mono text-xs">service-agreement.pdf</span>
+                  <span className="font-mono text-xs">
+                    service-agreement.pdf
+                  </span>
                 </div>
               </div>
 
@@ -117,7 +119,10 @@ export default function DigitalSignaturePage() {
                     onClick={handleSign}
                     disabled={processing}
                     className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ background: "var(--digital-pollen)", color: "var(--black)" }}
+                    style={{
+                      background: "var(--digital-pollen)",
+                      color: "var(--black)",
+                    }}
                   >
                     {processing ? "Signing..." : "Sign Document"}
                   </button>
@@ -164,7 +169,9 @@ export default function DigitalSignaturePage() {
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
                     <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Applying digital signature...</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Applying digital signature...
+                    </p>
                   </div>
                 </div>
               )}

@@ -51,7 +51,10 @@ export async function GET() {
 
     const data = await response.json();
     console.log("Certificates fetched successfully");
-    console.log("Certificate count:", data.data?.ca_certificates?.length || data.ca_certificates?.length || 0);
+    console.log(
+      "Certificate count:",
+      data.data?.ca_certificates?.length || data.ca_certificates?.length || 0,
+    );
 
     // DWS API returns {data: {ca_certificates: [...]}}
     return NextResponse.json(data.data || data);

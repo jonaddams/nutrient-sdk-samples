@@ -6,309 +6,309 @@
     <title>Invoice SD-2025-0041</title>
     <style>
       * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
 
-      body {
-        font-size: 0.75rem;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #333;
-        margin: 0 auto;
-        position: relative;
-        background: white;
-      }
+            body {
+              font-size: 0.75rem;
+              font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+              color: #333;
+              margin: 0 auto;
+              position: relative;
+              background: white;
+            }
 
-      #pspdfkit-header {
-        display: flow-root;
-        padding: 2rem 2.5rem 1.25rem;
-        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-        color: white;
-      }
+            #pspdfkit-header {
+              display: flow-root;
+              padding: 2rem 2.5rem 1.25rem;
+              background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+              color: white;
+            }
 
-      .header-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+            .header-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
 
-      .logotype {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
+            .logotype {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+            }
 
-      .logo-text {
-        font-size: 1.5rem;
-        font-weight: 100;
-        letter-spacing: 6px;
-        text-transform: uppercase;
-      }
+            .logo-text {
+              font-size: 1.5rem;
+              font-weight: 100;
+              letter-spacing: 6px;
+              text-transform: uppercase;
+            }
 
-      .logo-divider {
-        width: 1px;
-        height: 30px;
-        background: #e91e63;
-        margin: 0 0.5rem;
-      }
+            .logo-divider {
+              width: 1px;
+              height: 30px;
+              background: #e91e63;
+              margin: 0 0.5rem;
+            }
 
-      .logo-sub {
-        font-size: 0.5625rem;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        opacity: 0.7;
-      }
+            .logo-sub {
+              font-size: 0.5625rem;
+              letter-spacing: 3px;
+              text-transform: uppercase;
+              opacity: 0.7;
+            }
 
-      .header-right {
-        text-align: right;
-        font-size: 0.5625rem;
-        line-height: 1.8;
-        opacity: 0.8;
-      }
+            .header-right {
+              text-align: right;
+              font-size: 0.5625rem;
+              line-height: 1.8;
+              opacity: 0.8;
+            }
 
-      #pspdfkit-footer {
-        display: flow-root;
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        box-sizing: border-box;
-        width: 100%;
-        background: #1a1a1a;
-        color: white;
-        padding: 0.625rem 2.5rem;
-        font-size: 0.5rem;
-      }
+            #pspdfkit-footer {
+              display: flow-root;
+              position: absolute;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              box-sizing: border-box;
+              width: 100%;
+              background: #1a1a1a;
+              color: white;
+              padding: 0.625rem 2.5rem;
+              font-size: 0.5rem;
+            }
 
-      .footer-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+            .footer-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
 
-      .footer-links {
-        display: flex;
-        gap: 1.5rem;
-        opacity: 0.6;
-      }
+            .footer-links {
+              display: flex;
+              gap: 1.5rem;
+              opacity: 0.6;
+            }
 
-      .page {
-        margin: 0 2.5rem;
-        padding-top: 0.5rem;
-      }
+            .page {
+              margin: 0 2.5rem;
+              padding-top: 0.5rem;
+            }
 
-      .accent-line {
-        height: 3px;
-        background: linear-gradient(90deg, #e91e63, #ff5722, #ff9800);
-        margin-bottom: 2rem;
-      }
+            .accent-line {
+              height: 3px;
+              background: linear-gradient(90deg, #e91e63, #ff5722, #ff9800);
+              margin-bottom: 2rem;
+            }
 
-      .invoice-intro {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2.5rem;
-      }
+            .invoice-intro {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 2.5rem;
+            }
 
-      .invoice-intro h1 {
-        font-size: 2rem;
-        font-weight: 100;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        color: #1a1a1a;
-      }
+            .invoice-intro h1 {
+              font-size: 2rem;
+              font-weight: 100;
+              letter-spacing: 4px;
+              text-transform: uppercase;
+              color: #1a1a1a;
+            }
 
-      .invoice-intro .number {
-        font-size: 0.875rem;
-        color: #e91e63;
-        font-weight: 300;
-        margin-top: 0.25rem;
-      }
+            .invoice-intro .number {
+              font-size: 0.875rem;
+              color: #e91e63;
+              font-weight: 300;
+              margin-top: 0.25rem;
+            }
 
-      .invoice-dates {
-        text-align: right;
-        line-height: 2;
-      }
+            .invoice-dates {
+              text-align: right;
+              line-height: 2;
+            }
 
-      .invoice-dates .label {
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #999;
-      }
+            .invoice-dates .label {
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #999;
+            }
 
-      .parties-row {
-        display: flex;
-        gap: 3rem;
-        margin-bottom: 2rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #eee;
-      }
+            .parties-row {
+              display: flex;
+              gap: 3rem;
+              margin-bottom: 2rem;
+              padding-bottom: 2rem;
+              border-bottom: 1px solid #eee;
+            }
 
-      .party-col {
-        flex: 1;
-      }
+            .party-col {
+              flex: 1;
+            }
 
-      .party-col .title {
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #e91e63;
-        margin-bottom: 0.625rem;
-        font-weight: 500;
-      }
+            .party-col .title {
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              color: #e91e63;
+              margin-bottom: 0.625rem;
+              font-weight: 500;
+            }
 
-      .party-col p {
-        margin: 2px 0;
-        line-height: 1.6;
-        color: #555;
-      }
+            .party-col p {
+              margin: 2px 0;
+              line-height: 1.6;
+              color: #555;
+            }
 
-      .party-col p:first-of-type {
-        font-weight: 600;
-        color: #1a1a1a;
-      }
+            .party-col p:first-of-type {
+              font-weight: 600;
+              color: #1a1a1a;
+            }
 
-      .services-grid {
-        margin: 1.5rem 0;
-      }
+            .services-grid {
+              margin: 1.5rem 0;
+            }
 
-      .service-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 1rem 0;
-        border-bottom: 1px solid #f0f0f0;
-      }
+            .service-item {
+              display: flex;
+              justify-content: space-between;
+              padding: 1rem 0;
+              border-bottom: 1px solid #f0f0f0;
+            }
 
-      .service-item:last-child {
-        border-bottom: 2px solid #1a1a1a;
-      }
+            .service-item:last-child {
+              border-bottom: 2px solid #1a1a1a;
+            }
 
-      .service-left {
-        flex: 1;
-      }
+            .service-left {
+              flex: 1;
+            }
 
-      .service-name {
-        font-weight: 500;
-        font-size: 0.8125rem;
-        color: #1a1a1a;
-        margin-bottom: 0.25rem;
-      }
+            .service-name {
+              font-weight: 500;
+              font-size: 0.8125rem;
+              color: #1a1a1a;
+              margin-bottom: 0.25rem;
+            }
 
-      .service-desc {
-        font-size: 0.625rem;
-        color: #888;
-        line-height: 1.6;
-        max-width: 400px;
-      }
+            .service-desc {
+              font-size: 0.625rem;
+              color: #888;
+              line-height: 1.6;
+              max-width: 400px;
+            }
 
-      .service-right {
-        text-align: right;
-        min-width: 100px;
-      }
+            .service-right {
+              text-align: right;
+              min-width: 100px;
+            }
 
-      .service-amount {
-        font-size: 0.8125rem;
-        font-weight: 500;
-      }
+            .service-amount {
+              font-size: 0.8125rem;
+              font-weight: 500;
+            }
 
-      .service-detail {
-        font-size: 0.5625rem;
-        color: #999;
-        margin-top: 0.125rem;
-      }
+            .service-detail {
+              font-size: 0.5625rem;
+              color: #999;
+              margin-top: 0.125rem;
+            }
 
-      .summary-area {
-        display: flex;
-        justify-content: flex-end;
-        margin: 2rem 0;
-      }
+            .summary-area {
+              display: flex;
+              justify-content: flex-end;
+              margin: 2rem 0;
+            }
 
-      .summary-block {
-        width: 250px;
-      }
+            .summary-block {
+              width: 250px;
+            }
 
-      .summary-line {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.375rem 0;
-        font-size: 0.6875rem;
-        color: #666;
-      }
+            .summary-line {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.375rem 0;
+              font-size: 0.6875rem;
+              color: #666;
+            }
 
-      .summary-line.total {
-        padding: 0.75rem 0;
-        border-top: 2px solid #1a1a1a;
-        color: #1a1a1a;
-        font-weight: 600;
-        font-size: 1rem;
-      }
+            .summary-line.total {
+              padding: 0.75rem 0;
+              border-top: 2px solid #1a1a1a;
+              color: #1a1a1a;
+              font-weight: 600;
+              font-size: 1rem;
+            }
 
-      .summary-line.total .amount {
-        color: #e91e63;
-      }
+            .summary-line.total .amount {
+              color: #e91e63;
+            }
 
-      .deliverables {
-        margin-top: 2.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #eee;
-      }
+            .deliverables {
+              margin-top: 2.5rem;
+              padding-top: 1.5rem;
+              border-top: 1px solid #eee;
+            }
 
-      .deliverables h3 {
-        font-size: 0.6875rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #1a1a1a;
-        margin-bottom: 1rem;
-        font-weight: 400;
-      }
+            .deliverables h3 {
+              font-size: 0.6875rem;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              color: #1a1a1a;
+              margin-bottom: 1rem;
+              font-weight: 400;
+            }
 
-      .deliverables-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-      }
+            .deliverables-grid {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.75rem;
+            }
 
-      .deliverable-tag {
-        font-size: 0.5625rem;
-        padding: 0.375rem 0.75rem;
-        background: #f8f8f8;
-        border: 1px solid #e0e0e0;
-        color: #555;
-      }
+            .deliverable-tag {
+              font-size: 0.5625rem;
+              padding: 0.375rem 0.75rem;
+              background: #f8f8f8;
+              border: 1px solid #e0e0e0;
+              color: #555;
+            }
 
-      .thank-you {
-        margin-top: 3rem;
-        text-align: center;
-        padding: 2rem;
-      }
+            .thank-you {
+              margin-top: 3rem;
+              text-align: center;
+              padding: 2rem;
+            }
 
-      .thank-you p {
-        font-size: 0.875rem;
-        font-weight: 300;
-        letter-spacing: 2px;
-        color: #999;
-        text-transform: uppercase;
-      }
+            .thank-you p {
+              font-size: 0.875rem;
+              font-weight: 300;
+              letter-spacing: 2px;
+              color: #999;
+              text-transform: uppercase;
+            }
 
-      .payment-info {
-        margin-top: 1.5rem;
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        font-size: 0.625rem;
-        color: #999;
-      }
+            .payment-info {
+              margin-top: 1.5rem;
+              display: flex;
+              justify-content: center;
+              gap: 3rem;
+              font-size: 0.625rem;
+              color: #999;
+            }
 
-      .payment-info div {
-        text-align: center;
-      }
+            .payment-info div {
+              text-align: center;
+            }
 
-      .payment-info strong {
-        color: #555;
-        display: block;
-        margin-bottom: 0.125rem;
-      }
+            .payment-info strong {
+              color: #555;
+              display: block;
+              margin-bottom: 0.125rem;
+            }
     </style>
   </head>
 

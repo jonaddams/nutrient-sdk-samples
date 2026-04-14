@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
-import { type ValidationState, TOTAL_RULE_FIELDS } from "./viewer";
+import { TOTAL_RULE_FIELDS, type ValidationState } from "./viewer";
 import "./styles.css";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -41,7 +41,9 @@ export default function FormValidationPage() {
   const validateAllRef = useRef<(() => Promise<void>) | null>(null);
   const resetRef = useRef<(() => Promise<void>) | null>(null);
   const resetFormRef = useRef<(() => Promise<void>) | null>(null);
-  const navigateToFieldRef = useRef<((fieldName: string) => Promise<void>) | null>(null);
+  const navigateToFieldRef = useRef<
+    ((fieldName: string) => Promise<void>) | null
+  >(null);
 
   const handleValidationChange = useCallback((state: ValidationState) => {
     setValidationState(state);
@@ -73,7 +75,8 @@ export default function FormValidationPage() {
               <div className="validation-header">
                 <div className="validation-title">Validation Rules</div>
                 <div className="validation-subtitle">
-                  {TOTAL_RULE_FIELDS} rules active · {errorCount} error{errorCount !== 1 ? "s" : ""}
+                  {TOTAL_RULE_FIELDS} rules active · {errorCount} error
+                  {errorCount !== 1 ? "s" : ""}
                 </div>
               </div>
 
@@ -107,12 +110,16 @@ export default function FormValidationPage() {
                           key={fieldName}
                           type="button"
                           className="validation-error-card"
-                          onClick={() => navigateToFieldRef.current?.(fieldName)}
+                          onClick={() =>
+                            navigateToFieldRef.current?.(fieldName)
+                          }
                         >
                           <div className="validation-error-field">
                             {FIELD_LABELS[fieldName] ?? fieldName}
                           </div>
-                          <div className="validation-error-message">{message}</div>
+                          <div className="validation-error-message">
+                            {message}
+                          </div>
                         </button>
                       ))}
                     </div>

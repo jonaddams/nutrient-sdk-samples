@@ -1,0 +1,631 @@
+{
+  "elements": [
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "David Bricklane, CEO",
+      "words": [
+        {
+          "text": "David",
+          "bounds": {
+            "x": 1302,
+            "y": 2214,
+            "width": 77,
+            "height": 24
+          },
+          "confidence": 0.9329839
+        },
+        {
+          "text": "Bricklane,",
+          "bounds": {
+            "x": 1392,
+            "y": 2215,
+            "width": 137,
+            "height": 29
+          },
+          "confidence": 0.917089
+        },
+        {
+          "text": "CEO",
+          "bounds": {
+            "x": 1542,
+            "y": 2216,
+            "width": 61,
+            "height": 23
+          },
+          "confidence": 0.96601266
+        }
+      ],
+      "readingOrder": 4,
+      "pageNumber": 1,
+      "id": "811801c4-4870-43bc-81a8-268cb49b2620",
+      "bounds": {
+        "x": 1292.4952,
+        "y": 2206.482,
+        "width": 364.31396,
+        "height": 172.57544
+      },
+      "confidence": 0.9386952
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "David Bricklane, CEO",
+      "words": [
+        {
+          "text": "David",
+          "bounds": {
+            "x": 1302,
+            "y": 2214,
+            "width": 77,
+            "height": 24
+          },
+          "confidence": 0.9329843
+        },
+        {
+          "text": "Bricklane,",
+          "bounds": {
+            "x": 1392,
+            "y": 2215,
+            "width": 137,
+            "height": 29
+          },
+          "confidence": 0.86174643
+        },
+        {
+          "text": "CEO",
+          "bounds": {
+            "x": 1542,
+            "y": 2216,
+            "width": 61,
+            "height": 23
+          },
+          "confidence": 0.9666603
+        }
+      ],
+      "readingOrder": 5,
+      "pageNumber": 1,
+      "id": "c860db44-c009-4801-94f0-9734a1f364df",
+      "bounds": {
+        "x": 1296.5073,
+        "y": 2209.3645,
+        "width": 308.46118,
+        "height": 35.416748
+      },
+      "confidence": 0.9204636
+    },
+    {
+      "type": "paragraph",
+      "role": "Unknown",
+      "text": "Upper Arc Warp 70 Summerfield Republic of PDF",
+      "words": [
+        {
+          "text": "Upper",
+          "bounds": {
+            "x": 1299,
+            "y": 2714,
+            "width": 76,
+            "height": 25
+          },
+          "confidence": 0.96561056
+        },
+        {
+          "text": "Arc",
+          "bounds": {
+            "x": 1384,
+            "y": 2714,
+            "width": 40,
+            "height": 21
+          },
+          "confidence": 0.9606034
+        },
+        {
+          "text": "Warp",
+          "bounds": {
+            "x": 1434,
+            "y": 2715,
+            "width": 63,
+            "height": 25
+          },
+          "confidence": 0.96100235
+        },
+        {
+          "text": "70",
+          "bounds": {
+            "x": 1507,
+            "y": 2714,
+            "width": 29,
+            "height": 21
+          },
+          "confidence": 0.96997553
+        },
+        {
+          "text": "Summerfield",
+          "bounds": {
+            "x": 1298,
+            "y": 2756,
+            "width": 158,
+            "height": 21
+          },
+          "confidence": 0.9648335
+        },
+        {
+          "text": "Republic",
+          "bounds": {
+            "x": 1299,
+            "y": 2798,
+            "width": 106,
+            "height": 25
+          },
+          "confidence": 0.95253843
+        },
+        {
+          "text": "of",
+          "bounds": {
+            "x": 1414,
+            "y": 2798,
+            "width": 25,
+            "height": 21
+          },
+          "confidence": 0.9622177
+        },
+        {
+          "text": "PDF",
+          "bounds": {
+            "x": 1448,
+            "y": 2799,
+            "width": 49,
+            "height": 20
+          },
+          "confidence": 0.9622177
+        }
+      ],
+      "readingOrder": 8,
+      "pageNumber": 1,
+      "id": "5b5b8481-87b0-4ed4-89ed-902861e79f25",
+      "bounds": {
+        "x": 1293.3535,
+        "y": 2708.3123,
+        "width": 244.2732,
+        "height": 115.73804
+      },
+      "confidence": 0.9623749
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "\u002B100 847 738 227 info@bruuuk.com www.bruuuk.com",
+      "words": [
+        {
+          "text": "\u002B100",
+          "bounds": {
+            "x": 1301,
+            "y": 2883,
+            "width": 58,
+            "height": 21
+          },
+          "confidence": 0.9629028
+        },
+        {
+          "text": "847",
+          "bounds": {
+            "x": 1369,
+            "y": 2884,
+            "width": 48,
+            "height": 20
+          },
+          "confidence": 0.94251704
+        },
+        {
+          "text": "738",
+          "bounds": {
+            "x": 1426,
+            "y": 2884,
+            "width": 47,
+            "height": 20
+          },
+          "confidence": 0.94251704
+        },
+        {
+          "text": "227",
+          "bounds": {
+            "x": 1483,
+            "y": 2884,
+            "width": 45,
+            "height": 20
+          },
+          "confidence": 0.9657166
+        },
+        {
+          "text": "info@bruuuk.com",
+          "bounds": {
+            "x": 1300,
+            "y": 2924,
+            "width": 218,
+            "height": 25
+          },
+          "confidence": 0.83194953
+        },
+        {
+          "text": "www.bruuuk.com",
+          "bounds": {
+            "x": 1299,
+            "y": 2967,
+            "width": 217,
+            "height": 20
+          },
+          "confidence": 0.2811168
+        }
+      ],
+      "readingOrder": 9,
+      "pageNumber": 1,
+      "id": "b7f2a493-6d70-460d-bba4-423c419f65bf",
+      "bounds": {
+        "x": 1294.0972,
+        "y": 2877.0996,
+        "width": 234.92957,
+        "height": 110.49341
+      },
+      "confidence": 0.82112
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Company No. 400890w Tax No. AT98765321 IBAN AT13 2060 4236 6111 5994",
+      "words": [
+        {
+          "text": "Company",
+          "bounds": {
+            "x": 1297,
+            "y": 3050,
+            "width": 124,
+            "height": 26
+          },
+          "confidence": 0.96417755
+        },
+        {
+          "text": "No.",
+          "bounds": {
+            "x": 1429,
+            "y": 3051,
+            "width": 41,
+            "height": 20
+          },
+          "confidence": 0.9322343
+        },
+        {
+          "text": "400890w",
+          "bounds": {
+            "x": 1481,
+            "y": 3050,
+            "width": 120,
+            "height": 21
+          },
+          "confidence": 0.88512474
+        },
+        {
+          "text": "Tax",
+          "bounds": {
+            "x": 1297,
+            "y": 3093,
+            "width": 45,
+            "height": 20
+          },
+          "confidence": 0.9677807
+        },
+        {
+          "text": "No.",
+          "bounds": {
+            "x": 1351,
+            "y": 3093,
+            "width": 42,
+            "height": 20
+          },
+          "confidence": 0.9202196
+        },
+        {
+          "text": "AT98765321",
+          "bounds": {
+            "x": 1402,
+            "y": 3093,
+            "width": 156,
+            "height": 20
+          },
+          "confidence": 0.91266304
+        },
+        {
+          "text": "IBAN",
+          "bounds": {
+            "x": 1298,
+            "y": 3135,
+            "width": 62,
+            "height": 20
+          },
+          "confidence": 0.8444781
+        },
+        {
+          "text": "AT13",
+          "bounds": {
+            "x": 1370,
+            "y": 3135,
+            "width": 60,
+            "height": 20
+          },
+          "confidence": 0.8395386
+        },
+        {
+          "text": "2060",
+          "bounds": {
+            "x": 1441,
+            "y": 3135,
+            "width": 63,
+            "height": 21
+          },
+          "confidence": 0.8487541
+        },
+        {
+          "text": "4236",
+          "bounds": {
+            "x": 1514,
+            "y": 3135,
+            "width": 66,
+            "height": 20
+          },
+          "confidence": 0.85411805
+        },
+        {
+          "text": "6111",
+          "bounds": {
+            "x": 1590,
+            "y": 3135,
+            "width": 50,
+            "height": 21
+          },
+          "confidence": 0.88114035
+        },
+        {
+          "text": "5994",
+          "bounds": {
+            "x": 1652,
+            "y": 3135,
+            "width": 64,
+            "height": 20
+          },
+          "confidence": 0.8406658
+        }
+      ],
+      "readingOrder": 10,
+      "pageNumber": 1,
+      "id": "4238397c-3658-4afa-a4bb-81fc65d70b63",
+      "bounds": {
+        "x": 1293.01,
+        "y": 3044.6707,
+        "width": 426.0155,
+        "height": 114.04443
+      },
+      "confidence": 0.89090794
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Company No.",
+      "words": [
+        {
+          "text": "Company",
+          "bounds": {
+            "x": 1297,
+            "y": 3050,
+            "width": 124,
+            "height": 24
+          },
+          "confidence": 0.96104944
+        },
+        {
+          "text": "No.",
+          "bounds": {
+            "x": 1429,
+            "y": 3051,
+            "width": 41,
+            "height": 20
+          },
+          "confidence": 0.9653376
+        }
+      ],
+      "readingOrder": 11,
+      "pageNumber": 1,
+      "id": "4b457551-12ef-46bf-ac8a-5bd370485057",
+      "bounds": {
+        "x": 1294.5537,
+        "y": 3045.6274,
+        "width": 173.55396,
+        "height": 29.884521
+      },
+      "confidence": 0.96319354
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Tax No.",
+      "words": [
+        {
+          "text": "Tax",
+          "bounds": {
+            "x": 1297,
+            "y": 3093,
+            "width": 45,
+            "height": 20
+          },
+          "confidence": 0.9526372
+        },
+        {
+          "text": "No.",
+          "bounds": {
+            "x": 1351,
+            "y": 3093,
+            "width": 42,
+            "height": 20
+          },
+          "confidence": 0.95557237
+        }
+      ],
+      "readingOrder": 12,
+      "pageNumber": 1,
+      "id": "777092a9-959a-42f6-8956-d592caf50753",
+      "bounds": {
+        "x": 1294.9565,
+        "y": 3087.3953,
+        "width": 98.51453,
+        "height": 27.182861
+      },
+      "confidence": 0.9541048
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "IBAN",
+      "words": [
+        {
+          "text": "IBAN",
+          "bounds": {
+            "x": 1298,
+            "y": 3135,
+            "width": 62,
+            "height": 20
+          },
+          "confidence": 0.9122377
+        }
+      ],
+      "readingOrder": 13,
+      "pageNumber": 1,
+      "id": "4f178e66-b1e5-42d4-a1e7-fe42444bdd69",
+      "bounds": {
+        "x": 1294.5312,
+        "y": 3129.448,
+        "width": 80.08325,
+        "height": 26.886475
+      },
+      "confidence": 0.9122377
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "400890W",
+      "words": [
+        {
+          "text": "400890W",
+          "bounds": {
+            "x": 1481,
+            "y": 3050,
+            "width": 120,
+            "height": 22
+          },
+          "confidence": 0.6198115
+        }
+      ],
+      "readingOrder": 14,
+      "pageNumber": 1,
+      "id": "0fdba20c-b369-4a8b-8290-083af7f47208",
+      "bounds": {
+        "x": 1479.4703,
+        "y": 3046.081,
+        "width": 123.46765,
+        "height": 26.722412
+      },
+      "confidence": 0.6198115
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "AT9876532)",
+      "words": [
+        {
+          "text": "AT9876532)",
+          "bounds": {
+            "x": 1402,
+            "y": 3093,
+            "width": 156,
+            "height": 20
+          },
+          "confidence": 0
+        }
+      ],
+      "readingOrder": 15,
+      "pageNumber": 1,
+      "id": "14b4f8d6-52a8-499d-9c95-be6abe5e5441",
+      "bounds": {
+        "x": 1404.8264,
+        "y": 3086.0293,
+        "width": 153.82458,
+        "height": 27.927246
+      },
+      "confidence": 0
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "1113 2060 4236 6114 5994",
+      "words": [
+        {
+          "text": "1113",
+          "bounds": {
+            "x": 1381,
+            "y": 3135,
+            "width": 49,
+            "height": 20
+          },
+          "confidence": 0.6942789
+        },
+        {
+          "text": "2060",
+          "bounds": {
+            "x": 1441,
+            "y": 3135,
+            "width": 63,
+            "height": 21
+          },
+          "confidence": 0.9457752
+        },
+        {
+          "text": "4236",
+          "bounds": {
+            "x": 1514,
+            "y": 3135,
+            "width": 66,
+            "height": 20
+          },
+          "confidence": 0.9640549
+        },
+        {
+          "text": "6114",
+          "bounds": {
+            "x": 1590,
+            "y": 3135,
+            "width": 50,
+            "height": 21
+          },
+          "confidence": 0.76381737
+        },
+        {
+          "text": "5994",
+          "bounds": {
+            "x": 1652,
+            "y": 3135,
+            "width": 64,
+            "height": 20
+          },
+          "confidence": 0.9631521
+        }
+      ],
+      "readingOrder": 16,
+      "pageNumber": 1,
+      "id": "4937d086-3ce1-4fff-b65f-a62ad6bcaa8f",
+      "bounds": {
+        "x": 1381.8241,
+        "y": 3129.2136,
+        "width": 335.74548,
+        "height": 29.13379
+      },
+      "confidence": 0.8662157
+    }
+  ]
+}

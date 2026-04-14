@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useEffect, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -25,13 +25,7 @@ const FIELD_OPTIONS: Record<string, string[]> = {
     "Australia",
     "Japan",
   ],
-  interests: [
-    "Technology",
-    "Science",
-    "Finance",
-    "Healthcare",
-    "Education",
-  ],
+  interests: ["Technology", "Science", "Finance", "Healthcare", "Education"],
 };
 
 const PRESET: Record<string, string> = {
@@ -172,9 +166,7 @@ export default function FormFillPage() {
       const pdfBlob = await apiRes.blob();
       setPdfUrl(URL.createObjectURL(pdfBlob));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Form fill failed",
-      );
+      setError(err instanceof Error ? err.message : "Form fill failed");
     } finally {
       setProcessing(false);
     }
@@ -279,9 +271,7 @@ export default function FormFillPage() {
                                 type="radio"
                                 name={field.name}
                                 checked={values[field.name] === opt}
-                                onChange={() =>
-                                  updateValue(field.name, opt)
-                                }
+                                onChange={() => updateValue(field.name, opt)}
                                 className="w-3.5 h-3.5 accent-[var(--digital-pollen)]"
                               />
                               <span className="text-xs text-gray-700 dark:text-gray-300">
@@ -352,9 +342,7 @@ export default function FormFillPage() {
                       </label>
                       <input
                         type={
-                          field.name.includes("password")
-                            ? "password"
-                            : "text"
+                          field.name.includes("password") ? "password" : "text"
                         }
                         value={values[field.name] || ""}
                         onChange={(e) =>

@@ -3,7 +3,7 @@
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
 
-const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
+const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf";
 
 export interface WatermarkConfig {
   text: string;

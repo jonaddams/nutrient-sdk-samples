@@ -23,7 +23,7 @@ const AVAILABLE_DOCUMENTS = [
     name: "The Wind in the Willows",
   },
   {
-    path: "/documents/jacques-torres-chocolate-chip-cookies.pdf",
+    path: "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf",
     name: "Chocolate Chip Cookies Recipe",
   },
   { path: "/documents/usenix-example-paper.pdf", name: "USENIX Example Paper" },

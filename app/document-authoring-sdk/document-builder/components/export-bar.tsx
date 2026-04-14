@@ -27,7 +27,10 @@ export default function ExportBar({ document: doc }: ExportBarProps) {
     setExporting("pdf");
     try {
       const buffer = await doc.exportPDF();
-      triggerDownload(new Blob([buffer], { type: "application/pdf" }), "report.pdf");
+      triggerDownload(
+        new Blob([buffer], { type: "application/pdf" }),
+        "report.pdf",
+      );
     } catch (error) {
       console.error("❌ PDF export failed:", error);
     } finally {

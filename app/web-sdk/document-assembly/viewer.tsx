@@ -50,7 +50,11 @@ function parsePageSelection(input: string, totalPages: number): number[] {
     if (range.length === 1 && !Number.isNaN(range[0])) {
       const idx = range[0] - 1;
       if (idx >= 0 && idx < totalPages) indexes.add(idx);
-    } else if (range.length === 2 && !Number.isNaN(range[0]) && !Number.isNaN(range[1])) {
+    } else if (
+      range.length === 2 &&
+      !Number.isNaN(range[0]) &&
+      !Number.isNaN(range[1])
+    ) {
       const start = Math.max(0, range[0] - 1);
       const end = Math.min(totalPages - 1, range[1] - 1);
       for (let i = start; i <= end; i++) indexes.add(i);
@@ -87,7 +91,10 @@ async function loadDocumentThumbnails(
       const info = await instance.pageInfoForIndex(i);
       if (!info) continue;
       const thumbWidth = Math.min(info.width, 600);
-      const thumbnailUrl = await instance.renderPageAsImageURL({ width: thumbWidth }, i);
+      const thumbnailUrl = await instance.renderPageAsImageURL(
+        { width: thumbWidth },
+        i,
+      );
       pages.push({
         uid: generateUid(),
         index: i,
@@ -136,7 +143,10 @@ export default function DocumentAssemblyViewer() {
   });
 
   const [dragData, setDragData] = useState<DragData | null>(null);
-  const [dropTarget, setDropTarget] = useState<{ panel: "source" | "target"; index: number } | null>(null);
+  const [dropTarget, setDropTarget] = useState<{
+    panel: "source" | "target";
+    index: number;
+  } | null>(null);
   const [sourceSelectInput, setSourceSelectInput] = useState("");
   const [targetSelectInput, setTargetSelectInput] = useState("");
 
@@ -151,8 +161,16 @@ export default function DocumentAssemblyViewer() {
           loadDocumentThumbnails(TARGET_DOCUMENT, "Drawing1.pdf"),
         ]);
         if (!mounted) return;
-        setSourceDoc((prev) => ({ ...prev, pages: sourcePages, isLoading: false }));
-        setTargetDoc((prev) => ({ ...prev, pages: targetPages, isLoading: false }));
+        setSourceDoc((prev) => ({
+          ...prev,
+          pages: sourcePages,
+          isLoading: false,
+        }));
+        setTargetDoc((prev) => ({
+          ...prev,
+          pages: targetPages,
+          isLoading: false,
+        }));
       } catch (err) {
         console.error("Failed to load documents:", err);
         if (mounted) {
@@ -163,7 +181,9 @@ export default function DocumentAssemblyViewer() {
     }
 
     init();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Close context menu on click outside
@@ -201,7 +221,12 @@ export default function DocumentAssemblyViewer() {
       const indexes = parsePageSelection(input, doc.pages.length);
       setDoc((prev) => ({ ...prev, selectedIndexes: new Set(indexes) }));
     },
-    [sourceSelectInput, targetSelectInput, sourceDoc.pages.length, targetDoc.pages.length],
+    [
+      sourceSelectInput,
+      targetSelectInput,
+      sourceDoc.pages.length,
+      targetDoc.pages.length,
+    ],
   );
 
   // --- Drag and Drop ---
@@ -240,7 +265,11 @@ export default function DocumentAssemblyViewer() {
   }, []);
 
   const handleDrop = useCallback(
-    (e: React.DragEvent, targetPanel: "source" | "target", dropIndex: number) => {
+    (
+      e: React.DragEvent,
+      targetPanel: "source" | "target",
+      dropIndex: number,
+    ) => {
       e.preventDefault();
       let data: DragData;
       try {
@@ -251,7 +280,8 @@ export default function DocumentAssemblyViewer() {
 
       const fromPanel = data.panel;
       const pageIndexes = data.pageIndexes;
-      const getDoc = (p: "source" | "target") => (p === "source" ? sourceDoc : targetDoc);
+      const getDoc = (p: "source" | "target") =>
+        p === "source" ? sourceDoc : targetDoc;
       const setFrom = fromPanel === "source" ? setSourceDoc : setTargetDoc;
       const setTo = targetPanel === "source" ? setSourceDoc : setTargetDoc;
 
@@ -259,9 +289,12 @@ export default function DocumentAssemblyViewer() {
         // Reorder within same panel
         setTo((prev) => {
           const moving = pageIndexes.map((i) => prev.pages[i]).filter(Boolean);
-          const remaining = prev.pages.filter((_, i) => !pageIndexes.includes(i));
+          const remaining = prev.pages.filter(
+            (_, i) => !pageIndexes.includes(i),
+          );
           // Adjust drop index for removed items before it
-          const adjustedDrop = dropIndex - pageIndexes.filter((i) => i < dropIndex).length;
+          const adjustedDrop =
+            dropIndex - pageIndexes.filter((i) => i < dropIndex).length;
           const newPages = [
             ...remaining.slice(0, adjustedDrop),
             ...moving,
@@ -307,7 +340,13 @@ export default function DocumentAssemblyViewer() {
     (e: React.MouseEvent, panel: "source" | "target", pageIndex: number) => {
       e.preventDefault();
       e.stopPropagation();
-      setContextMenu({ show: true, x: e.clientX, y: e.clientY, pageIndex, panel });
+      setContextMenu({
+        show: true,
+        x: e.clientX,
+        y: e.clientY,
+        pageIndex,
+        panel,
+      });
     },
     [],
   );
@@ -320,7 +359,9 @@ export default function DocumentAssemblyViewer() {
       switch (action) {
         case "delete":
           setDoc((prev) => {
-            const newPages = prev.pages.filter((_, i) => i !== pageIndex).map((p, idx) => ({ ...p, index: idx }));
+            const newPages = prev.pages
+              .filter((_, i) => i !== pageIndex)
+              .map((p, idx) => ({ ...p, index: idx }));
             return { ...prev, pages: newPages, selectedIndexes: new Set() };
           });
           break;
@@ -352,7 +393,9 @@ export default function DocumentAssemblyViewer() {
           setDoc((prev) => ({
             ...prev,
             pages: prev.pages.map((p, i) =>
-              i === pageIndex ? { ...p, rotation: (p.rotation + 270) % 360 } : p,
+              i === pageIndex
+                ? { ...p, rotation: (p.rotation + 270) % 360 }
+                : p,
             ),
           }));
           break;
@@ -362,7 +405,10 @@ export default function DocumentAssemblyViewer() {
             const page = prev.pages[pageIndex];
             if (!page) return prev;
             const rest = prev.pages.filter((_, i) => i !== pageIndex);
-            const newPages = [page, ...rest].map((p, idx) => ({ ...p, index: idx }));
+            const newPages = [page, ...rest].map((p, idx) => ({
+              ...p,
+              index: idx,
+            }));
             return { ...prev, pages: newPages };
           });
           break;
@@ -372,7 +418,10 @@ export default function DocumentAssemblyViewer() {
             const page = prev.pages[pageIndex];
             if (!page) return prev;
             const rest = prev.pages.filter((_, i) => i !== pageIndex);
-            const newPages = [...rest, page].map((p, idx) => ({ ...p, index: idx }));
+            const newPages = [...rest, page].map((p, idx) => ({
+              ...p,
+              index: idx,
+            }));
             return { ...prev, pages: newPages };
           });
           break;
@@ -409,7 +458,10 @@ export default function DocumentAssemblyViewer() {
   // --- Try Merging ---
   const handleTryMerging = useCallback(() => {
     if (sourceDoc.pages.length === 0) return;
-    const movingPages = sourceDoc.pages.map((p) => ({ ...p, uid: generateUid() }));
+    const movingPages = sourceDoc.pages.map((p) => ({
+      ...p,
+      uid: generateUid(),
+    }));
     setTargetDoc((prev) => {
       const newPages = [...prev.pages, ...movingPages].map((p, idx) => ({
         ...p,
@@ -437,9 +489,9 @@ export default function DocumentAssemblyViewer() {
       const pageOrder = doc.pages.map((p) => p.index + 1).join(", ");
       alert(
         `Export would produce a PDF with ${doc.pages.length} pages.\n` +
-        `Page order: ${pageOrder}\n\n` +
-        `In production, this would use instance.exportPDFWithOperations() ` +
-        `with importDocument and keepPages operations to produce the final PDF.`,
+          `Page order: ${pageOrder}\n\n` +
+          `In production, this would use instance.exportPDFWithOperations() ` +
+          `with importDocument and keepPages operations to produce the final PDF.`,
       );
     },
     [sourceDoc, targetDoc],
@@ -468,7 +520,9 @@ export default function DocumentAssemblyViewer() {
         <div className="assembly-loading-inner">
           <div className="assembly-loading-spinner" />
           <div className="assembly-loading-text">Loading documents...</div>
-          <div className="assembly-loading-subtext">Generating page thumbnails</div>
+          <div className="assembly-loading-subtext">
+            Generating page thumbnails
+          </div>
         </div>
       </div>
     );
@@ -476,8 +530,10 @@ export default function DocumentAssemblyViewer() {
 
   const renderPanel = (panel: "source" | "target") => {
     const doc = panel === "source" ? sourceDoc : targetDoc;
-    const selectInput = panel === "source" ? sourceSelectInput : targetSelectInput;
-    const setSelectInput = panel === "source" ? setSourceSelectInput : setTargetSelectInput;
+    const selectInput =
+      panel === "source" ? sourceSelectInput : targetSelectInput;
+    const setSelectInput =
+      panel === "source" ? setSourceSelectInput : setTargetSelectInput;
 
     return (
       <div className="assembly-panel">
@@ -557,7 +613,10 @@ export default function DocumentAssemblyViewer() {
                 dropTarget.index === doc.pages.length;
 
               return (
-                <div key={page.uid} style={{ display: "flex", alignItems: "stretch" }}>
+                <div
+                  key={page.uid}
+                  style={{ display: "flex", alignItems: "stretch" }}
+                >
                   {/* Drop indicator before */}
                   <div
                     className={`assembly-drop-indicator ${isDropBefore ? "active" : ""}`}
@@ -578,7 +637,9 @@ export default function DocumentAssemblyViewer() {
                       e.preventDefault();
                       e.stopPropagation();
                       // Determine if dropping on left or right half of thumbnail
-                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      const rect = (
+                        e.currentTarget as HTMLElement
+                      ).getBoundingClientRect();
                       const midX = rect.left + rect.width / 2;
                       const insertIdx = e.clientX < midX ? idx : idx + 1;
                       setDropTarget({ panel, index: insertIdx });
@@ -586,7 +647,9 @@ export default function DocumentAssemblyViewer() {
                     onDrop={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      const rect = (
+                        e.currentTarget as HTMLElement
+                      ).getBoundingClientRect();
                       const midX = rect.left + rect.width / 2;
                       const insertIdx = e.clientX < midX ? idx : idx + 1;
                       handleDrop(e, panel, insertIdx);
@@ -606,7 +669,9 @@ export default function DocumentAssemblyViewer() {
                       className="assembly-thumb-menu"
                       onClick={(e) => {
                         e.stopPropagation();
-                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        const rect = (
+                          e.currentTarget as HTMLElement
+                        ).getBoundingClientRect();
                         setContextMenu({
                           show: true,
                           x: rect.left,
@@ -627,7 +692,9 @@ export default function DocumentAssemblyViewer() {
                   {isDropAfter && (
                     <div
                       className="assembly-drop-indicator active"
-                      onDragOver={(e) => handleDragOver(e, panel, doc.pages.length)}
+                      onDragOver={(e) =>
+                        handleDragOver(e, panel, doc.pages.length)
+                      }
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, panel, doc.pages.length)}
                     />
@@ -708,24 +775,48 @@ export default function DocumentAssemblyViewer() {
           role="menu"
           tabIndex={-1}
         >
-          <button type="button" className="assembly-context-item" onClick={() => handleContextAction("duplicate")}>
+          <button
+            type="button"
+            className="assembly-context-item"
+            onClick={() => handleContextAction("duplicate")}
+          >
             Duplicate
           </button>
-          <button type="button" className="assembly-context-item" onClick={() => handleContextAction("rotateCW")}>
+          <button
+            type="button"
+            className="assembly-context-item"
+            onClick={() => handleContextAction("rotateCW")}
+          >
             Rotate Clockwise
           </button>
-          <button type="button" className="assembly-context-item" onClick={() => handleContextAction("rotateCCW")}>
+          <button
+            type="button"
+            className="assembly-context-item"
+            onClick={() => handleContextAction("rotateCCW")}
+          >
             Rotate Counter-Clockwise
           </button>
           <div className="assembly-context-separator" />
-          <button type="button" className="assembly-context-item" onClick={() => handleContextAction("moveToTop")}>
+          <button
+            type="button"
+            className="assembly-context-item"
+            onClick={() => handleContextAction("moveToTop")}
+          >
             Move to Top
           </button>
-          <button type="button" className="assembly-context-item" onClick={() => handleContextAction("moveToBottom")}>
+          <button
+            type="button"
+            className="assembly-context-item"
+            onClick={() => handleContextAction("moveToBottom")}
+          >
             Move to Bottom
           </button>
           <div className="assembly-context-separator" />
-          <button type="button" className="assembly-context-item danger" onClick={() => handleContextAction("delete")}>
+          <button
+            type="button"
+            className="assembly-context-item danger"
+            onClick={() => handleContextAction("delete")}
+          >
             Delete
           </button>
         </div>

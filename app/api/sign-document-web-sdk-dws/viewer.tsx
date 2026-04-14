@@ -234,7 +234,8 @@ export default function Viewer({ document }: ViewerProps) {
 
         // Prepare configuration
         const certs = certificatesRef.current;
-        const hasCerts = certs?.ca_certificates && certs.ca_certificates.length > 0;
+        const hasCerts =
+          certs?.ca_certificates && certs.ca_certificates.length > 0;
 
         if (hasCerts) {
           console.log(

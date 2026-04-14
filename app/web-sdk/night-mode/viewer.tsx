@@ -3,7 +3,7 @@
 import type { Instance, ToolbarItem } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
 
-const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
+const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf";
 
 const DARK_MODE_STYLE_ID = "night-mode-style";
 const DARK_MODE_CSS = `
@@ -70,13 +70,9 @@ export default function NightModeViewer() {
       toolbarItems: [
         ...(NutrientViewer.defaultToolbarItems ?? []).filter(
           (item: { type: string }) =>
-            [
-              "pager",
-              "zoom-out",
-              "zoom-in",
-              "zoom-mode",
-              "search",
-            ].includes(item.type),
+            ["pager", "zoom-out", "zoom-in", "zoom-mode", "search"].includes(
+              item.type,
+            ),
         ),
         { type: "spacer" },
         nightModeButton,
@@ -90,7 +86,5 @@ export default function NightModeViewer() {
     };
   }, []);
 
-  return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-  );
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

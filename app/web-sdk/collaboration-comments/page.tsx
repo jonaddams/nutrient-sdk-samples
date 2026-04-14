@@ -4,11 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useRef, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
-import {
-  PRESET_AUTHORS,
-  type Author,
-  type CommentThread,
-} from "./viewer";
+import { type Author, type CommentThread, PRESET_AUTHORS } from "./viewer";
 import "./styles.css";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -73,7 +69,9 @@ export default function CollaborationCommentsPage() {
                     className="collab-author-select"
                     value={activeAuthor.id}
                     onChange={(e) => {
-                      const author = PRESET_AUTHORS.find((a) => a.id === e.target.value);
+                      const author = PRESET_AUTHORS.find(
+                        (a) => a.id === e.target.value,
+                      );
                       if (author) setActiveAuthor(author);
                     }}
                   >
@@ -118,7 +116,8 @@ export default function CollaborationCommentsPage() {
                 </div>
                 {threads.length === 0 ? (
                   <div className="collab-empty">
-                    No comments yet. Use the comment tool in the toolbar to add one.
+                    No comments yet. Use the comment tool in the toolbar to add
+                    one.
                   </div>
                 ) : (
                   <div className="collab-threads">
@@ -127,17 +126,27 @@ export default function CollaborationCommentsPage() {
                         key={thread.rootId}
                         type="button"
                         className="collab-thread-card"
-                        style={{ borderLeftColor: getAuthorColor(thread.authorName) }}
-                        onClick={() => navigateToThreadRef.current?.(thread.rootId)}
+                        style={{
+                          borderLeftColor: getAuthorColor(thread.authorName),
+                        }}
+                        onClick={() =>
+                          navigateToThreadRef.current?.(thread.rootId)
+                        }
                       >
                         <div className="collab-thread-header">
                           <div
                             className="collab-thread-avatar"
-                            style={{ backgroundColor: getAuthorColor(thread.authorName) }}
+                            style={{
+                              backgroundColor: getAuthorColor(
+                                thread.authorName,
+                              ),
+                            }}
                           >
                             {getAuthorInitial(thread.authorName)}
                           </div>
-                          <span className="collab-thread-author">{thread.authorName}</span>
+                          <span className="collab-thread-author">
+                            {thread.authorName}
+                          </span>
                           <span className="collab-thread-time">
                             {formatTimeAgo(thread.createdAt)}
                           </span>

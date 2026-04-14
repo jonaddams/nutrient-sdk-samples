@@ -46,8 +46,7 @@ const samples: Sample[] = [
   {
     name: "Digital Signature",
     category: "Signatures",
-    description:
-      "Apply digital signatures to PDF documents with certificates",
+    description: "Apply digital signatures to PDF documents with certificates",
     path: "/java-sdk/digital-signature",
   },
   // OCR and ICR extraction samples hidden until VlmEnhancedIcr ships in a future SDK release
@@ -66,11 +65,7 @@ const samples: Sample[] = [
   // },
 ];
 
-const categories = [
-  "All",
-  "Conversion",
-  "Signatures",
-];
+const categories = ["All", "Conversion", "Signatures"];
 
 export default function JavaSDKPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -128,7 +123,9 @@ export default function JavaSDKPage() {
             >
               Spring Boot backend
             </a>{" "}
-            that uses the Nutrient Java SDK for document processing. The frontend handles file uploads and result display, while the backend performs the actual PDF conversions, signing, and other operations.
+            that uses the Nutrient Java SDK for document processing. The
+            frontend handles file uploads and result display, while the backend
+            performs the actual PDF conversions, signing, and other operations.
           </p>
         </div>
 

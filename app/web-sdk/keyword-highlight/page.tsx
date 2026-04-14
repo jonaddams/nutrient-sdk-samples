@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
@@ -47,12 +47,9 @@ export default function KeywordHighlightPage() {
     }
   };
 
-  const handleHighlightResults = useCallback(
-    (results: HighlightResult[]) => {
-      setHighlightResults(results);
-    },
-    [],
-  );
+  const handleHighlightResults = useCallback((results: HighlightResult[]) => {
+    setHighlightResults(results);
+  }, []);
 
   const totalMatches = highlightResults.reduce((sum, r) => sum + r.count, 0);
 
@@ -137,7 +134,9 @@ export default function KeywordHighlightPage() {
                           )}
                           <button
                             type="button"
-                            onClick={() => handleRemoveKeyword(keywords.indexOf(keyword))}
+                            onClick={() =>
+                              handleRemoveKeyword(keywords.indexOf(keyword))
+                            }
                             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
                             aria-label={`Remove "${keyword}"`}
                           >

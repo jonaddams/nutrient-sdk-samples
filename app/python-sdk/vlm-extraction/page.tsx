@@ -1,98 +1,18 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { JavaSampleHeader } from "../_components/JavaSampleHeader";
-import { PdfViewer } from "../_components/PdfViewer";
+import { useCallback, useState } from "react";
+import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_JAVA_SDK_API_URL || "http://localhost:8080";
+  process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
 
 const SAMPLE_DOCUMENTS = [
   {
-    label: "Handwritten Employment Application",
-    path: "/documents/handwritten/handwritten-employment-application.jpg",
-    filename: "handwritten-employment-application.jpg",
-  },
-  {
-    label: "Cursive — Apricot Cake Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-apricot-cake-recipe.jpg",
-    filename: "handwritten-cursive-apricot-cake-recipe.jpg",
-  },
-  {
-    label: "Cursive — Chocolate Pie Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-choc-pie-recipe.jpg",
-    filename: "handwritten-cursive-choc-pie-recipe.jpg",
-  },
-  {
-    label: "Cursive — Thank You Note (Dear Magnus)",
-    path: "/documents/handwritten-cursive/handwritten-cursive-dear-magnus-thank-you-note.jpg",
-    filename: "handwritten-cursive-dear-magnus-thank-you-note.jpg",
-  },
-  {
-    label: "Cursive — Dear Mark",
-    path: "/documents/handwritten-cursive/handwritten-cursive-dear-mark.png",
-    filename: "handwritten-cursive-dear-mark.png",
-  },
-  {
-    label: "Cursive — Dear Mr. Frank",
-    path: "/documents/handwritten-cursive/handwritten-cursive-dear-mr-frank.jpeg",
-    filename: "handwritten-cursive-dear-mr-frank.jpeg",
-  },
-  {
-    label: "Cursive — Declaration",
-    path: "/documents/handwritten-cursive/handwritten-cursive-declaration.png",
-    filename: "handwritten-cursive-declaration.png",
-  },
-  {
-    label: "Cursive — To Whom It May Concern (Don Baker)",
-    path: "/documents/handwritten-cursive/handwritten-cursive-don-baker-to-whom-it-may-concern.jpeg",
-    filename: "handwritten-cursive-don-baker-to-whom-it-may-concern.jpeg",
-  },
-  {
-    label: "Cursive — Fruit Cookies Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-fruit-cookies-recipe.jpg",
-    filename: "handwritten-cursive-fruit-cookies-recipe.jpg",
-  },
-  {
-    label: "Cursive — Invoice",
-    path: "/documents/handwritten-cursive/handwritten-cursive-invoice.jpg",
-    filename: "handwritten-cursive-invoice.jpg",
-  },
-  {
-    label: "Cursive — Journal Page",
-    path: "/documents/handwritten-cursive/handwritten-cursive-journal-page.jpg",
-    filename: "handwritten-cursive-journal-page.jpg",
-  },
-  {
-    label: "Cursive — Letter to Lift Spirits",
-    path: "/documents/handwritten-cursive/handwritten-cursive-letter-to-lift-spirits.pdf",
-    filename: "handwritten-cursive-letter-to-lift-spirits.pdf",
-  },
-  {
-    label: "Cursive — Lt. John Delano Letter",
-    path: "/documents/handwritten-cursive/handwritten-cursive-lt-john-delano-letter.jpg",
-    filename: "handwritten-cursive-lt-john-delano-letter.jpg",
-  },
-  {
-    label: "Cursive — Merry Xmas Cookies Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-merry-xmas-cookies-recipe.jpg",
-    filename: "handwritten-cursive-merry-xmas-cookies-recipe.jpg",
-  },
-  {
-    label: "Cursive — Oatmeal Cookies Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-oatmeal-cookies-recipe.jpg",
-    filename: "handwritten-cursive-oatmeal-cookies-recipe.jpg",
-  },
-  {
-    label: "Cursive — Peanut Butter Cookies Recipe",
-    path: "/documents/handwritten-cursive/handwritten-cursive-peanut-butter-cookies-recipe.jpg",
-    filename: "handwritten-cursive-peanut-butter-cookies-recipe.jpg",
-  },
-  {
-    label: "Cursive — US Declaration of Independence",
-    path: "/documents/handwritten-cursive/handwritten-cursive-united-states-declaration-of-independence.jpg",
-    filename:
-      "handwritten-cursive-united-states-declaration-of-independence.jpg",
+    label: "Account Registration Form",
+    path: "/documents/account-registration-form.pdf",
+    filename: "account-registration-form.pdf",
+    cachedResult: "/documents/account-registration-form-vlm-result.json",
   },
 ];
 
@@ -134,18 +54,20 @@ interface ExtractionResult {
 
 type ViewMode = "formatted" | "json";
 
-export default function IcrExtractionPage() {
+export default function VlmExtractionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<ExtractionResult | null>(null);
   const [resultExpanded, setResultExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("formatted");
   const [error, setError] = useState<string | null>(null);
-  const [showBoxes, setShowBoxes] = useState(false);
-  const instanceRef = useRef<any>(null);
-  const annotationIdsRef = useRef<string[]>([]);
 
-  const selected = SAMPLE_DOCUMENTS[selectedIndex];
+  const selected = SAMPLE_DOCUMENTS[selectedIndex] as {
+    label: string;
+    path: string;
+    filename: string;
+    cachedResult?: string;
+  };
 
   const handleProcess = async () => {
     setProcessing(true);
@@ -154,40 +76,41 @@ export default function IcrExtractionPage() {
     setResultExpanded(false);
 
     try {
-      const response = await fetch(selected.path);
-      const blob = await response.blob();
-      const file = new File([blob], selected.filename);
+      if (selected.cachedResult) {
+        const res = await fetch(selected.cachedResult);
+        if (!res.ok) throw new Error(`Failed to load cached result`);
+        const data: ExtractionResult = await res.json();
+        setResult(data);
+      } else {
+        const response = await fetch(selected.path);
+        const blob = await response.blob();
+        const file = new File([blob], selected.filename);
 
-      const formData = new FormData();
-      formData.append("file", file);
+        const formData = new FormData();
+        formData.append("file", file);
 
-      const res = await fetch(`${API_BASE}/api/extraction/icr`, {
-        method: "POST",
-        body: formData,
-      });
+        const res = await fetch(`${API_BASE}/api/extraction/vlm`, {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!res.ok) throw new Error(`API returned ${res.status}`);
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
 
-      const data: ExtractionResult = await res.json();
-      setResult(data);
+        const data: ExtractionResult = await res.json();
+        setResult(data);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "ICR extraction failed");
+      setError(err instanceof Error ? err.message : "VLM extraction failed");
     } finally {
       setProcessing(false);
     }
   };
-
-  const handleInstance = useCallback((inst: any) => {
-    instanceRef.current = inst;
-  }, []);
 
   const handleDocumentChange = useCallback((index: number) => {
     setSelectedIndex(index);
     setResult(null);
     setResultExpanded(false);
     setError(null);
-    setShowBoxes(false);
-    annotationIdsRef.current = [];
   }, []);
 
   const handleDownload = () => {
@@ -198,7 +121,7 @@ export default function IcrExtractionPage() {
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-icr.json`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-vlm.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
@@ -215,74 +138,11 @@ export default function IcrExtractionPage() {
     return "bg-red-100 dark:bg-red-900/30";
   };
 
-  const confidenceStrokeColor = (c: number) => {
-    if (c >= 0.7) return { r: 34, g: 197, b: 94 }; // green
-    if (c >= 0.4) return { r: 234, g: 179, b: 8 }; // yellow
-    return { r: 239, g: 68, b: 68 }; // red
-  };
-
-  const clearAnnotations = async () => {
-    const instance = instanceRef.current;
-    if (!instance || annotationIdsRef.current.length === 0) return;
-    for (const id of annotationIdsRef.current) {
-      try {
-        await instance.delete(id);
-      } catch {
-        // annotation may already be gone
-      }
-    }
-    annotationIdsRef.current = [];
-  };
-
-  const addBoundingBoxes = async (elements: TextElement[]) => {
-    const instance = instanceRef.current;
-    const NV = (window as any).NutrientViewer;
-    if (!instance || !NV) return;
-
-    await clearAnnotations();
-
-    for (const el of elements) {
-      const color = confidenceStrokeColor(el.confidence);
-      const annotation = new NV.Annotations.RectangleAnnotation({
-        pageIndex: 0,
-        boundingBox: new NV.Geometry.Rect({
-          left: el.bounds.x,
-          top: el.bounds.y,
-          width: el.bounds.width,
-          height: el.bounds.height,
-        }),
-        strokeColor: new NV.Color(color),
-        strokeWidth: 2,
-        opacity: 0.6,
-        note: `[${el.readingOrder}] "${el.text}" — ${Math.round(el.confidence * 100)}% confidence`,
-      });
-
-      try {
-        const created = await instance.create(annotation);
-        if (created?.[0]?.id) {
-          annotationIdsRef.current.push(created[0].id);
-        }
-      } catch (err) {
-        console.warn("Failed to create annotation:", err);
-      }
-    }
-  };
-
-  const toggleBoundingBoxes = async () => {
-    if (showBoxes) {
-      await clearAnnotations();
-      setShowBoxes(false);
-    } else if (result) {
-      await addBoundingBoxes(result.textElements);
-      setShowBoxes(true);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <JavaSampleHeader
-        title="ICR Data Extraction"
-        description="Extract structured data from documents using intelligent content recognition with local ONNX models — runs entirely offline."
+      <PythonSampleHeader
+        title="VLM-Enhanced Extraction"
+        description="Extract structured data from documents using VLM-enhanced ICR with Claude as the Vision Language Model provider."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
@@ -322,20 +182,6 @@ export default function IcrExtractionPage() {
                   {processing ? "Extracting..." : "Extract Content"}
                 </button>
 
-                {result && (
-                  <button
-                    type="button"
-                    onClick={toggleBoundingBoxes}
-                    className={`w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer border ${
-                      showBoxes
-                        ? "border-green-500 dark:border-green-400 text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20"
-                        : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    {showBoxes ? "Hide Bounding Boxes" : "Show Bounding Boxes"}
-                  </button>
-                )}
-
                 {error && (
                   <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
                     {error}
@@ -355,7 +201,7 @@ export default function IcrExtractionPage() {
                     <div className="text-center space-y-2">
                       <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Running ICR extraction...
+                        Running VLM-enhanced extraction...
                       </p>
                     </div>
                   </div>
@@ -364,7 +210,6 @@ export default function IcrExtractionPage() {
                 <PdfViewer
                   document={selected.path}
                   toolbarItems={TOOLBAR_ITEMS}
-                  onInstance={handleInstance}
                 />
               </div>
 

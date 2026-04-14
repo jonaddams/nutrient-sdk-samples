@@ -6,313 +6,313 @@
     <title>Rechnung RE-2025-0219</title>
     <style>
       * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
 
-      body {
-        font-size: 0.75rem;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #1a1a1a;
-        margin: 0 auto;
-        position: relative;
-      }
+            body {
+              font-size: 0.75rem;
+              font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+              color: #1a1a1a;
+              margin: 0 auto;
+              position: relative;
+            }
 
-      #pspdfkit-header {
-        display: flow-root;
-        padding: 1.5rem 2.5rem;
-        border-bottom: 2px solid #003366;
-      }
+            #pspdfkit-header {
+              display: flow-root;
+              padding: 1.5rem 2.5rem;
+              border-bottom: 2px solid #003366;
+            }
 
-      .header-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
+            .header-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+            }
 
-      .logotype {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+            .logotype {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+            }
 
-      .logo-shield {
-        width: 44px;
-        height: 44px;
-        background: #003366;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 900;
-        font-size: 1rem;
-        letter-spacing: -1px;
-        border-radius: 2px;
-      }
+            .logo-shield {
+              width: 44px;
+              height: 44px;
+              background: #003366;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-weight: 900;
+              font-size: 1rem;
+              letter-spacing: -1px;
+              border-radius: 2px;
+            }
 
-      .company-block .name {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #003366;
-        letter-spacing: 0.5px;
-      }
+            .company-block .name {
+              font-size: 1rem;
+              font-weight: 700;
+              color: #003366;
+              letter-spacing: 0.5px;
+            }
 
-      .company-block .tagline {
-        font-size: 0.5rem;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 2px;
-      }
+            .company-block .tagline {
+              font-size: 0.5rem;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              margin-top: 2px;
+            }
 
-      .header-address {
-        text-align: right;
-        font-size: 0.5625rem;
-        line-height: 1.7;
-        color: #444;
-      }
+            .header-address {
+              text-align: right;
+              font-size: 0.5625rem;
+              line-height: 1.7;
+              color: #444;
+            }
 
-      #pspdfkit-footer {
-        display: flow-root;
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        box-sizing: border-box;
-        width: 100%;
-        border-top: 2px solid #003366;
-        padding: 0.75rem 2.5rem 1.5rem;
-        font-size: 0.5rem;
-        color: #666;
-      }
+            #pspdfkit-footer {
+              display: flow-root;
+              position: absolute;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              box-sizing: border-box;
+              width: 100%;
+              border-top: 2px solid #003366;
+              padding: 0.75rem 2.5rem 1.5rem;
+              font-size: 0.5rem;
+              color: #666;
+            }
 
-      .footer-columns {
-        display: flex;
-        justify-content: space-between;
-      }
+            .footer-columns {
+              display: flex;
+              justify-content: space-between;
+            }
 
-      .footer-legal {
-        display: flex;
-        gap: 2rem;
-      }
+            .footer-legal {
+              display: flex;
+              gap: 2rem;
+            }
 
-      .footer-legal div p {
-        margin: 1px 0;
-      }
+            .footer-legal div p {
+              margin: 1px 0;
+            }
 
-      .footer-legal div p:first-child {
-        font-weight: 600;
-        color: #003366;
-      }
+            .footer-legal div p:first-child {
+              font-weight: 600;
+              color: #003366;
+            }
 
-      .page {
-        margin: 0 2.5rem;
-        padding-top: 0.5rem;
-      }
+            .page {
+              margin: 0 2.5rem;
+              padding-top: 0.5rem;
+            }
 
-      .rechnung-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-      }
+            .rechnung-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 1rem;
+            }
 
-      .rechnung-title {
-        font-size: 1.5rem;
-        font-weight: 300;
-        color: #003366;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-      }
+            .rechnung-title {
+              font-size: 1.5rem;
+              font-weight: 300;
+              color: #003366;
+              text-transform: uppercase;
+              letter-spacing: 4px;
+            }
 
-      .rechnung-nummer {
-        text-align: right;
-      }
+            .rechnung-nummer {
+              text-align: right;
+            }
 
-      .rechnung-nummer .big {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #003366;
-      }
+            .rechnung-nummer .big {
+              font-size: 1rem;
+              font-weight: 700;
+              color: #003366;
+            }
 
-      .rechnung-nummer p {
-        font-size: 0.625rem;
-        color: #666;
-        margin: 2px 0;
-      }
+            .rechnung-nummer p {
+              font-size: 0.625rem;
+              color: #666;
+              margin: 2px 0;
+            }
 
-      .address-bar {
-        display: flex;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-        padding: 1rem 0;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-      }
+            .address-bar {
+              display: flex;
+              gap: 1.5rem;
+              margin: 1.5rem 0;
+              padding: 1rem 0;
+              border-top: 1px solid #ddd;
+              border-bottom: 1px solid #ddd;
+            }
 
-      .addr-col {
-        flex: 1;
-      }
+            .addr-col {
+              flex: 1;
+            }
 
-      .addr-col .label {
-        font-size: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: #003366;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-      }
+            .addr-col .label {
+              font-size: 0.5rem;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+              color: #003366;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+            }
 
-      .addr-col p {
-        font-size: 0.6875rem;
-        margin: 2px 0;
-        line-height: 1.5;
-      }
+            .addr-col p {
+              font-size: 0.6875rem;
+              margin: 2px 0;
+              line-height: 1.5;
+            }
 
-      .reference-grid {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
+            .reference-grid {
+              display: flex;
+              gap: 1rem;
+              margin-bottom: 1.5rem;
+            }
 
-      .ref-item {
-        flex: 1;
-        background: #f5f7fa;
-        padding: 0.625rem;
-        border-left: 3px solid #003366;
-      }
+            .ref-item {
+              flex: 1;
+              background: #f5f7fa;
+              padding: 0.625rem;
+              border-left: 3px solid #003366;
+            }
 
-      .ref-item .ref-label {
-        font-size: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #888;
-        margin-bottom: 0.25rem;
-      }
+            .ref-item .ref-label {
+              font-size: 0.5rem;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #888;
+              margin-bottom: 0.25rem;
+            }
 
-      .ref-item .ref-value {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #003366;
-      }
+            .ref-item .ref-value {
+              font-size: 0.75rem;
+              font-weight: 600;
+              color: #003366;
+            }
 
-      thead {
-        display: table-header-group;
-        break-inside: avoid;
-      }
+            thead {
+              display: table-header-group;
+              break-inside: avoid;
+            }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1rem 0;
-        font-size: 0.625rem;
-      }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 1rem 0;
+              font-size: 0.625rem;
+            }
 
-      thead th {
-        background: #003366;
-        color: white;
-        padding: 0.5rem 0.5rem;
-        text-align: left;
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 500;
-      }
+            thead th {
+              background: #003366;
+              color: white;
+              padding: 0.5rem 0.5rem;
+              text-align: left;
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              font-weight: 500;
+            }
 
-      thead th:nth-child(n+3) {
-        text-align: right;
-      }
+            thead th:nth-child(n+3) {
+              text-align: right;
+            }
 
-      tbody td {
-        padding: 0.4rem 0.5rem;
-        border-bottom: 1px solid #e8e8e8;
-      }
+            tbody td {
+              padding: 0.4rem 0.5rem;
+              border-bottom: 1px solid #e8e8e8;
+            }
 
-      tbody td:nth-child(n+3) {
-        text-align: right;
-      }
+            tbody td:nth-child(n+3) {
+              text-align: right;
+            }
 
-      tbody tr:nth-child(even) {
-        background: #fafbfc;
-      }
+            tbody tr:nth-child(even) {
+              background: #fafbfc;
+            }
 
-      .item-code {
-        font-family: "Courier New", monospace;
-        font-size: 0.5625rem;
-        color: #888;
-      }
+            .item-code {
+              font-family: "Courier New", monospace;
+              font-size: 0.5625rem;
+              color: #888;
+            }
 
-      .summary-section {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 1rem;
-      }
+            .summary-section {
+              display: flex;
+              justify-content: flex-end;
+              margin-top: 1rem;
+            }
 
-      .summary-table {
-        width: 300px;
-        border: 1px solid #ddd;
-      }
+            .summary-table {
+              width: 300px;
+              border: 1px solid #ddd;
+            }
 
-      .summary-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.4rem 0.75rem;
-        border-bottom: 1px solid #eee;
-        font-size: 0.6875rem;
-      }
+            .summary-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.4rem 0.75rem;
+              border-bottom: 1px solid #eee;
+              font-size: 0.6875rem;
+            }
 
-      .summary-row:last-child {
-        border-bottom: none;
-      }
+            .summary-row:last-child {
+              border-bottom: none;
+            }
 
-      .summary-row.mwst {
-        background: #f5f7fa;
-        font-size: 0.625rem;
-        color: #666;
-      }
+            .summary-row.mwst {
+              background: #f5f7fa;
+              font-size: 0.625rem;
+              color: #666;
+            }
 
-      .summary-row.total {
-        background: #003366;
-        color: white;
-        font-weight: 700;
-        font-size: 0.875rem;
-        padding: 0.625rem 0.75rem;
-      }
+            .summary-row.total {
+              background: #003366;
+              color: white;
+              font-weight: 700;
+              font-size: 0.875rem;
+              padding: 0.625rem 0.75rem;
+            }
 
-      .zahlungsinfo {
-        margin-top: 2rem;
-        border: 1px solid #ddd;
-        padding: 1rem;
-      }
+            .zahlungsinfo {
+              margin-top: 2rem;
+              border: 1px solid #ddd;
+              padding: 1rem;
+            }
 
-      .zahlungsinfo h4 {
-        font-size: 0.6875rem;
-        color: #003366;
-        margin-bottom: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
+            .zahlungsinfo h4 {
+              font-size: 0.6875rem;
+              color: #003366;
+              margin-bottom: 0.75rem;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            }
 
-      .zahlungs-grid {
-        display: flex;
-        gap: 2rem;
-        font-size: 0.625rem;
-      }
+            .zahlungs-grid {
+              display: flex;
+              gap: 2rem;
+              font-size: 0.625rem;
+            }
 
-      .zahlungs-grid div p {
-        margin: 2px 0;
-        line-height: 1.6;
-      }
+            .zahlungs-grid div p {
+              margin: 2px 0;
+              line-height: 1.6;
+            }
 
-      .hinweis {
-        margin-top: 1.5rem;
-        font-size: 0.5625rem;
-        color: #888;
-        line-height: 1.7;
-        border-left: 3px solid #ddd;
-        padding-left: 0.75rem;
-      }
+            .hinweis {
+              margin-top: 1.5rem;
+              font-size: 0.5625rem;
+              color: #888;
+              line-height: 1.7;
+              border-left: 3px solid #ddd;
+              padding-left: 0.75rem;
+            }
     </style>
   </head>
 

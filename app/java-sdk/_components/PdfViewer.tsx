@@ -16,7 +16,13 @@ interface PdfViewerProps {
   onInstance?: (instance: any) => void;
 }
 
-export function PdfViewer({ document, showSignatureValidation, toolbarItems, trustedCertificateUrl, onInstance }: PdfViewerProps) {
+export function PdfViewer({
+  document,
+  showSignatureValidation,
+  toolbarItems,
+  trustedCertificateUrl,
+  onInstance,
+}: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,7 +69,13 @@ export function PdfViewer({ document, showSignatureValidation, toolbarItems, tru
       cancelled = true;
       NutrientViewer.unload(container);
     };
-  }, [document, showSignatureValidation, toolbarItems, trustedCertificateUrl, onInstance]);
+  }, [
+    document,
+    showSignatureValidation,
+    toolbarItems,
+    trustedCertificateUrl,
+    onInstance,
+  ]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

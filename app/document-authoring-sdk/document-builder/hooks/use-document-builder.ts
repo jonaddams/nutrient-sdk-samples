@@ -173,14 +173,10 @@ function buildDocJson(state: ReportFormState): object {
     const headerRow: DocJsonTableRow = {
       cells: [
         {
-          elements: [
-            styledParagraph("Metric", { bold: true, pointSize: 11 }),
-          ],
+          elements: [styledParagraph("Metric", { bold: true, pointSize: 11 })],
         },
         {
-          elements: [
-            styledParagraph("Value", { bold: true, pointSize: 11 }),
-          ],
+          elements: [styledParagraph("Value", { bold: true, pointSize: 11 })],
         },
       ],
     };
