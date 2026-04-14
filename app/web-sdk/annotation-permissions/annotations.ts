@@ -106,6 +106,7 @@ const alexAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#f97316",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("alex"),
   },
   {
@@ -119,6 +120,7 @@ const alexAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#f97316",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("alex"),
   },
   {
@@ -132,6 +134,7 @@ const alexAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#f97316",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("alex"),
   },
   {
@@ -145,6 +148,7 @@ const alexAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#f97316",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("alex"),
   },
   // Section 3: Short Answer — thorough response
@@ -245,6 +249,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#22c55e",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("jordan"),
   },
   {
@@ -258,6 +263,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#22c55e",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("jordan"),
   },
   {
@@ -271,6 +277,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#22c55e",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("jordan"),
   },
   {
@@ -284,6 +291,7 @@ const jordanAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#22c55e",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("jordan"),
   },
   // Section 3: Short Answer — partial
@@ -373,6 +381,7 @@ const samAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#3b82f6",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("sam"),
   },
   {
@@ -386,6 +395,7 @@ const samAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#3b82f6",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("sam"),
   },
   {
@@ -399,6 +409,7 @@ const samAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#3b82f6",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("sam"),
   },
   {
@@ -412,6 +423,7 @@ const samAnnotations: AnnotationJSON[] = [
     fontSize: 12,
     fontColor: "#3b82f6",
     horizontalAlign: "left",
+    verticalAlign: "top",
     customData: makeCustomData("sam"),
   },
   // Section 3: Short Answer — brief/incomplete
