@@ -17,6 +17,7 @@ export default function TemplateVariablesPage() {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const sdkInitialized = useRef(false);
   const lastInsertedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prePreviewJson = useRef<string | null>(null);
 
   // Initialize DocAuthSystem
   useEffect(() => {
@@ -148,15 +149,27 @@ export default function TemplateVariablesPage() {
     if (!docAuthSystem || !editor) return;
 
     if (isPreviewing) {
-      // Restore original template
-      const templateJson = buildInvoiceTemplate();
-      const doc = await docAuthSystem.loadDocument(templateJson);
-      editor.setCurrentDocument(doc);
+      // Restore the user's document from before preview
+      try {
+        if (prePreviewJson.current) {
+          const doc = await docAuthSystem.loadDocument(
+            JSON.parse(prePreviewJson.current),
+          );
+          editor.setCurrentDocument(doc);
+          prePreviewJson.current = null;
+        }
+      } catch {
+        // Fallback: restore from pristine template if saved state fails
+        const templateJson = buildInvoiceTemplate();
+        const doc = await docAuthSystem.loadDocument(templateJson);
+        editor.setCurrentDocument(doc);
+      }
       setIsPreviewing(false);
     } else {
-      // Get current document JSON, replace tokens, reload
+      // Save current state, replace tokens with sample values, reload
       try {
         const jsonString = await editor.currentDocument().saveDocumentJSONString();
+        prePreviewJson.current = jsonString;
         let replaced = jsonString;
         for (const [token, sampleValue] of Object.entries(SAMPLE_VALUES)) {
           replaced = replaced.replaceAll(`{{${token}}}`, sampleValue);

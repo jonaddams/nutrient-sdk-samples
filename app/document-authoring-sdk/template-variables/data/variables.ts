@@ -61,7 +61,3 @@ export const SAMPLE_VALUES: Record<string, string> = Object.fromEntries(
     cat.variables.map((v) => [v.token, v.sampleValue]),
   ),
 );
-
-/** All variables as a flat array, used for search */
-export const ALL_VARIABLES: TemplateVariable[] =
-  VARIABLE_CATEGORIES.flatMap((cat) => cat.variables);
