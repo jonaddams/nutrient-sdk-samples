@@ -10,6 +10,12 @@ import {
   mergeExportedAnnotations,
 } from "./annotations";
 
+// Initialize the annotation store from pre-seeded data eagerly (before first render)
+const INITIAL_STORE = mergeExportedAnnotations(
+  buildInstantJSON(STUDENTS.map((s) => s.id)),
+  { alex: [], jordan: [], sam: [] },
+);
+
 const DOCUMENT = "/documents/solar-system-quiz.pdf";
 
 // Toolbar limited to quiz-relevant annotation tools + navigation
@@ -29,11 +35,7 @@ const ALLOWED_TOOLBAR_ITEMS = [
 export default function AnnotationPermissionsViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
-  const annotationStoreRef = useRef<Record<string, any[]>>({
-    alex: [],
-    jordan: [],
-    sam: [],
-  });
+  const annotationStoreRef = useRef<Record<string, any[]>>({ ...INITIAL_STORE });
   const currentRoleRef = useRef("teacher");
 
   const [currentRole, setCurrentRole] = useState("teacher");
@@ -85,7 +87,14 @@ export default function AnnotationPermissionsViewer() {
     instanceRef.current = null;
 
     const studentIds = getVisibleStudentIds();
-    const instantJSON = buildInstantJSON(studentIds);
+    // Read from the live store (which includes session-created annotations)
+    const annotations = studentIds.flatMap(
+      (id) => annotationStoreRef.current[id] ?? [],
+    );
+    const instantJSON = {
+      format: "https://pspdfkit.com/instant-json/v1",
+      annotations,
+    };
     const roleRef = currentRole;
 
     setIsLoading(true);
@@ -141,17 +150,6 @@ export default function AnnotationPermissionsViewer() {
         setIsLoading(false);
       });
   }, [currentRole, getVisibleStudentIds]);
-
-  // Initialize annotation store from pre-seeded data on first load
-  useEffect(() => {
-    if (Object.values(annotationStoreRef.current).every((v) => v.length === 0)) {
-      const seed = buildInstantJSON(STUDENTS.map((s) => s.id));
-      annotationStoreRef.current = mergeExportedAnnotations(
-        seed,
-        annotationStoreRef.current,
-      );
-    }
-  }, []);
 
   // Load viewer on role/visibility change
   useEffect(() => {
