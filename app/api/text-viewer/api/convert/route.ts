@@ -23,10 +23,7 @@ export async function POST(request: NextRequest) {
     const fileType = (formData.get("fileType") as string) || "txt";
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No file provided" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     const textContent = await file.text();
@@ -173,9 +170,7 @@ function textToHtml(content: string): string {
 }
 
 function csvToHtmlTable(content: string): string {
-  const lines = content
-    .split("\n")
-    .filter((line) => line.trim() !== "");
+  const lines = content.split("\n").filter((line) => line.trim() !== "");
 
   if (lines.length === 0) return "<p>Empty CSV file</p>";
 

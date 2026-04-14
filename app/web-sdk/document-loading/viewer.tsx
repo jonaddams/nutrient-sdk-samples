@@ -57,7 +57,6 @@ import "./styles.css";
  */
 type LoadingMethod = "url" | "arraybuffer" | "blob" | "base64";
 
-
 /**
  * Default document to load when the demo starts
  */

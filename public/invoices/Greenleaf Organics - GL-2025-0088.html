@@ -6,272 +6,272 @@
     <title>Invoice GL-2025-0088</title>
     <style>
       * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
 
-      body {
-        font-size: 0.75rem;
-        font-family: Georgia, "Times New Roman", serif;
-        color: #2d3436;
-        margin: 0 auto;
-        position: relative;
-      }
+            body {
+              font-size: 0.75rem;
+              font-family: Georgia, "Times New Roman", serif;
+              color: #2d3436;
+              margin: 0 auto;
+              position: relative;
+            }
 
-      #pspdfkit-header {
-        display: flow-root;
-        background: #27ae60;
-        color: white;
-        padding: 1.25rem 2.5rem;
-        margin-bottom: 1.5rem;
-      }
+            #pspdfkit-header {
+              display: flow-root;
+              background: #27ae60;
+              color: white;
+              padding: 1.25rem 2.5rem;
+              margin-bottom: 1.5rem;
+            }
 
-      .header-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+            .header-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
 
-      .logotype {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+            .logotype {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+            }
 
-      .logo-circle {
-        width: 36px;
-        height: 36px;
-        border: 2px solid white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.125rem;
-      }
+            .logo-circle {
+              width: 36px;
+              height: 36px;
+              border: 2px solid white;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.125rem;
+            }
 
-      .logotype h2 {
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 1px;
-      }
+            .logotype h2 {
+              font-size: 1rem;
+              font-weight: 600;
+              letter-spacing: 1px;
+            }
 
-      .logotype p {
-        font-size: 0.5625rem;
-        opacity: 0.85;
-        font-style: italic;
-      }
+            .logotype p {
+              font-size: 0.5625rem;
+              opacity: 0.85;
+              font-style: italic;
+            }
 
-      .header-right {
-        text-align: right;
-        font-size: 0.5625rem;
-        line-height: 1.6;
-      }
+            .header-right {
+              text-align: right;
+              font-size: 0.5625rem;
+              line-height: 1.6;
+            }
 
-      #pspdfkit-footer {
-        display: flow-root;
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        box-sizing: border-box;
-        width: 100%;
-        background: #27ae60;
-        color: white;
-        padding: 0.75rem 2.5rem;
-        font-size: 0.5rem;
-      }
+            #pspdfkit-footer {
+              display: flow-root;
+              position: absolute;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              box-sizing: border-box;
+              width: 100%;
+              background: #27ae60;
+              color: white;
+              padding: 0.75rem 2.5rem;
+              font-size: 0.5rem;
+            }
 
-      .footer-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+            .footer-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
 
-      .footer-columns .tagline {
-        font-style: italic;
-        opacity: 0.85;
-      }
+            .footer-columns .tagline {
+              font-style: italic;
+              opacity: 0.85;
+            }
 
-      .page {
-        margin: 0 2.5rem;
-      }
+            .page {
+              margin: 0 2.5rem;
+            }
 
-      .invoice-banner {
-        background: #f0faf4;
-        border: 1px solid #27ae60;
-        border-radius: 4px;
-        padding: 1.25rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-      }
+            .invoice-banner {
+              background: #f0faf4;
+              border: 1px solid #27ae60;
+              border-radius: 4px;
+              padding: 1.25rem;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 2rem;
+            }
 
-      .invoice-banner h1 {
-        font-size: 1.5rem;
-        font-weight: 400;
-        color: #27ae60;
-      }
+            .invoice-banner h1 {
+              font-size: 1.5rem;
+              font-weight: 400;
+              color: #27ae60;
+            }
 
-      .invoice-banner .meta {
-        text-align: right;
-        line-height: 1.8;
-      }
+            .invoice-banner .meta {
+              text-align: right;
+              line-height: 1.8;
+            }
 
-      .invoice-banner .meta .number {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: #27ae60;
-      }
+            .invoice-banner .meta .number {
+              font-size: 0.875rem;
+              font-weight: 700;
+              color: #27ae60;
+            }
 
-      .parties {
-        display: flex;
-        gap: 2rem;
-        margin-bottom: 2rem;
-      }
+            .parties {
+              display: flex;
+              gap: 2rem;
+              margin-bottom: 2rem;
+            }
 
-      .party {
-        flex: 1;
-      }
+            .party {
+              flex: 1;
+            }
 
-      .party h4 {
-        font-size: 0.625rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: #27ae60;
-        border-bottom: 2px solid #27ae60;
-        padding-bottom: 0.375rem;
-        margin-bottom: 0.625rem;
-      }
+            .party h4 {
+              font-size: 0.625rem;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+              color: #27ae60;
+              border-bottom: 2px solid #27ae60;
+              padding-bottom: 0.375rem;
+              margin-bottom: 0.625rem;
+            }
 
-      .party p {
-        margin: 3px 0;
-        line-height: 1.6;
-      }
+            .party p {
+              margin: 3px 0;
+              line-height: 1.6;
+            }
 
-      thead {
-        display: table-header-group;
-        break-inside: avoid;
-      }
+            thead {
+              display: table-header-group;
+              break-inside: avoid;
+            }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1.5rem 0;
-        font-size: 0.6875rem;
-      }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 1.5rem 0;
+              font-size: 0.6875rem;
+            }
 
-      thead th {
-        background: #2d3436;
-        color: white;
-        padding: 0.5rem 0.625rem;
-        text-align: left;
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-family: "Helvetica Neue", Arial, sans-serif;
-      }
+            thead th {
+              background: #2d3436;
+              color: white;
+              padding: 0.5rem 0.625rem;
+              text-align: left;
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              font-family: "Helvetica Neue", Arial, sans-serif;
+            }
 
-      thead th:nth-child(2),
-      thead th:nth-child(3),
-      thead th:nth-child(4),
-      thead th:last-child {
-        text-align: right;
-      }
+            thead th:nth-child(2),
+            thead th:nth-child(3),
+            thead th:nth-child(4),
+            thead th:last-child {
+              text-align: right;
+            }
 
-      tbody td {
-        padding: 0.5rem 0.625rem;
-        border-bottom: 1px solid #dfe6e9;
-      }
+            tbody td {
+              padding: 0.5rem 0.625rem;
+              border-bottom: 1px solid #dfe6e9;
+            }
 
-      tbody td:nth-child(2),
-      tbody td:nth-child(3),
-      tbody td:nth-child(4),
-      tbody td:last-child {
-        text-align: right;
-      }
+            tbody td:nth-child(2),
+            tbody td:nth-child(3),
+            tbody td:nth-child(4),
+            tbody td:last-child {
+              text-align: right;
+            }
 
-      tbody tr:hover {
-        background: #f0faf4;
-      }
+            tbody tr:hover {
+              background: #f0faf4;
+            }
 
-      .category-row td {
-        background: #eafaf1;
-        font-weight: 700;
-        font-style: italic;
-        color: #27ae60;
-        border-bottom: 1px solid #27ae60 !important;
-      }
+            .category-row td {
+              background: #eafaf1;
+              font-weight: 700;
+              font-style: italic;
+              color: #27ae60;
+              border-bottom: 1px solid #27ae60 !important;
+            }
 
-      .totals {
-        display: flex;
-        justify-content: flex-end;
-      }
+            .totals {
+              display: flex;
+              justify-content: flex-end;
+            }
 
-      .totals-box {
-        width: 260px;
-        border: 1px solid #dfe6e9;
-        border-radius: 4px;
-        overflow: hidden;
-      }
+            .totals-box {
+              width: 260px;
+              border: 1px solid #dfe6e9;
+              border-radius: 4px;
+              overflow: hidden;
+            }
 
-      .totals-box .line {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 0.75rem;
-        border-bottom: 1px solid #dfe6e9;
-        font-size: 0.6875rem;
-      }
+            .totals-box .line {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.5rem 0.75rem;
+              border-bottom: 1px solid #dfe6e9;
+              font-size: 0.6875rem;
+            }
 
-      .totals-box .line:last-child {
-        border-bottom: none;
-      }
+            .totals-box .line:last-child {
+              border-bottom: none;
+            }
 
-      .totals-box .grand-total {
-        background: #27ae60;
-        color: white;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
+            .totals-box .grand-total {
+              background: #27ae60;
+              color: white;
+              font-weight: 700;
+              font-size: 0.875rem;
+            }
 
-      .terms {
-        margin-top: 2.5rem;
-        columns: 2;
-        column-gap: 2rem;
-      }
+            .terms {
+              margin-top: 2.5rem;
+              columns: 2;
+              column-gap: 2rem;
+            }
 
-      .terms h3 {
-        font-size: 0.6875rem;
-        color: #27ae60;
-        margin-bottom: 0.5rem;
-        column-span: all;
-      }
+            .terms h3 {
+              font-size: 0.6875rem;
+              color: #27ae60;
+              margin-bottom: 0.5rem;
+              column-span: all;
+            }
 
-      .terms ul {
-        font-size: 0.625rem;
-        color: #555;
-        line-height: 1.8;
-        padding-left: 1rem;
-      }
+            .terms ul {
+              font-size: 0.625rem;
+              color: #555;
+              line-height: 1.8;
+              padding-left: 1rem;
+            }
 
-      .signature-area {
-        margin-top: 3rem;
-        display: flex;
-        justify-content: space-between;
-        gap: 3rem;
-      }
+            .signature-area {
+              margin-top: 3rem;
+              display: flex;
+              justify-content: space-between;
+              gap: 3rem;
+            }
 
-      .sig-block {
-        flex: 1;
-        border-top: 1px solid #2d3436;
-        padding-top: 0.5rem;
-      }
+            .sig-block {
+              flex: 1;
+              border-top: 1px solid #2d3436;
+              padding-top: 0.5rem;
+            }
 
-      .sig-block p {
-        font-size: 0.625rem;
-        color: #888;
-      }
+            .sig-block p {
+              font-size: 0.625rem;
+              color: #888;
+            }
     </style>
   </head>
 

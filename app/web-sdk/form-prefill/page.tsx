@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 import type { FormFieldInfo } from "./viewer";
@@ -135,8 +135,12 @@ export default function FormPrefillPage() {
   const textFields = fields
     .filter((f) => !isGroupedCheckbox(f) && f.type !== "checkbox")
     .sort((a, b) => {
-      const aIdx = FIELD_ORDER.findIndex((k) => a.name.toLowerCase().includes(k.toLowerCase()));
-      const bIdx = FIELD_ORDER.findIndex((k) => b.name.toLowerCase().includes(k.toLowerCase()));
+      const aIdx = FIELD_ORDER.findIndex((k) =>
+        a.name.toLowerCase().includes(k.toLowerCase()),
+      );
+      const bIdx = FIELD_ORDER.findIndex((k) =>
+        b.name.toLowerCase().includes(k.toLowerCase()),
+      );
       return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
     });
 
@@ -205,7 +209,8 @@ export default function FormPrefillPage() {
     // Fill group dropdowns
     for (const group of CHECKBOX_GROUPS) {
       const presetKey = Object.keys(values).find(
-        (k) => k.toLowerCase() === group.label.toLowerCase().replace(/\s+/g, ""),
+        (k) =>
+          k.toLowerCase() === group.label.toLowerCase().replace(/\s+/g, ""),
       );
       if (presetKey && values[presetKey]) {
         updated[group.label] = values[presetKey];

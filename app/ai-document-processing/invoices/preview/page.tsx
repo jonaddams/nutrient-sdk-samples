@@ -235,8 +235,7 @@ export default function PreviewInvoices() {
                   Error: {error}
                 </p>
                 <p style={{ color: "var(--foreground)", opacity: 0.7 }}>
-                  Please check that PDF files are present in
-                  /public/invoices/
+                  Please check that PDF files are present in /public/invoices/
                 </p>
               </div>
             ) : invoices.length === 0 ? (

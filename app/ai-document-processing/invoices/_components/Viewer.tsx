@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-
 interface FormField {
   name: string;
   type: string;
@@ -107,7 +106,9 @@ export default function Viewer({
           ? { ...baseConfig, toolbarItems: memoizedToolbarItems }
           : baseConfig;
 
-        NutrientViewer.load(loadConfig as Parameters<typeof NutrientViewer.load>[0])
+        NutrientViewer.load(
+          loadConfig as Parameters<typeof NutrientViewer.load>[0],
+        )
           .then(async (instance: unknown) => {
             instanceRef.current = instance as ViewerInstance;
             setIsLoading(false);

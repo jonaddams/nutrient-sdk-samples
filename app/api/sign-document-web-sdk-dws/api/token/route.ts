@@ -48,7 +48,10 @@ export async function POST(request: Request) {
     });
 
     console.log("DWS API response status:", response.status);
-    console.log("DWS API response headers:", Object.fromEntries(response.headers.entries()));
+    console.log(
+      "DWS API response headers:",
+      Object.fromEntries(response.headers.entries()),
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -62,7 +65,10 @@ export async function POST(request: Request) {
     const data = await response.json();
     console.log("DWS API success - token created");
     console.log("Token ID:", data.id);
-    console.log("Access token (first 20 chars):", data.accessToken?.substring(0, 20) + "...");
+    console.log(
+      "Access token (first 20 chars):",
+      data.accessToken?.substring(0, 20) + "...",
+    );
 
     return NextResponse.json({ token: data.accessToken });
   } catch (error) {

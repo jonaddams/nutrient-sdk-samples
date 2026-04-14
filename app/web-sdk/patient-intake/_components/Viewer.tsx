@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-
 interface ViewerProps {
   document: string | ArrayBuffer;
   onInstanceReady?: (instance: ViewerInstance) => void;

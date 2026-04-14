@@ -5,8 +5,21 @@
 /* --- Visual Effects --- */
 
 @keyframes neon-flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-  20%, 24%, 55% { opacity: 0.5; }
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  24%,
+  55% {
+    opacity: 0.5;
+  }
 }
 
 .renderer-neon-sign {
@@ -26,13 +39,28 @@
 }
 
 @keyframes hologram-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .renderer-hologram {
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe, #43e97b, #fbc2eb, #667eea);
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #764ba2,
+    #f093fb,
+    #4facfe,
+    #43e97b,
+    #fbc2eb,
+    #667eea
+  );
   background-size: 300% 300%;
   animation: hologram-shift 4s ease infinite;
   display: flex;
@@ -94,8 +122,13 @@
 /* --- Animated --- */
 
 @keyframes attention-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-  50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+  }
 }
 
 .renderer-callout {
@@ -117,8 +150,14 @@
 }
 
 @keyframes confetti-fall {
-  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(60px) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 .renderer-confetti {
@@ -148,8 +187,12 @@
 }
 
 @keyframes matrix-fall {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 .renderer-matrix {
@@ -169,7 +212,7 @@
   position: absolute;
   top: 0;
   color: #00ff41;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 10px;
   line-height: 1.2;
   writing-mode: vertical-lr;
@@ -181,7 +224,7 @@
   position: relative;
   z-index: 1;
   color: #00ff41;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-weight: bold;
   font-size: 14px;
   text-shadow: 0 0 10px #00ff41;
@@ -189,23 +232,41 @@
 }
 
 @keyframes seaweed-sway {
-  from { transform: rotate(-5deg); }
-  to { transform: rotate(5deg); }
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
 }
 
 @keyframes fish-swim {
-  from { left: -40px; }
-  to { left: calc(100% + 40px); }
+  from {
+    left: -40px;
+  }
+  to {
+    left: calc(100% + 40px);
+  }
 }
 
 @keyframes fish-swim-reverse {
-  from { right: -40px; }
-  to { right: calc(100% + 40px); }
+  from {
+    right: -40px;
+  }
+  to {
+    right: calc(100% + 40px);
+  }
 }
 
 @keyframes bubble-rise {
-  0% { transform: translateY(0); opacity: 0.6; }
-  100% { transform: translateY(-50px); opacity: 0; }
+  0% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
 }
 
 .renderer-aquarium {
@@ -388,7 +449,7 @@
   justify-content: center;
   gap: 12px;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   image-rendering: pixelated;
 }
 
@@ -452,7 +513,7 @@
   border: 3px solid black;
   border-radius: 20px;
   padding: 8px 16px;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
   font-weight: bold;
   font-size: 14px;
   max-width: 90%;

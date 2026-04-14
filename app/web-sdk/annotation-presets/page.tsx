@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 import type { PresetConfig } from "./viewer";
@@ -33,11 +33,29 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
     key: "ink",
     label: "Ink / Freehand",
     fields: [
-      { key: "lineWidth", label: "Line Width", type: "number", min: 1, max: 30, step: 1 },
+      {
+        key: "lineWidth",
+        label: "Line Width",
+        type: "number",
+        min: 1,
+        max: 30,
+        step: 1,
+      },
       { key: "strokeColor", label: "Stroke Color", type: "color" },
-      { key: "opacity", label: "Opacity", type: "number", min: 0.1, max: 1, step: 0.1 },
+      {
+        key: "opacity",
+        label: "Opacity",
+        type: "number",
+        min: 0.1,
+        max: 1,
+        step: 0.1,
+      },
     ],
-    defaults: { lineWidth: 5, strokeColor: { r: 0, g: 100, b: 200 }, opacity: 1 },
+    defaults: {
+      lineWidth: 5,
+      strokeColor: { r: 0, g: 100, b: 200 },
+      opacity: 1,
+    },
   },
   {
     key: "text",
@@ -54,7 +72,14 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
           { label: "Times New Roman", value: "Times-Roman" },
         ],
       },
-      { key: "fontSize", label: "Font Size", type: "number", min: 8, max: 72, step: 1 },
+      {
+        key: "fontSize",
+        label: "Font Size",
+        type: "number",
+        min: 8,
+        max: 72,
+        step: 1,
+      },
       { key: "fontColor", label: "Font Color", type: "color" },
       { key: "fillColor", label: "Background", type: "color" },
     ],
@@ -69,7 +94,14 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
     key: "line",
     label: "Line",
     fields: [
-      { key: "strokeWidth", label: "Stroke Width", type: "number", min: 1, max: 20, step: 1 },
+      {
+        key: "strokeWidth",
+        label: "Stroke Width",
+        type: "number",
+        min: 1,
+        max: 20,
+        step: 1,
+      },
       { key: "strokeColor", label: "Stroke Color", type: "color" },
       {
         key: "strokeDashArray",
@@ -83,13 +115,24 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
         ],
       },
     ],
-    defaults: { strokeWidth: 3, strokeColor: { r: 220, g: 50, b: 50 }, strokeDashArray: null },
+    defaults: {
+      strokeWidth: 3,
+      strokeColor: { r: 220, g: 50, b: 50 },
+      strokeDashArray: null,
+    },
   },
   {
     key: "arrow",
     label: "Arrow",
     fields: [
-      { key: "strokeWidth", label: "Stroke Width", type: "number", min: 1, max: 20, step: 1 },
+      {
+        key: "strokeWidth",
+        label: "Stroke Width",
+        type: "number",
+        min: 1,
+        max: 20,
+        step: 1,
+      },
       { key: "strokeColor", label: "Stroke Color", type: "color" },
     ],
     defaults: { strokeWidth: 3, strokeColor: { r: 220, g: 50, b: 50 } },
@@ -98,10 +141,24 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
     key: "rectangle",
     label: "Rectangle",
     fields: [
-      { key: "strokeWidth", label: "Border Width", type: "number", min: 0, max: 20, step: 1 },
+      {
+        key: "strokeWidth",
+        label: "Border Width",
+        type: "number",
+        min: 0,
+        max: 20,
+        step: 1,
+      },
       { key: "strokeColor", label: "Border Color", type: "color" },
       { key: "fillColor", label: "Fill Color", type: "color" },
-      { key: "opacity", label: "Opacity", type: "number", min: 0.1, max: 1, step: 0.1 },
+      {
+        key: "opacity",
+        label: "Opacity",
+        type: "number",
+        min: 0.1,
+        max: 1,
+        step: 0.1,
+      },
     ],
     defaults: {
       strokeWidth: 2,
@@ -114,10 +171,24 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
     key: "ellipse",
     label: "Ellipse",
     fields: [
-      { key: "strokeWidth", label: "Border Width", type: "number", min: 0, max: 20, step: 1 },
+      {
+        key: "strokeWidth",
+        label: "Border Width",
+        type: "number",
+        min: 0,
+        max: 20,
+        step: 1,
+      },
       { key: "strokeColor", label: "Border Color", type: "color" },
       { key: "fillColor", label: "Fill Color", type: "color" },
-      { key: "opacity", label: "Opacity", type: "number", min: 0.1, max: 1, step: 0.1 },
+      {
+        key: "opacity",
+        label: "Opacity",
+        type: "number",
+        min: 0.1,
+        max: 1,
+        step: 0.1,
+      },
     ],
     defaults: {
       strokeWidth: 2,
@@ -129,9 +200,7 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
   {
     key: "note",
     label: "Note / Sticky",
-    fields: [
-      { key: "color", label: "Color", type: "color" },
-    ],
+    fields: [{ key: "color", label: "Color", type: "color" }],
     defaults: { color: { r: 255, g: 220, b: 50 } },
   },
   {
@@ -139,7 +208,14 @@ const PRESET_DEFINITIONS: PresetDefinition[] = [
     label: "Text Highlighter",
     fields: [
       { key: "color", label: "Color", type: "color" },
-      { key: "opacity", label: "Opacity", type: "number", min: 0.1, max: 1, step: 0.1 },
+      {
+        key: "opacity",
+        label: "Opacity",
+        type: "number",
+        min: 0.1,
+        max: 1,
+        step: 0.1,
+      },
     ],
     defaults: { color: { r: 255, g: 215, b: 0 }, opacity: 0.5 },
   },
@@ -155,12 +231,18 @@ function rgbToHex(color: { r: number; g: number; b: number }): string {
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
-    ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
     : { r: 0, g: 0, b: 0 };
 }
 
 export default function AnnotationPresetsPage() {
-  const [presetValues, setPresetValues] = useState<Record<string, Record<string, unknown>>>(() => {
+  const [presetValues, setPresetValues] = useState<
+    Record<string, Record<string, unknown>>
+  >(() => {
     const initial: Record<string, Record<string, unknown>> = {};
     for (const def of PRESET_DEFINITIONS) {
       initial[def.key] = { ...def.defaults };

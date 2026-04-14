@@ -169,8 +169,7 @@ export default function KeywordHighlightViewer({
 
     const prev = prevKeywordsRef.current;
     const changed =
-      prev.length !== keywords.length ||
-      prev.some((k, i) => k !== keywords[i]);
+      prev.length !== keywords.length || prev.some((k, i) => k !== keywords[i]);
 
     if (changed) {
       prevKeywordsRef.current = keywords;

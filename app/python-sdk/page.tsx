@@ -39,15 +39,13 @@ const samples: Sample[] = [
   {
     name: "Digital Signature",
     category: "Signatures",
-    description:
-      "Apply digital signatures to PDF documents with certificates",
+    description: "Apply digital signatures to PDF documents with certificates",
     path: "/python-sdk/digital-signature",
   },
   {
     name: "PDF Redaction",
     category: "Editor",
-    description:
-      "Permanently remove sensitive content from PDF documents",
+    description: "Permanently remove sensitive content from PDF documents",
     path: "/python-sdk/redaction",
   },
   {
@@ -131,7 +129,10 @@ export default function PythonSDKPage() {
             >
               FastAPI backend
             </a>{" "}
-            that uses the Nutrient Python SDK for document processing. The frontend handles file uploads and result display, while the backend performs the actual PDF conversions, signing, redaction, and other operations.
+            that uses the Nutrient Python SDK for document processing. The
+            frontend handles file uploads and result display, while the backend
+            performs the actual PDF conversions, signing, redaction, and other
+            operations.
           </p>
         </div>
 

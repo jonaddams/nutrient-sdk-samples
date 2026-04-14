@@ -5,7 +5,10 @@ interface JavaSampleHeaderProps {
   description?: string;
 }
 
-export function JavaSampleHeader({ title, description }: JavaSampleHeaderProps) {
+export function JavaSampleHeader({
+  title,
+  description,
+}: JavaSampleHeaderProps) {
   return (
     <PageHeader
       title={title}

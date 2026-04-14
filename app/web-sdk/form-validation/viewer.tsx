@@ -13,40 +13,75 @@ type ValidationRule =
   | { type: "minLength"; value: number; message?: string }
   | { type: "maxLength"; value: number; message?: string }
   | { type: "matchField"; field: string; message?: string }
-  | { type: "conditionalRequired"; when: { field: string; values: string[] }; message?: string }
+  | {
+      type: "conditionalRequired";
+      when: { field: string; values: string[] };
+      message?: string;
+    }
   | { type: "minSelected"; value: number; message?: string }
   | { type: "checked"; message?: string }
   | { type: "dateFormat"; format: string; message?: string }
   | { type: "signed"; message?: string };
 
 // Rules that can be evaluated on a single field's value in real-time
-const REALTIME_RULE_TYPES = new Set(["required", "pattern", "minLength", "maxLength", "dateFormat", "checked"]);
+const REALTIME_RULE_TYPES = new Set([
+  "required",
+  "pattern",
+  "minLength",
+  "maxLength",
+  "dateFormat",
+  "checked",
+]);
 
 const validationRules: Record<string, ValidationRule[]> = {
   full_name: [{ type: "required" }],
   email: [
     { type: "required" },
-    { type: "pattern", regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email format" },
+    {
+      type: "pattern",
+      regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Invalid email format",
+    },
   ],
   phone: [
     { type: "required" },
-    { type: "pattern", regex: /^\+?[\d\s\-()]{7,15}$/, message: "Invalid phone number" },
+    {
+      type: "pattern",
+      regex: /^\+?[\d\s\-()]{7,15}$/,
+      message: "Invalid phone number",
+    },
   ],
   date_of_birth: [
     { type: "required" },
-    { type: "dateFormat", format: "mm/dd/yyyy", message: "Invalid date format (mm/dd/yyyy)" },
+    {
+      type: "dateFormat",
+      format: "mm/dd/yyyy",
+      message: "Invalid date format (mm/dd/yyyy)",
+    },
   ],
   username: [
     { type: "required" },
-    { type: "maxLength", value: 20, message: "Username must be 20 characters or fewer" },
+    {
+      type: "maxLength",
+      value: 20,
+      message: "Username must be 20 characters or fewer",
+    },
   ],
   password: [
     { type: "required" },
-    { type: "minLength", value: 8, message: "Password must be at least 8 characters" },
+    {
+      type: "minLength",
+      value: 8,
+      message: "Password must be at least 8 characters",
+    },
   ],
   confirm_password: [
     { type: "required" },
-    { type: "matchField", field: "password", message: "Passwords do not match" },
+    {
+      type: "matchField",
+      field: "password",
+      message: "Passwords do not match",
+    },
   ],
   company_name: [
     {
@@ -55,7 +90,9 @@ const validationRules: Record<string, ValidationRule[]> = {
     },
   ],
   country: [{ type: "required" }],
-  interests: [{ type: "minSelected", value: 1, message: "Select at least one interest" }],
+  interests: [
+    { type: "minSelected", value: 1, message: "Select at least one interest" },
+  ],
   terms_agree: [{ type: "checked", message: "You must agree to the terms" }],
   signature: [{ type: "signed", message: "Signature is required" }],
 };
@@ -72,7 +109,8 @@ function validateRule(
 
   switch (rule.type) {
     case "required":
-      if (!strVal && arrVal.length === 0) return rule.message ?? "This field is required";
+      if (!strVal && arrVal.length === 0)
+        return rule.message ?? "This field is required";
       return null;
 
     case "pattern":
@@ -90,9 +128,10 @@ function validateRule(
       return null;
 
     case "matchField": {
-      const otherVal = typeof allValues[rule.field] === "string"
-        ? (allValues[rule.field] as string).trim()
-        : "";
+      const otherVal =
+        typeof allValues[rule.field] === "string"
+          ? (allValues[rule.field] as string).trim()
+          : "";
       if (strVal && otherVal && strVal !== otherVal)
         return rule.message ?? "Fields do not match";
       return null;
@@ -184,7 +223,9 @@ interface FormValidationViewerProps {
   validateAllRef: React.MutableRefObject<(() => Promise<void>) | null>;
   resetRef: React.MutableRefObject<(() => Promise<void>) | null>;
   resetFormRef: React.MutableRefObject<(() => Promise<void>) | null>;
-  navigateToFieldRef: React.MutableRefObject<((fieldName: string) => Promise<void>) | null>;
+  navigateToFieldRef: React.MutableRefObject<
+    ((fieldName: string) => Promise<void>) | null
+  >;
 }
 
 export default function FormValidationViewer({
@@ -220,7 +261,11 @@ export default function FormValidationViewer({
   }, []);
 
   const validateAndUpdateField = useCallback(
-    async (fieldName: string, allValues: Record<string, string | string[] | null>, realtimeOnly: boolean) => {
+    async (
+      fieldName: string,
+      allValues: Record<string, string | string[] | null>,
+      realtimeOnly: boolean,
+    ) => {
       const error = validateField(fieldName, allValues, realtimeOnly);
       const state = validationStateRef.current;
 
@@ -244,7 +289,9 @@ export default function FormValidationViewer({
 
     const formFields = await instance.getFormFields();
     const sigField = (formFields as unknown as any[]).find(
-      (f: any) => f instanceof NutrientViewer.FormFields.SignatureFormField && f.name === "signature",
+      (f: any) =>
+        f instanceof NutrientViewer.FormFields.SignatureFormField &&
+        f.name === "signature",
     );
     if (!sigField) return true;
 
@@ -268,7 +315,9 @@ export default function FormValidationViewer({
     if (!instance) return;
 
     const allValues = await instance.getFormFieldValues();
-    const errors = validateAll(allValues as Record<string, string | string[] | null>);
+    const errors = validateAll(
+      allValues as Record<string, string | string[] | null>,
+    );
 
     const state = validationStateRef.current;
     state.errors = { ...errors };
@@ -307,7 +356,11 @@ export default function FormValidationViewer({
       if (field.name === "submit") continue; // Skip button
       const meta = fieldMetaRef.current.find((m) => m.name === field.name);
       if (!meta) continue;
-      if (meta.type === "checkbox" || meta.type === "listbox" || meta.type === "combobox") {
+      if (
+        meta.type === "checkbox" ||
+        meta.type === "listbox" ||
+        meta.type === "combobox"
+      ) {
         clearValues[field.name] = [];
       } else if (meta.type === "signature" || meta.type === "button") {
         // Signatures and buttons can't be cleared via setFormFieldValues
@@ -333,7 +386,9 @@ export default function FormValidationViewer({
 
     try {
       const annotations = await instance.getAnnotations(meta.pageIndex);
-      const annotation = annotations.find((a: any) => a.id === meta.annotationIds[0]);
+      const annotation = annotations.find(
+        (a: any) => a.id === meta.annotationIds[0],
+      );
       if (annotation) {
         instance.jumpToRect(meta.pageIndex, annotation.boundingBox);
       }
@@ -370,13 +425,22 @@ export default function FormValidationViewer({
 
       (formFields as unknown as any[]).forEach((field: any) => {
         let type = "unknown";
-        if (field instanceof NutrientViewer.FormFields.TextFormField) type = "text";
-        else if (field instanceof NutrientViewer.FormFields.CheckBoxFormField) type = "checkbox";
-        else if (field instanceof NutrientViewer.FormFields.RadioButtonFormField) type = "radio";
-        else if (field instanceof NutrientViewer.FormFields.ComboBoxFormField) type = "combobox";
-        else if (field instanceof NutrientViewer.FormFields.ListBoxFormField) type = "listbox";
-        else if (field instanceof NutrientViewer.FormFields.SignatureFormField) type = "signature";
-        else if (field instanceof NutrientViewer.FormFields.ButtonFormField) type = "button";
+        if (field instanceof NutrientViewer.FormFields.TextFormField)
+          type = "text";
+        else if (field instanceof NutrientViewer.FormFields.CheckBoxFormField)
+          type = "checkbox";
+        else if (
+          field instanceof NutrientViewer.FormFields.RadioButtonFormField
+        )
+          type = "radio";
+        else if (field instanceof NutrientViewer.FormFields.ComboBoxFormField)
+          type = "combobox";
+        else if (field instanceof NutrientViewer.FormFields.ListBoxFormField)
+          type = "listbox";
+        else if (field instanceof NutrientViewer.FormFields.SignatureFormField)
+          type = "signature";
+        else if (field instanceof NutrientViewer.FormFields.ButtonFormField)
+          type = "button";
 
         const annotationIds = field.annotationIds?.toArray?.() ?? [];
         metas.push({
@@ -396,17 +460,20 @@ export default function FormValidationViewer({
       navigateToFieldRef.current = handleNavigateToField;
 
       // Real-time field validation
-      instance.addEventListener("formFieldValues.update", async (event: any) => {
-        const allValues = await instance.getFormFieldValues();
-        const changedFieldName = event?.formFieldName ?? event?.name;
-        if (changedFieldName && validationRules[changedFieldName]) {
-          await validateAndUpdateField(
-            changedFieldName,
-            allValues as Record<string, string | string[] | null>,
-            true,
-          );
-        }
-      });
+      instance.addEventListener(
+        "formFieldValues.update",
+        async (event: any) => {
+          const allValues = await instance.getFormFieldValues();
+          const changedFieldName = event?.formFieldName ?? event?.name;
+          if (changedFieldName && validationRules[changedFieldName]) {
+            await validateAndUpdateField(
+              changedFieldName,
+              allValues as Record<string, string | string[] | null>,
+              true,
+            );
+          }
+        },
+      );
 
       // Wire submit button via annotations.focus event
       instance.addEventListener("annotations.focus", (event: any) => {
@@ -424,7 +491,14 @@ export default function FormValidationViewer({
       navigateToFieldRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, [handleValidateAll, handleReset, handleResetForm, handleNavigateToField, validateAndUpdateField, navigateToFieldRef]);
+  }, [
+    handleValidateAll,
+    handleReset,
+    handleResetForm,
+    handleNavigateToField,
+    validateAndUpdateField,
+    navigateToFieldRef,
+  ]);
 
   return <div ref={containerRef} className="validation-viewer" />;
 }

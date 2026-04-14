@@ -5,7 +5,10 @@ interface PythonSampleHeaderProps {
   description?: string;
 }
 
-export function PythonSampleHeader({ title, description }: PythonSampleHeaderProps) {
+export function PythonSampleHeader({
+  title,
+  description,
+}: PythonSampleHeaderProps) {
   return (
     <PageHeader
       title={title}

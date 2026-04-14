@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -71,7 +71,9 @@ export default function PdfToOfficePage() {
 
   const handleDownload = () => {
     if (!downloadBytes) return;
-    const blob = new Blob([downloadBytes], { type: "application/octet-stream" });
+    const blob = new Blob([downloadBytes], {
+      type: "application/octet-stream",
+    });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
@@ -121,7 +123,10 @@ export default function PdfToOfficePage() {
                   onClick={handleConvert}
                   disabled={processing}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ background: "var(--digital-pollen)", color: "var(--black)" }}
+                  style={{
+                    background: "var(--digital-pollen)",
+                    color: "var(--black)",
+                  }}
                 >
                   {processing ? "Converting..." : "Convert"}
                 </button>
@@ -133,7 +138,8 @@ export default function PdfToOfficePage() {
                       onClick={handleDownload}
                       className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                      Download {sample.outputName} ({(resultSize / 1024).toFixed(1)} KB)
+                      Download {sample.outputName} (
+                      {(resultSize / 1024).toFixed(1)} KB)
                     </button>
                     <button
                       type="button"
@@ -158,7 +164,9 @@ export default function PdfToOfficePage() {
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
                     <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Converting...</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Converting...
+                    </p>
                   </div>
                 </div>
               )}

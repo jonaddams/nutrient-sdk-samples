@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
-import type { OutlineNode, BookmarkNode } from "./viewer";
+import type { BookmarkNode, OutlineNode } from "./viewer";
 
 const Viewer = dynamic(() => import("./viewer"), {
   ssr: false,

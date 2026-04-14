@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 import type { LayerInfo } from "./viewer";
@@ -39,7 +39,14 @@ const PRESETS: Preset[] = [
   {
     name: "All Systems",
     description: "Show everything",
-    layerNames: ["Structure", "Furniture", "Plumbing", "Electrical", "HVAC", "Dimensions"],
+    layerNames: [
+      "Structure",
+      "Furniture",
+      "Plumbing",
+      "Electrical",
+      "HVAC",
+      "Dimensions",
+    ],
   },
   {
     name: "Structure Only",
@@ -71,25 +78,24 @@ const PRESETS: Preset[] = [
 export default function LayerManagementPage() {
   const [layers, setLayers] = useState<LayerInfo[]>([]);
   const [visibleLayerIds, setVisibleLayerIds] = useState<number[] | null>(null);
-  const [activePreset, setActivePreset] = useState<string | null>("All Systems");
+  const [activePreset, setActivePreset] = useState<string | null>(
+    "All Systems",
+  );
 
   const handleLayers = useCallback((discovered: LayerInfo[]) => {
     setLayers(discovered);
     setVisibleLayerIds(discovered.map((l) => l.id));
   }, []);
 
-  const toggleLayer = useCallback(
-    (id: number) => {
-      setActivePreset(null);
-      setVisibleLayerIds((prev) => {
-        if (!prev) return prev;
-        return prev.includes(id)
-          ? prev.filter((lid) => lid !== id)
-          : [...prev, id];
-      });
-    },
-    [],
-  );
+  const toggleLayer = useCallback((id: number) => {
+    setActivePreset(null);
+    setVisibleLayerIds((prev) => {
+      if (!prev) return prev;
+      return prev.includes(id)
+        ? prev.filter((lid) => lid !== id)
+        : [...prev, id];
+    });
+  }, []);
 
   const applyPreset = useCallback(
     (preset: Preset) => {
@@ -252,7 +258,13 @@ function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
   switch (icon) {
     case "wall":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <rect x="2" y="2" width="12" height="12" rx="1" />
           <line x1="8" y1="2" x2="8" y2="14" />
           <line x1="2" y1="8" x2="14" y2="8" />
@@ -260,7 +272,13 @@ function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
       );
     case "sofa":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <rect x="2" y="6" width="12" height="5" rx="1" />
           <path d="M4 6V5a2 2 0 012-2h4a2 2 0 012 2v1" />
           <line x1="3" y1="11" x2="3" y2="13" />
@@ -269,19 +287,37 @@ function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
       );
     case "droplet":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <path d="M8 2L4.5 8a3.5 3.5 0 107 0L8 2z" />
         </svg>
       );
     case "zap":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <polyline points="9 2 5 9 8 9 7 14 11 7 8 7 9 2" />
         </svg>
       );
     case "wind":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <path d="M2 6h8a2 2 0 100-4" />
           <path d="M2 10h10a2 2 0 110 4" />
           <path d="M2 8h6" />
@@ -289,7 +325,13 @@ function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
       );
     case "ruler":
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <rect x="1" y="6" width="14" height="4" rx="0.5" />
           <line x1="4" y1="6" x2="4" y2="8" />
           <line x1="7" y1="6" x2="7" y2="9" />
@@ -299,7 +341,13 @@ function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
       );
     default:
       return (
-        <svg className={cls} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg
+          className={cls}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
           <rect x="2" y="2" width="12" height="12" rx="2" />
         </svg>
       );

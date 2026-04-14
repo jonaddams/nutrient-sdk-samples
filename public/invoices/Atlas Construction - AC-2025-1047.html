@@ -6,331 +6,331 @@
     <title>Invoice AC-2025-1047</title>
     <style>
       * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
 
-      body {
-        font-size: 0.75rem;
-        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        color: #212529;
-        margin: 0 auto;
-        position: relative;
-      }
+            body {
+              font-size: 0.75rem;
+              font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              color: #212529;
+              margin: 0 auto;
+              position: relative;
+            }
 
-      #pspdfkit-header {
-        display: flow-root;
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-        padding: 0 2.5rem;
-      }
+            #pspdfkit-header {
+              display: flow-root;
+              margin-top: 1.5rem;
+              margin-bottom: 1rem;
+              padding: 0 2.5rem;
+            }
 
-      .header-columns {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        padding-bottom: 1rem;
-        border-bottom: 4px solid #e67e22;
-      }
+            .header-columns {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              padding-bottom: 1rem;
+              border-bottom: 4px solid #e67e22;
+            }
 
-      .logotype {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+            .logotype {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+            }
 
-      .logo-mark {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #e67e22, #d35400);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 900;
-        font-size: 1.25rem;
-      }
+            .logo-mark {
+              width: 40px;
+              height: 40px;
+              background: linear-gradient(135deg, #e67e22, #d35400);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-weight: 900;
+              font-size: 1.25rem;
+            }
 
-      .company-name {
-        font-size: 1.125rem;
-        font-weight: 800;
-        color: #2c3e50;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
+            .company-name {
+              font-size: 1.125rem;
+              font-weight: 800;
+              color: #2c3e50;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+            }
 
-      .company-sub {
-        font-size: 0.5625rem;
-        color: #7f8c8d;
-        letter-spacing: 1px;
-      }
+            .company-sub {
+              font-size: 0.5625rem;
+              color: #7f8c8d;
+              letter-spacing: 1px;
+            }
 
-      .header-badges {
-        display: flex;
-        gap: 0.5rem;
-      }
+            .header-badges {
+              display: flex;
+              gap: 0.5rem;
+            }
 
-      .badge {
-        font-size: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        border: 1px solid #e67e22;
-        color: #e67e22;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-      }
+            .badge {
+              font-size: 0.5rem;
+              padding: 0.25rem 0.5rem;
+              border: 1px solid #e67e22;
+              color: #e67e22;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              font-weight: 600;
+            }
 
-      #pspdfkit-footer {
-        display: flow-root;
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 1.5rem;
-        box-sizing: border-box;
-        width: 100%;
-        padding: 0 2.5rem;
-      }
+            #pspdfkit-footer {
+              display: flow-root;
+              position: absolute;
+              left: 0;
+              right: 0;
+              bottom: 1.5rem;
+              box-sizing: border-box;
+              width: 100%;
+              padding: 0 2.5rem;
+            }
 
-      .footer-columns {
-        display: flex;
-        justify-content: space-between;
-        border-top: 2px solid #e67e22;
-        padding-top: 0.5rem;
-        font-size: 0.5rem;
-        color: #95a5a6;
-      }
+            .footer-columns {
+              display: flex;
+              justify-content: space-between;
+              border-top: 2px solid #e67e22;
+              padding-top: 0.5rem;
+              font-size: 0.5rem;
+              color: #95a5a6;
+            }
 
-      .footer-columns .company-info {
-        max-width: 60%;
-      }
+            .footer-columns .company-info {
+              max-width: 60%;
+            }
 
-      .page {
-        margin: 0 2.5rem;
-      }
+            .page {
+              margin: 0 2.5rem;
+            }
 
-      .invoice-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-      }
+            .invoice-header-row {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 1.5rem;
+            }
 
-      .invoice-type {
-        background: #e67e22;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        font-size: 1.25rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-      }
+            .invoice-type {
+              background: #e67e22;
+              color: white;
+              padding: 0.75rem 1.5rem;
+              font-size: 1.25rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 3px;
+            }
 
-      .invoice-details {
-        text-align: right;
-        line-height: 1.8;
-      }
+            .invoice-details {
+              text-align: right;
+              line-height: 1.8;
+            }
 
-      .invoice-details .label {
-        color: #95a5a6;
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-      }
+            .invoice-details .label {
+              color: #95a5a6;
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+            }
 
-      .invoice-details .value {
-        font-weight: 600;
-      }
+            .invoice-details .value {
+              font-weight: 600;
+            }
 
-      .project-banner {
-        background: #2c3e50;
-        color: white;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-      }
+            .project-banner {
+              background: #2c3e50;
+              color: white;
+              padding: 1rem 1.25rem;
+              margin-bottom: 1.5rem;
+              display: flex;
+              justify-content: space-between;
+            }
 
-      .project-banner .proj-name {
-        font-size: 0.875rem;
-        font-weight: 600;
-      }
+            .project-banner .proj-name {
+              font-size: 0.875rem;
+              font-weight: 600;
+            }
 
-      .project-banner .proj-detail {
-        font-size: 0.625rem;
-        opacity: 0.8;
-        margin-top: 0.25rem;
-      }
+            .project-banner .proj-detail {
+              font-size: 0.625rem;
+              opacity: 0.8;
+              margin-top: 0.25rem;
+            }
 
-      .project-banner .proj-status {
-        background: #27ae60;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        font-size: 0.5625rem;
-        font-weight: 600;
-        align-self: center;
-        text-transform: uppercase;
-      }
+            .project-banner .proj-status {
+              background: #27ae60;
+              color: white;
+              padding: 0.25rem 0.75rem;
+              font-size: 0.5625rem;
+              font-weight: 600;
+              align-self: center;
+              text-transform: uppercase;
+            }
 
-      .client-info {
-        display: flex;
-        gap: 2rem;
-        margin-bottom: 1.5rem;
-      }
+            .client-info {
+              display: flex;
+              gap: 2rem;
+              margin-bottom: 1.5rem;
+            }
 
-      .info-card {
-        flex: 1;
-        border: 1px solid #dee2e6;
-        padding: 1rem;
-      }
+            .info-card {
+              flex: 1;
+              border: 1px solid #dee2e6;
+              padding: 1rem;
+            }
 
-      .info-card h4 {
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #e67e22;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.375rem;
-        border-bottom: 1px solid #e67e22;
-      }
+            .info-card h4 {
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #e67e22;
+              margin-bottom: 0.5rem;
+              padding-bottom: 0.375rem;
+              border-bottom: 1px solid #e67e22;
+            }
 
-      .info-card p {
-        margin: 2px 0;
-        line-height: 1.5;
-      }
+            .info-card p {
+              margin: 2px 0;
+              line-height: 1.5;
+            }
 
-      thead {
-        display: table-header-group;
-        break-inside: avoid;
-      }
+            thead {
+              display: table-header-group;
+              break-inside: avoid;
+            }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1rem 0;
-        font-size: 0.625rem;
-      }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 1rem 0;
+              font-size: 0.625rem;
+            }
 
-      thead th {
-        background: #2c3e50;
-        color: white;
-        padding: 0.5rem;
-        text-align: left;
-        font-size: 0.5625rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
+            thead th {
+              background: #2c3e50;
+              color: white;
+              padding: 0.5rem;
+              text-align: left;
+              font-size: 0.5625rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
 
-      thead th:nth-child(n+3) {
-        text-align: right;
-      }
+            thead th:nth-child(n+3) {
+              text-align: right;
+            }
 
-      tbody td {
-        padding: 0.4rem 0.5rem;
-        border-bottom: 1px solid #ecf0f1;
-      }
+            tbody td {
+              padding: 0.4rem 0.5rem;
+              border-bottom: 1px solid #ecf0f1;
+            }
 
-      tbody td:nth-child(n+3) {
-        text-align: right;
-      }
+            tbody td:nth-child(n+3) {
+              text-align: right;
+            }
 
-      .phase-header td {
-        background: #f8f9fa;
-        font-weight: 700;
-        color: #e67e22;
-        font-size: 0.6875rem;
-        padding: 0.5rem;
-        border-bottom: 2px solid #e67e22 !important;
-      }
+            .phase-header td {
+              background: #f8f9fa;
+              font-weight: 700;
+              color: #e67e22;
+              font-size: 0.6875rem;
+              padding: 0.5rem;
+              border-bottom: 2px solid #e67e22 !important;
+            }
 
-      .subtotal-row td {
-        font-weight: 600;
-        border-top: 1px solid #2c3e50;
-        background: #f8f9fa;
-      }
+            .subtotal-row td {
+              font-weight: 600;
+              border-top: 1px solid #2c3e50;
+              background: #f8f9fa;
+            }
 
-      .summary-section {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 1.5rem;
-        gap: 2rem;
-      }
+            .summary-section {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 1.5rem;
+              gap: 2rem;
+            }
 
-      .progress-box {
-        flex: 1;
-        border: 1px solid #dee2e6;
-        padding: 1rem;
-      }
+            .progress-box {
+              flex: 1;
+              border: 1px solid #dee2e6;
+              padding: 1rem;
+            }
 
-      .progress-box h4 {
-        font-size: 0.625rem;
-        text-transform: uppercase;
-        color: #e67e22;
-        margin-bottom: 0.75rem;
-      }
+            .progress-box h4 {
+              font-size: 0.625rem;
+              text-transform: uppercase;
+              color: #e67e22;
+              margin-bottom: 0.75rem;
+            }
 
-      .progress-bar-container {
-        background: #ecf0f1;
-        height: 8px;
-        border-radius: 4px;
-        margin: 0.375rem 0;
-      }
+            .progress-bar-container {
+              background: #ecf0f1;
+              height: 8px;
+              border-radius: 4px;
+              margin: 0.375rem 0;
+            }
 
-      .progress-bar {
-        height: 100%;
-        border-radius: 4px;
-        background: #e67e22;
-      }
+            .progress-bar {
+              height: 100%;
+              border-radius: 4px;
+              background: #e67e22;
+            }
 
-      .progress-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.5625rem;
-        color: #7f8c8d;
-      }
+            .progress-label {
+              display: flex;
+              justify-content: space-between;
+              font-size: 0.5625rem;
+              color: #7f8c8d;
+            }
 
-      .amount-box {
-        width: 280px;
-      }
+            .amount-box {
+              width: 280px;
+            }
 
-      .amount-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.4rem 0;
-        border-bottom: 1px solid #ecf0f1;
-        font-size: 0.6875rem;
-      }
+            .amount-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.4rem 0;
+              border-bottom: 1px solid #ecf0f1;
+              font-size: 0.6875rem;
+            }
 
-      .amount-row.total {
-        border-top: 2px solid #2c3e50;
-        border-bottom: 2px solid #2c3e50;
-        font-weight: 700;
-        font-size: 0.875rem;
-        padding: 0.5rem 0;
-      }
+            .amount-row.total {
+              border-top: 2px solid #2c3e50;
+              border-bottom: 2px solid #2c3e50;
+              font-weight: 700;
+              font-size: 0.875rem;
+              padding: 0.5rem 0;
+            }
 
-      .amount-row.due {
-        background: #e67e22;
-        color: white;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
+            .amount-row.due {
+              background: #e67e22;
+              color: white;
+              padding: 0.5rem;
+              margin-top: 0.5rem;
+              font-weight: 700;
+              font-size: 0.875rem;
+            }
 
-      .payment-terms {
-        margin-top: 2rem;
-        border: 1px solid #dee2e6;
-        padding: 1rem;
-        font-size: 0.625rem;
-        line-height: 1.7;
-        color: #555;
-      }
+            .payment-terms {
+              margin-top: 2rem;
+              border: 1px solid #dee2e6;
+              padding: 1rem;
+              font-size: 0.625rem;
+              line-height: 1.7;
+              color: #555;
+            }
 
-      .payment-terms h4 {
-        color: #2c3e50;
-        font-size: 0.6875rem;
-        margin-bottom: 0.5rem;
-      }
+            .payment-terms h4 {
+              color: #2c3e50;
+              font-size: 0.6875rem;
+              margin-bottom: 0.5rem;
+            }
     </style>
   </head>
 

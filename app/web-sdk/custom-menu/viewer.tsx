@@ -119,7 +119,10 @@ const TOOLS: Tool[] = [
 const createModeToToolMap = (NutrientViewer: NutrientViewerGlobal) => {
   const map: Record<string, string> = {};
   for (const tool of TOOLS) {
-    const mode = NutrientViewer.InteractionMode[tool.mode as keyof typeof NutrientViewer.InteractionMode];
+    const mode =
+      NutrientViewer.InteractionMode[
+        tool.mode as keyof typeof NutrientViewer.InteractionMode
+      ];
     if (mode && !tool.preset) {
       map[String(mode)] = tool.id;
     }
@@ -140,7 +143,9 @@ const toggleTool = (
   const tool = TOOLS.find((t) => t.id === toolId);
   if (!tool) return;
 
-  const targetMode = NutrientViewer.InteractionMode[tool.mode as keyof typeof NutrientViewer.InteractionMode] as unknown;
+  const targetMode = NutrientViewer.InteractionMode[
+    tool.mode as keyof typeof NutrientViewer.InteractionMode
+  ] as unknown;
 
   if (activeTool === toolId) {
     // Deactivate current tool

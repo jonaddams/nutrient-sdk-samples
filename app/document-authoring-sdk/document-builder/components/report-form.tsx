@@ -1,7 +1,11 @@
 "use client";
 
 import type { DocAuthDocument } from "../../types";
-import type { ReportFormState, ReportSection, MetricRow } from "../hooks/use-document-builder";
+import type {
+  MetricRow,
+  ReportFormState,
+  ReportSection,
+} from "../hooks/use-document-builder";
 import ExportBar from "./export-bar";
 
 interface ReportFormProps {
@@ -30,10 +34,7 @@ export default function ReportForm({
   };
 
   const addSection = () => {
-    updateField("sections", [
-      ...formState.sections,
-      { heading: "", body: "" },
-    ]);
+    updateField("sections", [...formState.sections, { heading: "", body: "" }]);
   };
 
   const removeSection = (index: number) => {
@@ -51,10 +52,7 @@ export default function ReportForm({
   };
 
   const addMetric = () => {
-    updateField("metrics", [
-      ...formState.metrics,
-      { metric: "", value: "" },
-    ]);
+    updateField("metrics", [...formState.metrics, { metric: "", value: "" }]);
   };
 
   const removeMetric = (index: number) => {
@@ -74,9 +72,7 @@ export default function ReportForm({
   return (
     <div className="h-full flex flex-col overflow-y-auto p-5 space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-gray-100 mb-1">
-          Report Builder
-        </h2>
+        <h2 className="text-lg font-bold text-gray-100 mb-1">Report Builder</h2>
         <p className="text-xs text-gray-400">
           Edit fields below to build your report. Changes update the document
           live.
@@ -150,9 +146,7 @@ export default function ReportForm({
             className="space-y-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">
-                Section {index + 1}
-              </span>
+              <span className="text-xs text-gray-400">Section {index + 1}</span>
               <button
                 type="button"
                 onClick={() => removeSection(index)}
@@ -172,9 +166,7 @@ export default function ReportForm({
             />
             <textarea
               value={section.body}
-              onChange={(e) =>
-                updateSection(index, { body: e.target.value })
-              }
+              onChange={(e) => updateSection(index, { body: e.target.value })}
               className={textareaClass}
               rows={3}
               placeholder="Section content"
@@ -196,25 +188,18 @@ export default function ReportForm({
           </button>
         </div>
         {formState.metrics.map((row, index) => (
-          <div
-            key={`metric-${index}`}
-            className="flex items-center gap-2"
-          >
+          <div key={`metric-${index}`} className="flex items-center gap-2">
             <input
               type="text"
               value={row.metric}
-              onChange={(e) =>
-                updateMetric(index, { metric: e.target.value })
-              }
+              onChange={(e) => updateMetric(index, { metric: e.target.value })}
               className={`${inputClass} flex-1`}
               placeholder="Metric name"
             />
             <input
               type="text"
               value={row.value}
-              onChange={(e) =>
-                updateMetric(index, { value: e.target.value })
-              }
+              onChange={(e) => updateMetric(index, { value: e.target.value })}
               className={`${inputClass} flex-1`}
               placeholder="Value"
             />

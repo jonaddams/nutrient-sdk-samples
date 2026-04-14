@@ -102,7 +102,10 @@ function generateStampPng(template: StampTemplate): Promise<Blob> {
     canvas.width = STAMP_WIDTH * scale;
     canvas.height = STAMP_HEIGHT * scale;
     const ctx = canvas.getContext("2d");
-    if (!ctx) { reject(new Error("No canvas context")); return; }
+    if (!ctx) {
+      reject(new Error("No canvas context"));
+      return;
+    }
 
     const img = new Image();
     const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
@@ -116,7 +119,10 @@ function generateStampPng(template: StampTemplate): Promise<Blob> {
         else reject(new Error("Canvas toBlob failed"));
       }, "image/png");
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("SVG load failed")); };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("SVG load failed"));
+    };
     img.src = url;
   });
 }
@@ -135,19 +141,101 @@ type FieldDef = {
 function getFieldsForTemplate(templateId: string): FieldDef[] {
   if (templateId === "review") {
     return [
-      { type: "checkbox", name: "no_exceptions", label: "No Exceptions Taken", offsetX: 15, offsetY: 48, width: 16, height: 16 },
-      { type: "checkbox", name: "amend_as_noted", label: "Amend As Noted", offsetX: 15, offsetY: 68, width: 16, height: 16 },
-      { type: "checkbox", name: "revise_resubmit", label: "Revise and Resubmit", offsetX: 15, offsetY: 88, width: 16, height: 16 },
-      { type: "signatureImage", name: "reviewed_by", label: "BY:", offsetX: 10, offsetY: 185, width: 150, height: 55, imageSrc: "/john-adams-signature.png" },
-      { type: "date", name: "review_date", label: "DATE:", offsetX: 180, offsetY: 195, width: 140, height: 24 },
+      {
+        type: "checkbox",
+        name: "no_exceptions",
+        label: "No Exceptions Taken",
+        offsetX: 15,
+        offsetY: 48,
+        width: 16,
+        height: 16,
+      },
+      {
+        type: "checkbox",
+        name: "amend_as_noted",
+        label: "Amend As Noted",
+        offsetX: 15,
+        offsetY: 68,
+        width: 16,
+        height: 16,
+      },
+      {
+        type: "checkbox",
+        name: "revise_resubmit",
+        label: "Revise and Resubmit",
+        offsetX: 15,
+        offsetY: 88,
+        width: 16,
+        height: 16,
+      },
+      {
+        type: "signatureImage",
+        name: "reviewed_by",
+        label: "BY:",
+        offsetX: 10,
+        offsetY: 185,
+        width: 150,
+        height: 55,
+        imageSrc: "/john-adams-signature.png",
+      },
+      {
+        type: "date",
+        name: "review_date",
+        label: "DATE:",
+        offsetX: 180,
+        offsetY: 195,
+        width: 140,
+        height: 24,
+      },
     ];
   }
   return [
-    { type: "checkbox", name: "approved", label: "Approved", offsetX: 15, offsetY: 48, width: 16, height: 16 },
-    { type: "checkbox", name: "approved_as_noted", label: "Approved As Noted", offsetX: 15, offsetY: 68, width: 16, height: 16 },
-    { type: "checkbox", name: "rejected", label: "Rejected", offsetX: 15, offsetY: 88, width: 16, height: 16 },
-    { type: "signatureImage", name: "approved_by", label: "BY:", offsetX: 10, offsetY: 185, width: 150, height: 55, imageSrc: "/john-hancock-signature.png" },
-    { type: "date", name: "approval_date", label: "DATE:", offsetX: 180, offsetY: 195, width: 140, height: 24 },
+    {
+      type: "checkbox",
+      name: "approved",
+      label: "Approved",
+      offsetX: 15,
+      offsetY: 48,
+      width: 16,
+      height: 16,
+    },
+    {
+      type: "checkbox",
+      name: "approved_as_noted",
+      label: "Approved As Noted",
+      offsetX: 15,
+      offsetY: 68,
+      width: 16,
+      height: 16,
+    },
+    {
+      type: "checkbox",
+      name: "rejected",
+      label: "Rejected",
+      offsetX: 15,
+      offsetY: 88,
+      width: 16,
+      height: 16,
+    },
+    {
+      type: "signatureImage",
+      name: "approved_by",
+      label: "BY:",
+      offsetX: 10,
+      offsetY: 185,
+      width: 150,
+      height: 55,
+      imageSrc: "/john-hancock-signature.png",
+    },
+    {
+      type: "date",
+      name: "approval_date",
+      label: "DATE:",
+      offsetX: 180,
+      offsetY: 195,
+      width: 140,
+      height: 24,
+    },
   ];
 }
 
@@ -181,8 +269,12 @@ export default function StampAnnotationsViewer({
     drop: (e: Event) => void;
   } | null>(null);
 
-  useEffect(() => { creatorModeRef.current = creatorMode; }, [creatorMode]);
-  useEffect(() => { onStampsChangedRef.current = onStampsChanged; }, [onStampsChanged]);
+  useEffect(() => {
+    creatorModeRef.current = creatorMode;
+  }, [creatorMode]);
+  useEffect(() => {
+    onStampsChangedRef.current = onStampsChanged;
+  }, [onStampsChanged]);
 
   const updateStamps = useCallback((newStamps: PlacedStamp[]) => {
     stampsRef.current = newStamps;
@@ -200,17 +292,27 @@ export default function StampAnnotationsViewer({
       suppressGroupSyncRef.current = true;
 
       for (const annId of stamp.annotationIds) {
-        try { await instance.delete(annId); } catch { /* already deleted */ }
+        try {
+          await instance.delete(annId);
+        } catch {
+          /* already deleted */
+        }
       }
 
       try {
         const formFields = await instance.getFormFields();
         for (const field of formFields.toArray()) {
           if ((field as any).name?.startsWith(`${groupId}-`)) {
-            try { await instance.delete(field); } catch { /* ignore */ }
+            try {
+              await instance.delete(field);
+            } catch {
+              /* ignore */
+            }
           }
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
 
       suppressGroupSyncRef.current = false;
       updateStamps(stampsRef.current.filter((s) => s.groupId !== groupId));
@@ -221,11 +323,18 @@ export default function StampAnnotationsViewer({
   // Expose deleteStampGroup to parent via ref
   useEffect(() => {
     deleteStampRef.current = deleteStampGroup;
-    return () => { deleteStampRef.current = null; };
+    return () => {
+      deleteStampRef.current = null;
+    };
   }, [deleteStampGroup, deleteStampRef]);
 
   const moveStampGroup = useCallback(
-    async (groupId: string, deltaX: number, deltaY: number, excludeId: string) => {
+    async (
+      groupId: string,
+      deltaX: number,
+      deltaY: number,
+      excludeId: string,
+    ) => {
       const instance = instanceRef.current;
       const NV = window.NutrientViewer;
       if (!instance || !NV) return;
@@ -251,7 +360,9 @@ export default function StampAnnotationsViewer({
             width: bbox.width,
             height: bbox.height,
           });
-          return instance.update((ann as any).set("boundingBox", newBbox)).catch(() => {});
+          return instance
+            .update((ann as any).set("boundingBox", newBbox))
+            .catch(() => {});
         })
         .filter(Boolean);
 
@@ -272,7 +383,12 @@ export default function StampAnnotationsViewer({
 
   // Place a stamp at the drop position (client coordinates)
   const placeStamp = useCallback(
-    async (templateId: string, pageIndex: number, clientX: number, clientY: number) => {
+    async (
+      templateId: string,
+      pageIndex: number,
+      clientX: number,
+      clientY: number,
+    ) => {
       const instance = instanceRef.current;
       const NV = window.NutrientViewer;
       if (!instance || !NV) return;
@@ -289,7 +405,10 @@ export default function StampAnnotationsViewer({
         width: STAMP_WIDTH,
         height: STAMP_HEIGHT,
       });
-      const stampPageRect = instance.transformContentClientToPageSpace(stampClientRect, pageIndex);
+      const stampPageRect = instance.transformContentClientToPageSpace(
+        stampClientRect,
+        pageIndex,
+      );
 
       // 1. Background image
       const pngBlob = await generateStampPng(template);
@@ -302,7 +421,11 @@ export default function StampAnnotationsViewer({
         contentType: "image/png",
         boundingBox: stampPageRect,
         imageAttachmentId: attachmentId,
-        customData: { groupId, stampTemplateId: template.id, role: "background" },
+        customData: {
+          groupId,
+          stampTemplateId: template.id,
+          role: "background",
+        },
       });
       annotationIds.push(imageId);
 
@@ -311,7 +434,11 @@ export default function StampAnnotationsViewer({
       const toCreate: any[] = [imageAnnotation];
 
       const makeList = (items: string[]) =>
-        new (NV.Immutable.List as unknown as new (items: string[]) => List<string>)(items);
+        new (
+          NV.Immutable.List as unknown as new (
+            items: string[],
+          ) => List<string>
+        )(items);
 
       for (const field of fields) {
         const fieldClientRect = new NV.Geometry.Rect({
@@ -320,7 +447,10 @@ export default function StampAnnotationsViewer({
           width: field.width,
           height: field.height,
         });
-        const fieldPageRect = instance.transformContentClientToPageSpace(fieldClientRect, pageIndex);
+        const fieldPageRect = instance.transformContentClientToPageSpace(
+          fieldClientRect,
+          pageIndex,
+        );
 
         // Signature images are static ImageAnnotations, not form fields
         if (field.type === "signatureImage" && field.imageSrc) {
@@ -334,7 +464,11 @@ export default function StampAnnotationsViewer({
             contentType: "image/png",
             boundingBox: fieldPageRect,
             imageAttachmentId: sigAttachmentId,
-            customData: { groupId, stampTemplateId: template.id, role: "signature" },
+            customData: {
+              groupId,
+              stampTemplateId: template.id,
+              role: "signature",
+            },
           });
           toCreate.push(sigAnnotation);
           annotationIds.push(sigId);
@@ -349,11 +483,19 @@ export default function StampAnnotationsViewer({
           pageIndex,
           boundingBox: fieldPageRect,
           formFieldName: fieldName,
-          customData: { groupId, stampTemplateId: template.id, role: "field", fieldType: field.type, fieldLabel: field.label },
+          customData: {
+            groupId,
+            stampTemplateId: template.id,
+            role: "field",
+            fieldType: field.type,
+            fieldLabel: field.label,
+          },
         };
         if (field.type === "date") {
           widgetOpts.additionalActions = {
-            onFormat: new NV.Actions.JavaScriptAction({ script: 'AFDate_FormatEx("mm/dd/yyyy")' }),
+            onFormat: new NV.Actions.JavaScriptAction({
+              script: 'AFDate_FormatEx("mm/dd/yyyy")',
+            }),
           };
         }
         const widget = new NV.Annotations.WidgetAnnotation(widgetOpts);
@@ -363,9 +505,11 @@ export default function StampAnnotationsViewer({
           formField = new NV.FormFields.CheckBoxFormField({
             name: fieldName,
             annotationIds: makeList([widgetId]),
-            options: new (NV.Immutable.List as unknown as new (items: any[]) => List<any>)(
-              [new NV.FormOption({ label: "Yes", value: "Yes" })],
-            ),
+            options: new (
+              NV.Immutable.List as unknown as new (
+                items: any[],
+              ) => List<any>
+            )([new NV.FormOption({ label: "Yes", value: "Yes" })]),
             defaultValues: makeList([]),
             value: [],
           });
@@ -386,49 +530,72 @@ export default function StampAnnotationsViewer({
       const centerY = stampPageRect.top + stampPageRect.height / 2;
       updateStamps([
         ...stampsRef.current,
-        { groupId, templateId: template.id, pageIndex, x: Math.round(centerX), y: Math.round(centerY), annotationIds },
+        {
+          groupId,
+          templateId: template.id,
+          pageIndex,
+          x: Math.round(centerX),
+          y: Math.round(centerY),
+          annotationIds,
+        },
       ]);
     },
     [updateStamps],
   );
 
   // Set up drag-and-drop handlers on the content document
-  const setupDragDrop = useCallback((instance: Instance, enabled: boolean) => {
-    const dragoverHandler = (event: Event) => {
-      if (!enabled) return;
-      const dragEvent = event as DragEvent;
-      if (findPageElement(dragEvent.target as Element)) {
+  const setupDragDrop = useCallback(
+    (instance: Instance, enabled: boolean) => {
+      const dragoverHandler = (event: Event) => {
+        if (!enabled) return;
+        const dragEvent = event as DragEvent;
+        if (findPageElement(dragEvent.target as Element)) {
+          event.preventDefault();
+        }
+      };
+
+      const dropHandler = async (event: Event) => {
+        if (!enabled) return;
+        const dragEvent = event as DragEvent;
         event.preventDefault();
+        event.stopPropagation();
+
+        const templateId = dragEvent.dataTransfer?.getData("text") || "";
+        if (!templateId || !STAMP_TEMPLATES.find((t) => t.id === templateId))
+          return;
+
+        const pageElement = findPageElement(dragEvent.target as Element);
+        if (!pageElement) return;
+
+        const pageIndex = parseInt(
+          (pageElement as HTMLElement).dataset.pageIndex || "0",
+          10,
+        );
+        placeStamp(templateId, pageIndex, dragEvent.clientX, dragEvent.clientY);
+      };
+
+      if (instance?.contentDocument) {
+        instance.contentDocument.addEventListener("dragover", dragoverHandler);
+        instance.contentDocument.addEventListener("drop", dropHandler);
+        dragHandlersRef.current = {
+          dragover: dragoverHandler,
+          drop: dropHandler,
+        };
       }
-    };
-
-    const dropHandler = async (event: Event) => {
-      if (!enabled) return;
-      const dragEvent = event as DragEvent;
-      event.preventDefault();
-      event.stopPropagation();
-
-      const templateId = dragEvent.dataTransfer?.getData("text") || "";
-      if (!templateId || !STAMP_TEMPLATES.find((t) => t.id === templateId)) return;
-
-      const pageElement = findPageElement(dragEvent.target as Element);
-      if (!pageElement) return;
-
-      const pageIndex = parseInt((pageElement as HTMLElement).dataset.pageIndex || "0", 10);
-      placeStamp(templateId, pageIndex, dragEvent.clientX, dragEvent.clientY);
-    };
-
-    if (instance?.contentDocument) {
-      instance.contentDocument.addEventListener("dragover", dragoverHandler);
-      instance.contentDocument.addEventListener("drop", dropHandler);
-      dragHandlersRef.current = { dragover: dragoverHandler, drop: dropHandler };
-    }
-  }, [placeStamp]);
+    },
+    [placeStamp],
+  );
 
   const cleanupDragDrop = useCallback((instance: Instance) => {
     if (instance?.contentDocument && dragHandlersRef.current) {
-      instance.contentDocument.removeEventListener("dragover", dragHandlersRef.current.dragover);
-      instance.contentDocument.removeEventListener("drop", dragHandlersRef.current.drop);
+      instance.contentDocument.removeEventListener(
+        "dragover",
+        dragHandlersRef.current.dragover,
+      );
+      instance.contentDocument.removeEventListener(
+        "drop",
+        dragHandlersRef.current.drop,
+      );
       dragHandlersRef.current = null;
     }
   }, []);
@@ -451,7 +618,9 @@ export default function StampAnnotationsViewer({
       toolbarItems: [
         ...(NutrientViewer.defaultToolbarItems ?? []).filter(
           (item: { type: string }) =>
-            ["pager", "zoom-out", "zoom-in", "zoom-mode", "search"].includes(item.type),
+            ["pager", "zoom-out", "zoom-in", "zoom-mode", "search"].includes(
+              item.type,
+            ),
         ),
       ],
       // Prevent stamp background annotations from being selected/edited
@@ -473,55 +642,72 @@ export default function StampAnnotationsViewer({
       setupDragDrop(instance, creatorModeRef.current);
 
       // Track annotation positions after creation
-      instance.addEventListener("annotations.create" as any, (annotations: any) => {
-        const list = annotations?.toArray ? annotations.toArray() : [];
-        for (const ann of list) {
-          if (ann?.boundingBox && ann?.customData?.groupId) {
-            prevBboxMap.set(ann.id, { left: ann.boundingBox.left, top: ann.boundingBox.top });
+      instance.addEventListener(
+        "annotations.create" as any,
+        (annotations: any) => {
+          const list = annotations?.toArray ? annotations.toArray() : [];
+          for (const ann of list) {
+            if (ann?.boundingBox && ann?.customData?.groupId) {
+              prevBboxMap.set(ann.id, {
+                left: ann.boundingBox.left,
+                top: ann.boundingBox.top,
+              });
+            }
           }
-        }
-      });
+        },
+      );
 
       // Handle group move
-      instance.addEventListener("annotations.update" as any, (annotations: any) => {
-        if (suppressGroupSyncRef.current) return;
-        if (!creatorModeRef.current) return; // no moves when locked
-        const list = annotations?.toArray ? annotations.toArray() : [];
+      instance.addEventListener(
+        "annotations.update" as any,
+        (annotations: any) => {
+          if (suppressGroupSyncRef.current) return;
+          if (!creatorModeRef.current) return; // no moves when locked
+          const list = annotations?.toArray ? annotations.toArray() : [];
 
-        for (const ann of list) {
-          const groupId = ann?.customData?.groupId;
-          if (!groupId || !ann?.boundingBox) continue;
+          for (const ann of list) {
+            const groupId = ann?.customData?.groupId;
+            if (!groupId || !ann?.boundingBox) continue;
 
-          const prev = prevBboxMap.get(ann.id);
-          if (!prev) {
-            prevBboxMap.set(ann.id, { left: ann.boundingBox.left, top: ann.boundingBox.top });
-            continue;
+            const prev = prevBboxMap.get(ann.id);
+            if (!prev) {
+              prevBboxMap.set(ann.id, {
+                left: ann.boundingBox.left,
+                top: ann.boundingBox.top,
+              });
+              continue;
+            }
+
+            const deltaX = ann.boundingBox.left - prev.left;
+            const deltaY = ann.boundingBox.top - prev.top;
+            prevBboxMap.set(ann.id, {
+              left: ann.boundingBox.left,
+              top: ann.boundingBox.top,
+            });
+
+            if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
+              moveStampGroup(groupId, deltaX, deltaY, ann.id);
+            }
           }
-
-          const deltaX = ann.boundingBox.left - prev.left;
-          const deltaY = ann.boundingBox.top - prev.top;
-          prevBboxMap.set(ann.id, { left: ann.boundingBox.left, top: ann.boundingBox.top });
-
-          if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
-            moveStampGroup(groupId, deltaX, deltaY, ann.id);
-          }
-        }
-      });
+        },
+      );
 
       // Handle group delete
-      instance.addEventListener("annotations.delete" as any, (annotations: any) => {
-        if (suppressGroupSyncRef.current) return;
-        if (!creatorModeRef.current) return; // no deletes when locked
-        const list = annotations?.toArray ? annotations.toArray() : [];
+      instance.addEventListener(
+        "annotations.delete" as any,
+        (annotations: any) => {
+          if (suppressGroupSyncRef.current) return;
+          if (!creatorModeRef.current) return; // no deletes when locked
+          const list = annotations?.toArray ? annotations.toArray() : [];
 
-        for (const ann of list) {
-          const groupId = ann?.customData?.groupId;
-          if (!groupId) continue;
-          deleteStampGroup(groupId);
-          break;
-        }
-      });
-
+          for (const ann of list) {
+            const groupId = ann?.customData?.groupId;
+            if (!groupId) continue;
+            deleteStampGroup(groupId);
+            break;
+          }
+        },
+      );
     });
 
     return () => {
@@ -548,13 +734,10 @@ export default function StampAnnotationsViewer({
         ? viewState.set("interactionMode", NV.InteractionMode.FORM_CREATOR)
         : viewState.set("interactionMode", null),
     );
-
   }, [creatorMode, cleanupDragDrop, setupDragDrop]);
 
-  return (
-    <div ref={containerRef} className="stamp-viewer" />
-  );
+  return <div ref={containerRef} className="stamp-viewer" />;
 }
 
-export { STAMP_TEMPLATES };
 export type { PlacedStamp, StampTemplate };
+export { STAMP_TEMPLATES };

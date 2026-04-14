@@ -121,7 +121,10 @@ function extractPageIndex(action: any, NutrientViewer: any): number | null {
   return null;
 }
 
-function parseOutlineElements(elements: any[], NutrientViewer: any): OutlineNode[] {
+function parseOutlineElements(
+  elements: any[],
+  NutrientViewer: any,
+): OutlineNode[] {
   return elements.map((el) => ({
     title: el.title || "Untitled",
     pageIndex: extractPageIndex(el.action, NutrientViewer),

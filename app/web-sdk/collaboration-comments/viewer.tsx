@@ -13,9 +13,19 @@ export type Author = {
 };
 
 export const PRESET_AUTHORS: Author[] = [
-  { id: "alice", name: "Alice Johnson", email: "alice@example.com", color: "#4a90d9" },
+  {
+    id: "alice",
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    color: "#4a90d9",
+  },
   { id: "bob", name: "Bob Smith", email: "bob@example.com", color: "#d94a7b" },
-  { id: "charlie", name: "Charlie Lee", email: "charlie@example.com", color: "#4ad97b" },
+  {
+    id: "charlie",
+    name: "Charlie Lee",
+    email: "charlie@example.com",
+    color: "#4ad97b",
+  },
 ];
 
 export type CommentThread = {
@@ -31,7 +41,9 @@ type CollaborationViewerProps = {
   activeAuthor: Author;
   displayMode: string;
   onThreadsChanged: (threads: CommentThread[]) => void;
-  navigateToThreadRef: React.MutableRefObject<((rootId: string) => void) | null>;
+  navigateToThreadRef: React.MutableRefObject<
+    ((rootId: string) => void) | null
+  >;
 };
 
 export default function CollaborationViewer({
@@ -92,7 +104,14 @@ export default function CollaborationViewer({
       toolbarItems: [
         ...(NutrientViewer.defaultToolbarItems ?? []).filter(
           (item: { type: string }) =>
-            ["pager", "pan", "zoom-out", "zoom-in", "zoom-mode", "spacer"].includes(item.type),
+            [
+              "pager",
+              "pan",
+              "zoom-out",
+              "zoom-in",
+              "zoom-mode",
+              "spacer",
+            ].includes(item.type),
         ),
         { type: "comment" },
       ],
@@ -124,7 +143,9 @@ export default function CollaborationViewer({
               authorName: comment.creatorName ?? "Unknown",
               text: comment.text?.value ?? "",
               replyCount: 0,
-              createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
+              createdAt: comment.createdAt
+                ? new Date(comment.createdAt)
+                : new Date(),
             });
           } else {
             const thread = threadMap.get(rootId)!;
@@ -190,12 +211,14 @@ export default function CollaborationViewer({
     const instance = instanceRef.current;
     if (!instance) return;
 
-    const others = PRESET_AUTHORS.filter((a) => a.id !== activeAuthor.id).map((a) => ({
-      id: a.id,
-      name: a.name,
-      displayName: a.name,
-      description: a.email,
-    }));
+    const others = PRESET_AUTHORS.filter((a) => a.id !== activeAuthor.id).map(
+      (a) => ({
+        id: a.id,
+        name: a.name,
+        displayName: a.name,
+        description: a.email,
+      }),
+    );
     instance.setMentionableUsers(others);
   }, [activeAuthor]);
 

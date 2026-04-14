@@ -105,8 +105,8 @@ export default function Home() {
           <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
             <h2 className="!mb-4">Java SDK</h2>
             <p className="!mb-6">
-              Server-side Java library for PDF conversion, editing, form filling,
-              signatures, and text extraction.
+              Server-side Java library for PDF conversion, editing, form
+              filling, signatures, and text extraction.
             </p>
             <div className="flex gap-4 flex-wrap">
               <Link

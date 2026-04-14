@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { JavaSampleHeader } from "../_components/JavaSampleHeader";
 import { PdfViewer } from "../_components/PdfViewer";
 
@@ -145,7 +145,10 @@ export default function OcrExtractionPage() {
                 </div>
               )}
 
-              <PdfViewer document={selected.path} toolbarItems={TOOLBAR_ITEMS} />
+              <PdfViewer
+                document={selected.path}
+                toolbarItems={TOOLBAR_ITEMS}
+              />
             </div>
           </div>
         </div>

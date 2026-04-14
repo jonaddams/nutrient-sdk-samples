@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useEffect, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -131,9 +131,7 @@ export default function WordTemplatePage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 <select
                   value={selectedIndex}
-                  onChange={(e) =>
-                    handleTemplateChange(Number(e.target.value))
-                  }
+                  onChange={(e) => handleTemplateChange(Number(e.target.value))}
                   className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
                 >
                   {SAMPLE_TEMPLATES.map((t, i) => (

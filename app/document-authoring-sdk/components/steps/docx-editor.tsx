@@ -141,10 +141,7 @@ export default function DocxEditor({
         // biome-ignore lint/suspicious/noExplicitAny: PSPDFKit global API has flexible type signature
         const docxBuffer = await (
           window.PSPDFKit as any
-        ).populateDocumentTemplate(
-          { document: templateBuffer },
-          dataJson,
-        );
+        ).populateDocumentTemplate({ document: templateBuffer }, dataJson);
         console.log(
           "✅ Template populated, result size:",
           docxBuffer.byteLength,

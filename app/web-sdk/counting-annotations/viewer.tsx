@@ -36,13 +36,9 @@ export default function CountingAnnotationsViewer() {
       toolbarItems: [
         ...(NutrientViewer.defaultToolbarItems ?? []).filter(
           (item: { type: string }) =>
-            [
-              "pager",
-              "zoom-out",
-              "zoom-in",
-              "zoom-mode",
-              "search",
-            ].includes(item.type),
+            ["pager", "zoom-out", "zoom-in", "zoom-mode", "search"].includes(
+              item.type,
+            ),
         ),
       ],
       customRenderers: {
@@ -91,18 +87,17 @@ export default function CountingAnnotationsViewer() {
         const number = counterRef.current;
 
         const halfSize = MARKER_SIZE / 2;
-        const annotation =
-          new NutrientViewer.Annotations.NoteAnnotation({
-            pageIndex,
-            boundingBox: new NutrientViewer.Geometry.Rect({
-              left: point.x - halfSize,
-              top: point.y - halfSize,
-              width: MARKER_SIZE,
-              height: MARKER_SIZE,
-            }),
-            text: { format: "plain" as const, value: String(number) },
-            color: NutrientViewer.Color.fromHex("#4537de"),
-          });
+        const annotation = new NutrientViewer.Annotations.NoteAnnotation({
+          pageIndex,
+          boundingBox: new NutrientViewer.Geometry.Rect({
+            left: point.x - halfSize,
+            top: point.y - halfSize,
+            width: MARKER_SIZE,
+            height: MARKER_SIZE,
+          }),
+          text: { format: "plain" as const, value: String(number) },
+          color: NutrientViewer.Color.fromHex("#4537de"),
+        });
 
         instance.create(annotation).then((created: any) => {
           const createdAnnotation = Array.isArray(created)
@@ -129,9 +124,7 @@ export default function CountingAnnotationsViewer() {
           }
         }
         if (deletedIds.size > 0) {
-          setMarkers((prev) =>
-            prev.filter((m) => !deletedIds.has(m.id)),
-          );
+          setMarkers((prev) => prev.filter((m) => !deletedIds.has(m.id)));
         }
       });
     });
@@ -193,9 +186,7 @@ export default function CountingAnnotationsViewer() {
           <div className="counting-total">
             <div className="counting-total-circle">{markers.length}</div>
             <div className="counting-total-text">
-              {markers.length === 1
-                ? "marker placed"
-                : "markers placed"}
+              {markers.length === 1 ? "marker placed" : "markers placed"}
             </div>
           </div>
         </div>
@@ -244,10 +235,7 @@ export default function CountingAnnotationsViewer() {
       </div>
 
       <section className="counting-viewer">
-        <div
-          ref={containerRef}
-          style={{ width: "100%", height: "100%" }}
-        />
+        <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       </section>
     </div>
   );

@@ -15,9 +15,7 @@ const Viewer = dynamic(() => import("./viewer"), {
 
 export default function StampAnnotationsPage() {
   const [creatorMode, setCreatorMode] = useState(false);
-  const [draggingTemplate, setDraggingTemplate] = useState<string | null>(
-    null,
-  );
+  const [draggingTemplate, setDraggingTemplate] = useState<string | null>(null);
   const [stamps, setStamps] = useState<PlacedStamp[]>([]);
   const deleteStampRef = useRef<((groupId: string) => void) | null>(null);
 
@@ -80,9 +78,7 @@ export default function StampAnnotationsPage() {
                       }}
                     />
                   </div>
-                  <span className="stamp-toggle-text">
-                    Stamp Creator Mode
-                  </span>
+                  <span className="stamp-toggle-text">Stamp Creator Mode</span>
                 </label>
               </div>
 
@@ -122,10 +118,7 @@ export default function StampAnnotationsPage() {
               </div>
 
               {/* Placed Stamps */}
-              <div
-                className="stamp-section"
-                style={{ flex: 1, minHeight: 0 }}
-              >
+              <div className="stamp-section" style={{ flex: 1, minHeight: 0 }}>
                 <div className="stamp-label">
                   Placed Stamps ({stamps.length})
                 </div>
@@ -161,9 +154,20 @@ export default function StampAnnotationsPage() {
                             type="button"
                             className="stamp-delete-btn"
                             title="Delete stamp"
-                            onClick={() => deleteStampRef.current?.(stamp.groupId)}
+                            onClick={() =>
+                              deleteStampRef.current?.(stamp.groupId)
+                            }
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
                               <title>Delete</title>
                               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
@@ -182,8 +186,8 @@ export default function StampAnnotationsPage() {
                   document. Stamps can be moved and deleted as a group.
                 </p>
                 <p style={{ marginTop: 6 }}>
-                  <strong>Creator mode off:</strong> Stamps are locked in
-                  place. Form fields remain interactive for end users.
+                  <strong>Creator mode off:</strong> Stamps are locked in place.
+                  Form fields remain interactive for end users.
                 </p>
               </div>
             </div>

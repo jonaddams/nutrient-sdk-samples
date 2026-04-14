@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -39,70 +39,114 @@ const PRESET_REGIONS: RedactionRegion[] = [
     id: "provider-name",
     label: "Service Provider name",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 608, width: 340, height: 18,
+    page: 0,
+    x: 115,
+    y: 608,
+    width: 340,
+    height: 18,
   },
   {
     id: "provider-address",
     label: "Service Provider street address",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 588, width: 340, height: 18,
+    page: 0,
+    x: 115,
+    y: 588,
+    width: 340,
+    height: 18,
   },
   {
     id: "provider-email",
     label: "Service Provider email",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 568, width: 300, height: 18,
+    page: 0,
+    x: 115,
+    y: 568,
+    width: 300,
+    height: 18,
   },
   {
     id: "client-name",
     label: "Client name",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 528, width: 340, height: 18,
+    page: 0,
+    x: 115,
+    y: 528,
+    width: 340,
+    height: 18,
   },
   {
     id: "client-address",
     label: "Client street address",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 508, width: 340, height: 18,
+    page: 0,
+    x: 115,
+    y: 508,
+    width: 340,
+    height: 18,
   },
   {
     id: "client-email",
     label: "Client email",
     category: "Names & Addresses",
-    page: 0, x: 115, y: 488, width: 300, height: 18,
+    page: 0,
+    x: 115,
+    y: 488,
+    width: 300,
+    height: 18,
   },
   // Page 1 — Financial
   {
     id: "rate",
     label: "Hourly rate ($150/hr)",
     category: "Financial",
-    page: 0, x: 335, y: 268, width: 105, height: 15,
+    page: 0,
+    x: 335,
+    y: 268,
+    width: 105,
+    height: 15,
   },
   // Page 1 — Initials
   {
     id: "initials-provider",
     label: "Service Provider initials",
     category: "Initials",
-    page: 0, x: 130, y: 100, width: 110, height: 100,
+    page: 0,
+    x: 130,
+    y: 100,
+    width: 110,
+    height: 100,
   },
   {
     id: "initials-client",
     label: "Client initials",
     category: "Initials",
-    page: 0, x: 345, y: 100, width: 110, height: 100,
+    page: 0,
+    x: 345,
+    y: 100,
+    width: 110,
+    height: 100,
   },
   // Page 2 — Signatures
   {
     id: "sig-provider",
     label: "Service Provider signature",
     category: "Signatures",
-    page: 1, x: 80, y: 150, width: 240, height: 140,
+    page: 1,
+    x: 80,
+    y: 150,
+    width: 240,
+    height: 140,
   },
   {
     id: "sig-client",
     label: "Client signature",
     category: "Signatures",
-    page: 1, x: 305, y: 155, width: 260, height: 130,
+    page: 1,
+    x: 305,
+    y: 155,
+    width: 260,
+    height: 130,
   },
 ];
 
@@ -126,9 +170,9 @@ export default function RedactionPage() {
   const selectCategory = useCallback((category: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      const ids = PRESET_REGIONS.filter(
-        (r) => r.category === category,
-      ).map((r) => r.id);
+      const ids = PRESET_REGIONS.filter((r) => r.category === category).map(
+        (r) => r.id,
+      );
       const allSelected = ids.every((id) => next.has(id));
       for (const id of ids) {
         if (allSelected) next.delete(id);
@@ -183,9 +227,7 @@ export default function RedactionPage() {
       const pdfBlob = await apiRes.blob();
       setPdfUrl(URL.createObjectURL(pdfBlob));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Redaction failed",
-      );
+      setError(err instanceof Error ? err.message : "Redaction failed");
     } finally {
       setProcessing(false);
     }
@@ -229,12 +271,9 @@ export default function RedactionPage() {
                   const items = PRESET_REGIONS.filter(
                     (r) => r.category === category,
                   );
-                  const allChecked = items.every((r) =>
-                    selected.has(r.id),
-                  );
+                  const allChecked = items.every((r) => selected.has(r.id));
                   const someChecked =
-                    !allChecked &&
-                    items.some((r) => selected.has(r.id));
+                    !allChecked && items.some((r) => selected.has(r.id));
 
                   return (
                     <div key={category}>

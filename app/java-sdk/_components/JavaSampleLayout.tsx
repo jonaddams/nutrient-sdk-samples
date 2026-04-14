@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { JavaSampleHeader } from "./JavaSampleHeader";
 
-const API_BASE = process.env.NEXT_PUBLIC_JAVA_SDK_API_URL || "http://localhost:8080";
+const API_BASE =
+  process.env.NEXT_PUBLIC_JAVA_SDK_API_URL || "http://localhost:8080";
 
 interface JavaSampleLayoutProps {
   title: string;
@@ -183,7 +184,9 @@ export function JavaSampleLayout({
 
               {!result && !error && !processing && (
                 <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
-                  <p className="text-sm">Click &quot;Process Document&quot; to see the result</p>
+                  <p className="text-sm">
+                    Click &quot;Process Document&quot; to see the result
+                  </p>
                 </div>
               )}
 
@@ -217,24 +220,26 @@ export function JavaSampleLayout({
                 />
               )}
 
-              {result && (resultType === "pdf" || resultType === "download") && (
-                <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Document processed successfully ({(resultSize / 1024).toFixed(1)} KB)
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleDownload}
-                    className="px-6 py-2.5 text-sm font-semibold rounded-md cursor-pointer"
-                    style={{
-                      background: "var(--digital-pollen)",
-                      color: "var(--black)",
-                    }}
-                  >
-                    Download Result
-                  </button>
-                </div>
-              )}
+              {result &&
+                (resultType === "pdf" || resultType === "download") && (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Document processed successfully (
+                      {(resultSize / 1024).toFixed(1)} KB)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      className="px-6 py-2.5 text-sm font-semibold rounded-md cursor-pointer"
+                      style={{
+                        background: "var(--digital-pollen)",
+                        color: "var(--black)",
+                      }}
+                    >
+                      Download Result
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
         </div>

@@ -1,0 +1,3355 @@
+{
+  "engine": "VLM",
+  "filename": "account-registration-form.pdf",
+  "statistics": {
+    "totalElements": 25,
+    "textElements": 25,
+    "averageConfidence": 0.88,
+    "lowConfidenceElements": 0
+  },
+  "fullText": "[1] Personal Information Full Name * Phone * Account Details Username * Confirm Password * Business & Preferences Company Name (required if Business/Enterprise) Interests (select one or more) Technology Science Finance Healthcare Education a Finalize Signature * Email * Date of Birth (mm/dd/yyyy) Password * Account Type * Personal C) Business Enterprise Country * Agreements | agree to the Terms and Conditions * Subscribe to newsletter Validate & Submit\n[3] Full Name \"\n[4] Phone *\n[6] Username *\n[7] Confirm Password *\n[9] Company Name (required if Business/Enterprise)\n[10] Interests (select one or more)\n[11] Technology\n[12] Science\n[13] Finance\n[14] Healthcare\n[15] Education\n[17] Signature '\"\n[18] Email *\n[19] Date of Birth (mm/dd/yyyy)\n[20] Password \"\n[21] Account Type *\n[22] () Personal\n[23] Country *\n[24] Agreements\n[25] | agree to the Terms and Conditions *\n[26] Subscribe to newsletter\n[27] Validate & Submit\n[28] Business\n[29] Enterprise",
+  "textElements": [
+    {
+      "readingOrder": 1,
+      "type": "paragraph",
+      "role": "Unknown",
+      "text": "Personal Information Full Name * Phone * Account Details Username * Confirm Password * Business & Preferences Company Name (required if Business/Enterprise) Interests (select one or more) Technology Science Finance Healthcare Education a Finalize Signature * Email * Date of Birth (mm/dd/yyyy) Password * Account Type * Personal C) Business Enterprise Country * Agreements | agree to the Terms and Conditions * Subscribe to newsletter Validate & Submit",
+      "confidence": 0.94,
+      "words": [
+        {
+          "text": "Personal",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 212,
+            "y": 249,
+            "width": 174,
+            "height": 34
+          }
+        },
+        {
+          "text": "Information",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 406,
+            "y": 248,
+            "width": 222,
+            "height": 35
+          }
+        },
+        {
+          "text": "Full",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 211,
+            "y": 339,
+            "width": 55,
+            "height": 28
+          }
+        },
+        {
+          "text": "Name",
+          "confidence": 0.88,
+          "bounds": {
+            "x": 281,
+            "y": 339,
+            "width": 97,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.88,
+          "bounds": {
+            "x": 390,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Phone",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 211,
+            "y": 539,
+            "width": 105,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.89,
+          "bounds": {
+            "x": 328,
+            "y": 539,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Account",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 209,
+            "y": 773,
+            "width": 164,
+            "height": 34
+          }
+        },
+        {
+          "text": "Details",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 389,
+            "y": 773,
+            "width": 136,
+            "height": 34
+          }
+        },
+        {
+          "text": "Username",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 211,
+            "y": 856,
+            "width": 169,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 392,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Confirm",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 209,
+            "y": 1056,
+            "width": 128,
+            "height": 29
+          }
+        },
+        {
+          "text": "Password",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 353,
+            "y": 1057,
+            "width": 159,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 526,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Business",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 211,
+            "y": 1291,
+            "width": 182,
+            "height": 34
+          }
+        },
+        {
+          "text": "&",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 409,
+            "y": 1291,
+            "width": 27,
+            "height": 34
+          }
+        },
+        {
+          "text": "Preferences",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 454,
+            "y": 1290,
+            "width": 242,
+            "height": 35
+          }
+        },
+        {
+          "text": "Company",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 209,
+            "y": 1380,
+            "width": 159,
+            "height": 36
+          }
+        },
+        {
+          "text": "Name",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 381,
+            "y": 1381,
+            "width": 97,
+            "height": 28
+          }
+        },
+        {
+          "text": "(required",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 491,
+            "y": 1380,
+            "width": 146,
+            "height": 36
+          }
+        },
+        {
+          "text": "if",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 652,
+            "y": 1380,
+            "width": 16,
+            "height": 28
+          }
+        },
+        {
+          "text": "Business/Enterprise)",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 681,
+            "y": 1380,
+            "width": 341,
+            "height": 36
+          }
+        },
+        {
+          "text": "Interests",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 211,
+            "y": 1581,
+            "width": 140,
+            "height": 28
+          }
+        },
+        {
+          "text": "(select",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 364,
+            "y": 1580,
+            "width": 108,
+            "height": 36
+          }
+        },
+        {
+          "text": "one",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 484,
+            "y": 1588,
+            "width": 61,
+            "height": 21
+          }
+        },
+        {
+          "text": "or",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 557,
+            "y": 1588,
+            "width": 32,
+            "height": 21
+          }
+        },
+        {
+          "text": "more)",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 602,
+            "y": 1580,
+            "width": 93,
+            "height": 36
+          }
+        },
+        {
+          "text": "Technology",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 217,
+            "y": 1645,
+            "width": 257,
+            "height": 47
+          }
+        },
+        {
+          "text": "Science",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 219,
+            "y": 1702,
+            "width": 173,
+            "height": 38
+          }
+        },
+        {
+          "text": "Finance",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 221,
+            "y": 1761,
+            "width": 171,
+            "height": 37
+          }
+        },
+        {
+          "text": "Healthcare",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 220,
+            "y": 1820,
+            "width": 236,
+            "height": 37
+          }
+        },
+        {
+          "text": "Education",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 221,
+            "y": 1878,
+            "width": 215,
+            "height": 37
+          }
+        },
+        {
+          "text": "a",
+          "confidence": 0.76,
+          "bounds": {
+            "x": 514,
+            "y": 1940,
+            "width": 13,
+            "height": 10
+          }
+        },
+        {
+          "text": "Finalize",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 212,
+            "y": 2048,
+            "width": 152,
+            "height": 34
+          }
+        },
+        {
+          "text": "Signature",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 210,
+            "y": 2131,
+            "width": 158,
+            "height": 36
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 380,
+            "y": 2132,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Email",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1336,
+            "y": 339,
+            "width": 89,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1438,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Date",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1336,
+            "y": 547,
+            "width": 76,
+            "height": 28
+          }
+        },
+        {
+          "text": "of",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1424,
+            "y": 546,
+            "width": 30,
+            "height": 29
+          }
+        },
+        {
+          "text": "Birth",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1467,
+            "y": 547,
+            "width": 73,
+            "height": 28
+          }
+        },
+        {
+          "text": "(mm/dd/yyyy)",
+          "confidence": 0.78,
+          "bounds": {
+            "x": 1554,
+            "y": 546,
+            "width": 220,
+            "height": 36
+          }
+        },
+        {
+          "text": "Password",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1336,
+            "y": 856,
+            "width": 160,
+            "height": 28
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1509,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Account",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1334,
+            "y": 1057,
+            "width": 134,
+            "height": 28
+          }
+        },
+        {
+          "text": "Type",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 1479,
+            "y": 1057,
+            "width": 82,
+            "height": 35
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 1574,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Personal",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1411,
+            "y": 1122,
+            "width": 143,
+            "height": 28
+          }
+        },
+        {
+          "text": "C)",
+          "confidence": 0.8,
+          "bounds": {
+            "x": 1666,
+            "y": 1121,
+            "width": 63,
+            "height": 63
+          }
+        },
+        {
+          "text": "Business",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1744,
+            "y": 1122,
+            "width": 149,
+            "height": 28
+          }
+        },
+        {
+          "text": "Enterprise",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 2078,
+            "y": 1123,
+            "width": 167,
+            "height": 35
+          }
+        },
+        {
+          "text": "Country",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1334,
+            "y": 1373,
+            "width": 130,
+            "height": 36
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 1476,
+            "y": 1374,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Agreements",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1334,
+            "y": 1574,
+            "width": 201,
+            "height": 36
+          }
+        },
+        {
+          "text": "|",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 1428,
+            "y": 1649,
+            "width": 4,
+            "height": 27
+          }
+        },
+        {
+          "text": "agree",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1447,
+            "y": 1656,
+            "width": 94,
+            "height": 29
+          }
+        },
+        {
+          "text": "to",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1552,
+            "y": 1651,
+            "width": 30,
+            "height": 26
+          }
+        },
+        {
+          "text": "the",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1594,
+            "y": 1649,
+            "width": 51,
+            "height": 28
+          }
+        },
+        {
+          "text": "Terms",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1656,
+            "y": 1649,
+            "width": 106,
+            "height": 28
+          }
+        },
+        {
+          "text": "and",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1774,
+            "y": 1649,
+            "width": 59,
+            "height": 28
+          }
+        },
+        {
+          "text": "Conditions",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 1847,
+            "y": 1648,
+            "width": 175,
+            "height": 29
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 2034,
+            "y": 1649,
+            "width": 12,
+            "height": 11
+          }
+        },
+        {
+          "text": "Subscribe",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1427,
+            "y": 1756,
+            "width": 164,
+            "height": 29
+          }
+        },
+        {
+          "text": "to",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1602,
+            "y": 1759,
+            "width": 30,
+            "height": 26
+          }
+        },
+        {
+          "text": "newsletter",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1646,
+            "y": 1757,
+            "width": 168,
+            "height": 28
+          }
+        },
+        {
+          "text": "Validate",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1350,
+            "y": 2292,
+            "width": 266,
+            "height": 55
+          }
+        },
+        {
+          "text": "&",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1643,
+            "y": 2292,
+            "width": 45,
+            "height": 55
+          }
+        },
+        {
+          "text": "Submit",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1714,
+            "y": 2291,
+            "width": 228,
+            "height": 57
+          }
+        }
+      ],
+      "bounds": {
+        "x": 203.3587,
+        "y": 243.74858,
+        "width": 2061.9155,
+        "height": 2183.367
+      }
+    },
+    {
+      "readingOrder": 3,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Full Name \"",
+      "confidence": 0.7,
+      "words": [
+        {
+          "text": "Full",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 211,
+            "y": 339,
+            "width": 55,
+            "height": 26
+          }
+        },
+        {
+          "text": "Name",
+          "confidence": 0.88,
+          "bounds": {
+            "x": 281,
+            "y": 339,
+            "width": 97,
+            "height": 26
+          }
+        },
+        {
+          "text": "\"",
+          "confidence": 0.28,
+          "bounds": {
+            "x": 390,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 206.9247,
+        "y": 334.27362,
+        "width": 193.27214,
+        "height": 31.994171
+      }
+    },
+    {
+      "readingOrder": 4,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Phone *",
+      "confidence": 0.58,
+      "words": [
+        {
+          "text": "Phone",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 211,
+            "y": 539,
+            "width": 105,
+            "height": 27
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.23,
+          "bounds": {
+            "x": 328,
+            "y": 539,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 208.03687,
+        "y": 534.4214,
+        "width": 130.91254,
+        "height": 32.184692
+      }
+    },
+    {
+      "readingOrder": 6,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Username *",
+      "confidence": 0.7,
+      "words": [
+        {
+          "text": "Username",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 211,
+            "y": 856,
+            "width": 169,
+            "height": 27
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.48,
+          "bounds": {
+            "x": 392,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 207.67569,
+        "y": 852.20337,
+        "width": 195.69992,
+        "height": 31.81897
+      }
+    },
+    {
+      "readingOrder": 7,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Confirm Password *",
+      "confidence": 0.93,
+      "words": [
+        {
+          "text": "Confirm",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 209,
+            "y": 1056,
+            "width": 128,
+            "height": 28
+          }
+        },
+        {
+          "text": "Password",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 353,
+            "y": 1057,
+            "width": 159,
+            "height": 27
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 526,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 206.54434,
+        "y": 1052.7253,
+        "width": 331.19504,
+        "height": 32.917236
+      }
+    },
+    {
+      "readingOrder": 9,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Company Name (required if Business/Enterprise)",
+      "confidence": 0.94,
+      "words": [
+        {
+          "text": "Company",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 209,
+            "y": 1380,
+            "width": 159,
+            "height": 35
+          }
+        },
+        {
+          "text": "Name",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 381,
+            "y": 1381,
+            "width": 97,
+            "height": 28
+          }
+        },
+        {
+          "text": "(required",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 491,
+            "y": 1380,
+            "width": 146,
+            "height": 35
+          }
+        },
+        {
+          "text": "if",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 652,
+            "y": 1380,
+            "width": 16,
+            "height": 28
+          }
+        },
+        {
+          "text": "Business/Enterprise)",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 681,
+            "y": 1380,
+            "width": 341,
+            "height": 35
+          }
+        }
+      ],
+      "bounds": {
+        "x": 206.60863,
+        "y": 1376.5941,
+        "width": 816.8371,
+        "height": 39.878418
+      }
+    },
+    {
+      "readingOrder": 10,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Interests (select one or more)",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Interests",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 211,
+            "y": 1581,
+            "width": 140,
+            "height": 28
+          }
+        },
+        {
+          "text": "(select",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 364,
+            "y": 1580,
+            "width": 108,
+            "height": 36
+          }
+        },
+        {
+          "text": "one",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 484,
+            "y": 1588,
+            "width": 61,
+            "height": 21
+          }
+        },
+        {
+          "text": "or",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 557,
+            "y": 1588,
+            "width": 32,
+            "height": 21
+          }
+        },
+        {
+          "text": "more)",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 602,
+            "y": 1580,
+            "width": 93,
+            "height": 36
+          }
+        }
+      ],
+      "bounds": {
+        "x": 207.60608,
+        "y": 1576.4976,
+        "width": 488.7517,
+        "height": 40.295654
+      }
+    },
+    {
+      "readingOrder": 11,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Technology",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Technology",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 217,
+            "y": 1645,
+            "width": 257,
+            "height": 44
+          }
+        }
+      ],
+      "bounds": {
+        "x": 214.1306,
+        "y": 1642.6799,
+        "width": 260.71478,
+        "height": 47.681763
+      }
+    },
+    {
+      "readingOrder": 12,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Science",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Science",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 219,
+            "y": 1702,
+            "width": 173,
+            "height": 36
+          }
+        }
+      ],
+      "bounds": {
+        "x": 215.77925,
+        "y": 1700.604,
+        "width": 175.63829,
+        "height": 38.263184
+      }
+    },
+    {
+      "readingOrder": 13,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Finance",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Finance",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 221,
+            "y": 1761,
+            "width": 171,
+            "height": 35
+          }
+        }
+      ],
+      "bounds": {
+        "x": 216.9983,
+        "y": 1759.0748,
+        "width": 174.50047,
+        "height": 37.254883
+      }
+    },
+    {
+      "readingOrder": 14,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Healthcare",
+      "confidence": 0.95,
+      "words": [
+        {
+          "text": "Healthcare",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 220,
+            "y": 1820,
+            "width": 236,
+            "height": 36
+          }
+        }
+      ],
+      "bounds": {
+        "x": 216.60115,
+        "y": 1817.2863,
+        "width": 239.68916,
+        "height": 39.980225
+      }
+    },
+    {
+      "readingOrder": 15,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Education",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Education",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 221,
+            "y": 1878,
+            "width": 215,
+            "height": 36
+          }
+        }
+      ],
+      "bounds": {
+        "x": 217.68877,
+        "y": 1875.8794,
+        "width": 217.92961,
+        "height": 39.745483
+      }
+    },
+    {
+      "readingOrder": 17,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Signature '\"",
+      "confidence": 0.65,
+      "words": [
+        {
+          "text": "Signature",
+          "confidence": 0.89,
+          "bounds": {
+            "x": 210,
+            "y": 2131,
+            "width": 158,
+            "height": 34
+          }
+        },
+        {
+          "text": "'\"",
+          "confidence": 0.41,
+          "bounds": {
+            "x": 380,
+            "y": 2132,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 207.6328,
+        "y": 2127.758,
+        "width": 180.76024,
+        "height": 38.70337
+      }
+    },
+    {
+      "readingOrder": 18,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Email *",
+      "confidence": 0.8,
+      "words": [
+        {
+          "text": "Email",
+          "confidence": 0.72,
+          "bounds": {
+            "x": 1336,
+            "y": 339,
+            "width": 89,
+            "height": 26
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.88,
+          "bounds": {
+            "x": 1438,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1333.0533,
+        "y": 334.54587,
+        "width": 115.527466,
+        "height": 31.24237
+      }
+    },
+    {
+      "readingOrder": 19,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Date of Birth (mm/dd/yyyy)",
+      "confidence": 0.94,
+      "words": [
+        {
+          "text": "Date",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1336,
+            "y": 547,
+            "width": 76,
+            "height": 28
+          }
+        },
+        {
+          "text": "of",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1424,
+            "y": 546,
+            "width": 30,
+            "height": 29
+          }
+        },
+        {
+          "text": "Birth",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1467,
+            "y": 547,
+            "width": 73,
+            "height": 28
+          }
+        },
+        {
+          "text": "(mm/dd/yyyy)",
+          "confidence": 0.9,
+          "bounds": {
+            "x": 1554,
+            "y": 546,
+            "width": 220,
+            "height": 34
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1332.4268,
+        "y": 542.9018,
+        "width": 441.55664,
+        "height": 38.97229
+      }
+    },
+    {
+      "readingOrder": 20,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Password \"",
+      "confidence": 0.87,
+      "words": [
+        {
+          "text": "Password",
+          "confidence": 0.9,
+          "bounds": {
+            "x": 1336,
+            "y": 856,
+            "width": 160,
+            "height": 27
+          }
+        },
+        {
+          "text": "\"",
+          "confidence": 0.85,
+          "bounds": {
+            "x": 1509,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1332.6943,
+        "y": 852.8371,
+        "width": 187.06934,
+        "height": 31.130981
+      }
+    },
+    {
+      "readingOrder": 21,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Account Type *",
+      "confidence": 0.94,
+      "words": [
+        {
+          "text": "Account",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1334,
+            "y": 1057,
+            "width": 134,
+            "height": 28
+          }
+        },
+        {
+          "text": "Type",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1479,
+            "y": 1057,
+            "width": 82,
+            "height": 34
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1574,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1330.5188,
+        "y": 1053.2169,
+        "width": 255.18677,
+        "height": 38.54016
+      }
+    },
+    {
+      "readingOrder": 22,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "() Personal",
+      "confidence": 0.81,
+      "words": [
+        {
+          "text": "()",
+          "confidence": 0.66,
+          "bounds": {
+            "x": 1333,
+            "y": 1121,
+            "width": 63,
+            "height": 62
+          }
+        },
+        {
+          "text": "Personal",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1411,
+            "y": 1122,
+            "width": 143,
+            "height": 28
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1330.174,
+        "y": 1117.8251,
+        "width": 226.12585,
+        "height": 66.23401
+      }
+    },
+    {
+      "readingOrder": 23,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Country *",
+      "confidence": 0.72,
+      "words": [
+        {
+          "text": "Country",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 1334,
+            "y": 1373,
+            "width": 130,
+            "height": 35
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.52,
+          "bounds": {
+            "x": 1476,
+            "y": 1374,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1332.5364,
+        "y": 1370.0663,
+        "width": 154.65991,
+        "height": 38.43286
+      }
+    },
+    {
+      "readingOrder": 24,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Agreements",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Agreements",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1334,
+            "y": 1574,
+            "width": 201,
+            "height": 34
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1331.1107,
+        "y": 1570.7177,
+        "width": 203.64685,
+        "height": 38.4541
+      }
+    },
+    {
+      "readingOrder": 25,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "| agree to the Terms and Conditions *",
+      "confidence": 0.95,
+      "words": [
+        {
+          "text": "|",
+          "confidence": 0.94,
+          "bounds": {
+            "x": 1428,
+            "y": 1649,
+            "width": 4,
+            "height": 27
+          }
+        },
+        {
+          "text": "agree",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 1447,
+            "y": 1656,
+            "width": 94,
+            "height": 29
+          }
+        },
+        {
+          "text": "to",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1552,
+            "y": 1651,
+            "width": 30,
+            "height": 26
+          }
+        },
+        {
+          "text": "the",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1594,
+            "y": 1649,
+            "width": 51,
+            "height": 28
+          }
+        },
+        {
+          "text": "Terms",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1656,
+            "y": 1649,
+            "width": 106,
+            "height": 28
+          }
+        },
+        {
+          "text": "and",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1774,
+            "y": 1649,
+            "width": 59,
+            "height": 28
+          }
+        },
+        {
+          "text": "Conditions",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1847,
+            "y": 1648,
+            "width": 175,
+            "height": 29
+          }
+        },
+        {
+          "text": "*",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 2034,
+            "y": 1649,
+            "width": 12,
+            "height": 11
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1330.7892,
+        "y": 1639.6476,
+        "width": 715.4275,
+        "height": 63.259888
+      }
+    },
+    {
+      "readingOrder": 26,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Subscribe to newsletter",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Subscribe",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1427,
+            "y": 1756,
+            "width": 164,
+            "height": 29
+          }
+        },
+        {
+          "text": "to",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 1602,
+            "y": 1759,
+            "width": 30,
+            "height": 26
+          }
+        },
+        {
+          "text": "newsletter",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1646,
+            "y": 1757,
+            "width": 168,
+            "height": 28
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1331.2148,
+        "y": 1749.0426,
+        "width": 484.34265,
+        "height": 62.309082
+      }
+    },
+    {
+      "readingOrder": 27,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Validate & Submit",
+      "confidence": 0.94,
+      "words": [
+        {
+          "text": "Validate",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1350,
+            "y": 2292,
+            "width": 266,
+            "height": 55
+          }
+        },
+        {
+          "text": "&",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 1643,
+            "y": 2292,
+            "width": 45,
+            "height": 55
+          }
+        },
+        {
+          "text": "Submit",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1714,
+            "y": 2291,
+            "width": 228,
+            "height": 57
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1346.0459,
+        "y": 2288.143,
+        "width": 597.2534,
+        "height": 61.197998
+      }
+    },
+    {
+      "readingOrder": 28,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Business",
+      "confidence": 0.96,
+      "words": [
+        {
+          "text": "Business",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 1744,
+            "y": 1122,
+            "width": 149,
+            "height": 28
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1665.3977,
+        "y": 1117.8257,
+        "width": 227.80444,
+        "height": 65.34595
+      }
+    },
+    {
+      "readingOrder": 29,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Enterprise",
+      "confidence": 0.97,
+      "words": [
+        {
+          "text": "Enterprise",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 2078,
+            "y": 1123,
+            "width": 167,
+            "height": 35
+          }
+        }
+      ],
+      "bounds": {
+        "x": 1998.5767,
+        "y": 1118.0962,
+        "width": 245.64917,
+        "height": 65.829834
+      }
+    }
+  ],
+  "rawElements": [
+    {
+      "type": "paragraph",
+      "role": "Unknown",
+      "text": "Personal Information Full Name * Phone * Account Details Username * Confirm Password * Business & Preferences Company Name (required if Business/Enterprise) Interests (select one or more) Technology Science Finance Healthcare Education a Finalize Signature * Email * Date of Birth (mm/dd/yyyy) Password * Account Type * Personal C) Business Enterprise Country * Agreements | agree to the Terms and Conditions * Subscribe to newsletter Validate & Submit",
+      "words": [
+        {
+          "text": "Personal",
+          "bounds": {
+            "x": 212,
+            "y": 249,
+            "width": 174,
+            "height": 34
+          },
+          "confidence": 0.96524507
+        },
+        {
+          "text": "Information",
+          "bounds": {
+            "x": 406,
+            "y": 248,
+            "width": 222,
+            "height": 35
+          },
+          "confidence": 0.96306247
+        },
+        {
+          "text": "Full",
+          "bounds": {
+            "x": 211,
+            "y": 339,
+            "width": 55,
+            "height": 28
+          },
+          "confidence": 0.9544409
+        },
+        {
+          "text": "Name",
+          "bounds": {
+            "x": 281,
+            "y": 339,
+            "width": 97,
+            "height": 28
+          },
+          "confidence": 0.88422287
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 390,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.88422287
+        },
+        {
+          "text": "Phone",
+          "bounds": {
+            "x": 211,
+            "y": 539,
+            "width": 105,
+            "height": 28
+          },
+          "confidence": 0.92970556
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 328,
+            "y": 539,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.88727975
+        },
+        {
+          "text": "Account",
+          "bounds": {
+            "x": 209,
+            "y": 773,
+            "width": 164,
+            "height": 34
+          },
+          "confidence": 0.9641723
+        },
+        {
+          "text": "Details",
+          "bounds": {
+            "x": 389,
+            "y": 773,
+            "width": 136,
+            "height": 34
+          },
+          "confidence": 0.95781404
+        },
+        {
+          "text": "Username",
+          "bounds": {
+            "x": 211,
+            "y": 856,
+            "width": 169,
+            "height": 28
+          },
+          "confidence": 0.91911334
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 392,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9306034
+        },
+        {
+          "text": "Confirm",
+          "bounds": {
+            "x": 209,
+            "y": 1056,
+            "width": 128,
+            "height": 29
+          },
+          "confidence": 0.9564459
+        },
+        {
+          "text": "Password",
+          "bounds": {
+            "x": 353,
+            "y": 1057,
+            "width": 159,
+            "height": 28
+          },
+          "confidence": 0.931792
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 526,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.931792
+        },
+        {
+          "text": "Business",
+          "bounds": {
+            "x": 211,
+            "y": 1291,
+            "width": 182,
+            "height": 34
+          },
+          "confidence": 0.93253213
+        },
+        {
+          "text": "&",
+          "bounds": {
+            "x": 409,
+            "y": 1291,
+            "width": 27,
+            "height": 34
+          },
+          "confidence": 0.9306041
+        },
+        {
+          "text": "Preferences",
+          "bounds": {
+            "x": 454,
+            "y": 1290,
+            "width": 242,
+            "height": 35
+          },
+          "confidence": 0.9588741
+        },
+        {
+          "text": "Company",
+          "bounds": {
+            "x": 209,
+            "y": 1380,
+            "width": 159,
+            "height": 36
+          },
+          "confidence": 0.9623388
+        },
+        {
+          "text": "Name",
+          "bounds": {
+            "x": 381,
+            "y": 1381,
+            "width": 97,
+            "height": 28
+          },
+          "confidence": 0.9599955
+        },
+        {
+          "text": "(required",
+          "bounds": {
+            "x": 491,
+            "y": 1380,
+            "width": 146,
+            "height": 36
+          },
+          "confidence": 0.9599955
+        },
+        {
+          "text": "if",
+          "bounds": {
+            "x": 652,
+            "y": 1380,
+            "width": 16,
+            "height": 28
+          },
+          "confidence": 0.932849
+        },
+        {
+          "text": "Business/Enterprise)",
+          "bounds": {
+            "x": 681,
+            "y": 1380,
+            "width": 341,
+            "height": 36
+          },
+          "confidence": 0.9168357
+        },
+        {
+          "text": "Interests",
+          "bounds": {
+            "x": 211,
+            "y": 1581,
+            "width": 140,
+            "height": 28
+          },
+          "confidence": 0.96294755
+        },
+        {
+          "text": "(select",
+          "bounds": {
+            "x": 364,
+            "y": 1580,
+            "width": 108,
+            "height": 36
+          },
+          "confidence": 0.95933235
+        },
+        {
+          "text": "one",
+          "bounds": {
+            "x": 484,
+            "y": 1588,
+            "width": 61,
+            "height": 21
+          },
+          "confidence": 0.96091086
+        },
+        {
+          "text": "or",
+          "bounds": {
+            "x": 557,
+            "y": 1588,
+            "width": 32,
+            "height": 21
+          },
+          "confidence": 0.9625163
+        },
+        {
+          "text": "more)",
+          "bounds": {
+            "x": 602,
+            "y": 1580,
+            "width": 93,
+            "height": 36
+          },
+          "confidence": 0.96881104
+        },
+        {
+          "text": "Technology",
+          "bounds": {
+            "x": 217,
+            "y": 1645,
+            "width": 257,
+            "height": 47
+          },
+          "confidence": 0.96362245
+        },
+        {
+          "text": "Science",
+          "bounds": {
+            "x": 219,
+            "y": 1702,
+            "width": 173,
+            "height": 38
+          },
+          "confidence": 0.96223944
+        },
+        {
+          "text": "Finance",
+          "bounds": {
+            "x": 221,
+            "y": 1761,
+            "width": 171,
+            "height": 37
+          },
+          "confidence": 0.967434
+        },
+        {
+          "text": "Healthcare",
+          "bounds": {
+            "x": 220,
+            "y": 1820,
+            "width": 236,
+            "height": 37
+          },
+          "confidence": 0.95919096
+        },
+        {
+          "text": "Education",
+          "bounds": {
+            "x": 221,
+            "y": 1878,
+            "width": 215,
+            "height": 37
+          },
+          "confidence": 0.96780807
+        },
+        {
+          "text": "a",
+          "bounds": {
+            "x": 514,
+            "y": 1940,
+            "width": 13,
+            "height": 10
+          },
+          "confidence": 0.7638581
+        },
+        {
+          "text": "Finalize",
+          "bounds": {
+            "x": 212,
+            "y": 2048,
+            "width": 152,
+            "height": 34
+          },
+          "confidence": 0.9611428
+        },
+        {
+          "text": "Signature",
+          "bounds": {
+            "x": 210,
+            "y": 2131,
+            "width": 158,
+            "height": 36
+          },
+          "confidence": 0.9184504
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 380,
+            "y": 2132,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9285231
+        },
+        {
+          "text": "Email",
+          "bounds": {
+            "x": 1336,
+            "y": 339,
+            "width": 89,
+            "height": 28
+          },
+          "confidence": 0.9296221
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1438,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9296221
+        },
+        {
+          "text": "Date",
+          "bounds": {
+            "x": 1336,
+            "y": 547,
+            "width": 76,
+            "height": 28
+          },
+          "confidence": 0.96469146
+        },
+        {
+          "text": "of",
+          "bounds": {
+            "x": 1424,
+            "y": 546,
+            "width": 30,
+            "height": 29
+          },
+          "confidence": 0.9661522
+        },
+        {
+          "text": "Birth",
+          "bounds": {
+            "x": 1467,
+            "y": 547,
+            "width": 73,
+            "height": 28
+          },
+          "confidence": 0.9329654
+        },
+        {
+          "text": "(mm/dd/yyyy)",
+          "bounds": {
+            "x": 1554,
+            "y": 546,
+            "width": 220,
+            "height": 36
+          },
+          "confidence": 0.7756479
+        },
+        {
+          "text": "Password",
+          "bounds": {
+            "x": 1336,
+            "y": 856,
+            "width": 160,
+            "height": 28
+          },
+          "confidence": 0.92686677
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1509,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.92686677
+        },
+        {
+          "text": "Account",
+          "bounds": {
+            "x": 1334,
+            "y": 1057,
+            "width": 134,
+            "height": 28
+          },
+          "confidence": 0.96404856
+        },
+        {
+          "text": "Type",
+          "bounds": {
+            "x": 1479,
+            "y": 1057,
+            "width": 82,
+            "height": 35
+          },
+          "confidence": 0.91742116
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1574,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.91742116
+        },
+        {
+          "text": "Personal",
+          "bounds": {
+            "x": 1411,
+            "y": 1122,
+            "width": 143,
+            "height": 28
+          },
+          "confidence": 0.9629882
+        },
+        {
+          "text": "C)",
+          "bounds": {
+            "x": 1666,
+            "y": 1121,
+            "width": 63,
+            "height": 63
+          },
+          "confidence": 0.804802
+        },
+        {
+          "text": "Business",
+          "bounds": {
+            "x": 1744,
+            "y": 1122,
+            "width": 149,
+            "height": 28
+          },
+          "confidence": 0.96212876
+        },
+        {
+          "text": "Enterprise",
+          "bounds": {
+            "x": 2078,
+            "y": 1123,
+            "width": 167,
+            "height": 35
+          },
+          "confidence": 0.9658279
+        },
+        {
+          "text": "Country",
+          "bounds": {
+            "x": 1334,
+            "y": 1373,
+            "width": 130,
+            "height": 36
+          },
+          "confidence": 0.932242
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1476,
+            "y": 1374,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9223933
+        },
+        {
+          "text": "Agreements",
+          "bounds": {
+            "x": 1334,
+            "y": 1574,
+            "width": 201,
+            "height": 36
+          },
+          "confidence": 0.96038353
+        },
+        {
+          "text": "|",
+          "bounds": {
+            "x": 1428,
+            "y": 1649,
+            "width": 4,
+            "height": 27
+          },
+          "confidence": 0.95161295
+        },
+        {
+          "text": "agree",
+          "bounds": {
+            "x": 1447,
+            "y": 1656,
+            "width": 94,
+            "height": 29
+          },
+          "confidence": 0.9624566
+        },
+        {
+          "text": "to",
+          "bounds": {
+            "x": 1552,
+            "y": 1651,
+            "width": 30,
+            "height": 26
+          },
+          "confidence": 0.95956343
+        },
+        {
+          "text": "the",
+          "bounds": {
+            "x": 1594,
+            "y": 1649,
+            "width": 51,
+            "height": 28
+          },
+          "confidence": 0.95956343
+        },
+        {
+          "text": "Terms",
+          "bounds": {
+            "x": 1656,
+            "y": 1649,
+            "width": 106,
+            "height": 28
+          },
+          "confidence": 0.9684249
+        },
+        {
+          "text": "and",
+          "bounds": {
+            "x": 1774,
+            "y": 1649,
+            "width": 59,
+            "height": 28
+          },
+          "confidence": 0.96343863
+        },
+        {
+          "text": "Conditions",
+          "bounds": {
+            "x": 1847,
+            "y": 1648,
+            "width": 175,
+            "height": 29
+          },
+          "confidence": 0.92265165
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 2034,
+            "y": 1649,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.93120414
+        },
+        {
+          "text": "Subscribe",
+          "bounds": {
+            "x": 1427,
+            "y": 1756,
+            "width": 164,
+            "height": 29
+          },
+          "confidence": 0.9687205
+        },
+        {
+          "text": "to",
+          "bounds": {
+            "x": 1602,
+            "y": 1759,
+            "width": 30,
+            "height": 26
+          },
+          "confidence": 0.9698467
+        },
+        {
+          "text": "newsletter",
+          "bounds": {
+            "x": 1646,
+            "y": 1757,
+            "width": 168,
+            "height": 28
+          },
+          "confidence": 0.9661709
+        },
+        {
+          "text": "Validate",
+          "bounds": {
+            "x": 1350,
+            "y": 2292,
+            "width": 266,
+            "height": 55
+          },
+          "confidence": 0.93262756
+        },
+        {
+          "text": "&",
+          "bounds": {
+            "x": 1643,
+            "y": 2292,
+            "width": 45,
+            "height": 55
+          },
+          "confidence": 0.932143
+        },
+        {
+          "text": "Submit",
+          "bounds": {
+            "x": 1714,
+            "y": 2291,
+            "width": 228,
+            "height": 57
+          },
+          "confidence": 0.9626479
+        }
+      ],
+      "readingOrder": 1,
+      "pageNumber": 1,
+      "id": "b3b431f9-125f-42be-8085-12a95d3d2fd1",
+      "bounds": {
+        "x": 203.3587,
+        "y": 243.74858,
+        "width": 2061.9155,
+        "height": 2183.367
+      },
+      "confidence": 0.9387339
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Full Name \"",
+      "words": [
+        {
+          "text": "Full",
+          "bounds": {
+            "x": 211,
+            "y": 339,
+            "width": 55,
+            "height": 26
+          },
+          "confidence": 0.9556696
+        },
+        {
+          "text": "Name",
+          "bounds": {
+            "x": 281,
+            "y": 339,
+            "width": 97,
+            "height": 26
+          },
+          "confidence": 0.8768303
+        },
+        {
+          "text": "\"",
+          "bounds": {
+            "x": 390,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.2801729
+        }
+      ],
+      "readingOrder": 3,
+      "pageNumber": 1,
+      "id": "f2bf42b0-18ec-4622-8721-95125a0ee940",
+      "bounds": {
+        "x": 206.9247,
+        "y": 334.27362,
+        "width": 193.27214,
+        "height": 31.994171
+      },
+      "confidence": 0.7042243
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Phone *",
+      "words": [
+        {
+          "text": "Phone",
+          "bounds": {
+            "x": 211,
+            "y": 539,
+            "width": 105,
+            "height": 27
+          },
+          "confidence": 0.9158312
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 328,
+            "y": 539,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.23431851
+        }
+      ],
+      "readingOrder": 4,
+      "pageNumber": 1,
+      "id": "a4c938a8-573d-4f66-b3eb-614d13961dd1",
+      "bounds": {
+        "x": 208.03687,
+        "y": 534.4214,
+        "width": 130.91254,
+        "height": 32.184692
+      },
+      "confidence": 0.57507485
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Username *",
+      "words": [
+        {
+          "text": "Username",
+          "bounds": {
+            "x": 211,
+            "y": 856,
+            "width": 169,
+            "height": 27
+          },
+          "confidence": 0.91498023
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 392,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.48295537
+        }
+      ],
+      "readingOrder": 6,
+      "pageNumber": 1,
+      "id": "0009f587-c9c7-4e6a-9f23-a0e66150c022",
+      "bounds": {
+        "x": 207.67569,
+        "y": 852.20337,
+        "width": 195.69992,
+        "height": 31.81897
+      },
+      "confidence": 0.6989678
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Confirm Password *",
+      "words": [
+        {
+          "text": "Confirm",
+          "bounds": {
+            "x": 209,
+            "y": 1056,
+            "width": 128,
+            "height": 28
+          },
+          "confidence": 0.9525471
+        },
+        {
+          "text": "Password",
+          "bounds": {
+            "x": 353,
+            "y": 1057,
+            "width": 159,
+            "height": 27
+          },
+          "confidence": 0.9257194
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 526,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9257194
+        }
+      ],
+      "readingOrder": 7,
+      "pageNumber": 1,
+      "id": "bda5f5c0-66b8-4f05-8289-207d0707d7d6",
+      "bounds": {
+        "x": 206.54434,
+        "y": 1052.7253,
+        "width": 331.19504,
+        "height": 32.917236
+      },
+      "confidence": 0.9346619
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Company Name (required if Business/Enterprise)",
+      "words": [
+        {
+          "text": "Company",
+          "bounds": {
+            "x": 209,
+            "y": 1380,
+            "width": 159,
+            "height": 35
+          },
+          "confidence": 0.96379286
+        },
+        {
+          "text": "Name",
+          "bounds": {
+            "x": 381,
+            "y": 1381,
+            "width": 97,
+            "height": 28
+          },
+          "confidence": 0.95796585
+        },
+        {
+          "text": "(required",
+          "bounds": {
+            "x": 491,
+            "y": 1380,
+            "width": 146,
+            "height": 35
+          },
+          "confidence": 0.91774863
+        },
+        {
+          "text": "if",
+          "bounds": {
+            "x": 652,
+            "y": 1380,
+            "width": 16,
+            "height": 28
+          },
+          "confidence": 0.93127114
+        },
+        {
+          "text": "Business/Enterprise)",
+          "bounds": {
+            "x": 681,
+            "y": 1380,
+            "width": 341,
+            "height": 35
+          },
+          "confidence": 0.90620863
+        }
+      ],
+      "readingOrder": 9,
+      "pageNumber": 1,
+      "id": "d1518548-764a-4e91-af0f-6ca9191581e3",
+      "bounds": {
+        "x": 206.60863,
+        "y": 1376.5941,
+        "width": 816.8371,
+        "height": 39.878418
+      },
+      "confidence": 0.93539745
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Interests (select one or more)",
+      "words": [
+        {
+          "text": "Interests",
+          "bounds": {
+            "x": 211,
+            "y": 1581,
+            "width": 140,
+            "height": 28
+          },
+          "confidence": 0.9631898
+        },
+        {
+          "text": "(select",
+          "bounds": {
+            "x": 364,
+            "y": 1580,
+            "width": 108,
+            "height": 36
+          },
+          "confidence": 0.96430594
+        },
+        {
+          "text": "one",
+          "bounds": {
+            "x": 484,
+            "y": 1588,
+            "width": 61,
+            "height": 21
+          },
+          "confidence": 0.96157455
+        },
+        {
+          "text": "or",
+          "bounds": {
+            "x": 557,
+            "y": 1588,
+            "width": 32,
+            "height": 21
+          },
+          "confidence": 0.95482093
+        },
+        {
+          "text": "more)",
+          "bounds": {
+            "x": 602,
+            "y": 1580,
+            "width": 93,
+            "height": 36
+          },
+          "confidence": 0.9650352
+        }
+      ],
+      "readingOrder": 10,
+      "pageNumber": 1,
+      "id": "4f37e0cb-60b3-4afc-9707-b270b626cc77",
+      "bounds": {
+        "x": 207.60608,
+        "y": 1576.4976,
+        "width": 488.7517,
+        "height": 40.295654
+      },
+      "confidence": 0.9617853
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Technology",
+      "words": [
+        {
+          "text": "Technology",
+          "bounds": {
+            "x": 217,
+            "y": 1645,
+            "width": 257,
+            "height": 44
+          },
+          "confidence": 0.9606525
+        }
+      ],
+      "readingOrder": 11,
+      "pageNumber": 1,
+      "id": "3caa3c11-2fe1-469a-9b2b-b9818dc2bdd2",
+      "bounds": {
+        "x": 214.1306,
+        "y": 1642.6799,
+        "width": 260.71478,
+        "height": 47.681763
+      },
+      "confidence": 0.9606525
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Science",
+      "words": [
+        {
+          "text": "Science",
+          "bounds": {
+            "x": 219,
+            "y": 1702,
+            "width": 173,
+            "height": 36
+          },
+          "confidence": 0.96189654
+        }
+      ],
+      "readingOrder": 12,
+      "pageNumber": 1,
+      "id": "522ab5b4-10d5-437b-bc1f-dd54ef13b1ec",
+      "bounds": {
+        "x": 215.77925,
+        "y": 1700.604,
+        "width": 175.63829,
+        "height": 38.263184
+      },
+      "confidence": 0.96189654
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Finance",
+      "words": [
+        {
+          "text": "Finance",
+          "bounds": {
+            "x": 221,
+            "y": 1761,
+            "width": 171,
+            "height": 35
+          },
+          "confidence": 0.96126723
+        }
+      ],
+      "readingOrder": 13,
+      "pageNumber": 1,
+      "id": "29c9ae52-3305-4cc0-9907-89e0d544ea35",
+      "bounds": {
+        "x": 216.9983,
+        "y": 1759.0748,
+        "width": 174.50047,
+        "height": 37.254883
+      },
+      "confidence": 0.96126723
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Healthcare",
+      "words": [
+        {
+          "text": "Healthcare",
+          "bounds": {
+            "x": 220,
+            "y": 1820,
+            "width": 236,
+            "height": 36
+          },
+          "confidence": 0.95258987
+        }
+      ],
+      "readingOrder": 14,
+      "pageNumber": 1,
+      "id": "4f95b5e3-c6ab-4ea4-bc6d-285a6ccd04f8",
+      "bounds": {
+        "x": 216.60115,
+        "y": 1817.2863,
+        "width": 239.68916,
+        "height": 39.980225
+      },
+      "confidence": 0.95258987
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Education",
+      "words": [
+        {
+          "text": "Education",
+          "bounds": {
+            "x": 221,
+            "y": 1878,
+            "width": 215,
+            "height": 36
+          },
+          "confidence": 0.95697695
+        }
+      ],
+      "readingOrder": 15,
+      "pageNumber": 1,
+      "id": "a748d870-9d63-4b4e-a0c7-d39ba07fdf52",
+      "bounds": {
+        "x": 217.68877,
+        "y": 1875.8794,
+        "width": 217.92961,
+        "height": 39.745483
+      },
+      "confidence": 0.95697695
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Signature '\"",
+      "words": [
+        {
+          "text": "Signature",
+          "bounds": {
+            "x": 210,
+            "y": 2131,
+            "width": 158,
+            "height": 34
+          },
+          "confidence": 0.8896356
+        },
+        {
+          "text": "'\"",
+          "bounds": {
+            "x": 380,
+            "y": 2132,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.40705672
+        }
+      ],
+      "readingOrder": 17,
+      "pageNumber": 1,
+      "id": "6a30b9e8-2469-4945-9092-597ae86ab8e2",
+      "bounds": {
+        "x": 207.6328,
+        "y": 2127.758,
+        "width": 180.76024,
+        "height": 38.70337
+      },
+      "confidence": 0.6483462
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Email *",
+      "words": [
+        {
+          "text": "Email",
+          "bounds": {
+            "x": 1336,
+            "y": 339,
+            "width": 89,
+            "height": 26
+          },
+          "confidence": 0.72296506
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1438,
+            "y": 339,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.88239217
+        }
+      ],
+      "readingOrder": 18,
+      "pageNumber": 1,
+      "id": "50d61bb8-fe30-4661-b3b1-7fd55b22795d",
+      "bounds": {
+        "x": 1333.0533,
+        "y": 334.54587,
+        "width": 115.527466,
+        "height": 31.24237
+      },
+      "confidence": 0.8026786
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Date of Birth (mm/dd/yyyy)",
+      "words": [
+        {
+          "text": "Date",
+          "bounds": {
+            "x": 1336,
+            "y": 547,
+            "width": 76,
+            "height": 28
+          },
+          "confidence": 0.96871424
+        },
+        {
+          "text": "of",
+          "bounds": {
+            "x": 1424,
+            "y": 546,
+            "width": 30,
+            "height": 29
+          },
+          "confidence": 0.9620446
+        },
+        {
+          "text": "Birth",
+          "bounds": {
+            "x": 1467,
+            "y": 547,
+            "width": 73,
+            "height": 28
+          },
+          "confidence": 0.9326602
+        },
+        {
+          "text": "(mm/dd/yyyy)",
+          "bounds": {
+            "x": 1554,
+            "y": 546,
+            "width": 220,
+            "height": 34
+          },
+          "confidence": 0.8995677
+        }
+      ],
+      "readingOrder": 19,
+      "pageNumber": 1,
+      "id": "53ed3909-508a-46d5-9de2-c50f90b1b94e",
+      "bounds": {
+        "x": 1332.4268,
+        "y": 542.9018,
+        "width": 441.55664,
+        "height": 38.97229
+      },
+      "confidence": 0.94074667
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Password \"",
+      "words": [
+        {
+          "text": "Password",
+          "bounds": {
+            "x": 1336,
+            "y": 856,
+            "width": 160,
+            "height": 27
+          },
+          "confidence": 0.90034324
+        },
+        {
+          "text": "\"",
+          "bounds": {
+            "x": 1509,
+            "y": 856,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.8491732
+        }
+      ],
+      "readingOrder": 20,
+      "pageNumber": 1,
+      "id": "39b23930-3787-4948-b8f1-b78a715af1cf",
+      "bounds": {
+        "x": 1332.6943,
+        "y": 852.8371,
+        "width": 187.06934,
+        "height": 31.130981
+      },
+      "confidence": 0.87475824
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Account Type *",
+      "words": [
+        {
+          "text": "Account",
+          "bounds": {
+            "x": 1334,
+            "y": 1057,
+            "width": 134,
+            "height": 28
+          },
+          "confidence": 0.96493113
+        },
+        {
+          "text": "Type",
+          "bounds": {
+            "x": 1479,
+            "y": 1057,
+            "width": 82,
+            "height": 34
+          },
+          "confidence": 0.93176097
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1574,
+            "y": 1057,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9276363
+        }
+      ],
+      "readingOrder": 21,
+      "pageNumber": 1,
+      "id": "8bca5740-fb91-4423-bc7a-1dd490935cd5",
+      "bounds": {
+        "x": 1330.5188,
+        "y": 1053.2169,
+        "width": 255.18677,
+        "height": 38.54016
+      },
+      "confidence": 0.9414428
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "() Personal",
+      "words": [
+        {
+          "text": "()",
+          "bounds": {
+            "x": 1333,
+            "y": 1121,
+            "width": 63,
+            "height": 62
+          },
+          "confidence": 0.65636796
+        },
+        {
+          "text": "Personal",
+          "bounds": {
+            "x": 1411,
+            "y": 1122,
+            "width": 143,
+            "height": 28
+          },
+          "confidence": 0.96828234
+        }
+      ],
+      "readingOrder": 22,
+      "pageNumber": 1,
+      "id": "ef9af9f2-5a8f-455f-8125-cfd05739d3e5",
+      "bounds": {
+        "x": 1330.174,
+        "y": 1117.8251,
+        "width": 226.12585,
+        "height": 66.23401
+      },
+      "confidence": 0.8123251
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Country *",
+      "words": [
+        {
+          "text": "Country",
+          "bounds": {
+            "x": 1334,
+            "y": 1373,
+            "width": 130,
+            "height": 35
+          },
+          "confidence": 0.92486113
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 1476,
+            "y": 1374,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.52439094
+        }
+      ],
+      "readingOrder": 23,
+      "pageNumber": 1,
+      "id": "f5eb12a4-bbca-4af8-9ee9-de8b0b01e6c5",
+      "bounds": {
+        "x": 1332.5364,
+        "y": 1370.0663,
+        "width": 154.65991,
+        "height": 38.43286
+      },
+      "confidence": 0.72462606
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Agreements",
+      "words": [
+        {
+          "text": "Agreements",
+          "bounds": {
+            "x": 1334,
+            "y": 1574,
+            "width": 201,
+            "height": 34
+          },
+          "confidence": 0.96255875
+        }
+      ],
+      "readingOrder": 24,
+      "pageNumber": 1,
+      "id": "28678022-7819-4584-a564-a8c4914bfcb8",
+      "bounds": {
+        "x": 1331.1107,
+        "y": 1570.7177,
+        "width": 203.64685,
+        "height": 38.4541
+      },
+      "confidence": 0.96255875
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "| agree to the Terms and Conditions *",
+      "words": [
+        {
+          "text": "|",
+          "bounds": {
+            "x": 1428,
+            "y": 1649,
+            "width": 4,
+            "height": 27
+          },
+          "confidence": 0.9397989
+        },
+        {
+          "text": "agree",
+          "bounds": {
+            "x": 1447,
+            "y": 1656,
+            "width": 94,
+            "height": 29
+          },
+          "confidence": 0.9544522
+        },
+        {
+          "text": "to",
+          "bounds": {
+            "x": 1552,
+            "y": 1651,
+            "width": 30,
+            "height": 26
+          },
+          "confidence": 0.9677983
+        },
+        {
+          "text": "the",
+          "bounds": {
+            "x": 1594,
+            "y": 1649,
+            "width": 51,
+            "height": 28
+          },
+          "confidence": 0.96287346
+        },
+        {
+          "text": "Terms",
+          "bounds": {
+            "x": 1656,
+            "y": 1649,
+            "width": 106,
+            "height": 28
+          },
+          "confidence": 0.96514994
+        },
+        {
+          "text": "and",
+          "bounds": {
+            "x": 1774,
+            "y": 1649,
+            "width": 59,
+            "height": 28
+          },
+          "confidence": 0.967574
+        },
+        {
+          "text": "Conditions",
+          "bounds": {
+            "x": 1847,
+            "y": 1648,
+            "width": 175,
+            "height": 29
+          },
+          "confidence": 0.9300558
+        },
+        {
+          "text": "*",
+          "bounds": {
+            "x": 2034,
+            "y": 1649,
+            "width": 12,
+            "height": 11
+          },
+          "confidence": 0.9246529
+        }
+      ],
+      "readingOrder": 25,
+      "pageNumber": 1,
+      "id": "24b95b3a-36ac-4095-8756-2dfbdd86452f",
+      "bounds": {
+        "x": 1330.7892,
+        "y": 1639.6476,
+        "width": 715.4275,
+        "height": 63.259888
+      },
+      "confidence": 0.95154446
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Subscribe to newsletter",
+      "words": [
+        {
+          "text": "Subscribe",
+          "bounds": {
+            "x": 1427,
+            "y": 1756,
+            "width": 164,
+            "height": 29
+          },
+          "confidence": 0.959975
+        },
+        {
+          "text": "to",
+          "bounds": {
+            "x": 1602,
+            "y": 1759,
+            "width": 30,
+            "height": 26
+          },
+          "confidence": 0.9650762
+        },
+        {
+          "text": "newsletter",
+          "bounds": {
+            "x": 1646,
+            "y": 1757,
+            "width": 168,
+            "height": 28
+          },
+          "confidence": 0.9609321
+        }
+      ],
+      "readingOrder": 26,
+      "pageNumber": 1,
+      "id": "34fc27e8-433a-4d16-9cf5-2877bd29ebb0",
+      "bounds": {
+        "x": 1331.2148,
+        "y": 1749.0426,
+        "width": 484.34265,
+        "height": 62.309082
+      },
+      "confidence": 0.9619944
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Validate & Submit",
+      "words": [
+        {
+          "text": "Validate",
+          "bounds": {
+            "x": 1350,
+            "y": 2292,
+            "width": 266,
+            "height": 55
+          },
+          "confidence": 0.9316555
+        },
+        {
+          "text": "&",
+          "bounds": {
+            "x": 1643,
+            "y": 2292,
+            "width": 45,
+            "height": 55
+          },
+          "confidence": 0.9307404
+        },
+        {
+          "text": "Submit",
+          "bounds": {
+            "x": 1714,
+            "y": 2291,
+            "width": 228,
+            "height": 57
+          },
+          "confidence": 0.96337664
+        }
+      ],
+      "readingOrder": 27,
+      "pageNumber": 1,
+      "id": "9c71b2f9-831a-491a-bde2-823b4dcf97bf",
+      "bounds": {
+        "x": 1346.0459,
+        "y": 2288.143,
+        "width": 597.2534,
+        "height": 61.197998
+      },
+      "confidence": 0.9419243
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Business",
+      "words": [
+        {
+          "text": "Business",
+          "bounds": {
+            "x": 1744,
+            "y": 1122,
+            "width": 149,
+            "height": 28
+          },
+          "confidence": 0.9608591
+        }
+      ],
+      "readingOrder": 28,
+      "pageNumber": 1,
+      "id": "19bd02f8-e4d0-4d32-bc0f-678900c77794",
+      "bounds": {
+        "x": 1665.3977,
+        "y": 1117.8257,
+        "width": 227.80444,
+        "height": 65.34595
+      },
+      "confidence": 0.9608591
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Enterprise",
+      "words": [
+        {
+          "text": "Enterprise",
+          "bounds": {
+            "x": 2078,
+            "y": 1123,
+            "width": 167,
+            "height": 35
+          },
+          "confidence": 0.96613556
+        }
+      ],
+      "readingOrder": 29,
+      "pageNumber": 1,
+      "id": "28f38355-0f22-49a9-87fc-8f1c876cd194",
+      "bounds": {
+        "x": 1998.5767,
+        "y": 1118.0962,
+        "width": 245.64917,
+        "height": 65.829834
+      },
+      "confidence": 0.96613556
+    }
+  ]
+}

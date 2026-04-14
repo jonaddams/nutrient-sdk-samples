@@ -3,7 +3,7 @@
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
+const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf";
 const FILTER_STYLE_ID = "brightness-contrast-style";
 
 function MoonIcon() {
@@ -19,6 +19,7 @@ function MoonIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
+      <title>Moon</title>
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   );
@@ -37,6 +38,7 @@ function SunIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
+      <title>Sun</title>
       <circle cx="12" cy="12" r="5" />
       <line x1="12" y1="1" x2="12" y2="3" />
       <line x1="12" y1="21" x2="12" y2="23" />
@@ -118,13 +120,9 @@ export default function BrightnessContrastViewer() {
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       toolbarItems: (NutrientViewer.defaultToolbarItems ?? []).filter(
         (item: { type: string }) =>
-          [
-            "pager",
-            "zoom-out",
-            "zoom-in",
-            "zoom-mode",
-            "search",
-          ].includes(item.type),
+          ["pager", "zoom-out", "zoom-in", "zoom-mode", "search"].includes(
+            item.type,
+          ),
       ),
     }).then((instance: Instance) => {
       instanceRef.current = instance;

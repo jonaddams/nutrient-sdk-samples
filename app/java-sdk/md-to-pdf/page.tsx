@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { JavaSampleHeader } from "../_components/JavaSampleHeader";
 import { PdfViewer } from "../_components/PdfViewer";
 

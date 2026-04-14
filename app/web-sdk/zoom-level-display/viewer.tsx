@@ -3,7 +3,7 @@
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
 
-const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies.pdf";
+const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf";
 
 export default function ZoomLevelDisplayViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,9 +37,7 @@ export default function ZoomLevelDisplayViewer() {
           selected: true,
           tooltip: "Reset to 100%",
           onPress: () => {
-            instance.setViewState((viewState: any) =>
-              viewState.set("zoom", 1),
-            );
+            instance.setViewState((viewState: any) => viewState.set("zoom", 1));
           },
         },
       ];
@@ -53,7 +51,9 @@ export default function ZoomLevelDisplayViewer() {
           const percentage = Math.round(zoom * 100) + "%";
           instance.setToolbarItems((items: any[]) =>
             items.map((item) =>
-              item.id === "zoom-display" ? { ...item, title: percentage } : item,
+              item.id === "zoom-display"
+                ? { ...item, title: percentage }
+                : item,
             ),
           );
         }
