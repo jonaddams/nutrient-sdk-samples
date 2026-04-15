@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @page { size: letter; margin: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 48px 56px;
+    color: #1a1a1a;
+    font-size: 11px;
+    line-height: 1.4;
+    box-sizing: border-box;
+    width: 8.5in;
+    height: 11in;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 20px;
+    margin: 0 0 2px 0;
+    font-weight: 700;
+  }
+  .header .subtitle {
+    font-size: 11px;
+    color: #666;
+  }
+  .header .date-area {
+    text-align: right;
+    font-size: 11px;
+    color: #666;
+  }
+  .header .date-area .label {
+    margin-bottom: 4px;
+  }
+  .header .date-area .placeholder {
+    width: 160px;
+    height: 24px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #333;
+    margin: 20px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 14px;
+  }
+  .field-row.stacked {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field {
+    flex: 1;
+  }
+  .field.half {
+    flex: 0 0 48%;
+  }
+  .field.third {
+    flex: 0 0 31%;
+  }
+
+  .field-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #555;
+    margin-bottom: 4px;
+  }
+
+  .field-placeholder {
+    height: 28px;
+    border-bottom: 1px solid #ccc;
+    background: transparent;
+  }
+  .field-placeholder.tall {
+    height: 48px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .checkbox-box {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .radio-circle {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .signature-section {
+    display: flex;
+    gap: 40px;
+    margin-top: 8px;
+  }
+  .signature-block {
+    flex: 1;
+  }
+  .signature-line {
+    height: 48px;
+    border-bottom: 1px solid #999;
+    margin-bottom: 4px;
+  }
+  .signature-label {
+    font-size: 9px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .notice {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    font-size: 9px;
+    color: #666;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Patient Intake Form</h1>
+      <div class="subtitle">Sunrise Medical Group &mdash; New Patient Registration</div>
+    </div>
+    <div class="date-area">
+      <div class="label">Date of Visit</div>
+      <div class="placeholder"></div>
+    </div>
+  </div>
+
+  <h2>Patient Information</h2>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">First Name</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field">
+      <div class="field-label">Last Name</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field third">
+      <div class="field-label">Date of Birth</div>
+      <div class="field-placeholder"></div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">Street Address</div>
+      <div class="field-placeholder"></div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">City</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field third">
+      <div class="field-label">State</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field third">
+      <div class="field-label">ZIP Code</div>
+      <div class="field-placeholder"></div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field half">
+      <div class="field-label">Phone Number</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field half">
+      <div class="field-label">Email Address</div>
+      <div class="field-placeholder"></div>
+    </div>
+  </div>
+
+  <h2>Medical History</h2>
+
+  <div class="field-label" style="margin-bottom: 8px;">Do you have any of the following conditions? (check all that apply)</div>
+  <div class="checkbox-row">
+    <div class="checkbox-item"><div class="checkbox-box"></div> Diabetes</div>
+    <div class="checkbox-item"><div class="checkbox-box"></div> Heart Disease</div>
+    <div class="checkbox-item"><div class="checkbox-box"></div> High Blood Pressure</div>
+    <div class="checkbox-item"><div class="checkbox-box"></div> Asthma</div>
+    <div class="checkbox-item"><div class="checkbox-box"></div> Allergies</div>
+    <div class="checkbox-item"><div class="checkbox-box"></div> None of the above</div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">Current Medications (list all)</div>
+      <div class="field-placeholder tall"></div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">Reason for Today's Visit</div>
+      <div class="field-placeholder tall"></div>
+    </div>
+  </div>
+
+  <h2>Insurance Information</h2>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">Insurance Provider</div>
+      <div class="field-placeholder"></div>
+    </div>
+    <div class="field">
+      <div class="field-label">Policy Number</div>
+      <div class="field-placeholder"></div>
+    </div>
+  </div>
+
+  <h2>Consent &amp; Signatures</h2>
+
+  <div class="checkbox-row" style="margin-bottom: 4px;">
+    <div class="checkbox-item"><div class="checkbox-box"></div> I confirm that the information provided is accurate and complete.</div>
+  </div>
+  <div class="checkbox-row">
+    <div class="checkbox-item"><div class="checkbox-box"></div> I consent to treatment and authorize the release of medical information as needed.</div>
+  </div>
+
+  <div class="signature-section">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-label">Patient Signature</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-label">Provider Signature</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Privacy Notice:</strong> Your personal health information is protected under HIPAA regulations. Information collected on this form will only be used for treatment, payment, and healthcare operations. You have the right to request access to your records at any time.
+  </div>
+
+</body>
+</html>
