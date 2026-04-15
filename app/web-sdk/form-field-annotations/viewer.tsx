@@ -31,6 +31,7 @@ export default function FormFieldAnnotationsViewer() {
   const instanceRef = useRef<Instance | null>(null);
   const hasLoadedRef = useRef(false);
   const fieldCounterRef = useRef(0);
+  const activeViewRef = useRef<ActiveView>("editor");
 
   const [activeView, setActiveView] = useState<ActiveView>("editor");
   const [selectedAnnotationId, setSelectedAnnotationId] = useState<
@@ -85,12 +86,24 @@ export default function FormFieldAnnotationsViewer() {
             const role = ROLES[roleId];
             if (!role) return null;
 
+            const currentView = activeViewRef.current;
+            const isDimmed =
+              currentView !== "editor" &&
+              roleId !== currentView &&
+              roleId !== "either";
+
+            const borderColor = isDimmed ? "#d1d5db" : role.color;
+            const bgColor = isDimmed
+              ? "rgba(0,0,0,0.03)"
+              : `${role.color}15`;
+            const opacity = isDimmed ? "0.5" : "1";
+
             const node = document.createElement("div");
             node.style.cssText = `
               width: 100%;
               height: 100%;
-              border: 2px solid ${role.color};
-              background-color: ${role.color}15;
+              border: 2px solid ${borderColor};
+              background-color: ${bgColor};
               display: flex;
               align-items: center;
               gap: 6px;
@@ -98,27 +111,30 @@ export default function FormFieldAnnotationsViewer() {
               pointer-events: none;
               box-sizing: border-box;
               overflow: hidden;
+              opacity: ${opacity};
             `;
 
-            const badge = document.createElement("span");
-            badge.textContent = role.label;
-            badge.style.cssText = `
-              background: ${role.color};
-              color: white;
-              font-size: 9px;
-              padding: 1px 5px;
-              border-radius: 3px;
-              font-weight: 600;
-              white-space: nowrap;
-              flex-shrink: 0;
-            `;
-            node.appendChild(badge);
+            if (!isDimmed) {
+              const badge = document.createElement("span");
+              badge.textContent = role.label;
+              badge.style.cssText = `
+                background: ${role.color};
+                color: white;
+                font-size: 9px;
+                padding: 1px 5px;
+                border-radius: 3px;
+                font-weight: 600;
+                white-space: nowrap;
+                flex-shrink: 0;
+              `;
+              node.appendChild(badge);
+            }
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent = annotation.customData.fieldName || "";
             nameSpan.style.cssText = `
               font-size: 11px;
-              color: ${role.color};
+              color: ${isDimmed ? "#999" : role.color};
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
@@ -183,6 +199,7 @@ export default function FormFieldAnnotationsViewer() {
   // ─── Role Switching ───────────────────────────────────────────────
   const switchView = useCallback(async (view: ActiveView) => {
     setActiveView(view);
+    activeViewRef.current = view;
     setSelectedAnnotationId(null);
     setSelectedFieldData(null);
 
@@ -239,6 +256,21 @@ export default function FormFieldAnnotationsViewer() {
       }
     } catch (error) {
       console.error("Error updating field permissions:", error);
+    }
+
+    // Force re-render of custom overlays by touching each annotation
+    try {
+      const totalPages2 = await instance.totalPageCount;
+      for (let pageIndex = 0; pageIndex < totalPages2; pageIndex++) {
+        const annotations = await instance.getAnnotations(pageIndex);
+        for (const annotation of annotations) {
+          if ((annotation as any).customData?.roleId) {
+            await instance.update(annotation);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error re-rendering annotations:", error);
     }
   }, []);
 
