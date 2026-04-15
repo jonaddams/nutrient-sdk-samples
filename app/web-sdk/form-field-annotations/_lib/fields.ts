@@ -1,14 +1,14 @@
 import type { List } from "@nutrient-sdk/viewer";
-import type { FieldType, FieldCustomData } from "./types";
+import type { FieldCustomData, FieldType } from "./types";
 
 /**
  * Helper to create an Immutable.List from a plain array.
  * The SDK uses Immutable.js lists for annotationIds and options.
  */
 function makeList<T>(NV: typeof window.NutrientViewer, items: T[]) {
-  return new (
-    NV!.Immutable.List as unknown as new (items: T[]) => List<T>
-  )(items);
+  return new (NV?.Immutable.List as unknown as new (items: T[]) => List<T>)(
+    items,
+  );
 }
 
 /**
@@ -18,7 +18,9 @@ function makeList<T>(NV: typeof window.NutrientViewer, items: T[]) {
 export function createFormField(
   NV: typeof window.NutrientViewer,
   pageIndex: number,
-  boundingBox: InstanceType<typeof NutrientViewer.Geometry.Rect>,
+  boundingBox: InstanceType<
+    NonNullable<typeof window.NutrientViewer>["Geometry"]["Rect"]
+  >,
   fieldType: FieldType,
   customData: FieldCustomData,
 ): [any, any] {
@@ -78,8 +80,6 @@ export function createFormField(
       });
       break;
 
-    case "text":
-    case "date":
     default:
       formField = new NV.FormFields.TextFormField({
         name: formFieldName,
