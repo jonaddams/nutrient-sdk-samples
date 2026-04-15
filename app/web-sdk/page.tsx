@@ -127,6 +127,13 @@ const samples: Sample[] = [
     path: "/web-sdk/form-prefill",
   },
   {
+    name: "Form Field Annotations",
+    category: "Forms",
+    description:
+      "Build custom form builder UI by hiding SDK defaults and replacing with your own components",
+    path: "/web-sdk/form-field-annotations",
+  },
+  {
     name: "Form Designer",
     category: "Forms",
     description:
@@ -262,6 +269,14 @@ export default function WebSDKPage() {
               className="btn btn-sm btn-secondary"
             >
               Guides
+            </a>
+            <a
+              href="https://github.com/jonaddams/nutrient-sdk-samples"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Source
             </a>
           </>
         }
