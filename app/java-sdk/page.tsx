@@ -106,6 +106,14 @@ export default function JavaSDKPage() {
             >
               Backend API Repo
             </a>
+            <a
+              href="https://github.com/jonaddams/nutrient-sdk-samples"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Source
+            </a>
           </>
         }
       />
