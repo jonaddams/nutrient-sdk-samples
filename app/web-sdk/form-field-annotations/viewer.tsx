@@ -196,8 +196,10 @@ export default function FormFieldAnnotationsViewer() {
 
             const borderColor = isDimmed ? "#d1d5db" : role.color;
             const opacity = isDimmed ? "0.5" : "1";
+            const fieldType = annotation.customData.fieldType as string;
+            const isSmallWidget =
+              fieldType === "checkbox" || fieldType === "radio";
 
-            // Wrapper: label bar on top, field border below, no gap
             const node = document.createElement("div");
             node.style.cssText = `
               position: relative;
@@ -206,6 +208,23 @@ export default function FormFieldAnnotationsViewer() {
               pointer-events: none;
               opacity: ${opacity};
             `;
+
+            if (isSmallWidget) {
+              // Small widgets (checkbox, radio): colored border only
+              const fieldBorder = document.createElement("div");
+              fieldBorder.style.cssText = `
+                width: 100%;
+                height: 100%;
+                border: 2px solid ${borderColor};
+                border-radius: 3px;
+                box-sizing: border-box;
+              `;
+              node.appendChild(fieldBorder);
+
+              return { node, append: true };
+            }
+
+            // Wide fields (text, signature, date): label bar + field border
 
             // Top bar: role badge + field name
             const labelBar = document.createElement("div");
