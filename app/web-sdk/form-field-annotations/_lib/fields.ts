@@ -6,7 +6,7 @@ import type { FieldCustomData, FieldType } from "./types";
  * The SDK uses Immutable.js lists for annotationIds and options.
  */
 function makeList<T>(NV: typeof window.NutrientViewer, items: T[]) {
-  return new (NV?.Immutable.List as unknown as new (items: T[]) => List<T>)(
+  return new (NV!.Immutable.List as unknown as new (items: T[]) => List<T>)(
     items,
   );
 }
