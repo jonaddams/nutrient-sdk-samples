@@ -11,3 +11,10 @@
 .PSPDFKit-Toolbar {
   display: none !important;
 }
+
+/* Add horizontal padding to text form field inputs */
+.PSPDFKit-Annotation-Widget-Text input,
+.PSPDFKit-Annotation-Widget-Text textarea {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
