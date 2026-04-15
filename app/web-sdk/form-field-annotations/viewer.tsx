@@ -286,9 +286,16 @@ export default function FormFieldAnnotationsViewer() {
     return () => {
       if (instanceRef.current) {
         setupDragDrop(instanceRef.current, false);
-        instanceRef.current.unload();
         instanceRef.current = null;
       }
+      if (NV.current && container) {
+        try {
+          NV.current.unload(container);
+        } catch {
+          // Container may already be unmounted
+        }
+      }
+      hasLoadedRef.current = false;
     };
   }, [setupDragDrop]);
 
@@ -302,6 +309,9 @@ export default function FormFieldAnnotationsViewer() {
     const instance = instanceRef.current;
     const sdk = NV.current;
     if (!instance || !sdk) return;
+
+    // Toggle drag-and-drop based on editor mode
+    setupDragDrop(instance, view === "editor");
 
     // Set interaction mode
     if (view === "editor") {
@@ -365,7 +375,7 @@ export default function FormFieldAnnotationsViewer() {
     } catch (error) {
       console.error("Error re-rendering annotations:", error);
     }
-  }, []);
+  }, [setupDragDrop]);
 
   // ─── Property Updates ───────────────────────────────────────────
   const updateFieldProperty = useCallback(
