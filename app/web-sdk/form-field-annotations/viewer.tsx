@@ -317,12 +317,27 @@ export default function FormFieldAnnotationsViewer() {
       );
     }
 
-    // Update field permissions
+    // Force re-render of custom overlays first (before permission changes)
+    try {
+      const totalPages = await instance.totalPageCount;
+      for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        const annotations = await instance.getAnnotations(pageIndex);
+        for (const annotation of annotations) {
+          if ((annotation as any).customData?.roleId) {
+            await instance.update(annotation);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error re-rendering annotations:", error);
+    }
+
+    // Update field permissions (after re-render so updates aren't overwritten)
     try {
       const formFields = await instance.getFormFields();
-      const totalPages = await instance.totalPageCount;
+      const totalPages2 = await instance.totalPageCount;
       let allAnnotations: any[] = [];
-      for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+      for (let pageIndex = 0; pageIndex < totalPages2; pageIndex++) {
         const pageAnnotations = await instance.getAnnotations(pageIndex);
         allAnnotations = allAnnotations.concat(pageAnnotations.toArray());
       }
@@ -352,21 +367,6 @@ export default function FormFieldAnnotationsViewer() {
       }
     } catch (error) {
       console.error("Error updating field permissions:", error);
-    }
-
-    // Force re-render of custom overlays by touching each annotation
-    try {
-      const totalPages2 = await instance.totalPageCount;
-      for (let pageIndex = 0; pageIndex < totalPages2; pageIndex++) {
-        const annotations = await instance.getAnnotations(pageIndex);
-        for (const annotation of annotations) {
-          if ((annotation as any).customData?.roleId) {
-            await instance.update(annotation);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error re-rendering annotations:", error);
     }
   }, [setupDragDrop]);
 
