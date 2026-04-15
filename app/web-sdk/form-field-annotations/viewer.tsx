@@ -212,8 +212,8 @@ export default function FormFieldAnnotationsViewer() {
             labelBar.style.cssText = `
               position: absolute;
               bottom: 100%;
-              left: -2px;
-              right: -2px;
+              left: 0;
+              right: 0;
               height: 22px;
               border: 2px solid ${borderColor};
               border-bottom: none;
@@ -222,8 +222,9 @@ export default function FormFieldAnnotationsViewer() {
               display: flex;
               align-items: center;
               gap: 5px;
-              padding: 0 6px;
+              padding: 0;
               white-space: nowrap;
+              overflow: hidden;
             `;
 
             if (!isDimmed) {
@@ -233,9 +234,12 @@ export default function FormFieldAnnotationsViewer() {
                 background: ${role.color};
                 color: white;
                 font-size: 9px;
-                padding: 1px 6px;
-                border-radius: 3px;
+                padding: 0 6px;
+                height: 100%;
+                display: flex;
+                align-items: center;
                 font-weight: 600;
+                flex-shrink: 0;
               `;
               labelBar.appendChild(badge);
             }
@@ -249,6 +253,7 @@ export default function FormFieldAnnotationsViewer() {
               font-weight: 500;
               overflow: hidden;
               text-overflow: ellipsis;
+              padding-left: 5px;
             `;
             labelBar.appendChild(nameSpan);
             node.appendChild(labelBar);
@@ -259,7 +264,7 @@ export default function FormFieldAnnotationsViewer() {
               width: 100%;
               height: 100%;
               border: 2px solid ${borderColor};
-              border-radius: 0 0 3px 3px;
+              border-radius: 0 0 2px 2px;
               box-sizing: border-box;
             `;
             node.appendChild(fieldBorder);
