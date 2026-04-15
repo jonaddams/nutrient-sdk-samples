@@ -260,20 +260,17 @@ export default function FormFieldAnnotationsViewer() {
       // Set up drag-and-drop
       setupDragDrop(instance, true);
 
-      // Listen for annotation selection to populate properties panel
-      instance.addEventListener("annotations.focus", (event: any) => {
+      // Listen for annotation clicks to populate properties panel
+      instance.addEventListener("annotations.press", (event: any) => {
         const annotation = event?.annotation ?? event;
         if (!annotation?.customData?.roleId) {
+          setSelectedAnnotationId(null);
+          setSelectedFieldData(null);
           return;
         }
 
         setSelectedAnnotationId(annotation.id);
         setSelectedFieldData(annotation.customData as FieldCustomData);
-      });
-
-      instance.addEventListener("annotations.blur", () => {
-        setSelectedAnnotationId(null);
-        setSelectedFieldData(null);
       });
     };
 
