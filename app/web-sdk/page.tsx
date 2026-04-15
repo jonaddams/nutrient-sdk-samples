@@ -91,6 +91,13 @@ const samples: Sample[] = [
     path: "/web-sdk/custom-renderers",
   },
   {
+    name: "Custom UI Form Creator",
+    category: "Forms",
+    description:
+      "Build custom form builder UI by hiding SDK defaults and replacing with your own components",
+    path: "/web-sdk/custom-ui-form-creator",
+  },
+  {
     name: "Document Assembly",
     category: "Document Editor",
     description:
@@ -125,13 +132,6 @@ const samples: Sample[] = [
     description:
       "Programmatically populate PDF form fields from JSON data presets with editable field values and apply/clear controls",
     path: "/web-sdk/form-prefill",
-  },
-  {
-    name: "Custom UI Form Creator",
-    category: "Forms",
-    description:
-      "Build custom form builder UI by hiding SDK defaults and replacing with your own components",
-    path: "/web-sdk/custom-ui-form-creator",
   },
   {
     name: "Form Designer",
