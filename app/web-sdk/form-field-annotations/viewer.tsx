@@ -171,7 +171,7 @@ export default function FormFieldAnnotationsViewer() {
 
       const instance = await NutrientViewer.load({
         container,
-        document: "/documents/service-agreement.pdf",
+        document: "/documents/patient-intake-form.pdf",
         licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         useCDN: true,
         styleSheets: ["/form-field-annotations.css"],
