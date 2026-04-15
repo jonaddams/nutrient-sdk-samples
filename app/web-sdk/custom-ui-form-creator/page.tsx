@@ -5,20 +5,20 @@ import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
 const Viewer = dynamic(
-  () => import("@/app/web-sdk/form-field-annotations/viewer"),
+  () => import("@/app/web-sdk/custom-ui-form-creator/viewer"),
   {
     ssr: false,
     loading: () => (
-      <LoadingSpinner message="Loading form field annotations..." />
+      <LoadingSpinner message="Loading custom UI form creator..." />
     ),
   },
 );
 
-export default function FormFieldAnnotationsPage() {
+export default function CustomUIFormCreatorPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414] flex flex-col">
       <SampleHeader
-        title="Form Field Annotations"
+        title="Custom UI Form Creator"
         description="Build custom form builder UI by hiding SDK defaults and replacing with your own components"
       />
 
