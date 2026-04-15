@@ -1,0 +1,13 @@
+/* Hide SDK's built-in form creator UI — replaced by our custom sidebar */
+.PSPDFKit-Form-Creator-Toolbar {
+  display: none !important;
+}
+
+.PSPDFKit-Form-Creator-Popover {
+  display: none !important;
+}
+
+/* Hide the main toolbar — our sidebar handles all interaction */
+.PSPDFKit-Toolbar {
+  display: none !important;
+}
