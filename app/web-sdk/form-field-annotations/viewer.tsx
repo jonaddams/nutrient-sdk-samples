@@ -554,7 +554,7 @@ export default function FormFieldAnnotationsViewer() {
             <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
               Drag onto document
             </div>
-            <ul className="flex flex-col gap-1.5 list-none m-0" style={{ padding: 0 }}
+            <ul className="flex flex-col gap-1.5 list-none m-0" style={{ padding: 0 }}>
               {FIELD_PALETTE.map((item) => (
                 <li
                   key={item.type}
