@@ -6,6 +6,24 @@ import type { FieldType, FieldCustomData, RoleId } from "./_lib/types";
 import { ROLES, EDITOR_COLOR, FIELD_PALETTE } from "./_lib/roles";
 import { createFormField } from "./_lib/fields";
 
+function closestByClass(
+  el: Element | Node | null,
+  className: string,
+): Element | null {
+  if (!el) return null;
+  if (el instanceof Element && el.classList?.contains(className)) {
+    return el as Element;
+  }
+  if (
+    el instanceof Element &&
+    typeof el.className === "string" &&
+    el.className.includes(className)
+  ) {
+    return el as Element;
+  }
+  return el.parentNode ? closestByClass(el.parentNode, className) : null;
+}
+
 type ActiveView = "editor" | RoleId;
 
 export default function FormFieldAnnotationsViewer() {
@@ -121,17 +139,21 @@ export default function FormFieldAnnotationsViewer() {
           NutrientViewer.InteractionMode.FORM_CREATOR,
         ),
       );
+
+      // Set up drag-and-drop
+      setupDragDrop(instance, true);
     };
 
     initSDK();
 
     return () => {
       if (instanceRef.current) {
+        setupDragDrop(instanceRef.current, false);
         instanceRef.current.unload();
         instanceRef.current = null;
       }
     };
-  }, []);
+  }, [setupDragDrop]);
 
   // ─── Role Switching ───────────────────────────────────────────────
   const switchView = useCallback(async (view: ActiveView) => {
@@ -194,6 +216,110 @@ export default function FormFieldAnnotationsViewer() {
       console.error("Error updating field permissions:", error);
     }
   }, []);
+
+  // ─── Drag and Drop ────────────────────────────────────────────────
+  const eventHandlersRef = useRef<{
+    dragover: (e: Event) => void;
+    drop: (e: Event) => void;
+  } | null>(null);
+
+  const setupDragDrop = useCallback(
+    (instance: Instance, enabled: boolean) => {
+      // Clean up previous handlers
+      if (eventHandlersRef.current && instance.contentDocument) {
+        instance.contentDocument.removeEventListener(
+          "dragover",
+          eventHandlersRef.current.dragover,
+        );
+        instance.contentDocument.removeEventListener(
+          "drop",
+          eventHandlersRef.current.drop,
+        );
+        eventHandlersRef.current = null;
+      }
+
+      if (!enabled) return;
+
+      const sdk = NV.current;
+      if (!sdk) return;
+
+      const dragoverHandler = (event: Event) => {
+        const dragEvent = event as DragEvent;
+        const pageElement =
+          closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
+          closestByClass(dragEvent.target as Element, "pspdfkit-page");
+        if (pageElement) {
+          event.preventDefault();
+        }
+      };
+
+      const dropHandler = async (event: Event) => {
+        const dragEvent = event as DragEvent;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const fieldType = dragEvent.dataTransfer?.getData("text") as FieldType;
+        if (!fieldType) return;
+
+        const paletteItem = FIELD_PALETTE.find((f) => f.type === fieldType);
+        if (!paletteItem) return;
+
+        const pageElement =
+          closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
+          closestByClass(dragEvent.target as Element, "pspdfkit-page");
+        if (!pageElement) return;
+
+        const pageIndex = parseInt(
+          (pageElement as HTMLElement).dataset.pageIndex || "0",
+          10,
+        );
+
+        try {
+          const { width, height } = paletteItem.defaultSize;
+          const clientRect = new sdk.Geometry.Rect({
+            left: dragEvent.clientX - width / 2,
+            top: dragEvent.clientY - height / 2,
+            width,
+            height,
+          });
+
+          const pageRect = instance.transformContentClientToPageSpace(
+            clientRect,
+            pageIndex,
+          );
+
+          fieldCounterRef.current += 1;
+          const fieldName = `${fieldType}-${fieldCounterRef.current}`;
+
+          const customData: FieldCustomData = {
+            fieldType,
+            roleId: "either",
+            fieldName,
+            required: false,
+          };
+
+          const [widget, formField] = createFormField(
+            sdk,
+            pageIndex,
+            pageRect,
+            fieldType,
+            customData,
+          );
+
+          await instance.create([widget, formField]);
+        } catch (error) {
+          console.error("Error creating field:", error);
+        }
+      };
+
+      if (instance.contentDocument) {
+        instance.contentDocument.addEventListener("dragover", dragoverHandler);
+        instance.contentDocument.addEventListener("drop", dropHandler);
+        eventHandlersRef.current = { dragover: dragoverHandler, drop: dropHandler };
+      }
+    },
+    [],
+  );
 
   // ─── Render ───────────────────────────────────────────────────────
   const isEditor = activeView === "editor";
@@ -262,7 +388,6 @@ export default function FormFieldAnnotationsViewer() {
           </div>
         </div>
 
-        {/* Field Palette — placeholder for Task 7 */}
         {isEditor && (
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
@@ -271,8 +396,30 @@ export default function FormFieldAnnotationsViewer() {
             <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
               Drag onto document
             </div>
-            <div className="text-sm text-gray-400 italic text-center py-4">
-              Field palette loading...
+            <div className="flex flex-col gap-1.5">
+              {FIELD_PALETTE.map((item) => (
+                <div
+                  key={item.type}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text", item.type);
+                    setDraggingItem(item.type);
+                  }}
+                  onDragEnd={() => setDraggingItem(null)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md border transition-all cursor-grab active:cursor-grabbing ${
+                    draggingItem === item.type
+                      ? "opacity-50 border-gray-300 dark:border-gray-600"
+                      : "border-gray-200 dark:border-gray-700 hover:border-[var(--digital-pollen)] hover:bg-gray-50 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <span className="text-lg w-6 text-center flex-shrink-0">
+                    {item.icon}
+                  </span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
