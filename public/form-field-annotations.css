@@ -1,0 +1,28 @@
+/* Hide SDK's built-in form creator UI — replaced by our custom sidebar */
+.PSPDFKit-Form-Creator-Toolbar {
+  display: none !important;
+}
+
+.PSPDFKit-Form-Creator-Popover {
+  display: none !important;
+}
+
+/* Hide the main toolbar — our sidebar handles all interaction */
+.PSPDFKit-Toolbar {
+  display: none !important;
+}
+
+/* Hide the blue selection outline rectangle in editor mode */
+/* Hide the selection UI (outline, border, resize anchors) */
+.PSPDFKit-Selection-Outline-Rect,
+.PSPDFKit-Selection-Outline-Border,
+.PSPDFKit-Resize-Anchor {
+  display: none !important;
+}
+
+/* Add horizontal padding to text form field inputs */
+input.PSPDFKit-Annotation-Widget-Text,
+textarea.PSPDFKit-Annotation-Widget-Text {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
