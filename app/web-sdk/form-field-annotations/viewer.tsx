@@ -547,14 +547,14 @@ export default function FormFieldAnnotationsViewer() {
         </div>
 
         {isEditor && (
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <div className="px-4 pt-4 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
               Add Fields
             </div>
-            <div className="px-4 text-xs text-gray-400 dark:text-gray-500 mb-3">
+            <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
               Drag onto document
             </div>
-            <ul className="flex flex-col list-none p-0 m-0">
+            <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
               {FIELD_PALETTE.map((item) => (
                 <li
                   key={item.type}
@@ -564,10 +564,10 @@ export default function FormFieldAnnotationsViewer() {
                     setDraggingItem(item.type);
                   }}
                   onDragEnd={() => setDraggingItem(null)}
-                  className={`flex items-center gap-3 px-4 py-2.5 border-b transition-all cursor-grab active:cursor-grabbing ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md border transition-all cursor-grab active:cursor-grabbing ${
                     draggingItem === item.type
-                      ? "opacity-50 bg-gray-100 dark:bg-gray-800"
-                      : "border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      ? "opacity-50 border-gray-300 dark:border-gray-600"
+                      : "border-gray-200 dark:border-gray-700 hover:border-[var(--digital-pollen)] hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <span className="text-lg w-6 text-center flex-shrink-0">
