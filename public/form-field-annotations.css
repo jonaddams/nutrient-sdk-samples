@@ -13,7 +13,8 @@
 }
 
 /* Hide the blue selection outline rectangle in editor mode */
-.PSPDFKit-Selection-Outline-Rect {
+.PSPDFKit-Selection-Outline-Rect,
+.PSPDFKit-Selection-Outline-Border {
   display: none !important;
 }
 
