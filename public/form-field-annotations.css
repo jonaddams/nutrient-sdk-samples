@@ -13,8 +13,8 @@
 }
 
 /* Add horizontal padding to text form field inputs */
-.PSPDFKit-Annotation-Widget-Text input,
-.PSPDFKit-Annotation-Widget-Text textarea {
+input.PSPDFKit-Annotation-Widget-Text,
+textarea.PSPDFKit-Annotation-Widget-Text {
   padding-left: 6px !important;
   padding-right: 6px !important;
 }
