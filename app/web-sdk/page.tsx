@@ -127,11 +127,11 @@ const samples: Sample[] = [
     path: "/web-sdk/form-prefill",
   },
   {
-    name: "Form Field Annotations",
+    name: "Custom UI Form Creator",
     category: "Forms",
     description:
       "Build custom form builder UI by hiding SDK defaults and replacing with your own components",
-    path: "/web-sdk/form-field-annotations",
+    path: "/web-sdk/custom-ui-form-creator",
   },
   {
     name: "Form Designer",
