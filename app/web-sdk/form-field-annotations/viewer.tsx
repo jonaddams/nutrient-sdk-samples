@@ -142,6 +142,31 @@ export default function FormFieldAnnotationsViewer() {
 
       // Set up drag-and-drop
       setupDragDrop(instance, true);
+
+      // Listen for annotation selection to populate properties panel
+      instance.addEventListener(
+        "annotations.focus",
+        async (event: any) => {
+          const annotation = event;
+          if (!annotation) {
+            setSelectedAnnotationId(null);
+            setSelectedFieldData(null);
+            return;
+          }
+
+          if (annotation.customData?.roleId) {
+            setSelectedAnnotationId(annotation.id);
+            setSelectedFieldData(
+              annotation.customData as FieldCustomData,
+            );
+          }
+        },
+      );
+
+      instance.addEventListener("annotations.blur", () => {
+        setSelectedAnnotationId(null);
+        setSelectedFieldData(null);
+      });
     };
 
     initSDK();
@@ -321,6 +346,65 @@ export default function FormFieldAnnotationsViewer() {
     [],
   );
 
+  // ─── Property Updates ───────────────────────────────────────────
+  const updateFieldProperty = useCallback(
+    async (updates: Partial<FieldCustomData>) => {
+      const instance = instanceRef.current;
+      if (!instance || !selectedAnnotationId) return;
+
+      const newData = { ...selectedFieldData, ...updates } as FieldCustomData;
+      setSelectedFieldData(newData);
+
+      try {
+        const totalPages = await instance.totalPageCount;
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+          const annotations = await instance.getAnnotations(pageIndex);
+          const annotation = annotations.find(
+            (a: any) => a.id === selectedAnnotationId,
+          );
+          if (annotation) {
+            const updatedAnnotation = annotation.set("customData", newData);
+            await instance.update(updatedAnnotation);
+            break;
+          }
+        }
+      } catch (error) {
+        console.error("Error updating field property:", error);
+      }
+    },
+    [selectedAnnotationId, selectedFieldData],
+  );
+
+  const deleteSelectedField = useCallback(async () => {
+    const instance = instanceRef.current;
+    if (!instance || !selectedAnnotationId) return;
+
+    try {
+      const totalPages = await instance.totalPageCount;
+      for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        const annotations = await instance.getAnnotations(pageIndex);
+        const annotation = annotations.find(
+          (a: any) => a.id === selectedAnnotationId,
+        );
+        if (annotation) {
+          const formFields = await instance.getFormFields();
+          const formField = formFields.find(
+            (f: any) => f.name === annotation.formFieldName,
+          );
+          if (formField) {
+            await instance.delete(formField);
+          }
+          await instance.delete(annotation);
+          break;
+        }
+      }
+      setSelectedAnnotationId(null);
+      setSelectedFieldData(null);
+    } catch (error) {
+      console.error("Error deleting field:", error);
+    }
+  }, [selectedAnnotationId]);
+
   // ─── Render ───────────────────────────────────────────────────────
   const isEditor = activeView === "editor";
 
@@ -424,15 +508,89 @@ export default function FormFieldAnnotationsViewer() {
           </div>
         )}
 
-        {/* Properties Panel — placeholder for Task 8 */}
         {isEditor && (
           <div className="p-4">
             <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
               Field Properties
             </div>
-            <div className="text-sm text-gray-400 dark:text-gray-500 italic text-center py-6">
-              Select a field on the document to edit its properties
-            </div>
+            {selectedFieldData ? (
+              <div className="flex flex-col gap-3">
+                {/* Field Name */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Field Name
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedFieldData.fieldName}
+                    onChange={(e) =>
+                      updateFieldProperty({ fieldName: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+
+                {/* Required */}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedFieldData.required}
+                    onChange={(e) =>
+                      updateFieldProperty({ required: e.target.checked })
+                    }
+                    className="accent-indigo-500"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    Required
+                  </span>
+                </label>
+
+                {/* Role Assignment */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                    Assign to Role
+                  </label>
+                  <div className="flex flex-col gap-1">
+                    {Object.values(ROLES).map((role) => (
+                      <label
+                        key={role.id}
+                        className="flex items-center gap-2 py-1 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="field-role"
+                          checked={selectedFieldData.roleId === role.id}
+                          onChange={() =>
+                            updateFieldProperty({ roleId: role.id })
+                          }
+                          style={{ accentColor: role.color }}
+                        />
+                        <span
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: role.color }}
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {role.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Delete */}
+                <button
+                  type="button"
+                  onClick={deleteSelectedField}
+                  className="w-full mt-1 px-3 py-2 text-sm text-red-500 border border-red-200 dark:border-red-900/30 rounded-md hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                >
+                  Delete Field
+                </button>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400 dark:text-gray-500 italic text-center py-6">
+                Select a field on the document to edit its properties
+              </div>
+            )}
           </div>
         )}
       </div>
