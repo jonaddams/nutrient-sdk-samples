@@ -7,14 +7,24 @@ export default function WorkflowPage() {
         title="Workflow"
         breadcrumbs={[{ label: "Home", href: "/" }]}
         actions={
-          <a
-            href="https://www.nutrient.io/workflow-automation"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-sm btn-secondary"
-          >
-            Product Home
-          </a>
+          <>
+            <a
+              href="https://www.nutrient.io/workflow-automation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Product Home
+            </a>
+            <a
+              href="https://github.com/jonaddams/nutrient-sdk-samples"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-secondary"
+            >
+              Source
+            </a>
+          </>
         }
       />
 
