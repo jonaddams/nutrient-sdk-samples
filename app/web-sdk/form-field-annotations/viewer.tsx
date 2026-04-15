@@ -195,23 +195,30 @@ export default function FormFieldAnnotationsViewer() {
               roleId !== "either";
 
             const borderColor = isDimmed ? "#d1d5db" : role.color;
-            const bgColor = isDimmed ? "rgba(0,0,0,0.03)" : `${role.color}15`;
+            const bgColor = isDimmed ? "rgba(0,0,0,0.03)" : `${role.color}08`;
             const opacity = isDimmed ? "0.5" : "1";
 
+            // Wrapper positions the label above and the border around the field
             const node = document.createElement("div");
             node.style.cssText = `
+              position: relative;
               width: 100%;
               height: 100%;
-              border: 2px solid ${borderColor};
-              background-color: ${bgColor};
+              pointer-events: none;
+              opacity: ${opacity};
+            `;
+
+            // Label row above the field
+            const label = document.createElement("div");
+            label.style.cssText = `
+              position: absolute;
+              bottom: 100%;
+              left: 0;
               display: flex;
               align-items: center;
-              gap: 6px;
-              padding-left: 6px;
-              pointer-events: none;
-              box-sizing: border-box;
-              overflow: hidden;
-              opacity: ${opacity};
+              gap: 4px;
+              padding-bottom: 2px;
+              white-space: nowrap;
             `;
 
             if (!isDimmed) {
@@ -224,23 +231,32 @@ export default function FormFieldAnnotationsViewer() {
                 padding: 1px 5px;
                 border-radius: 3px;
                 font-weight: 600;
-                white-space: nowrap;
-                flex-shrink: 0;
               `;
-              node.appendChild(badge);
+              label.appendChild(badge);
             }
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent =
               (annotation.customData.fieldName as string) || "";
             nameSpan.style.cssText = `
-              font-size: 11px;
+              font-size: 10px;
               color: ${isDimmed ? "#999" : role.color};
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              font-weight: 500;
             `;
-            node.appendChild(nameSpan);
+            label.appendChild(nameSpan);
+            node.appendChild(label);
+
+            // Border overlay on the field itself (no content inside)
+            const border = document.createElement("div");
+            border.style.cssText = `
+              width: 100%;
+              height: 100%;
+              border: 2px solid ${borderColor};
+              background-color: ${bgColor};
+              box-sizing: border-box;
+              border-radius: 2px;
+            `;
+            node.appendChild(border);
 
             return { node, append: true };
           },
@@ -248,6 +264,7 @@ export default function FormFieldAnnotationsViewer() {
       });
 
       instanceRef.current = instance;
+      window.instance = instance;
 
       // Set initial interaction mode to FORM_CREATOR
       instance.setViewState((viewState) =>
