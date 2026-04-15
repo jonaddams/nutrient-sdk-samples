@@ -1,4 +1,4 @@
-import type { Role, RoleId, FieldPaletteItem } from "./types";
+import type { FieldPaletteItem, Role, RoleId } from "./types";
 
 export const ROLES: Record<RoleId, Role> = {
   provider: { id: "provider", label: "Provider", color: "#3b82f6" },

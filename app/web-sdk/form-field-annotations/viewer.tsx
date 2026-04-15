@@ -1,10 +1,10 @@
 "use client";
 
-import type { Instance, List } from "@nutrient-sdk/viewer";
+import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FieldType, FieldCustomData, RoleId } from "./_lib/types";
-import { ROLES, EDITOR_COLOR, FIELD_PALETTE } from "./_lib/roles";
 import { createFormField } from "./_lib/fields";
+import { EDITOR_COLOR, FIELD_PALETTE, ROLES } from "./_lib/roles";
+import type { FieldCustomData, FieldType, RoleId } from "./_lib/types";
 
 function closestByClass(
   el: Element | Node | null,
@@ -43,6 +43,110 @@ export default function FormFieldAnnotationsViewer() {
 
   const NV = useRef<typeof window.NutrientViewer | null>(null);
 
+  // ─── Drag and Drop ────────────────────────────────────────────────
+  const eventHandlersRef = useRef<{
+    dragover: (e: Event) => void;
+    drop: (e: Event) => void;
+  } | null>(null);
+
+  const setupDragDrop = useCallback((instance: Instance, enabled: boolean) => {
+    // Clean up previous handlers
+    if (eventHandlersRef.current && instance.contentDocument) {
+      instance.contentDocument.removeEventListener(
+        "dragover",
+        eventHandlersRef.current.dragover,
+      );
+      instance.contentDocument.removeEventListener(
+        "drop",
+        eventHandlersRef.current.drop,
+      );
+      eventHandlersRef.current = null;
+    }
+
+    if (!enabled) return;
+
+    const sdk = NV.current;
+    if (!sdk) return;
+
+    const dragoverHandler = (event: Event) => {
+      const dragEvent = event as DragEvent;
+      const pageElement =
+        closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
+        closestByClass(dragEvent.target as Element, "pspdfkit-page");
+      if (pageElement) {
+        event.preventDefault();
+      }
+    };
+
+    const dropHandler = async (event: Event) => {
+      const dragEvent = event as DragEvent;
+      event.preventDefault();
+      event.stopPropagation();
+
+      const fieldType = dragEvent.dataTransfer?.getData("text") as FieldType;
+      if (!fieldType) return;
+
+      const paletteItem = FIELD_PALETTE.find((f) => f.type === fieldType);
+      if (!paletteItem) return;
+
+      const pageElement =
+        closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
+        closestByClass(dragEvent.target as Element, "pspdfkit-page");
+      if (!pageElement) return;
+
+      const pageIndex = parseInt(
+        (pageElement as HTMLElement).dataset.pageIndex || "0",
+        10,
+      );
+
+      try {
+        const { width, height } = paletteItem.defaultSize;
+        const clientRect = new sdk.Geometry.Rect({
+          left: dragEvent.clientX - width / 2,
+          top: dragEvent.clientY - height / 2,
+          width,
+          height,
+        });
+
+        const pageRect = instance.transformContentClientToPageSpace(
+          clientRect,
+          pageIndex,
+        );
+
+        fieldCounterRef.current += 1;
+        const fieldName = `${fieldType}-${fieldCounterRef.current}`;
+
+        const customData: FieldCustomData = {
+          fieldType,
+          roleId: "either",
+          fieldName,
+          required: false,
+        };
+
+        const [widget, formField] = createFormField(
+          sdk,
+          pageIndex,
+          pageRect,
+          fieldType,
+          customData,
+        );
+
+        await instance.create([widget, formField]);
+      } catch (error) {
+        console.error("Error creating field:", error);
+      }
+    };
+
+    if (instance.contentDocument) {
+      instance.contentDocument.addEventListener("dragover", dragoverHandler);
+      instance.contentDocument.addEventListener("drop", dropHandler);
+      eventHandlersRef.current = {
+        dragover: dragoverHandler,
+        drop: dropHandler,
+      };
+    }
+  }, []);
+
   // ─── SDK Initialization ───────────────────────────────────────────
   useEffect(() => {
     if (hasLoadedRef.current) return;
@@ -63,6 +167,7 @@ export default function FormFieldAnnotationsViewer() {
 
       const NutrientViewer = await waitForSDK();
       NV.current = NutrientViewer;
+      if (!NutrientViewer) return;
 
       const instance = await NutrientViewer.load({
         container,
@@ -74,10 +179,7 @@ export default function FormFieldAnnotationsViewer() {
           Annotation: ({ annotation }: any) => {
             if (!NV.current) return null;
             if (
-              !(
-                annotation instanceof
-                NV.current.Annotations.WidgetAnnotation
-              )
+              !(annotation instanceof NV.current.Annotations.WidgetAnnotation)
             )
               return null;
             if (!annotation.customData?.roleId) return null;
@@ -93,9 +195,7 @@ export default function FormFieldAnnotationsViewer() {
               roleId !== "either";
 
             const borderColor = isDimmed ? "#d1d5db" : role.color;
-            const bgColor = isDimmed
-              ? "rgba(0,0,0,0.03)"
-              : `${role.color}15`;
+            const bgColor = isDimmed ? "rgba(0,0,0,0.03)" : `${role.color}15`;
             const opacity = isDimmed ? "0.5" : "1";
 
             const node = document.createElement("div");
@@ -131,7 +231,8 @@ export default function FormFieldAnnotationsViewer() {
             }
 
             const nameSpan = document.createElement("span");
-            nameSpan.textContent = annotation.customData.fieldName || "";
+            nameSpan.textContent =
+              (annotation.customData.fieldName as string) || "";
             nameSpan.style.cssText = `
               font-size: 11px;
               color: ${isDimmed ? "#999" : role.color};
@@ -160,24 +261,19 @@ export default function FormFieldAnnotationsViewer() {
       setupDragDrop(instance, true);
 
       // Listen for annotation selection to populate properties panel
-      instance.addEventListener(
-        "annotations.focus",
-        async (event: any) => {
-          const annotation = event;
-          if (!annotation) {
-            setSelectedAnnotationId(null);
-            setSelectedFieldData(null);
-            return;
-          }
+      instance.addEventListener("annotations.focus", async (event: any) => {
+        const annotation = event;
+        if (!annotation) {
+          setSelectedAnnotationId(null);
+          setSelectedFieldData(null);
+          return;
+        }
 
-          if (annotation.customData?.roleId) {
-            setSelectedAnnotationId(annotation.id);
-            setSelectedFieldData(
-              annotation.customData as FieldCustomData,
-            );
-          }
-        },
-      );
+        if (annotation.customData?.roleId) {
+          setSelectedAnnotationId(annotation.id);
+          setSelectedFieldData(annotation.customData as FieldCustomData);
+        }
+      });
 
       instance.addEventListener("annotations.blur", () => {
         setSelectedAnnotationId(null);
@@ -210,10 +306,7 @@ export default function FormFieldAnnotationsViewer() {
     // Set interaction mode
     if (view === "editor") {
       instance.setViewState((viewState) =>
-        viewState.set(
-          "interactionMode",
-          sdk.InteractionMode.FORM_CREATOR,
-        ),
+        viewState.set("interactionMode", sdk.InteractionMode.FORM_CREATOR),
       );
     } else {
       instance.setViewState((viewState) =>
@@ -274,110 +367,6 @@ export default function FormFieldAnnotationsViewer() {
     }
   }, []);
 
-  // ─── Drag and Drop ────────────────────────────────────────────────
-  const eventHandlersRef = useRef<{
-    dragover: (e: Event) => void;
-    drop: (e: Event) => void;
-  } | null>(null);
-
-  const setupDragDrop = useCallback(
-    (instance: Instance, enabled: boolean) => {
-      // Clean up previous handlers
-      if (eventHandlersRef.current && instance.contentDocument) {
-        instance.contentDocument.removeEventListener(
-          "dragover",
-          eventHandlersRef.current.dragover,
-        );
-        instance.contentDocument.removeEventListener(
-          "drop",
-          eventHandlersRef.current.drop,
-        );
-        eventHandlersRef.current = null;
-      }
-
-      if (!enabled) return;
-
-      const sdk = NV.current;
-      if (!sdk) return;
-
-      const dragoverHandler = (event: Event) => {
-        const dragEvent = event as DragEvent;
-        const pageElement =
-          closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
-          closestByClass(dragEvent.target as Element, "pspdfkit-page");
-        if (pageElement) {
-          event.preventDefault();
-        }
-      };
-
-      const dropHandler = async (event: Event) => {
-        const dragEvent = event as DragEvent;
-        event.preventDefault();
-        event.stopPropagation();
-
-        const fieldType = dragEvent.dataTransfer?.getData("text") as FieldType;
-        if (!fieldType) return;
-
-        const paletteItem = FIELD_PALETTE.find((f) => f.type === fieldType);
-        if (!paletteItem) return;
-
-        const pageElement =
-          closestByClass(dragEvent.target as Element, "PSPDFKit-Page") ||
-          closestByClass(dragEvent.target as Element, "pspdfkit-page");
-        if (!pageElement) return;
-
-        const pageIndex = parseInt(
-          (pageElement as HTMLElement).dataset.pageIndex || "0",
-          10,
-        );
-
-        try {
-          const { width, height } = paletteItem.defaultSize;
-          const clientRect = new sdk.Geometry.Rect({
-            left: dragEvent.clientX - width / 2,
-            top: dragEvent.clientY - height / 2,
-            width,
-            height,
-          });
-
-          const pageRect = instance.transformContentClientToPageSpace(
-            clientRect,
-            pageIndex,
-          );
-
-          fieldCounterRef.current += 1;
-          const fieldName = `${fieldType}-${fieldCounterRef.current}`;
-
-          const customData: FieldCustomData = {
-            fieldType,
-            roleId: "either",
-            fieldName,
-            required: false,
-          };
-
-          const [widget, formField] = createFormField(
-            sdk,
-            pageIndex,
-            pageRect,
-            fieldType,
-            customData,
-          );
-
-          await instance.create([widget, formField]);
-        } catch (error) {
-          console.error("Error creating field:", error);
-        }
-      };
-
-      if (instance.contentDocument) {
-        instance.contentDocument.addEventListener("dragover", dragoverHandler);
-        instance.contentDocument.addEventListener("drop", dropHandler);
-        eventHandlersRef.current = { dragover: dragoverHandler, drop: dropHandler };
-      }
-    },
-    [],
-  );
-
   // ─── Property Updates ───────────────────────────────────────────
   const updateFieldProperty = useCallback(
     async (updates: Partial<FieldCustomData>) => {
@@ -395,7 +384,10 @@ export default function FormFieldAnnotationsViewer() {
             (a: any) => a.id === selectedAnnotationId,
           );
           if (annotation) {
-            const updatedAnnotation = annotation.set("customData", newData);
+            const updatedAnnotation = annotation.set(
+              "customData",
+              newData as unknown as Record<string, unknown>,
+            );
             await instance.update(updatedAnnotation);
             break;
           }
@@ -421,7 +413,7 @@ export default function FormFieldAnnotationsViewer() {
         if (annotation) {
           const formFields = await instance.getFormFields();
           const formField = formFields.find(
-            (f: any) => f.name === annotation.formFieldName,
+            (f: any) => f.name === (annotation as any).formFieldName,
           );
           if (formField) {
             await instance.delete(formField);
@@ -512,9 +504,9 @@ export default function FormFieldAnnotationsViewer() {
             <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
               Drag onto document
             </div>
-            <div className="flex flex-col gap-1.5">
+            <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
               {FIELD_PALETTE.map((item) => (
-                <div
+                <li
                   key={item.type}
                   draggable
                   onDragStart={(e) => {
@@ -534,9 +526,9 @@ export default function FormFieldAnnotationsViewer() {
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     {item.label}
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -548,10 +540,10 @@ export default function FormFieldAnnotationsViewer() {
             {selectedFieldData ? (
               <div className="flex flex-col gap-3">
                 {/* Field Name */}
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <label className="block">
+                  <span className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Field Name
-                  </label>
+                  </span>
                   <input
                     type="text"
                     value={selectedFieldData.fieldName}
@@ -560,7 +552,7 @@ export default function FormFieldAnnotationsViewer() {
                     }
                     className="w-full px-2.5 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                   />
-                </div>
+                </label>
 
                 {/* Required */}
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -578,10 +570,10 @@ export default function FormFieldAnnotationsViewer() {
                 </label>
 
                 {/* Role Assignment */}
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                <fieldset>
+                  <legend className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
                     Assign to Role
-                  </label>
+                  </legend>
                   <div className="flex flex-col gap-1">
                     {Object.values(ROLES).map((role) => (
                       <label
@@ -607,7 +599,7 @@ export default function FormFieldAnnotationsViewer() {
                       </label>
                     ))}
                   </div>
-                </div>
+                </fieldset>
 
                 {/* Delete */}
                 <button
