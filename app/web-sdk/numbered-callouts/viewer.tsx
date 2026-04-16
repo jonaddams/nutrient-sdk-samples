@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   buildCalloutAnnotations,
   type Callout,
+  type Point,
   renderBubble,
   SEED_CALLOUTS,
 } from "./callouts";
@@ -13,10 +14,18 @@ const DOCUMENT = "/documents/floor-plan-layers.pdf";
 const SEED_PAGE_INDEX = 0;
 
 export default function NumberedCalloutsViewer() {
+  type PlaceMode =
+    | { phase: "idle" }
+    | { phase: "awaiting-bubble" }
+    | { phase: "awaiting-tip"; bubbleCenter: Point; pageIndex: number };
+
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
   const [callouts, setCallouts] = useState<Callout[]>([]);
-  const [nextNumber, _setNextNumber] = useState(SEED_CALLOUTS.length + 1);
+  const [placeMode, setPlaceMode] = useState<PlaceMode>({ phase: "idle" });
+  const [nextNumber, setNextNumber] = useState(SEED_CALLOUTS.length + 1);
+  const placeModeRef = useRef<PlaceMode>({ phase: "idle" });
+  const nextNumberRef = useRef(SEED_CALLOUTS.length + 1);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -70,6 +79,64 @@ export default function NumberedCalloutsViewer() {
           });
         }
         setCallouts(seeded);
+
+        // biome-ignore lint/suspicious/noExplicitAny: page.press event typing is minimal
+        instance.addEventListener("page.press" as any, (event: any) => {
+          const point = event.point;
+          if (!point) return;
+          const pageIndex = instance.viewState.currentPageIndex;
+          const mode = placeModeRef.current;
+
+          if (mode.phase === "awaiting-bubble") {
+            setPlaceMode({
+              phase: "awaiting-tip",
+              bubbleCenter: { x: point.x, y: point.y },
+              pageIndex,
+            });
+            return;
+          }
+
+          if (mode.phase === "awaiting-tip" && pageIndex === mode.pageIndex) {
+            const calloutId = crypto.randomUUID();
+            const number = nextNumberRef.current;
+            setNextNumber((n) => n + 1);
+
+            const { bubble, leader } = buildCalloutAnnotations(NV, {
+              calloutId,
+              number,
+              pageIndex,
+              bubbleCenter: mode.bubbleCenter,
+              tipPoint: { x: point.x, y: point.y },
+            });
+
+            (async () => {
+              // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
+              const created: any = await instance.create([bubble, leader]);
+              const bubbleAnn = created.find(
+                // biome-ignore lint/suspicious/noExplicitAny: inferred
+                (a: any) => a.customData?.role === "bubble",
+              );
+              const leaderAnn = created.find(
+                // biome-ignore lint/suspicious/noExplicitAny: inferred
+                (a: any) => a.customData?.role === "leader",
+              );
+              if (!bubbleAnn?.id || !leaderAnn?.id) return;
+
+              setCallouts((prev) => [
+                ...prev,
+                {
+                  calloutId,
+                  number,
+                  description: `Callout #${number}`,
+                  bubbleAnnotationId: bubbleAnn.id as string,
+                  leaderAnnotationId: leaderAnn.id as string,
+                  pageIndex,
+                },
+              ]);
+              setPlaceMode({ phase: "idle" });
+            })();
+          }
+        });
       })
       .catch((error: Error) => {
         console.error("Error loading viewer:", error);
@@ -80,6 +147,23 @@ export default function NumberedCalloutsViewer() {
       NV.unload(container);
     };
   }, []);
+
+  useEffect(() => {
+    placeModeRef.current = placeMode;
+  }, [placeMode]);
+
+  useEffect(() => {
+    nextNumberRef.current = nextNumber;
+  }, [nextNumber]);
+
+  useEffect(() => {
+    if (placeMode.phase === "idle") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPlaceMode({ phase: "idle" });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [placeMode.phase]);
 
   const focusCallout = useCallback((callout: Callout) => {
     const instance = instanceRef.current;
@@ -146,10 +230,18 @@ export default function NumberedCalloutsViewer() {
             type="button"
             className="w-full rounded-lg border-2 border-[var(--digital-pollen)] bg-[var(--digital-pollen)]/10 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:bg-[var(--digital-pollen)]/20 cursor-pointer"
             onClick={() => {
-              /* placement wired in Task 9 */
+              setPlaceMode((m) =>
+                m.phase === "idle"
+                  ? { phase: "awaiting-bubble" }
+                  : { phase: "idle" },
+              );
             }}
           >
-            + Add Callout
+            {placeMode.phase === "idle"
+              ? "+ Add Callout"
+              : placeMode.phase === "awaiting-bubble"
+                ? "Click to place bubble (Esc to cancel)"
+                : "Click to set arrow tip (Esc to cancel)"}
           </button>
 
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -213,10 +305,16 @@ export default function NumberedCalloutsViewer() {
       </div>
 
       {/* Viewer Container */}
-      <div
-        ref={containerRef}
-        style={{ flex: 1, height: "100%", position: "relative" }}
-      />
+      <div style={{ flex: 1, position: "relative" }}>
+        <div
+          ref={containerRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            cursor: placeMode.phase === "idle" ? "default" : "crosshair",
+          }}
+        />
+      </div>
     </div>
   );
 }
