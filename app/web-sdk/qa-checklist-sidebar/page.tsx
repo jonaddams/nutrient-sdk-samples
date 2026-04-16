@@ -6,15 +6,15 @@ import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
 const Viewer = dynamic(() => import("./viewer"), {
   ssr: false,
-  loading: () => <LoadingSpinner message="Loading QA Checklist..." />,
+  loading: () => <LoadingSpinner message="Loading Slot UI Customization..." />,
 });
 
 export default function QAChecklistSidebarPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       <SampleHeader
-        title="QA Checklist Sidebar"
-        description="Custom sidebar with categorized QA checklist, severity badges on comments, and click-to-navigate — built with the slot UI customization API"
+        title="Slot UI Customization"
+        description="Custom sidebar, comment badges, and interactive slot actions — demonstrating the Nutrient Web SDK slot UI customization API"
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
