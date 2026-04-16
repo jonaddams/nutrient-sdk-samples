@@ -126,6 +126,17 @@ export default function NumberedCalloutsViewer() {
     })();
   }, []);
 
+  const updateDescription = useCallback(
+    (calloutId: string, description: string) => {
+      setCallouts((prev) =>
+        prev.map((c) =>
+          c.calloutId === calloutId ? { ...c, description } : c,
+        ),
+      );
+    },
+    [],
+  );
+
   return (
     <div className="flex h-full">
       {/* Sidebar */}
@@ -160,9 +171,15 @@ export default function NumberedCalloutsViewer() {
                 >
                   {c.number}
                 </button>
-                <span className="text-sm text-gray-900 dark:text-white leading-snug flex-1">
-                  {c.description}
-                </span>
+                <input
+                  type="text"
+                  value={c.description}
+                  onChange={(e) =>
+                    updateDescription(c.calloutId, e.target.value)
+                  }
+                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white leading-snug border-none outline-none focus:ring-1 focus:ring-[var(--digital-pollen)] rounded px-1"
+                  aria-label={`Description for callout ${c.number}`}
+                />
                 <button
                   type="button"
                   className="text-gray-400 hover:text-red-600 text-sm cursor-pointer"
