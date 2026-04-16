@@ -5,7 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   buildCalloutAnnotations,
   type Callout,
+  computeBubbleCenter,
+  leaderBoundingBox,
   type Point,
+  pointDrifted,
   renderBubble,
   SEED_CALLOUTS,
 } from "./callouts";
@@ -26,6 +29,7 @@ export default function NumberedCalloutsViewer() {
   const [nextNumber, setNextNumber] = useState(SEED_CALLOUTS.length + 1);
   const placeModeRef = useRef<PlaceMode>({ phase: "idle" });
   const nextNumberRef = useRef(SEED_CALLOUTS.length + 1);
+  const reconcilingRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -135,6 +139,78 @@ export default function NumberedCalloutsViewer() {
               ]);
               setPlaceMode({ phase: "idle" });
             })();
+          }
+        });
+
+        // biome-ignore lint/suspicious/noExplicitAny: annotation change event typing is minimal
+        instance.addEventListener("annotations.change" as any, async () => {
+          if (reconcilingRef.current) return;
+
+          const pageIndex = instance.viewState.currentPageIndex;
+          const annotations = (
+            await instance.getAnnotations(pageIndex)
+          ).toArray();
+
+          // biome-ignore lint/suspicious/noExplicitAny: annotation type
+          const bubbles = new Map<string, any>();
+          // biome-ignore lint/suspicious/noExplicitAny: annotation type
+          const leaders = new Map<string, any>();
+          for (const a of annotations) {
+            const cd = a.customData;
+            if (!cd?.calloutId) continue;
+            if (cd.role === "bubble") bubbles.set(cd.calloutId, a);
+            if (cd.role === "leader") leaders.set(cd.calloutId, a);
+          }
+
+          // biome-ignore lint/suspicious/noExplicitAny: annotation update type
+          const updates: any[] = [];
+          for (const [calloutId, bubble] of bubbles) {
+            const leader = leaders.get(calloutId);
+            if (!leader) continue;
+
+            const bubbleCenter = computeBubbleCenter(bubble.boundingBox);
+            const currentStart: Point = {
+              x: leader.startPoint.x,
+              y: leader.startPoint.y,
+            };
+            const currentEnd: Point = {
+              x: leader.endPoint.x,
+              y: leader.endPoint.y,
+            };
+
+            if (pointDrifted(currentStart, bubbleCenter)) {
+              const NV = window.NutrientViewer;
+              const newBbox = leaderBoundingBox(bubbleCenter, currentEnd);
+              const updated = leader
+                .set("startPoint", new NV.Geometry.Point(bubbleCenter))
+                .set("boundingBox", new NV.Geometry.Rect(newBbox));
+              updates.push(updated);
+            } else {
+              const expectedBbox = leaderBoundingBox(currentStart, currentEnd);
+              const lbb = leader.boundingBox;
+              if (
+                Math.abs(lbb.left - expectedBbox.left) > 0.5 ||
+                Math.abs(lbb.top - expectedBbox.top) > 0.5 ||
+                Math.abs(lbb.width - expectedBbox.width) > 0.5 ||
+                Math.abs(lbb.height - expectedBbox.height) > 0.5
+              ) {
+                const NV = window.NutrientViewer;
+                updates.push(
+                  leader.set("boundingBox", new NV.Geometry.Rect(expectedBbox)),
+                );
+              }
+            }
+          }
+
+          if (updates.length > 0) {
+            reconcilingRef.current = true;
+            try {
+              await instance.update(updates);
+            } finally {
+              setTimeout(() => {
+                reconcilingRef.current = false;
+              }, 0);
+            }
           }
         });
       })
