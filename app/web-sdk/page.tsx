@@ -190,18 +190,18 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
-    name: "Slot UI Customization",
-    category: "User Interface",
-    description:
-      "Custom sidebar, comment badges, and interactive slot actions — demonstrating the Nutrient Web SDK slot UI customization API",
-    path: "/web-sdk/qa-checklist-sidebar",
-  },
-  {
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
       "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and digital signatures via DWS API",
     path: "/web-sdk/simple-signing-demo",
+  },
+  {
+    name: "Slot UI Customization",
+    category: "User Interface",
+    description:
+      "Custom sidebar, comment badges, and interactive slot actions — demonstrating the Nutrient Web SDK slot UI customization API",
+    path: "/web-sdk/qa-checklist-sidebar",
   },
   {
     name: "Text Comparison",
