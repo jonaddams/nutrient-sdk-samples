@@ -190,10 +190,10 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
-    name: "QA Checklist Sidebar",
+    name: "Slot UI Customization",
     category: "User Interface",
     description:
-      "Custom sidebar with categorized QA checklist, severity badges on comments, and click-to-navigate — built with the slot UI customization API",
+      "Custom sidebar, comment badges, and interactive slot actions — demonstrating the Nutrient Web SDK slot UI customization API",
     path: "/web-sdk/qa-checklist-sidebar",
   },
   {
