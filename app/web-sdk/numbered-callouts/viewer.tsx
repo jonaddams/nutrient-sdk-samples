@@ -30,6 +30,7 @@ export default function NumberedCalloutsViewer() {
   const placeModeRef = useRef<PlaceMode>({ phase: "idle" });
   const nextNumberRef = useRef(SEED_CALLOUTS.length + 1);
   const reconcilingRef = useRef(false);
+  const cascadingDeleteRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -213,6 +214,54 @@ export default function NumberedCalloutsViewer() {
             }
           }
         });
+
+        instance.addEventListener(
+          // biome-ignore lint/suspicious/noExplicitAny: delete event typing is minimal
+          "annotations.delete" as any,
+          // biome-ignore lint/suspicious/noExplicitAny: delete event typing is minimal
+          async (event: any) => {
+            if (cascadingDeleteRef.current) return;
+
+            const deleted = event?.annotations ?? [];
+            const deletedCalloutIds = new Set<string>();
+
+            for (const ann of deleted) {
+              const cd = ann?.customData;
+              if (!cd?.calloutId) continue;
+              deletedCalloutIds.add(cd.calloutId);
+            }
+
+            if (deletedCalloutIds.size === 0) return;
+
+            // Find sibling annotation IDs still present
+            const pageIndex = instance.viewState.currentPageIndex;
+            const stillPresent = (
+              await instance.getAnnotations(pageIndex)
+            ).toArray();
+            const siblingIdsToDelete: string[] = [];
+            for (const a of stillPresent) {
+              const cd = a.customData;
+              if (cd?.calloutId && deletedCalloutIds.has(cd.calloutId)) {
+                if (a.id) siblingIdsToDelete.push(a.id as string);
+              }
+            }
+
+            if (siblingIdsToDelete.length > 0) {
+              cascadingDeleteRef.current = true;
+              try {
+                await instance.delete(siblingIdsToDelete);
+              } finally {
+                setTimeout(() => {
+                  cascadingDeleteRef.current = false;
+                }, 0);
+              }
+            }
+
+            setCallouts((prev) =>
+              prev.filter((c) => !deletedCalloutIds.has(c.calloutId)),
+            );
+          },
+        );
       })
       .catch((error: Error) => {
         console.error("Error loading viewer:", error);
@@ -351,8 +400,10 @@ export default function NumberedCalloutsViewer() {
                 <button
                   type="button"
                   className="text-gray-400 hover:text-red-600 text-sm cursor-pointer"
-                  onClick={() => {
-                    /* delete wired in Task 11 */
+                  onClick={async () => {
+                    const instance = instanceRef.current;
+                    if (!instance) return;
+                    await instance.delete(c.bubbleAnnotationId);
                   }}
                   aria-label={`Delete callout ${c.number}`}
                 >
@@ -366,8 +417,24 @@ export default function NumberedCalloutsViewer() {
             <button
               type="button"
               className="w-full rounded border border-[var(--warm-gray-400)] px-3 py-2 text-xs text-gray-600 dark:text-gray-400 hover:text-red-600 hover:border-red-600 cursor-pointer"
-              onClick={() => {
-                /* clear-all wired in Task 11 */
+              onClick={async () => {
+                const instance = instanceRef.current;
+                if (!instance) return;
+                const ids = callouts.flatMap((c) => [
+                  c.bubbleAnnotationId,
+                  c.leaderAnnotationId,
+                ]);
+                if (ids.length === 0) return;
+                cascadingDeleteRef.current = true;
+                try {
+                  await instance.delete(ids);
+                } finally {
+                  setTimeout(() => {
+                    cascadingDeleteRef.current = false;
+                  }, 0);
+                }
+                setCallouts([]);
+                setNextNumber(1);
               }}
             >
               Clear all
