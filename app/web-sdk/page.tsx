@@ -190,6 +190,13 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
+    name: "QA Checklist Sidebar",
+    category: "User Interface",
+    description:
+      "Custom sidebar with categorized QA checklist, severity badges on comments, and click-to-navigate — built with the slot UI customization API",
+    path: "/web-sdk/qa-checklist-sidebar",
+  },
+  {
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
