@@ -86,26 +86,65 @@ export default function NumberedCalloutsViewer() {
       {/* Sidebar */}
       <div className="w-72 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
         <div className="p-5 flex flex-col gap-3">
+          <button
+            type="button"
+            className="w-full rounded-lg border-2 border-[var(--digital-pollen)] bg-[var(--digital-pollen)]/10 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:bg-[var(--digital-pollen)]/20 cursor-pointer"
+            onClick={() => {
+              /* placement wired in Task 9 */
+            }}
+          >
+            + Add Callout
+          </button>
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Place numbered callouts on the floor plan and manage them from the
-            list below.
+            Click <strong>Add Callout</strong>, then click once on the drawing
+            to place the bubble and again to set the arrow tip.
           </p>
 
-          <ul className="space-y-2 mt-2">
+          <ul className="space-y-2">
             {callouts.map((c) => (
               <li
                 key={c.calloutId}
                 className="flex items-start gap-3 rounded border border-[var(--warm-gray-400)] p-2"
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-xs font-semibold text-white">
+                <button
+                  type="button"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-xs font-semibold text-white cursor-pointer"
+                  onClick={() => {
+                    /* click-to-focus wired in Task 7 */
+                  }}
+                  aria-label={`Focus callout ${c.number}`}
+                >
                   {c.number}
-                </span>
-                <span className="text-sm text-gray-900 dark:text-white leading-snug">
+                </button>
+                <span className="text-sm text-gray-900 dark:text-white leading-snug flex-1">
                   {c.description}
                 </span>
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-red-600 text-sm cursor-pointer"
+                  onClick={() => {
+                    /* delete wired in Task 11 */
+                  }}
+                  aria-label={`Delete callout ${c.number}`}
+                >
+                  ✕
+                </button>
               </li>
             ))}
           </ul>
+
+          {callouts.length > 0 && (
+            <button
+              type="button"
+              className="w-full rounded border border-[var(--warm-gray-400)] px-3 py-2 text-xs text-gray-600 dark:text-gray-400 hover:text-red-600 hover:border-red-600 cursor-pointer"
+              onClick={() => {
+                /* clear-all wired in Task 11 */
+              }}
+            >
+              Clear all
+            </button>
+          )}
 
           <div className="text-xs text-gray-500 dark:text-gray-400">
             Next number: #{nextNumber}
