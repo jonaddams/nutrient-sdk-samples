@@ -134,22 +134,6 @@ function buildSidebarDOM(instanceRef: { current: Instance | null }): HTMLElement
       labelEl.appendChild(labelText);
 
       row.appendChild(labelEl);
-
-      // Page link sits outside the <label> so clicks navigate without toggling checkbox
-      if (item.pageIndex !== null) {
-        const link = document.createElement("button");
-        link.className = "qa-item__link";
-        link.textContent = `Page ${item.pageIndex + 1}`;
-        link.type = "button";
-        const pageIdx = item.pageIndex;
-        link.addEventListener("click", () => {
-          instanceRef.current?.setViewState((vs) =>
-            vs.set("currentPageIndex", pageIdx),
-          );
-        });
-        row.appendChild(link);
-      }
-
       section.appendChild(row);
     }
 
