@@ -8,9 +8,45 @@ import {
   PRE_POPULATED_COMMENTS,
   SEVERITY_CONFIG,
 } from "./checklist-data";
-import "./styles.css";
-
 const DOCUMENT = "/documents/executive-business-plan-docx.pdf";
+
+// Styles injected into the shadow root (CSS classes don't cross shadow boundaries)
+const QA_STYLES = `
+.qa-sidebar { display:flex; flex-direction:column; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:13px; color:#1a1a2e; background:#f8f8fa; overflow-y:auto; }
+.qa-sidebar__header { padding:16px; border-bottom:1px solid rgba(0,0,0,0.08); }
+.qa-sidebar__title { font-size:15px; font-weight:600; margin:0 0 10px; }
+.qa-sidebar__progress-bar { background:rgba(0,0,0,0.08); border-radius:4px; height:8px; overflow:hidden; margin-bottom:6px; }
+.qa-sidebar__progress-fill { background:#16a34a; height:100%; border-radius:4px; transition:width 0.3s ease; }
+.qa-sidebar__progress-text { font-size:11px; color:rgba(0,0,0,0.45); margin:0; }
+.qa-category { padding:12px 16px 4px; border-top:1px solid rgba(0,0,0,0.06); }
+.qa-category:first-of-type { border-top:none; }
+.qa-category__title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:rgba(0,0,0,0.4); margin:0 0 8px; }
+.qa-item { padding:6px 0; }
+.qa-item__checkbox { margin-top:2px; accent-color:#16a34a; cursor:pointer; }
+.qa-item__label { cursor:pointer; display:flex; align-items:flex-start; gap:8px; }
+.qa-item__link { font-size:11px; color:#6366f1; background:none; border:none; padding:0; margin-left:25px; cursor:pointer; text-decoration:none; }
+.qa-item__link:hover { color:#4f46e5; text-decoration:underline; }
+.qa-thread-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; margin:4px 8px; }
+.qa-thread-badge--resolved { text-decoration:line-through; opacity:0.5; }
+.qa-thread-resolve-btn { display:block; width:calc(100% - 16px); margin:4px 8px 8px; padding:6px 12px; background:rgba(0,0,0,0.04); color:rgba(0,0,0,0.6); border:1px solid rgba(0,0,0,0.1); border-radius:6px; font-size:12px; cursor:pointer; transition:background 0.15s; }
+.qa-thread-resolve-btn:hover { background:rgba(0,0,0,0.08); }
+.qa-thread-resolve-btn--resolved { color:#16a34a; }
+.qa-severity-badge { display:inline-block; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; margin:4px 8px; }
+.qa-flag-btn { display:block; margin:2px 8px 6px; padding:4px 10px; background:none; color:rgba(0,0,0,0.45); border:1px solid rgba(0,0,0,0.1); border-radius:4px; font-size:11px; cursor:pointer; transition:all 0.15s; }
+.qa-flag-btn:hover { background:rgba(0,0,0,0.04); color:rgba(0,0,0,0.65); }
+.qa-flag-btn--flagged { background:rgba(239,68,68,0.1); color:#dc2626; border-color:rgba(239,68,68,0.3); }
+`;
+
+const QA_STYLE_ID = "qa-checklist-styles";
+
+function injectStyles(container: HTMLElement) {
+  const root = container.querySelector(".PSPDFKit-Container")?.shadowRoot ?? container;
+  if (root.querySelector(`#${QA_STYLE_ID}`)) return;
+  const style = document.createElement("style");
+  style.id = QA_STYLE_ID;
+  style.textContent = QA_STYLES;
+  root.appendChild(style);
+}
 
 // SVG icon for toolbar button
 const CHECKLIST_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m3 17 2 2 4-4"/></svg>`;
@@ -241,6 +277,7 @@ export default function Viewer() {
       },
     }).then(async (instance: Instance) => {
       instanceRef.current = instance;
+      injectStyles(container);
 
       // Add custom toolbar button to toggle the QA sidebar
       const toolbarItem = {
