@@ -1,7 +1,7 @@
 // app/web-sdk/qa-checklist-sidebar/viewer.tsx
 "use client";
 
-import type { AnnotationsUnion, Instance } from "@nutrient-sdk/viewer";
+import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
 import {
   CHECKLIST_CATEGORIES,
@@ -15,7 +15,7 @@ const DOCUMENT = "/documents/executive-business-plan-docx.pdf";
 // SVG icon for toolbar button
 const CHECKLIST_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m3 17 2 2 4-4"/></svg>`;
 
-function buildSidebarDOM(instance: Instance): HTMLElement {
+function buildSidebarDOM(instanceRef: { current: Instance | null }): HTMLElement {
   // Clone initial checked state so we can mutate it
   const checkedState: Record<string, boolean> = {};
   for (const cat of CHECKLIST_CATEGORIES) {
@@ -72,8 +72,15 @@ function buildSidebarDOM(instance: Instance): HTMLElement {
     section.appendChild(catTitle);
 
     for (const item of cat.items) {
-      const row = document.createElement("label");
+      const row = document.createElement("div");
       row.className = "qa-item";
+
+      // Wrap checkbox + label text in a <label> for click-to-toggle
+      const labelEl = document.createElement("label");
+      labelEl.style.display = "flex";
+      labelEl.style.alignItems = "flex-start";
+      labelEl.style.gap = "8px";
+      labelEl.style.cursor = "pointer";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -83,33 +90,30 @@ function buildSidebarDOM(instance: Instance): HTMLElement {
         checkedState[item.id] = checkbox.checked;
         updateProgress();
       });
-      row.appendChild(checkbox);
+      labelEl.appendChild(checkbox);
 
-      const textWrap = document.createElement("div");
+      const labelText = document.createElement("span");
+      labelText.className = "qa-item__label";
+      labelText.textContent = item.label;
+      labelEl.appendChild(labelText);
 
-      const label = document.createElement("span");
-      label.className = "qa-item__label";
-      label.textContent = item.label;
-      textWrap.appendChild(label);
+      row.appendChild(labelEl);
 
+      // Page link sits outside the <label> so clicks navigate without toggling checkbox
       if (item.pageIndex !== null) {
         const link = document.createElement("button");
         link.className = "qa-item__link";
         link.textContent = `Page ${item.pageIndex + 1}`;
         link.type = "button";
         const pageIdx = item.pageIndex;
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          instance.setViewState((vs) =>
+        link.addEventListener("click", () => {
+          instanceRef.current?.setViewState((vs) =>
             vs.set("currentPageIndex", pageIdx),
           );
         });
-        textWrap.appendChild(document.createElement("br"));
-        textWrap.appendChild(link);
+        row.appendChild(link);
       }
 
-      row.appendChild(textWrap);
       section.appendChild(row);
     }
 
@@ -132,6 +136,10 @@ export default function Viewer() {
     const threadMeta: Record<string, { category: string; severity: string }> = {};
     const commentMeta: Record<string, { severity: string }> = {};
 
+    // Mutable ref for the instance — slot callbacks may fire before .then() resolves,
+    // but click handlers fire later when the instance is guaranteed available.
+    const instanceRef: { current: Instance | null } = { current: null };
+
     NutrientViewer.load({
       container,
       document: DOCUMENT,
@@ -143,8 +151,8 @@ export default function Viewer() {
       }),
       ui: {
         sidebar: {
-          qaChecklist: (instance: Instance | null, _id: string) => ({
-            render: () => buildSidebarDOM(instance!),
+          qaChecklist: (_instance: Instance | null, _id: string) => ({
+            render: () => buildSidebarDOM(instanceRef),
           }),
         },
         commentThread: {
@@ -232,6 +240,8 @@ export default function Viewer() {
         },
       },
     }).then(async (instance: Instance) => {
+      instanceRef.current = instance;
+
       // Add custom toolbar button to toggle the QA sidebar
       const toolbarItem = {
         type: "custom" as const,
@@ -277,43 +287,42 @@ export default function Viewer() {
           const pageInfo = instance.pageInfoForIndex(comment.pageIndex);
           if (!pageInfo) continue;
 
-          // Create a text annotation with a comment
-          const annotation = new NutrientViewer.Annotations.CommentMarkerAnnotation({
+          // Generate IDs for the marker and comment
+          const markerId = NutrientViewer.generateInstantId();
+          const commentId = NutrientViewer.generateInstantId();
+
+          // Create the marker annotation
+          const marker = new NutrientViewer.Annotations.CommentMarkerAnnotation({
+            id: markerId,
             pageIndex: comment.pageIndex,
             boundingBox: new NutrientViewer.Geometry.Rect({
               left: 50,
               top: 50 + PRE_POPULATED_COMMENTS.indexOf(comment) * 80,
-              width: 32,
-              height: 32,
+              width: 20,
+              height: 20,
             }),
           });
 
-          const createdAnnotations = await instance.create(annotation);
-          const created = createdAnnotations[0] as AnnotationsUnion | undefined;
+          // Create the comment text
+          const commentObj = new NutrientViewer.Comment({
+            id: commentId,
+            pageIndex: comment.pageIndex,
+            rootId: markerId,
+            text: { format: "plain", value: comment.text },
+            creatorName: "QA Reviewer",
+          });
 
-          if (created) {
-            // Store thread metadata for slot rendering
-            threadMeta[created.id] = {
-              category: comment.threadCategory,
-              severity: comment.severity,
-            };
+          // Create both together in a single call
+          await instance.create([marker, commentObj]);
 
-            // Add the comment text to the annotation
-            const commentObj = new NutrientViewer.Comment({
-              pageIndex: comment.pageIndex,
-              rootId: created.id,
-              text: { format: "plain", value: comment.text },
-              creatorName: "QA Reviewer",
-            });
-            const createdComment = await instance.createComment(commentObj);
-
-            // Store comment metadata for the comment.header slot
-            if (createdComment) {
-              commentMeta[createdComment.id] = {
-                severity: comment.severity,
-              };
-            }
-          }
+          // Store metadata for slot rendering
+          threadMeta[markerId] = {
+            category: comment.threadCategory,
+            severity: comment.severity,
+          };
+          commentMeta[commentId] = {
+            severity: comment.severity,
+          };
         } catch (err) {
           console.warn("Failed to create pre-populated comment:", err);
         }
