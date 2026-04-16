@@ -183,6 +183,13 @@ const samples: Sample[] = [
     path: "/web-sdk/night-mode",
   },
   {
+    name: "Numbered Callouts",
+    category: "Annotations",
+    description:
+      "Bluebeam/Procore-style numbered bubble + leader arrows for construction punch lists, with a live legend sidebar",
+    path: "/web-sdk/numbered-callouts",
+  },
+  {
     name: "Patient Intake Forms",
     category: "Forms",
     description:
