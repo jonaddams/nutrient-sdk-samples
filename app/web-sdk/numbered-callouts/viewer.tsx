@@ -159,8 +159,9 @@ export default function NumberedCalloutsViewer() {
           for (const a of annotations) {
             const cd = a.customData;
             if (!cd?.calloutId) continue;
-            if (cd.role === "bubble") bubbles.set(cd.calloutId, a);
-            if (cd.role === "leader") leaders.set(cd.calloutId, a);
+            const calloutId = cd.calloutId as string;
+            if (cd.role === "bubble") bubbles.set(calloutId, a);
+            if (cd.role === "leader") leaders.set(calloutId, a);
           }
 
           // biome-ignore lint/suspicious/noExplicitAny: annotation update type
@@ -183,8 +184,10 @@ export default function NumberedCalloutsViewer() {
               const NV = window.NutrientViewer;
               const newBbox = leaderBoundingBox(bubbleCenter, currentEnd);
               const updated = leader
-                .set("startPoint", new NV.Geometry.Point(bubbleCenter))
-                .set("boundingBox", new NV.Geometry.Rect(newBbox));
+                // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
+                .set("startPoint", new (NV as any).Geometry.Point(bubbleCenter))
+                // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
+                .set("boundingBox", new (NV as any).Geometry.Rect(newBbox));
               updates.push(updated);
             } else {
               const expectedBbox = leaderBoundingBox(currentStart, currentEnd);
@@ -197,7 +200,11 @@ export default function NumberedCalloutsViewer() {
               ) {
                 const NV = window.NutrientViewer;
                 updates.push(
-                  leader.set("boundingBox", new NV.Geometry.Rect(expectedBbox)),
+                  leader.set(
+                    "boundingBox",
+                    // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
+                    new (NV as any).Geometry.Rect(expectedBbox),
+                  ),
                 );
               }
             }
@@ -241,7 +248,10 @@ export default function NumberedCalloutsViewer() {
             const siblingIdsToDelete: string[] = [];
             for (const a of stillPresent) {
               const cd = a.customData;
-              if (cd?.calloutId && deletedCalloutIds.has(cd.calloutId)) {
+              if (
+                cd?.calloutId &&
+                deletedCalloutIds.has(cd.calloutId as string)
+              ) {
                 if (a.id) siblingIdsToDelete.push(a.id as string);
               }
             }
