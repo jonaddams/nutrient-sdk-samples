@@ -11,7 +11,6 @@ export default function NumberedCalloutsViewer() {
   const instanceRef = useRef<Instance | null>(null);
   const [callouts, _setCallouts] = useState<Callout[]>([]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only load viewer once on mount
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !window.NutrientViewer) return;
