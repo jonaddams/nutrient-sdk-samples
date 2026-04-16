@@ -96,23 +96,13 @@ export function buildCalloutAnnotations(
     customData: { calloutId, role: "bubble", number },
   });
 
-  // Bounding box for the line covers both endpoints with a small margin.
-  const pad = 4;
-  const minX = Math.min(bubbleCenter.x, tipPoint.x) - pad;
-  const minY = Math.min(bubbleCenter.y, tipPoint.y) - pad;
-  const maxX = Math.max(bubbleCenter.x, tipPoint.x) + pad;
-  const maxY = Math.max(bubbleCenter.y, tipPoint.y) + pad;
-
   const leader = new NV.Annotations.LineAnnotation({
     pageIndex,
     startPoint: new NV.Geometry.Point(bubbleCenter),
     endPoint: new NV.Geometry.Point(tipPoint),
-    boundingBox: new NV.Geometry.Rect({
-      left: minX,
-      top: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    }),
+    boundingBox: new NV.Geometry.Rect(
+      leaderBoundingBox(bubbleCenter, tipPoint),
+    ),
     strokeColor: new NV.Color({ r: 220, g: 38, b: 38 }),
     strokeWidth: 2,
     lineCaps: { end: "openArrow" },
