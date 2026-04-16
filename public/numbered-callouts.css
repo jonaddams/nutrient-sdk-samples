@@ -5,7 +5,10 @@
   border-radius: 50%;
   background: #dc2626; /* red-600 */
   color: #fff;
-  font: 600 16px/1 system-ui, -apple-system, sans-serif;
+  font:
+    600 16px / 1 system-ui,
+    -apple-system,
+    sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
