@@ -197,6 +197,13 @@ const samples: Sample[] = [
     path: "/web-sdk/simple-signing-demo",
   },
   {
+    name: "Slot UI Customization",
+    category: "User Interface",
+    description:
+      "Custom sidebar, comment badges, and interactive slot actions — demonstrating the Nutrient Web SDK slot UI customization API",
+    path: "/web-sdk/qa-checklist-sidebar",
+  },
+  {
     name: "Text Comparison",
     category: "Document Comparison",
     description:
