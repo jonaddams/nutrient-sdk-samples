@@ -132,3 +132,30 @@ export function leaderBoundingBox(start: Point, end: Point): BoundingBox {
 export function pointDrifted(a: Point, b: Point, threshold = 0.5): boolean {
   return Math.abs(a.x - b.x) > threshold || Math.abs(a.y - b.y) > threshold;
 }
+
+type RendererResult = {
+  node: HTMLElement;
+  append: boolean;
+};
+
+export function renderBubble(annotation: any): RendererResult | null {
+  if (annotation.customData?.role !== "bubble") return null;
+
+  const number = annotation.customData?.number ?? annotation.text?.value ?? "";
+  const numberStr = String(number);
+
+  const node = document.createElement("div");
+  node.className = "callout-bubble";
+  node.setAttribute("data-digits", String(numberStr.length));
+  node.textContent = numberStr;
+
+  const highlightVersion = annotation.customData?.highlightVersion;
+  if (
+    typeof highlightVersion === "number" &&
+    Date.now() - highlightVersion < 1600
+  ) {
+    node.classList.add("highlight");
+  }
+
+  return { node, append: false };
+}
