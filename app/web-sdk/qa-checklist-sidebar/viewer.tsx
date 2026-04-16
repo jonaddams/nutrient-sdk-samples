@@ -152,10 +152,11 @@ export default function Viewer() {
 
     const { NutrientViewer } = window;
 
-    // Track metadata mappings for slot rendering
+    // Track metadata and UI state for slot rendering (persists across slot recreation)
     const threadMeta: Record<string, { category: string; severity: string }> = {};
     const commentMeta: Record<string, { severity: string }> = {};
-    const resolvedState: Record<string, { get: () => boolean; set: (v: boolean) => void }> = {};
+    const threadResolved: Record<string, boolean> = {};
+    const commentFlagged: Record<string, boolean> = {};
 
     // Mutable ref for the instance — slot callbacks may fire before .then() resolves,
     // but click handlers fire later when the instance is guaranteed available.
@@ -177,51 +178,41 @@ export default function Viewer() {
           }),
         },
         commentThread: {
-          header: (_instance: Instance | null, id: string) => {
-            let resolved = false;
-            // Expose setter so the footer's "Mark Resolved" can update this badge
-            resolvedState[id] = { get: () => resolved, set: (v: boolean) => { resolved = v; } };
-            return {
-              render: () => {
-                const meta = threadMeta[id];
-                if (!meta) return null;
-                const cat = CHECKLIST_CATEGORIES.find(
-                  (c) => c.id === meta.category,
-                );
-                if (!cat) return null;
+          header: (_instance: Instance | null, id: string) => ({
+            render: () => {
+              const meta = threadMeta[id];
+              if (!meta) return null;
+              const cat = CHECKLIST_CATEGORIES.find(
+                (c) => c.id === meta.category,
+              );
+              if (!cat) return null;
 
-                const badge = document.createElement("span");
-                badge.className = `qa-thread-badge${resolved ? " qa-thread-badge--resolved" : ""}`;
-                badge.dataset.threadId = id;
-                badge.style.color = cat.color;
-                badge.style.backgroundColor = `${cat.color}22`;
-                badge.textContent = cat.label;
-                return badge;
-              },
-            };
-          },
-          footer: (_instance: Instance | null, id: string) => {
-            let resolved = false;
-            return {
-              render: () => {
-                const btn = document.createElement("button");
-                btn.className = `qa-thread-resolve-btn${resolved ? " qa-thread-resolve-btn--resolved" : ""}`;
-                btn.type = "button";
-                btn.textContent = resolved ? "✓ Resolved" : "Mark Resolved";
+              const badge = document.createElement("span");
+              badge.className = `qa-thread-badge${threadResolved[id] ? " qa-thread-badge--resolved" : ""}`;
+              badge.dataset.threadId = id;
+              badge.style.color = cat.color;
+              badge.style.backgroundColor = `${cat.color}22`;
+              badge.textContent = cat.label;
+              return badge;
+            },
+          }),
+          footer: (_instance: Instance | null, id: string) => ({
+            render: () => {
+              const resolved = !!threadResolved[id];
+              const btn = document.createElement("button");
+              btn.className = `qa-thread-resolve-btn${resolved ? " qa-thread-resolve-btn--resolved" : ""}`;
+              btn.type = "button";
+              btn.textContent = resolved ? "✓ Resolved" : "Mark Resolved";
 
-                btn.addEventListener("click", () => {
-                  resolved = !resolved;
-                  btn.classList.toggle("qa-thread-resolve-btn--resolved", resolved);
-                  btn.textContent = resolved ? "✓ Resolved" : "Mark Resolved";
+              btn.addEventListener("click", () => {
+                threadResolved[id] = !threadResolved[id];
+                btn.classList.toggle("qa-thread-resolve-btn--resolved", threadResolved[id]);
+                btn.textContent = threadResolved[id] ? "✓ Resolved" : "Mark Resolved";
+              });
 
-                  // Sync the header badge's resolved state so it persists across re-renders
-                  resolvedState[id]?.set(resolved);
-                });
-
-                return btn;
-              },
-            };
-          },
+              return btn;
+            },
+          }),
           comment: {
             header: (_instance: Instance | null, id: string) => ({
               render: () => {
@@ -240,25 +231,23 @@ export default function Viewer() {
                 return badge;
               },
             }),
-            footer: (_instance: Instance | null, _id: string) => {
-              let flagged = false;
-              return {
-                render: () => {
-                  const btn = document.createElement("button");
-                  btn.className = `qa-flag-btn${flagged ? " qa-flag-btn--flagged" : ""}`;
-                  btn.type = "button";
-                  btn.textContent = flagged ? "⚑ Flagged" : "⚑ Flag for Review";
+            footer: (_instance: Instance | null, id: string) => ({
+              render: () => {
+                const flagged = !!commentFlagged[id];
+                const btn = document.createElement("button");
+                btn.className = `qa-flag-btn${flagged ? " qa-flag-btn--flagged" : ""}`;
+                btn.type = "button";
+                btn.textContent = flagged ? "⚑ Flagged" : "⚑ Flag for Review";
 
-                  btn.addEventListener("click", () => {
-                    flagged = !flagged;
-                    btn.classList.toggle("qa-flag-btn--flagged", flagged);
-                    btn.textContent = flagged ? "⚑ Flagged" : "⚑ Flag for Review";
-                  });
+                btn.addEventListener("click", () => {
+                  commentFlagged[id] = !commentFlagged[id];
+                  btn.classList.toggle("qa-flag-btn--flagged", commentFlagged[id]);
+                  btn.textContent = commentFlagged[id] ? "⚑ Flagged" : "⚑ Flag for Review";
+                });
 
-                  return btn;
-                },
-              };
-            },
+                return btn;
+              },
+            }),
           },
         },
       },
