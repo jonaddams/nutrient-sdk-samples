@@ -1,0 +1,36 @@
+/* public/numbered-callouts.css */
+.callout-bubble {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #dc2626; /* red-600 */
+  color: #fff;
+  font: 600 16px/1 system-ui, -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.callout-bubble[data-digits="2"] {
+  font-size: 14px;
+}
+
+.callout-bubble[data-digits="3"] {
+  font-size: 11px;
+}
+
+.callout-bubble.highlight {
+  animation: callout-pulse 1.5s ease-out;
+}
+
+@keyframes callout-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 16px rgba(220, 38, 38, 0);
+  }
+}
