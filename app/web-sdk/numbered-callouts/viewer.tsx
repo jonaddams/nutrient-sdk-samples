@@ -1,7 +1,7 @@
 "use client";
 
 import type { Instance } from "@nutrient-sdk/viewer";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   buildCalloutAnnotations,
   type Callout,
@@ -81,6 +81,51 @@ export default function NumberedCalloutsViewer() {
     };
   }, []);
 
+  const focusCallout = useCallback((callout: Callout) => {
+    const instance = instanceRef.current;
+    const NV = window.NutrientViewer;
+    if (!instance || !NV) return;
+
+    (async () => {
+      const annotations = await instance.getAnnotations(callout.pageIndex);
+      const bubble = annotations.toArray().find(
+        // biome-ignore lint/suspicious/noExplicitAny: annotation type
+        (a: any) =>
+          a.customData?.calloutId === callout.calloutId &&
+          a.customData?.role === "bubble",
+      );
+      if (!bubble) return;
+
+      const bbox = bubble.boundingBox;
+      const padded = new NV.Geometry.Rect({
+        left: bbox.left - 60,
+        top: bbox.top - 60,
+        width: bbox.width + 120,
+        height: bbox.height + 120,
+      });
+      instance.jumpToRect(callout.pageIndex, padded);
+
+      const withHighlight = bubble.set("customData", {
+        ...bubble.customData,
+        highlightVersion: Date.now(),
+      });
+      await instance.update(withHighlight);
+
+      setTimeout(async () => {
+        const current = (await instance.getAnnotations(callout.pageIndex))
+          .toArray()
+          // biome-ignore lint/suspicious/noExplicitAny: annotation type
+          .find((a: any) => a.id === bubble.id);
+        if (!current) return;
+        const cleared = current.set("customData", {
+          ...current.customData,
+          highlightVersion: undefined,
+        });
+        await instance.update(cleared);
+      }, 1600);
+    })();
+  }, []);
+
   return (
     <div className="flex h-full">
       {/* Sidebar */}
@@ -110,9 +155,7 @@ export default function NumberedCalloutsViewer() {
                 <button
                   type="button"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-xs font-semibold text-white cursor-pointer"
-                  onClick={() => {
-                    /* click-to-focus wired in Task 7 */
-                  }}
+                  onClick={() => focusCallout(c)}
                   aria-label={`Focus callout ${c.number}`}
                 >
                   {c.number}
