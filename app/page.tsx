@@ -65,6 +65,12 @@ export default function Home() {
               processing at scale.
             </p>
             <div className="flex gap-4 flex-wrap">
+              <Link
+                href="/document-engine"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                View Samples
+              </Link>
               <a
                 href="https://www.nutrient.io/sdk/document-engine/"
                 target="_blank"
