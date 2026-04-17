@@ -58,6 +58,33 @@ export default function DocumentEnginePage() {
             to learn more about this product.
           </p>
         </div>
+
+        {/* Standalone Demo */}
+        <div className="mb-16">
+          <h2 className="!mb-6">Standalone Demo App</h2>
+          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 max-w-4xl">
+            <h3 className="!mb-3">DE CRUD</h3>
+            <p className="opacity-80 !mb-6">
+              A self-contained CRUD application built on Document Engine for
+              viewing and editing documents. Hosted separately from this repo
+              and intended to be run locally.
+            </p>
+            <div className="flex gap-4 flex-wrap !mb-4">
+              <a
+                href="https://github.com/jonaddams/decrud"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                Source
+              </a>
+            </div>
+            <p className="text-sm opacity-60 italic !mb-0">
+              No hosted demo — clone the repo and follow its README to run
+              locally, or ask your Nutrient rep for a walkthrough.
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   );
