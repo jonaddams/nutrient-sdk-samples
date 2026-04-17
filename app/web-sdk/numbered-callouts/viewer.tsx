@@ -146,6 +146,8 @@ export default function NumberedCalloutsViewer() {
         // biome-ignore lint/suspicious/noExplicitAny: annotation change event typing is minimal
         instance.addEventListener("annotations.change" as any, async () => {
           if (reconcilingRef.current) return;
+          const NV = window.NutrientViewer;
+          if (!NV) return;
 
           const pageIndex = instance.viewState.currentPageIndex;
           const annotations = (
@@ -181,13 +183,10 @@ export default function NumberedCalloutsViewer() {
             };
 
             if (pointDrifted(currentStart, bubbleCenter)) {
-              const NV = window.NutrientViewer;
               const newBbox = leaderBoundingBox(bubbleCenter, currentEnd);
               const updated = leader
-                // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
-                .set("startPoint", new (NV as any).Geometry.Point(bubbleCenter))
-                // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
-                .set("boundingBox", new (NV as any).Geometry.Rect(newBbox));
+                .set("startPoint", new NV.Geometry.Point(bubbleCenter))
+                .set("boundingBox", new NV.Geometry.Rect(newBbox));
               updates.push(updated);
             } else {
               const expectedBbox = leaderBoundingBox(currentStart, currentEnd);
@@ -198,13 +197,8 @@ export default function NumberedCalloutsViewer() {
                 Math.abs(lbb.width - expectedBbox.width) > 0.5 ||
                 Math.abs(lbb.height - expectedBbox.height) > 0.5
               ) {
-                const NV = window.NutrientViewer;
                 updates.push(
-                  leader.set(
-                    "boundingBox",
-                    // biome-ignore lint/suspicious/noExplicitAny: Nutrient SDK type not exported
-                    new (NV as any).Geometry.Rect(expectedBbox),
-                  ),
+                  leader.set("boundingBox", new NV.Geometry.Rect(expectedBbox)),
                 );
               }
             }
