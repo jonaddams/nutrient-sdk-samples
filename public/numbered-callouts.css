@@ -29,6 +29,12 @@
   animation: callout-pulse 1.5s ease-out;
 }
 
+/* Nutrient sets z-index: 0 on line annotation SVGs. Without an explicit
+   z-index on the bubble's wrapper, the leader paints on top of the number. */
+div:has(> .callout-bubble) {
+  z-index: 1;
+}
+
 @keyframes callout-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
