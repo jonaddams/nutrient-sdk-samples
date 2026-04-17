@@ -180,6 +180,7 @@ export default function Page() {
         container: originalContainer!,
         document: originalDoc,
         useCDN: true,
+        pageRendering: "next",
         styleSheets: ["/styles.css"],
         licenseKey: licenseKey,
         // biome-ignore lint/suspicious/noExplicitAny: toolbar items type inference fails with CDN types
@@ -191,6 +192,7 @@ export default function Page() {
         container: changedContainer!,
         document: changedDoc,
         useCDN: true,
+        pageRendering: "next",
         styleSheets: ["/styles.css"],
         licenseKey: licenseKey,
         // biome-ignore lint/suspicious/noExplicitAny: toolbar items type inference fails with CDN types
