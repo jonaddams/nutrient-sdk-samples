@@ -19,8 +19,8 @@ const SEED_PAGE_INDEX = 0;
 export default function NumberedCalloutsViewer() {
   type PlaceMode =
     | { phase: "idle" }
-    | { phase: "awaiting-bubble" }
-    | { phase: "awaiting-tip"; bubbleCenter: Point; pageIndex: number };
+    | { phase: "awaiting-tip" }
+    | { phase: "awaiting-bubble"; tipPoint: Point; pageIndex: number };
 
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
@@ -31,6 +31,7 @@ export default function NumberedCalloutsViewer() {
   const nextNumberRef = useRef(SEED_CALLOUTS.length + 1);
   const reconcilingRef = useRef(false);
   const cascadingDeleteRef = useRef(false);
+  const calloutsRef = useRef<Callout[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -92,16 +93,19 @@ export default function NumberedCalloutsViewer() {
           const pageIndex = instance.viewState.currentPageIndex;
           const mode = placeModeRef.current;
 
-          if (mode.phase === "awaiting-bubble") {
+          if (mode.phase === "awaiting-tip") {
             setPlaceMode({
-              phase: "awaiting-tip",
-              bubbleCenter: { x: point.x, y: point.y },
+              phase: "awaiting-bubble",
+              tipPoint: { x: point.x, y: point.y },
               pageIndex,
             });
             return;
           }
 
-          if (mode.phase === "awaiting-tip" && pageIndex === mode.pageIndex) {
+          if (
+            mode.phase === "awaiting-bubble" &&
+            pageIndex === mode.pageIndex
+          ) {
             const calloutId = crypto.randomUUID();
             const number = nextNumberRef.current;
             setNextNumber((n) => n + 1);
@@ -110,8 +114,8 @@ export default function NumberedCalloutsViewer() {
               calloutId,
               number,
               pageIndex,
-              bubbleCenter: mode.bubbleCenter,
-              tipPoint: { x: point.x, y: point.y },
+              bubbleCenter: { x: point.x, y: point.y },
+              tipPoint: mode.tipPoint,
             });
 
             (async () => {
@@ -223,30 +227,45 @@ export default function NumberedCalloutsViewer() {
           async (event: any) => {
             if (cascadingDeleteRef.current) return;
 
-            const deleted = event?.annotations ?? [];
-            const deletedCalloutIds = new Set<string>();
-
-            for (const ann of deleted) {
-              const cd = ann?.customData;
-              if (!cd?.calloutId) continue;
-              deletedCalloutIds.add(cd.calloutId);
+            // Nutrient delivers the deleted annotations as an Immutable List
+            // directly on `event` (accessed via .toArray()) rather than
+            // under `event.annotations` — handle both shapes defensively.
+            let deleted: unknown[] = [];
+            if (Array.isArray(event?.annotations)) {
+              deleted = event.annotations;
+            } else if (event?.annotations?.toArray) {
+              deleted = event.annotations.toArray();
+            } else if (Array.isArray(event)) {
+              deleted = event;
+            } else if (event?.toArray) {
+              deleted = event.toArray();
             }
 
-            if (deletedCalloutIds.size === 0) return;
+            const deletedIds = new Set<string>();
+            for (const ann of deleted) {
+              // biome-ignore lint/suspicious/noExplicitAny: annotation shape varies
+              const a = ann as any;
+              if (a?.id != null) deletedIds.add(String(a.id));
+              else if (typeof a === "string") deletedIds.add(a);
+            }
+            if (deletedIds.size === 0) return;
 
-            // Find sibling annotation IDs still present
-            const pageIndex = instance.viewState.currentPageIndex;
-            const stillPresent = (
-              await instance.getAnnotations(pageIndex)
-            ).toArray();
+            // Match deletions against our callouts via annotation IDs —
+            // customData on the event payload isn't reliably populated.
+            const affected = calloutsRef.current.filter(
+              (c) =>
+                deletedIds.has(c.bubbleAnnotationId) ||
+                deletedIds.has(c.leaderAnnotationId),
+            );
+            if (affected.length === 0) return;
+
             const siblingIdsToDelete: string[] = [];
-            for (const a of stillPresent) {
-              const cd = a.customData;
-              if (
-                cd?.calloutId &&
-                deletedCalloutIds.has(cd.calloutId as string)
-              ) {
-                if (a.id) siblingIdsToDelete.push(a.id as string);
+            for (const c of affected) {
+              if (!deletedIds.has(c.bubbleAnnotationId)) {
+                siblingIdsToDelete.push(c.bubbleAnnotationId);
+              }
+              if (!deletedIds.has(c.leaderAnnotationId)) {
+                siblingIdsToDelete.push(c.leaderAnnotationId);
               }
             }
 
@@ -261,8 +280,11 @@ export default function NumberedCalloutsViewer() {
               }
             }
 
+            const affectedCalloutIds = new Set(
+              affected.map((c) => c.calloutId),
+            );
             setCallouts((prev) =>
-              prev.filter((c) => !deletedCalloutIds.has(c.calloutId)),
+              prev.filter((c) => !affectedCalloutIds.has(c.calloutId)),
             );
           },
         );
@@ -284,6 +306,10 @@ export default function NumberedCalloutsViewer() {
   useEffect(() => {
     nextNumberRef.current = nextNumber;
   }, [nextNumber]);
+
+  useEffect(() => {
+    calloutsRef.current = callouts;
+  }, [callouts]);
 
   useEffect(() => {
     if (placeMode.phase === "idle") return;
@@ -361,24 +387,24 @@ export default function NumberedCalloutsViewer() {
             onClick={() => {
               setPlaceMode((m) =>
                 m.phase === "idle"
-                  ? { phase: "awaiting-bubble" }
+                  ? { phase: "awaiting-tip" }
                   : { phase: "idle" },
               );
             }}
           >
             {placeMode.phase === "idle"
               ? "+ Add Callout"
-              : placeMode.phase === "awaiting-bubble"
-                ? "Click to place bubble (Esc to cancel)"
-                : "Click to set arrow tip (Esc to cancel)"}
+              : placeMode.phase === "awaiting-tip"
+                ? "Click to set arrow tip (Esc to cancel)"
+                : "Click to place bubble (Esc to cancel)"}
           </button>
 
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Click <strong>Add Callout</strong>, then click once on the drawing
-            to place the bubble and again to set the arrow tip.
+            to set the arrow tip and again to place the bubble.
           </p>
 
-          <ul className="space-y-2">
+          <ul className="space-y-2 pl-0!">
             {callouts.map((c) => (
               <li
                 key={c.calloutId}
