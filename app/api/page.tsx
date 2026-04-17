@@ -146,6 +146,41 @@ export default function APIPage() {
           </div>
         </div>
 
+        {/* Standalone Demo */}
+        <div className="mb-16">
+          <h2 className="!mb-6">Standalone Demo App</h2>
+          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 max-w-4xl">
+            <h3 className="!mb-3">DWS CRUD</h3>
+            <p className="opacity-80 !mb-6">
+              A self-contained CRUD application built on the Nutrient DWS APIs
+              for viewing and editing documents. Hosted separately from this
+              repo.
+            </p>
+            <div className="flex gap-4 flex-wrap !mb-4">
+              <a
+                href="https://dws-crud.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                Launch Demo
+              </a>
+              <a
+                href="https://github.com/jonaddams/dws-crud"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-yellow-outline no-underline"
+              >
+                Source
+              </a>
+            </div>
+            <p className="text-sm opacity-60 italic !mb-0">
+              Access requires a Nutrient Google account — ask your Nutrient
+              rep for a walkthrough.
+            </p>
+          </div>
+        </div>
+
         {/* Footer Note */}
         <div className="text-sm opacity-60">
           <p>
