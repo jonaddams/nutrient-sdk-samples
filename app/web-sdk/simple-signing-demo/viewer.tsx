@@ -426,6 +426,7 @@ export default function SigningDemoViewer() {
           document: "/documents/service-agreement.pdf",
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
           useCDN: true,
+          pageRendering: "next",
           styleSheets: ["/simple-signing-demo.css"],
 
           /**

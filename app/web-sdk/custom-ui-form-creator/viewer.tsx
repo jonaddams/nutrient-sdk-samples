@@ -174,6 +174,7 @@ export default function FormFieldAnnotationsViewer() {
         document: "/documents/patient-intake-form.pdf",
         licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         useCDN: true,
+        pageRendering: "next",
         styleSheets: ["/custom-ui-form-creator.css"],
         customRenderers: {
           Annotation: ({ annotation }: any) => {
