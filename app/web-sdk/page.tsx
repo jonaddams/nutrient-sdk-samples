@@ -197,6 +197,13 @@ const samples: Sample[] = [
     path: "/web-sdk/patient-intake",
   },
   {
+    name: "Search & Redact",
+    category: "Redaction",
+    description:
+      "Permanently redact sensitive information using preset PII patterns (SSN, credit card, email, phone), custom text terms, or regular expressions",
+    path: "/web-sdk/search-and-redact",
+  },
+  {
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
