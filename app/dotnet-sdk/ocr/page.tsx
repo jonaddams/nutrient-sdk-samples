@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
 import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
 
@@ -54,17 +54,57 @@ export default function OcrPage() {
 
   const [activeTabId, setActiveTabId] = useState<TabId>("searchable");
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  function clearResults() {
+  // Fetch the selected sample as a Blob whenever the selection changes so the
+  // viewer can show the input document before the user clicks Run.
+  useEffect(() => {
+    let cancelled = false;
+    const sample = SAMPLES.find((s) => s.id === selectedSampleId);
+    if (!sample) return;
+
+    setIsLoadingPreview(true);
     setOriginalBlob(null);
+    setSearchableBlob(null);
+    setExtractedText(null);
+    setError(null);
+
+    fetch(sample.url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load sample (${res.status})`);
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!cancelled) {
+          setOriginalBlob(blob);
+          setActiveTabId("searchable");
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load sample");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingPreview(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSampleId]);
+
+  // Clear results (but keep the preview blob) when switching mode or language.
+  function clearResultsKeepPreview() {
     setSearchableBlob(null);
     setExtractedText(null);
     setError(null);
   }
 
   const handleRun = async () => {
+    if (!originalBlob) return;
     setIsRunning(true);
     setError(null);
     setSearchableBlob(null);
@@ -72,14 +112,9 @@ export default function OcrPage() {
 
     try {
       const sample = SAMPLES.find((s) => s.id === selectedSampleId)!;
-      const sourceResponse = await fetch(sample.url);
-      if (!sourceResponse.ok) throw new Error("Failed to load sample");
-      const sourceBlob = await sourceResponse.blob();
-      setOriginalBlob(sourceBlob);
-
       const fileName = sample.url.split("/").pop() ?? "document.pdf";
       const formData = new FormData();
-      formData.append("file", new File([sourceBlob], fileName, { type: "application/pdf" }));
+      formData.append("file", new File([originalBlob], fileName, { type: "application/pdf" }));
 
       const queryParams = new URLSearchParams({ lang: language });
       if (mode === "text") queryParams.set("format", "json");
@@ -141,8 +176,10 @@ export default function OcrPage() {
     }
   };
 
-  const showPdfViewer = mode === "pdf" && searchableBlob !== null;
   const showTextResult = mode === "text" && extractedText !== null;
+  const showTabbedPdfViewer = mode === "pdf" && searchableBlob !== null && originalBlob !== null;
+  const showPreviewOnly = !showTextResult && !showTabbedPdfViewer && originalBlob !== null;
+
   const activeBlob = activeTabId === "original" ? originalBlob : searchableBlob;
 
   const TABS: { id: TabId; label: string }[] = [
@@ -173,10 +210,7 @@ export default function OcrPage() {
                 <SamplePicker
                   samples={SAMPLES}
                   selectedId={selectedSampleId}
-                  onSelect={(id) => {
-                    setSelectedSampleId(id);
-                    clearResults();
-                  }}
+                  onSelect={(id) => setSelectedSampleId(id)}
                   disabled={isRunning}
                 />
 
@@ -190,7 +224,7 @@ export default function OcrPage() {
                       type="button"
                       onClick={() => {
                         setMode("pdf");
-                        clearResults();
+                        clearResultsKeepPreview();
                       }}
                       disabled={isRunning}
                       className={
@@ -206,7 +240,7 @@ export default function OcrPage() {
                       type="button"
                       onClick={() => {
                         setMode("text");
-                        clearResults();
+                        clearResultsKeepPreview();
                       }}
                       disabled={isRunning}
                       className={
@@ -234,7 +268,7 @@ export default function OcrPage() {
                     value={language}
                     onChange={(e) => {
                       setLanguage(e.target.value);
-                      clearResults();
+                      clearResultsKeepPreview();
                     }}
                     disabled={isRunning}
                     className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -255,7 +289,7 @@ export default function OcrPage() {
                 <button
                   type="button"
                   onClick={handleRun}
-                  disabled={isRunning}
+                  disabled={isRunning || !originalBlob}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: "var(--digital-pollen)",
@@ -306,19 +340,28 @@ export default function OcrPage() {
             </div>
 
             {/* Right Panel — Results */}
-            <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-12rem)]">
-              {isRunning && (
+            <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-12rem)] relative">
+              {(isRunning || isLoadingPreview) && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60 pointer-events-none">
                   <div className="text-center space-y-2">
                     <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Running OCR...
+                      {isRunning ? "Running OCR..." : "Loading preview..."}
                     </p>
                   </div>
                 </div>
               )}
 
-              {showPdfViewer ? (
+              {showTextResult ? (
+                <div className="flex-1 min-h-0 flex flex-col p-4 gap-3">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">
+                    Extracted {formatCount(extractedText.length)} characters
+                  </p>
+                  <pre className="flex-1 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1414] p-4 text-xs font-mono text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap break-words">
+                    {extractedText}
+                  </pre>
+                </div>
+              ) : showTabbedPdfViewer ? (
                 <>
                   {/* Tab bar */}
                   <div className="flex items-center border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020] overflow-x-auto flex-shrink-0">
@@ -355,24 +398,22 @@ export default function OcrPage() {
                     )}
                   </div>
                 </>
-              ) : showTextResult ? (
-                <div className="flex-1 min-h-0 flex flex-col p-4 gap-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">
-                    Extracted {formatCount(extractedText.length)} characters
-                  </p>
-                  <pre className="flex-1 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1414] p-4 text-xs font-mono text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap break-words">
-                    {extractedText}
-                  </pre>
-                </div>
+              ) : showPreviewOnly ? (
+                <>
+                  {/* Preview banner */}
+                  <div className="flex-shrink-0 px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020]">
+                    Preview of input document — try selecting text to confirm it&apos;s an image-based PDF, then run OCR.
+                  </div>
+
+                  {/* PDF viewer */}
+                  <div className="flex-1 min-h-0">
+                    <Viewer key={selectedSampleId} blob={originalBlob!} />
+                  </div>
+                </>
               ) : (
                 <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
                   <div className="text-center space-y-2">
-                    <p className="text-sm">Run OCR to see the result.</p>
-                    <p className="text-xs">
-                      {mode === "pdf"
-                        ? "Original and searchable PDFs will appear in side-by-side tabs."
-                        : "The extracted text will appear here."}
-                    </p>
+                    <p className="text-sm">Select a sample to preview.</p>
                   </div>
                 </div>
               )}
