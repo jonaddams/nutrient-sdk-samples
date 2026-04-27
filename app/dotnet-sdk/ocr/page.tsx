@@ -357,7 +357,7 @@ export default function OcrPage() {
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">
                     Extracted {formatCount(extractedText.length)} characters
                   </p>
-                  <pre className="flex-1 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1414] p-4 text-xs font-mono text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap break-words">
+                  <pre className="flex-1 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1414] p-4 text-xs font-mono text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre">
                     {extractedText}
                   </pre>
                 </div>
