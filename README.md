@@ -329,8 +329,10 @@ header before forwarding to the .NET API.
 ### Available demos
 
 - **Optimize** — MRC compression to dramatically reduce PDF file size on
-  image-heavy documents.
-- (Coming soon: convert, ocr, redact, pdfa, linearize, merge, watermark.)
+  image-heavy documents. Choose from curated sample PDFs in the picker.
+- **Linearize** — Restructure a PDF for fast web view (progressive loading
+  over HTTP). Choose from curated sample PDFs in the picker.
+- (Coming soon: convert, ocr, redact, pdfa, merge, watermark.)
 
 ## Resources
 

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
+import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
 
 const Viewer = dynamic(() => import("./viewer"), {
   ssr: false,
@@ -13,10 +14,26 @@ const Viewer = dynamic(() => import("./viewer"), {
   ),
 });
 
-const SAMPLE_FILE = {
-  name: "scanned-sample.pdf",
-  path: "/documents/dotnet-sdk/scanned-sample.pdf",
-};
+const SAMPLES: SampleOption[] = [
+  {
+    id: "scanned-sample",
+    label: "Scanned document",
+    subtitle: "Rasterized 4-page PDF — best case for MRC compression.",
+    url: "/documents/dotnet-sdk/scanned-sample.pdf",
+  },
+  {
+    id: "cookies-recipe",
+    label: "Jacques Torres cookies recipe",
+    subtitle: "Image-heavy recipe PDF — shows photo recompression.",
+    url: "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf",
+  },
+  {
+    id: "usenix-paper",
+    label: "USENIX example paper",
+    subtitle: "Vector text document — shows minimal savings (already efficient).",
+    url: "/documents/usenix-example-paper.pdf",
+  },
+];
 
 function formatBytes(n: number): string {
   if (n < 1024) return `${n} B`;
@@ -34,8 +51,7 @@ type Level = "low" | "medium" | "high";
 type TabId = "original" | "optimized";
 
 export default function OptimizePage() {
-  const [useCustomFile, setUseCustomFile] = useState(false);
-  const [customFile, setCustomFile] = useState<File | null>(null);
+  const [selectedSampleId, setSelectedSampleId] = useState<string>(SAMPLES[0].id);
   const [level, setLevel] = useState<Level>("medium");
   const [isRunning, setIsRunning] = useState(false);
   const [originalBlob, setOriginalBlob] = useState<Blob | null>(null);
@@ -50,25 +66,17 @@ export default function OptimizePage() {
     setError(null);
 
     try {
-      let inputBlob: Blob;
-      if (useCustomFile && customFile) {
-        inputBlob = customFile;
-      } else {
-        const res = await fetch(SAMPLE_FILE.path);
-        if (!res.ok) throw new Error(`Failed to fetch sample file: ${res.status}`);
-        inputBlob = await res.blob();
-      }
+      const sample = SAMPLES.find((s) => s.id === selectedSampleId)!;
+      const sourceResponse = await fetch(sample.url);
+      if (!sourceResponse.ok) throw new Error("Failed to load sample");
+      const sourceBlob = await sourceResponse.blob();
 
-      setOriginalBlob(inputBlob);
-      setOriginalSize(inputBlob.size);
+      setOriginalBlob(sourceBlob);
+      setOriginalSize(sourceBlob.size);
 
+      const fileName = sample.url.split("/").pop() ?? "document.pdf";
       const formData = new FormData();
-      formData.append(
-        "file",
-        useCustomFile && customFile
-          ? customFile
-          : new File([inputBlob], SAMPLE_FILE.name, { type: "application/pdf" }),
-      );
+      formData.append("file", new File([sourceBlob], fileName, { type: "application/pdf" }));
 
       const res = await fetch(`/api/dotnet-sdk/optimize?level=${level}`, {
         method: "POST",
@@ -129,47 +137,21 @@ export default function OptimizePage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* File source toggle */}
-                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#1a1414] rounded-lg">
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(false)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      !useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Sample File
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(true)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Upload File
-                  </button>
-                </div>
-
-                {useCustomFile ? (
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={(e) => setCustomFile(e.target.files?.[0] ?? null)}
-                    className="w-full text-sm text-gray-600 dark:text-gray-400"
-                  />
-                ) : (
-                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
-                    <span className="font-mono text-xs">{SAMPLE_FILE.name}</span>
-                    <p className="mt-1 text-xs opacity-70">
-                      Scanned-style rasterized PDF — ideal for MRC compression
-                    </p>
-                  </div>
-                )}
+                {/* Sample picker */}
+                <SamplePicker
+                  samples={SAMPLES}
+                  selectedId={selectedSampleId}
+                  onSelect={(id) => {
+                    setSelectedSampleId(id);
+                    // Clear previous results when switching samples
+                    setOriginalBlob(null);
+                    setOptimizedBlob(null);
+                    setOriginalSize(null);
+                    setOptimizedSize(null);
+                    setError(null);
+                  }}
+                  disabled={isRunning}
+                />
 
                 {/* Level selector */}
                 <div>
@@ -195,7 +177,7 @@ export default function OptimizePage() {
                 <button
                   type="button"
                   onClick={handleRun}
-                  disabled={isRunning || (useCustomFile && !customFile)}
+                  disabled={isRunning}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: "var(--digital-pollen)",
