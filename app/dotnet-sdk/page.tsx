@@ -43,7 +43,7 @@ const demos: Demo[] = [
     name: "Linearize",
     description: "Optimize PDFs for fast web viewing (fast web view).",
     path: "/dotnet-sdk/linearize",
-    available: false,
+    available: true,
   },
   {
     name: "Merge",
