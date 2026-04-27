@@ -165,8 +165,14 @@ export default function Home() {
               manipulation in .NET applications.
             </p>
             <div className="flex gap-4 flex-wrap">
+              <Link
+                href="/dotnet-sdk"
+                className="btn btn-yellow no-underline !text-[var(--black)]"
+              >
+                View Samples
+              </Link>
               <a
-                href="https://www.nutrient.io/sdk/dotnet/"
+                href="https://www.nutrient.io/guides/dotnet/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow-outline no-underline"
