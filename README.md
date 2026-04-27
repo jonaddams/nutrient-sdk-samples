@@ -308,6 +308,30 @@ pnpm start
 
 [Your License Here]
 
+## .NET SDK Samples
+
+Demos calling the Nutrient .NET SDK backend deployed on Railway. Source for
+the backend API: https://github.com/jonaddams/nutrient-dotnet-api
+
+### Setup
+
+Add to your `.env.local`:
+
+```
+NEXT_PUBLIC_DOTNET_SDK_API_URL=https://nutrient-dotnet-api-production.up.railway.app
+DOTNET_SDK_API_KEY=<the X-API-Key value set in Railway env vars>
+```
+
+`DOTNET_SDK_API_KEY` is a server-side secret. Browser code never sees it —
+all calls go through `/app/api/dotnet-sdk/*` proxy routes, which add the
+header before forwarding to the .NET API.
+
+### Available demos
+
+- **Optimize** — MRC compression to dramatically reduce PDF file size on
+  image-heavy documents.
+- (Coming soon: convert, ocr, redact, pdfa, linearize, merge, watermark.)
+
 ## Resources
 
 ### Documentation
