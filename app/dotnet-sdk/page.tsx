@@ -25,7 +25,7 @@ const demos: Demo[] = [
     name: "OCR",
     description: "Extract text from scanned documents using optical character recognition.",
     path: "/dotnet-sdk/ocr",
-    available: false,
+    available: true,
   },
   {
     name: "Redact",

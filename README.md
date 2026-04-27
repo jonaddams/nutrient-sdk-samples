@@ -332,7 +332,11 @@ header before forwarding to the .NET API.
   image-heavy documents. Choose from curated sample PDFs in the picker.
 - **Linearize** — Restructure a PDF for fast web view (progressive loading
   over HTTP). Choose from curated sample PDFs in the picker.
-- (Coming soon: convert, ocr, redact, pdfa, merge, watermark.)
+- **OCR** — Run optical character recognition on a scanned PDF. Choose
+  Searchable PDF mode (adds a selectable text layer) or Extracted Text mode
+  (returns the raw recognized text). Supports English, French, German, and
+  Spanish via a language picker.
+- (Coming soon: convert, redact, pdfa, merge, watermark.)
 
 ## Resources
 
