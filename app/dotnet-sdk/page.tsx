@@ -1,65 +1,51 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { PageHeader } from "@/app/_components/PageHeader";
 
-type Demo = {
+type Sample = {
   name: string;
+  category: string;
   description: string;
   path: string;
-  available: boolean;
+  wip?: boolean;
 };
 
-const demos: Demo[] = [
+const samples: Sample[] = [
   {
-    name: "Optimize",
-    description: "MRC compression for scanned PDFs.",
-    path: "/dotnet-sdk/optimize",
-    available: true,
-  },
-  {
-    name: "Convert",
-    description: "Convert Office documents and other formats to PDF.",
-    path: "/dotnet-sdk/convert",
-    available: false,
+    name: "Linearize",
+    category: "File Optimization",
+    description:
+      "Optimize PDFs for fast web view, allowing the first page to render before the entire file downloads.",
+    path: "/dotnet-sdk/linearize",
   },
   {
     name: "OCR",
-    description: "Extract text from scanned documents using optical character recognition.",
+    category: "Text Extraction",
+    description:
+      "Recognize text in scanned PDFs and images. Output a searchable PDF or extract the recognized text as plain text.",
     path: "/dotnet-sdk/ocr",
-    available: true,
   },
   {
-    name: "Redact",
-    description: "Permanently remove sensitive content from PDFs.",
-    path: "/dotnet-sdk/redact",
-    available: false,
-  },
-  {
-    name: "PDF/A",
-    description: "Convert PDFs to the archival PDF/A standard.",
-    path: "/dotnet-sdk/pdfa",
-    available: false,
-  },
-  {
-    name: "Linearize",
-    description: "Optimize PDFs for fast web viewing (fast web view).",
-    path: "/dotnet-sdk/linearize",
-    available: true,
-  },
-  {
-    name: "Merge",
-    description: "Combine multiple PDF documents into a single file.",
-    path: "/dotnet-sdk/merge",
-    available: false,
-  },
-  {
-    name: "Watermark",
-    description: "Apply text or image watermarks to PDF pages.",
-    path: "/dotnet-sdk/watermark",
-    available: false,
+    name: "Optimize",
+    category: "File Optimization",
+    description:
+      "Reduce PDF file size with MRC compression. Especially effective on scanned and image-heavy documents.",
+    path: "/dotnet-sdk/optimize",
   },
 ];
 
+const categories = ["All", "File Optimization", "Text Extraction"];
+
 export default function DotNetSDKPage() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const filteredSamples =
+    selectedCategory === "All"
+      ? samples
+      : samples.filter((sample) => sample.category === selectedCategory);
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1414]">
       <PageHeader
@@ -103,67 +89,55 @@ export default function DotNetSDKPage() {
         }
       />
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-8 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-6">
-          <h2 className="text-lg font-semibold mb-2">How These Samples Work</h2>
-          <p className="text-sm text-[var(--text-secondary)]">
-            This Next.js frontend sends requests to a{" "}
-            <a
-              href="https://github.com/jonaddams/nutrient-dotnet-api"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:opacity-70"
-            >
-              .NET backend
-            </a>{" "}
-            that uses the Nutrient .NET SDK for document processing. The
-            frontend handles file uploads and result display, while the backend
-            performs the actual PDF operations. API calls go through Next.js
-            server-side proxy routes so the API key stays server-side.
-          </p>
-        </div>
-
         <div className="mb-16">
-          {/* Demos table */}
+          {/* Category Filter */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setSelectedCategory(category)}
+                className={`btn btn-sm ${
+                  selectedCategory === category
+                    ? "btn-primary"
+                    : "btn-secondary"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* Samples Table */}
           <div className="nutrient-table-container">
             <table className="nutrient-table">
               <thead>
                 <tr>
-                  <th className="nutrient-th nutrient-th-title">Demo</th>
+                  <th className="nutrient-th nutrient-th-title">Name</th>
+                  <th className="nutrient-th nutrient-th-title">Category</th>
                   <th className="nutrient-th nutrient-th-title">Description</th>
-                  <th className="nutrient-th nutrient-th-title">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {demos.map((demo) => (
-                  <tr key={demo.path}>
+                {filteredSamples.map((sample) => (
+                  <tr key={sample.path}>
                     <td className="nutrient-td nutrient-td-bold">
-                      {demo.available ? (
-                        <Link
-                          href={demo.path}
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          {demo.name}
-                        </Link>
-                      ) : (
-                        <span className="opacity-40">{demo.name}</span>
-                      )}
-                    </td>
-                    <td className={`nutrient-td${demo.available ? "" : " opacity-40"}`}>
-                      {demo.description}
-                    </td>
-                    <td className="nutrient-td">
-                      {demo.available ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 dark:text-green-400">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                          Available
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">
-                          Coming soon
+                      <Link
+                        href={sample.path}
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        {sample.name}
+                      </Link>
+                      {sample.wip && (
+                        <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full">
+                          Work in Progress
                         </span>
                       )}
                     </td>
+                    <td className="nutrient-td">{sample.category}</td>
+                    <td className="nutrient-td">{sample.description}</td>
                   </tr>
                 ))}
               </tbody>
