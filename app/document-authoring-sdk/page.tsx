@@ -32,6 +32,13 @@ const samples: Sample[] = [
       "Insert template variables from a browsable sidebar instead of typing them manually, with search, categories, and sample data preview",
     path: "/document-authoring-sdk/template-variables",
   },
+  {
+    name: "Click-to-Scroll Outline",
+    category: "Navigation",
+    description:
+      "Sidebar outline derived from the document model that jumps to a heading on click. Approximate (the SDK has no public scroll-to API) — see in-page notes",
+    path: "/document-authoring-sdk/click-to-scroll",
+  },
 ];
 
 export default function DocumentAuthoringSdkSamplesPage() {
