@@ -22,9 +22,16 @@ const samples: Sample[] = [
       "Build documents programmatically from form data using the transaction() API with live preview",
     path: "/document-authoring-sdk/document-builder",
   },
+  {
+    name: "Click-to-Scroll Outline",
+    category: "Navigation",
+    description:
+      "Sidebar outline derived from the document model that jumps to a heading on click. Approximate (the SDK has no public scroll-to API) — see in-page notes",
+    path: "/document-authoring-sdk/click-to-scroll",
+  },
 ];
 
-const categories = ["All", "Templates", "Programmatic API"];
+const categories = ["All", "Templates", "Programmatic API", "Navigation"];
 
 export default function DocumentAuthoringSdkSamplesPage() {
   return (
