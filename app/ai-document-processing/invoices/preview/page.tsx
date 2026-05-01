@@ -254,9 +254,6 @@ export default function PreviewInvoices() {
             ) : (
               invoices.map((invoice) => {
                 const isSelected = selectedInvoice === invoice.filename;
-                const isDarkMode =
-                  typeof window !== "undefined" &&
-                  window.matchMedia("(prefers-color-scheme: dark)").matches;
 
                 return (
                   <button
@@ -267,23 +264,16 @@ export default function PreviewInvoices() {
                     style={{
                       borderColor: "var(--neutral)",
                       background: isSelected
-                        ? isDarkMode
-                          ? "var(--digital-pollen-dark)"
-                          : "hsla(43, 82%, 80%, 0.4)"
+                        ? "var(--accent-tint)"
                         : "transparent",
                       borderLeftWidth: isSelected ? "4px" : "0",
                       borderLeftColor: isSelected
-                        ? "var(--digital-pollen)"
+                        ? "var(--accent)"
                         : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (!isSelected) {
-                        const isDarkMode = window.matchMedia(
-                          "(prefers-color-scheme: dark)",
-                        ).matches;
-                        e.currentTarget.style.background = isDarkMode
-                          ? "rgba(229, 192, 79, 0.1)"
-                          : "hsla(43, 82%, 67%, 0.2)";
+                        e.currentTarget.style.background = "var(--accent-tint)";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -299,9 +289,7 @@ export default function PreviewInvoices() {
                             className="w-12 h-12 rounded-lg flex items-center justify-center"
                             style={{
                               background: isSelected
-                                ? isDarkMode
-                                  ? "var(--digital-pollen)"
-                                  : "var(--digital-pollen)"
+                                ? "var(--accent)"
                                 : "rgba(239, 68, 68, 0.1)",
                             }}
                           >
@@ -309,7 +297,7 @@ export default function PreviewInvoices() {
                               className="h-6 w-6"
                               style={{
                                 color: isSelected
-                                  ? "var(--black)"
+                                  ? "var(--bg)"
                                   : "var(--code-coral)",
                               }}
                             />
@@ -318,25 +306,15 @@ export default function PreviewInvoices() {
                         <div className="flex-1 min-w-0">
                           <p
                             className="text-sm font-medium truncate"
-                            style={{
-                              color: isSelected
-                                ? isDarkMode
-                                  ? "var(--white)"
-                                  : "var(--black)"
-                                : "var(--foreground)",
-                            }}
+                            style={{ color: "var(--foreground)" }}
                           >
                             {invoice.filename}
                           </p>
                           <p
                             className="text-xs mt-1"
                             style={{
-                              color: isSelected
-                                ? isDarkMode
-                                  ? "var(--white)"
-                                  : "var(--black)"
-                                : "var(--foreground)",
-                              opacity: isSelected ? 0.8 : 0.6,
+                              color: "var(--foreground)",
+                              opacity: 0.7,
                             }}
                           >
                             {invoice.size
@@ -350,9 +328,7 @@ export default function PreviewInvoices() {
                           className="h-5 w-5"
                           style={{
                             color: isSelected
-                              ? isDarkMode
-                                ? "var(--digital-pollen)"
-                                : "var(--digital-pollen)"
+                              ? "var(--accent)"
                               : "var(--neutral)",
                           }}
                         />

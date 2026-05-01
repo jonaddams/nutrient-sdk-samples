@@ -180,7 +180,7 @@ export default function FormFillPage() {
     setValues((prev) => ({ ...prev, [name]: val }));
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="PDF Form Fill"
         description="Programmatically fill PDF form fields with data using the Nutrient Python SDK."

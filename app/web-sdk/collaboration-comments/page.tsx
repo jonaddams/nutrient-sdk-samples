@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useRef, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import { type Author, type CommentThread, PRESET_AUTHORS } from "./viewer";
 import "./styles.css";
 
@@ -44,15 +44,12 @@ export default function CollaborationCommentsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Collaboration Comments"
-        description="Switch between authors to add threaded comments with @mentions. Toggle display modes to compare Fitting, Floating, and Popover comment layouts. Use the comment tool in the toolbar to place comments on the document."
-      />
-
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="collab-wrapper">
+    <SampleFrame
+      title="Collaboration Comments"
+      description="Switch between authors to add threaded comments with @mentions. Toggle display modes to compare Fitting, Floating, and Popover comment layouts. Use the comment tool in the toolbar to place comments on the document."
+      wide
+    >
+      <div className="collab-wrapper">
             {/* Sidebar */}
             <div className="collab-sidebar">
               {/* Author Switcher */}
@@ -172,9 +169,7 @@ export default function CollaborationCommentsPage() {
                 navigateToThreadRef={navigateToThreadRef}
               />
             </section>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </SampleFrame>
   );
 }

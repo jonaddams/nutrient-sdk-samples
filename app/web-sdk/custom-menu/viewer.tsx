@@ -7,6 +7,7 @@ import type {
 } from "@nutrient-sdk/viewer";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 import "./styles.css";
 
 interface Tool {
@@ -481,6 +482,7 @@ const Viewer = () => {
     null,
   );
   const [blendMode, setBlendMode] = useState("normal");
+  const appTheme = useAppTheme();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -491,19 +493,15 @@ const Viewer = () => {
     setIsLoading(true);
     setError(null);
 
-    // Detect system theme preference
-    const isDarkMode = window.matchMedia?.(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-
     NutrientViewer.load({
       container,
       document: "/documents/Drawing1.pdf",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       pageRendering: "next",
-      theme: isDarkMode
-        ? NutrientViewer.Theme.DARK
-        : NutrientViewer.Theme.LIGHT,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
     })
       .then((instance) => {
         instanceRef.current = instance;
@@ -542,7 +540,7 @@ const Viewer = () => {
         NutrientViewer.unload(container);
       }
     };
-  }, []);
+  }, [appTheme]);
 
   const handleToolClick = (toolId: string) => {
     const NutrientViewer = window.NutrientViewer;

@@ -9,12 +9,37 @@ const Viewer = dynamic(() => import("./viewer"), {
   loading: () => (
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Loading viewer...</p>
+        <div
+          className="inline-block animate-spin rounded-full h-8 w-8 mb-4"
+          style={{
+            border: "2px solid var(--line)",
+            borderBottomColor: "var(--accent)",
+          }}
+        />
+        <p style={{ color: "var(--ink-3)" }}>Loading viewer...</p>
       </div>
     </div>
   ),
 });
+
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+};
+
+const featureIconBg = (token: string): React.CSSProperties => ({
+  background: `color-mix(in srgb, ${token} 18%, var(--bg-elev))`,
+  color: token,
+  borderRadius: "var(--r-2)",
+});
+
+const inputStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  color: "var(--ink)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-2)",
+};
 
 const AVAILABLE_DOCUMENTS = [
   { path: "/documents/contract-template.pdf", name: "Contract Template" },
@@ -47,7 +72,6 @@ export default function SignDocumentDWSPage() {
       setIsSigning(true);
       setError(null);
 
-      // Fetch the selected document
       const documentResponse = await fetch(selectedDocument);
       if (!documentResponse.ok) {
         throw new Error("Failed to fetch document");
@@ -55,7 +79,6 @@ export default function SignDocumentDWSPage() {
 
       const documentBlob = await documentResponse.blob();
 
-      // Prepare form data
       const formData = new FormData();
       formData.append(
         "file",
@@ -64,7 +87,6 @@ export default function SignDocumentDWSPage() {
       );
       formData.append("signatureType", signatureType);
 
-      // Call our API to sign the document
       const response = await fetch("/api/sign-document-dws/api/sign", {
         method: "POST",
         body: formData,
@@ -75,10 +97,7 @@ export default function SignDocumentDWSPage() {
         throw new Error(errorData.error || "Failed to sign document");
       }
 
-      // Get the signed PDF blob
       const signedBlob = await response.blob();
-
-      // Create a URL for the signed document
       const url = URL.createObjectURL(signedBlob);
       setSignedDocumentUrl(url);
     } catch (err) {
@@ -105,7 +124,7 @@ export default function SignDocumentDWSPage() {
   }, [selectedDocument]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PageHeader
         title="DWS API Document Signing"
         description="Sign PDF documents server-side by uploading to Nutrient DWS Processor API"
@@ -119,7 +138,7 @@ export default function SignDocumentDWSPage() {
               href="https://www.nutrient.io/api/signing-api/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
+              className="btn ghost btn-sm"
             >
               API Documentation
             </a>
@@ -127,7 +146,7 @@ export default function SignDocumentDWSPage() {
               href="https://www.nutrient.io/guides/dws-processor/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
+              className="btn ghost btn-sm"
             >
               DWS Processor Guide
             </a>
@@ -135,14 +154,22 @@ export default function SignDocumentDWSPage() {
         }
       />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+        }}
+      >
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--code-coral)")}
+            >
               <svg
-                className="w-6 h-6 text-orange-600 dark:text-orange-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -156,19 +183,25 @@ export default function SignDocumentDWSPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               Server-Side Signing
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Send complete documents to DWS API for server-side digital
               signature processing
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--disc-pink)")}
+            >
               <svg
-                className="w-6 h-6 text-pink-600 dark:text-pink-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,18 +215,24 @@ export default function SignDocumentDWSPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               Full Document Processing
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Complete PDF is sent to DWS API and returned fully signed
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--data-green)")}
+            >
               <svg
-                className="w-6 h-6 text-teal-600 dark:text-teal-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -213,10 +252,13 @@ export default function SignDocumentDWSPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               Configurable Signatures
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Choose between visible and invisible signatures with CAdES b-lt
               validation
             </p>
@@ -225,25 +267,34 @@ export default function SignDocumentDWSPage() {
 
         {/* Document Selection Section */}
         {!signedDocumentUrl && (
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+          <div className="p-8 mb-8" style={cardStyle}>
+            <h3
+              className="text-2xl font-bold mb-6"
+              style={{ color: "var(--ink)" }}
+            >
               Select Document to Sign
             </h3>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-800 dark:text-red-300">
-                  {error}
-                </p>
+              <div
+                className="mb-6 p-4"
+                style={{
+                  background: "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+                  border: "1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line))",
+                  borderRadius: "var(--r-2)",
+                  color: "var(--code-coral)",
+                }}
+              >
+                <p className="text-sm">{error}</p>
               </div>
             )}
 
             <div className="space-y-6">
-              {/* Document Selection */}
               <div>
                 <label
                   htmlFor="document-select"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--ink-2)" }}
                 >
                   Choose PDF Document
                 </label>
@@ -251,7 +302,8 @@ export default function SignDocumentDWSPage() {
                   id="document-select"
                   value={selectedDocument}
                   onChange={(e) => setSelectedDocument(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 focus:outline-none"
+                  style={inputStyle}
                 >
                   {AVAILABLE_DOCUMENTS.map((doc) => (
                     <option key={doc.path} value={doc.path}>
@@ -261,9 +313,11 @@ export default function SignDocumentDWSPage() {
                 </select>
               </div>
 
-              {/* Signature Type */}
               <div>
-                <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--ink-2)" }}
+                >
                   Signature Type
                 </div>
                 <div className="flex gap-4">
@@ -276,9 +330,13 @@ export default function SignDocumentDWSPage() {
                       onChange={(e) =>
                         setSignatureType(e.target.value as "invisible")
                       }
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer"
+                      style={{ accentColor: "var(--accent)" }}
                     />
-                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                    <span
+                      className="text-sm"
+                      style={{ color: "var(--ink)" }}
+                    >
                       Invisible (Cryptographic only)
                     </span>
                   </label>
@@ -291,27 +349,30 @@ export default function SignDocumentDWSPage() {
                       onChange={(e) =>
                         setSignatureType(e.target.value as "visible")
                       }
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer"
+                      style={{ accentColor: "var(--accent)" }}
                     />
-                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                    <span
+                      className="text-sm"
+                      style={{ color: "var(--ink)" }}
+                    >
                       Visible
                     </span>
                   </label>
                 </div>
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-xs" style={{ color: "var(--ink-3)" }}>
                   {signatureType === "invisible"
                     ? "Signature will be embedded cryptographically without visible appearance"
                     : "Signature will appear on the first page with date and watermark"}
                 </p>
               </div>
 
-              {/* Sign Button */}
               <div className="flex justify-center pt-4">
                 <button
                   type="button"
                   onClick={handleSign}
                   disabled={isSigning}
-                  className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSigning ? (
                     <>
@@ -367,28 +428,31 @@ export default function SignDocumentDWSPage() {
         {signedDocumentUrl && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <h3
+                className="text-2xl font-bold"
+                style={{ color: "var(--ink)" }}
+              >
                 Signed Document
               </h3>
               <div className="flex gap-3">
                 <a
                   href={signedDocumentUrl}
                   download={`signed-${selectedDocumentName}.pdf`}
-                  className="btn btn-sm btn-secondary"
+                  className="btn ghost btn-sm"
                 >
                   Download Signed PDF
                 </a>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="btn btn-sm btn-secondary"
+                  className="btn ghost btn-sm"
                 >
                   Sign Another Document
                 </button>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-hidden" style={cardStyle}>
               <div className="h-[calc(100vh-28rem)]">
                 <Viewer documentUrl={signedDocumentUrl} />
               </div>
@@ -396,13 +460,19 @@ export default function SignDocumentDWSPage() {
           </div>
         )}
 
-        {/* How It Works - Collapsible */}
+        {/* How It Works */}
         {!signedDocumentUrl && (
-          <details className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <summary className="text-xl font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:opacity-80">
+          <details className="p-6" style={cardStyle}>
+            <summary
+              className="text-xl font-semibold cursor-pointer hover:opacity-80"
+              style={{ color: "var(--ink)" }}
+            >
               How It Works
             </summary>
-            <ol className="mt-4 ml-5 space-y-2 text-gray-600 dark:text-gray-400 list-decimal">
+            <ol
+              className="mt-4 ml-5 space-y-2 list-decimal"
+              style={{ color: "var(--ink-2)" }}
+            >
               <li>Select a PDF document from the available samples</li>
               <li>Choose between visible or invisible signature types</li>
               <li>
@@ -423,9 +493,11 @@ export default function SignDocumentDWSPage() {
           </details>
         )}
 
-        {/* Footer Note */}
         {!signedDocumentUrl && (
-          <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 text-center">
+          <div
+            className="mt-6 text-sm text-center"
+            style={{ color: "var(--ink-3)" }}
+          >
             <p>
               This sample demonstrates server-side document signing using DWS
               Processor API. Requires NUTRIENT_API_KEY environment variable to

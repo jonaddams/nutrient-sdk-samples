@@ -14,15 +14,15 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@nutrient-sdk/viewer": "^1.13.1",
-    "lucide-react": "^1.8.0",
-    "next": "16.2.3",
+    "@nutrient-sdk/viewer": "^1.14.0",
+    "lucide-react": "^1.12.0",
+    "next": "16.2.4",
     "react": "19.2.5",
     "react-dom": "19.2.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.11",
-    "@tailwindcss/postcss": "^4.2.2",
+    "@biomejs/biome": "2.4.13",
+    "@tailwindcss/postcss": "^4.2.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -30,11 +30,11 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/ui": "^4.1.4",
-    "happy-dom": "^20.8.9",
+    "@vitest/ui": "^4.1.5",
+    "happy-dom": "^20.9.0",
     "shx": "^0.4.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^6.0.2",
-    "vitest": "^4.1.4"
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
   }
 }

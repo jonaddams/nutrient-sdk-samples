@@ -12,56 +12,36 @@
 .validation-sidebar {
   width: 300px;
   flex-shrink: 0;
-  background-color: var(--warm-gray-100);
-  border-right: 1px solid var(--warm-gray-400);
+  background: var(--bg-elev);
+  border-right: 1px solid var(--line);
   padding: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-sidebar {
-    background-color: var(--warm-gray-950);
-    border-right-color: var(--warm-gray-800);
-  }
-}
 
-/* Header */
+/* Header — uppercase mono eyebrow style matching .panel-section. */
 .validation-header {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--warm-gray-300);
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-header {
-    border-bottom-color: var(--warm-gray-800);
-  }
+  border-bottom: 1px solid var(--line);
 }
 
 .validation-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--black);
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-title {
-    color: var(--warm-gray-200);
-  }
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
 }
 
 .validation-subtitle {
-  font-size: 11px;
-  color: var(--warm-gray-700);
-  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-subtitle {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Status counters */
 .validation-counters {
@@ -72,96 +52,73 @@
 
 .validation-counter {
   flex: 1;
-  border-radius: 8px;
+  border-radius: var(--r-2);
   padding: 10px;
   text-align: center;
-  border: 1px solid;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
 }
 
 .validation-counter-value {
   font-size: 20px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .validation-counter-label {
+  font-family: var(--font-mono);
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   margin-top: 2px;
+  color: var(--ink-4);
 }
 
 .validation-counter--valid {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
+  background: color-mix(in srgb, var(--data-green) 12%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--data-green) 35%, var(--line));
 }
 
 .validation-counter--valid .validation-counter-value {
-  color: #16a34a;
-}
-
-.validation-counter--valid .validation-counter-label {
-  color: #22c55e;
+  color: var(--data-green);
 }
 
 .validation-counter--errors {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background: color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--code-coral) 35%, var(--line));
 }
 
 .validation-counter--errors .validation-counter-value {
-  color: #dc2626;
-}
-
-.validation-counter--errors .validation-counter-label {
-  color: #ef4444;
+  color: var(--code-coral);
 }
 
 .validation-counter--pending {
-  background-color: #f8fafc;
-  border-color: #e2e8f0;
+  background: var(--surface);
+  border-color: var(--line);
 }
 
 .validation-counter--pending .validation-counter-value {
-  color: #64748b;
+  color: var(--ink-3);
 }
 
-.validation-counter--pending .validation-counter-label {
-  color: #94a3b8;
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-counter--valid {
-    background-color: rgba(22, 163, 74, 0.1);
-    border-color: rgba(22, 163, 74, 0.3);
-  }
-
-  .validation-counter--errors {
-    background-color: rgba(220, 38, 38, 0.1);
-    border-color: rgba(220, 38, 38, 0.3);
-  }
-
-  .validation-counter--pending {
-    background-color: rgba(100, 116, 139, 0.1);
-    border-color: rgba(100, 116, 139, 0.3);
-  }
-}
 
 /* Section labels */
 .validation-section-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.12em;
   margin-bottom: 8px;
   padding: 0 20px;
 }
 
 .validation-section-label--errors {
-  color: #ef4444;
+  color: var(--code-coral);
 }
 
 .validation-section-label--valid {
-  color: #22c55e;
+  color: var(--data-green);
 }
 
 /* Scrollable content */
@@ -183,54 +140,34 @@
 }
 
 .validation-error-card {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
+  background: color-mix(in srgb, var(--code-coral) 10%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line));
+  border-radius: var(--r-2);
   padding: 10px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s;
   text-align: left;
   width: 100%;
 }
 
 .validation-error-card:hover {
-  background-color: #fee2e2;
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-error-card {
-    background-color: rgba(220, 38, 38, 0.1);
-    border-color: rgba(220, 38, 38, 0.3);
-  }
-
-  .validation-error-card:hover {
-    background-color: rgba(220, 38, 38, 0.15);
-  }
+  background: color-mix(in srgb, var(--code-coral) 18%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--code-coral) 55%, var(--line));
 }
 
 .validation-error-field {
   font-weight: 600;
   font-size: 12px;
-  color: #b91c1c;
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-error-field {
-    color: #fca5a5;
-  }
+  color: var(--code-coral);
 }
 
 .validation-error-message {
   font-size: 11px;
-  color: #dc2626;
+  color: color-mix(in srgb, var(--code-coral) 80%, var(--ink-2));
   margin-top: 2px;
+  line-height: 1.4;
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-error-message {
-    color: #f87171;
-  }
-}
 
 /* Valid field rows */
 .validation-valid-list {
@@ -243,59 +180,45 @@
 .validation-valid-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 8px 10px;
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 6px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .validation-valid-row {
-    background-color: rgba(22, 163, 74, 0.1);
-    border-color: rgba(22, 163, 74, 0.3);
-  }
+  background: color-mix(in srgb, var(--data-green) 10%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--data-green) 35%, var(--line));
+  border-radius: var(--r-2);
 }
 
 .validation-valid-check {
-  color: #22c55e;
+  color: var(--data-green);
   font-size: 14px;
+  font-weight: 700;
 }
 
 .validation-valid-name {
   font-size: 12px;
-  color: #16a34a;
+  color: var(--data-green);
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-valid-name {
-    color: #86efac;
-  }
-}
 
-/* Action buttons */
+/* Action buttons — use the same shape vocabulary as .panel-button. */
 .validation-actions {
   padding: 12px 20px;
-  border-top: 1px solid var(--warm-gray-300);
+  border-top: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-actions {
-    border-top-color: var(--warm-gray-800);
-  }
-}
-
 .validation-btn-primary {
-  background: var(--digital-pollen);
-  color: var(--black);
-  border: none;
-  border-radius: 6px;
+  background: var(--accent);
+  color: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-2);
   padding: 10px;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: opacity 0.15s;
 }
@@ -305,47 +228,35 @@
 }
 
 .validation-btn-secondary {
-  background: transparent;
-  color: var(--warm-gray-700);
-  border: 1px solid var(--warm-gray-400);
-  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
   padding: 10px;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .validation-btn-secondary:hover {
-  border-color: var(--warm-gray-600);
-  color: var(--black);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-btn-secondary {
-    color: var(--warm-gray-400);
-    border-color: var(--warm-gray-700);
-  }
-
-  .validation-btn-secondary:hover {
-    border-color: var(--warm-gray-500);
-    color: var(--warm-gray-200);
-  }
-}
 
 /* Empty state */
 .validation-empty {
   font-size: 13px;
-  color: var(--warm-gray-700);
+  color: var(--ink-3);
   text-align: center;
   padding: 16px 20px;
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .validation-empty {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Viewer */
 .validation-viewer-container {
