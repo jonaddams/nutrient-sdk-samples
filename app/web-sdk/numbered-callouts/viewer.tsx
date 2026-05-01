@@ -376,14 +376,35 @@ export default function NumberedCalloutsViewer() {
     [],
   );
 
+  const isPlacing = placeMode.phase !== "idle";
+
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-72 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
+      <div
+        className="w-72 flex flex-col overflow-y-auto"
+        style={{
+          background: "var(--bg-elev)",
+          borderRight: "1px solid var(--line)",
+        }}
+      >
         <div className="p-5 flex flex-col gap-3">
+          <div
+            className="panel-section"
+            style={{ paddingTop: 0, marginBottom: -4 }}
+          >
+            Punch List
+          </div>
+
           <button
             type="button"
-            className="w-full rounded-lg border-2 border-[var(--digital-pollen)] bg-[var(--digital-pollen)]/10 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:bg-[var(--digital-pollen)]/20 cursor-pointer"
+            className="w-full px-4 py-2.5 text-sm font-semibold cursor-pointer transition-colors"
+            style={{
+              background: isPlacing ? "var(--accent)" : "var(--accent-tint)",
+              color: isPlacing ? "var(--bg)" : "var(--accent)",
+              border: `1px solid var(--accent)`,
+              borderRadius: "var(--r-2)",
+            }}
             onClick={() => {
               setPlaceMode((m) =>
                 m.phase === "idle"
@@ -399,20 +420,36 @@ export default function NumberedCalloutsViewer() {
                 : "Click to place bubble (Esc to cancel)"}
           </button>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Click <strong>Add Callout</strong>, then click once on the drawing
-            to set the arrow tip and again to place the bubble.
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: "var(--ink-3)" }}
+          >
+            Click <strong style={{ color: "var(--ink-2)" }}>Add Callout</strong>
+            , then click once on the drawing to set the arrow tip and again to
+            place the bubble.
           </p>
 
-          <ul className="space-y-2 pl-0!">
+          <ul className="space-y-2" style={{ paddingLeft: 0, margin: 0 }}>
             {callouts.map((c) => (
               <li
                 key={c.calloutId}
-                className="flex items-start gap-3 rounded border border-[var(--warm-gray-400)] p-2"
+                className="flex items-start gap-3 p-2"
+                style={{
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-2)",
+                  background: "var(--bg-elev)",
+                  listStyle: "none",
+                }}
               >
                 <button
                   type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-xs font-semibold text-white cursor-pointer"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center text-xs font-semibold cursor-pointer"
+                  style={{
+                    background: "var(--code-coral)",
+                    color: "#fff",
+                    borderRadius: "var(--r-pill)",
+                    border: "none",
+                  }}
                   onClick={() => focusCallout(c)}
                   aria-label={`Focus callout ${c.number}`}
                 >
@@ -424,12 +461,20 @@ export default function NumberedCalloutsViewer() {
                   onChange={(e) =>
                     updateDescription(c.calloutId, e.target.value)
                   }
-                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white leading-snug border-none outline-none focus:ring-1 focus:ring-[var(--digital-pollen)] rounded px-1"
+                  className="flex-1 bg-transparent text-sm leading-snug border-none outline-none rounded px-1"
+                  style={{ color: "var(--ink)" }}
                   aria-label={`Description for callout ${c.number}`}
                 />
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-red-600 text-sm cursor-pointer"
+                  className="text-sm cursor-pointer transition-colors"
+                  style={{ color: "var(--ink-4)" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "var(--code-coral)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "var(--ink-4)";
+                  }}
                   onClick={async () => {
                     const instance = instanceRef.current;
                     if (!instance) return;
@@ -446,7 +491,7 @@ export default function NumberedCalloutsViewer() {
           {callouts.length > 0 && (
             <button
               type="button"
-              className="w-full rounded border border-[var(--warm-gray-400)] px-3 py-2 text-xs text-gray-600 dark:text-gray-400 hover:text-red-600 hover:border-red-600 cursor-pointer"
+              className="panel-button"
               onClick={async () => {
                 const instance = instanceRef.current;
                 if (!instance) return;
@@ -471,7 +516,10 @@ export default function NumberedCalloutsViewer() {
             </button>
           )}
 
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div
+            className="text-xs font-mono tabular-nums"
+            style={{ color: "var(--ink-4)" }}
+          >
             Next number: #{nextNumber}
           </div>
         </div>

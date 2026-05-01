@@ -66,7 +66,7 @@ export class ViewerErrorBoundary extends React.Component<
 
       // Default error UI
       return (
-        <div className="h-full flex items-center justify-center bg-white dark:bg-[#1a1414] p-8">
+        <div className="h-full flex items-center justify-center p-8" style={{ background: "var(--bg)" }}>
           <div className="max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="w-8 h-8 text-red-600" />

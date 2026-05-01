@@ -90,7 +90,7 @@ export default function PdfToOfficePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="PDF to Office"
         description="Convert PDF documents to Word and Excel formats using the Nutrient Java SDK."

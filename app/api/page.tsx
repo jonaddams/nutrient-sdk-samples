@@ -1,195 +1,79 @@
-import Link from "next/link";
-import { PageHeader } from "@/app/_components/PageHeader";
+import { SamplesIndex, type Sample } from "@/app/_components/SamplesIndex";
+
+const samples: Sample[] = [
+  {
+    name: "Web SDK Digital Signature (DWS)",
+    category: "Signatures",
+    description:
+      "Sign documents directly in the Nutrient Web SDK viewer using DWS API for secure, in-browser digital signatures",
+    path: "/api/sign-document-web-sdk-dws",
+  },
+  {
+    name: "DWS Document Signing",
+    category: "Signatures",
+    description:
+      "Upload and sign PDF documents server-side using DWS Processor API with visible or invisible signatures",
+    path: "/api/sign-document-dws",
+  },
+  {
+    name: "Markdown Comparison",
+    category: "Comparison",
+    description:
+      "Compare documents using Nutrient DWS API to convert PDFs to Markdown, preserving semantic structure for accurate cross-page comparison",
+    path: "/api/markdown-comparison",
+    wip: true,
+  },
+  {
+    name: "HTML Comparison",
+    category: "Comparison",
+    description:
+      "Compare documents using Nutrient DWS API to convert PDFs to HTML, preserving semantic structure for accurate cross-page comparison",
+    path: "/api/html-comparison",
+    wip: true,
+  },
+  {
+    name: "Text File Viewer",
+    category: "Conversion",
+    description:
+      "View .txt, .csv, and .xml files in the Nutrient viewer by converting them to styled HTML and then to PDF via DWS API",
+    path: "/api/text-viewer",
+  },
+];
+
+const categories = ["All", "Signatures", "Comparison", "Conversion"];
 
 export default function APIPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <PageHeader
-        title="Nutrient DWS API"
-        breadcrumbs={[{ label: "Home", href: "/" }]}
-        actions={
-          <>
-            <a
-              href="https://www.nutrient.io/api/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
-            >
-              Product Home
-            </a>
-            <a
-              href="https://www.nutrient.io/guides/api/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
-            >
-              Guides
-            </a>
-            <a
-              href="https://github.com/jonaddams/nutrient-sdk-samples"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
-            >
-              Source
-            </a>
-          </>
-        }
-      />
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* About Section */}
-        <div className="mb-8">
-          <h2 className="!mb-6">About</h2>
-          <p className="opacity-80 mb-6 max-w-4xl">
-            Nutrient DWS API provides powerful RESTful document operations
-            without requiring SDK installation or server management. Convert,
-            merge, split, and process documents with simple HTTP requests.
-          </p>
-        </div>
-
-        {/* Available Samples */}
-        <div className="mb-16">
-          <h2 className="!mb-6">Available Samples</h2>
-
-          {/* Samples Table */}
-          <div className="nutrient-table-container">
-            <table className="nutrient-table">
-              <thead>
-                <tr>
-                  <th className="nutrient-th nutrient-th-title">Name</th>
-                  <th className="nutrient-th nutrient-th-title">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="nutrient-td nutrient-td-bold">
-                    <Link
-                      href="/api/sign-document-web-sdk-dws"
-                      className="hover:opacity-70 transition-opacity"
-                    >
-                      Web SDK Digital Signature (DWS)
-                    </Link>
-                  </td>
-                  <td className="nutrient-td">
-                    Sign documents directly in the Nutrient Web SDK viewer using
-                    DWS API for secure, in-browser digital signatures
-                  </td>
-                </tr>
-                <tr>
-                  <td className="nutrient-td nutrient-td-bold">
-                    <Link
-                      href="/api/sign-document-dws"
-                      className="hover:opacity-70 transition-opacity"
-                    >
-                      DWS Document Signing
-                    </Link>
-                  </td>
-                  <td className="nutrient-td">
-                    Upload and sign PDF documents server-side using DWS
-                    Processor API with visible or invisible signatures
-                  </td>
-                </tr>
-                <tr>
-                  <td className="nutrient-td nutrient-td-bold">
-                    <Link
-                      href="/api/markdown-comparison"
-                      className="hover:opacity-70 transition-opacity"
-                    >
-                      Markdown Comparison
-                    </Link>
-                    <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full">
-                      Work in Progress
-                    </span>
-                  </td>
-                  <td className="nutrient-td">
-                    Compare documents using Nutrient DWS API to convert PDFs to
-                    Markdown, preserving semantic structure for accurate
-                    cross-page comparison
-                  </td>
-                </tr>
-                <tr>
-                  <td className="nutrient-td nutrient-td-bold">
-                    <Link
-                      href="/api/html-comparison"
-                      className="hover:opacity-70 transition-opacity"
-                    >
-                      HTML Comparison
-                    </Link>
-                    <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full">
-                      Work in Progress
-                    </span>
-                  </td>
-                  <td className="nutrient-td">
-                    Compare documents using Nutrient DWS API to convert PDFs to
-                    HTML, preserving semantic structure for accurate cross-page
-                    comparison
-                  </td>
-                </tr>
-                <tr>
-                  <td className="nutrient-td nutrient-td-bold">
-                    <Link
-                      href="/api/text-viewer"
-                      className="hover:opacity-70 transition-opacity"
-                    >
-                      Text File Viewer
-                    </Link>
-                  </td>
-                  <td className="nutrient-td">
-                    View .txt, .csv, and .xml files in the Nutrient viewer by
-                    converting them to styled HTML and then to PDF via DWS API
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Standalone Demo */}
-        <div className="mb-16">
-          <h2 className="!mb-6">Standalone Demo App</h2>
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 max-w-4xl">
-            <h3 className="!mb-3">DWS CRUD</h3>
-            <p className="opacity-80 !mb-6">
-              A self-contained CRUD application built on the Nutrient DWS APIs
-              for viewing and editing documents. Hosted separately from this
-              repo.
-            </p>
-            <div className="flex gap-4 flex-wrap !mb-4">
-              <a
-                href="https://dws-crud.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                Launch Demo
-              </a>
-              <a
-                href="https://github.com/jonaddams/dws-crud"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Source
-              </a>
-            </div>
-            <p className="text-sm opacity-60 italic !mb-0">
-              Access requires a Nutrient Google account — ask your Nutrient
-              rep for a walkthrough.
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Note */}
-        <div className="text-sm opacity-60">
+    <SamplesIndex
+      title="Nutrient DWS API"
+      description="RESTful document operations without SDK installation or server management — convert, merge, split, and sign with HTTP."
+      samples={samples}
+      categories={categories}
+      productHomeUrl="https://www.nutrient.io/api/"
+      guidesUrl="https://www.nutrient.io/guides/dws-api/"
+      intro={
+        <div className="callout">
+          <span className="callout-label">Standalone demo</span>
           <p>
-            These samples demonstrate the Nutrient DWS API capabilities.
-            Requires a Nutrient DWS API key configured in your environment
-            variables.
+            <a
+              href="https://dws-crud.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              DWS CRUD
+            </a>{" "}
+            — a self-contained CRUD app built on the DWS APIs (
+            <a
+              href="https://github.com/jonaddams/dws-crud"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              source
+            </a>
+            ). Access requires a Nutrient Google account.
           </p>
         </div>
-      </main>
-    </div>
+      }
+    />
   );
 }

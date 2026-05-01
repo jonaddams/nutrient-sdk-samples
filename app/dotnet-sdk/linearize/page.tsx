@@ -8,7 +8,10 @@ import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
 const Viewer = dynamic(() => import("../_components/PdfBlobViewer"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full text-sm text-gray-400 dark:text-gray-500">
+    <div
+      className="flex items-center justify-center h-full text-sm"
+      style={{ color: "var(--ink-4)" }}
+    >
       Loading viewer...
     </div>
   ),
@@ -42,22 +45,34 @@ function formatBytes(n: number): string {
 }
 
 async function isLinearized(blob: Blob): Promise<boolean> {
-  // The linearization dict lives in the first PDF object, well within the first 2 KB.
   const head = await blob.slice(0, 2048).text();
   return /\/Linearized\b/.test(head);
 }
 
 type TabId = "original" | "linearized";
 
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+  overflow: "hidden",
+};
+
 export default function LinearizePage() {
-  const [selectedSampleId, setSelectedSampleId] = useState<string>(SAMPLES[0].id);
+  const [selectedSampleId, setSelectedSampleId] = useState<string>(
+    SAMPLES[0].id,
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [originalBlob, setOriginalBlob] = useState<Blob | null>(null);
   const [linearizedBlob, setLinearizedBlob] = useState<Blob | null>(null);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
   const [linearizedSize, setLinearizedSize] = useState<number | null>(null);
-  const [originalFastWebView, setOriginalFastWebView] = useState<boolean | null>(null);
-  const [linearizedFastWebView, setLinearizedFastWebView] = useState<boolean | null>(null);
+  const [originalFastWebView, setOriginalFastWebView] = useState<
+    boolean | null
+  >(null);
+  const [linearizedFastWebView, setLinearizedFastWebView] = useState<
+    boolean | null
+  >(null);
   const [activeTabId, setActiveTabId] = useState<TabId>("linearized");
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +91,10 @@ export default function LinearizePage() {
 
       const fileName = sample.url.split("/").pop() ?? "document.pdf";
       const formData = new FormData();
-      formData.append("file", new File([inputBlob], fileName, { type: "application/pdf" }));
+      formData.append(
+        "file",
+        new File([inputBlob], fileName, { type: "application/pdf" }),
+      );
 
       const res = await fetch("/api/dotnet-sdk/linearize", {
         method: "POST",
@@ -92,7 +110,6 @@ export default function LinearizePage() {
       setLinearizedBlob(resultBlob);
       setLinearizedSize(resultBlob.size);
 
-      // Compute fast-web-view status for both blobs
       const [origFwv, linearFwv] = await Promise.all([
         isLinearized(inputBlob),
         isLinearized(resultBlob),
@@ -103,7 +120,6 @@ export default function LinearizePage() {
       setActiveTabId("linearized");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Linearization failed");
-      // Keep any previous successful blobs intact
     } finally {
       setIsRunning(false);
     }
@@ -128,31 +144,47 @@ export default function LinearizePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <DotNetSampleHeader
         title="Linearize PDF"
         description="Restructure a PDF for fast web view using the Nutrient .NET SDK. The first page renders before the full file downloads — ideal for HTTP delivery."
       />
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+        }}
+      >
+        <div style={cardStyle}>
           <div className="flex">
             {/* Left Panel — Controls */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0 min-h-[calc(100vh-12rem)]">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div
+              className="w-80 flex flex-col shrink-0 min-h-[calc(100vh-12rem)]"
+              style={{
+                background: "var(--surface)",
+                borderRight: "1px solid var(--line)",
+              }}
+            >
+              <div
+                className="p-4"
+                style={{ borderBottom: "1px solid var(--line)" }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--ink)" }}
+                >
                   Input Document
                 </h3>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Sample picker */}
                 <SamplePicker
                   samples={SAMPLES}
                   selectedId={selectedSampleId}
                   onSelect={(id) => {
                     setSelectedSampleId(id);
-                    // Clear previous results when switching samples
                     setOriginalBlob(null);
                     setLinearizedBlob(null);
                     setOriginalSize(null);
@@ -164,76 +196,115 @@ export default function LinearizePage() {
                   disabled={isRunning}
                 />
 
-                {/* Run button */}
                 <button
                   type="button"
                   onClick={handleRun}
                   disabled={isRunning}
-                  className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
-                  }}
+                  className="btn btn-sm w-full"
                 >
                   {isRunning ? "Linearizing..." : "Run"}
                 </button>
 
-                {/* Error */}
                 {error && (
-                  <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-xs text-red-700 dark:text-red-300">
+                  <div
+                    className="p-3 text-xs"
+                    style={{
+                      background:
+                        "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+                      border:
+                        "1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line))",
+                      borderRadius: "var(--r-2)",
+                      color: "var(--code-coral)",
+                    }}
+                  >
                     {error}
                   </div>
                 )}
 
-                {/* Fast Web View + Size table */}
                 {originalSize !== null && linearizedSize !== null && (
-                  <div className="rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div
+                    className="overflow-hidden"
+                    style={{
+                      border: "1px solid var(--line)",
+                      borderRadius: "var(--r-2)",
+                    }}
+                  >
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="bg-gray-50 dark:bg-[#1a1414] border-b border-gray-200 dark:border-gray-700">
-                          <th className="text-left px-3 py-2 font-semibold text-gray-500 dark:text-gray-400">
+                        <tr
+                          style={{
+                            background: "var(--surface)",
+                            borderBottom: "1px solid var(--line)",
+                          }}
+                        >
+                          <th
+                            className="text-left px-3 py-2 font-semibold"
+                            style={{ color: "var(--ink-3)" }}
+                          >
                             Metric
                           </th>
-                          <th className="text-right px-3 py-2 font-semibold text-gray-500 dark:text-gray-400">
+                          <th
+                            className="text-right px-3 py-2 font-semibold"
+                            style={{ color: "var(--ink-3)" }}
+                          >
                             Original
                           </th>
-                          <th className="text-right px-3 py-2 font-semibold text-gray-500 dark:text-gray-400">
+                          <th
+                            className="text-right px-3 py-2 font-semibold"
+                            style={{ color: "var(--ink-3)" }}
+                          >
                             Linearized
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="border-b border-gray-100 dark:border-gray-800">
-                          <td className="px-3 py-2 text-gray-600 dark:text-gray-400">
+                        <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                          <td
+                            className="px-3 py-2"
+                            style={{ color: "var(--ink-3)" }}
+                          >
                             Fast Web View
                           </td>
                           <td className="px-3 py-2 text-right font-mono">
                             {originalFastWebView === null ? (
-                              <span className="text-gray-400">—</span>
+                              <span style={{ color: "var(--ink-4)" }}>—</span>
                             ) : originalFastWebView ? (
-                              <span className="text-green-600 dark:text-green-400">Yes</span>
+                              <span style={{ color: "var(--data-green)" }}>
+                                Yes
+                              </span>
                             ) : (
-                              <span className="text-gray-500 dark:text-gray-400">No</span>
+                              <span style={{ color: "var(--ink-3)" }}>No</span>
                             )}
                           </td>
                           <td className="px-3 py-2 text-right font-mono">
                             {linearizedFastWebView === null ? (
-                              <span className="text-gray-400">—</span>
+                              <span style={{ color: "var(--ink-4)" }}>—</span>
                             ) : linearizedFastWebView ? (
-                              <span className="text-green-600 dark:text-green-400">Yes</span>
+                              <span style={{ color: "var(--data-green)" }}>
+                                Yes
+                              </span>
                             ) : (
-                              <span className="text-gray-500 dark:text-gray-400">No</span>
+                              <span style={{ color: "var(--ink-3)" }}>No</span>
                             )}
                           </td>
                         </tr>
                         <tr>
-                          <td className="px-3 py-2 text-gray-600 dark:text-gray-400">
+                          <td
+                            className="px-3 py-2"
+                            style={{ color: "var(--ink-3)" }}
+                          >
                             Size
                           </td>
-                          <td className="px-3 py-2 text-right font-mono text-gray-700 dark:text-gray-300">
+                          <td
+                            className="px-3 py-2 text-right font-mono"
+                            style={{ color: "var(--ink-2)" }}
+                          >
                             {formatBytes(originalSize)}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono text-gray-700 dark:text-gray-300">
+                          <td
+                            className="px-3 py-2 text-right font-mono"
+                            style={{ color: "var(--ink-2)" }}
+                          >
                             {formatBytes(linearizedSize)}
                           </td>
                         </tr>
@@ -242,33 +313,49 @@ export default function LinearizePage() {
                   </div>
                 )}
 
-                {/* Download button */}
                 {linearizedBlob && (
                   <button
                     type="button"
                     onClick={handleDownload}
-                    className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="btn ghost btn-sm w-full"
                   >
                     Download Linearized PDF
                   </button>
                 )}
 
-                {/* Description */}
-                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Linearization restructures a PDF for fast web view, allowing the
-                  first page to render before the entire file downloads. Useful for
-                  documents served over HTTP.
+                <p
+                  className="text-xs leading-relaxed"
+                  style={{ color: "var(--ink-3)" }}
+                >
+                  Linearization restructures a PDF for fast web view, allowing
+                  the first page to render before the entire file downloads.
+                  Useful for documents served over HTTP.
                 </p>
               </div>
             </div>
 
             {/* Right Panel — Tab bar + Viewer */}
-            <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-12rem)]">
+            <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-12rem)] relative">
               {isRunning && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60 pointer-events-none">
+                <div
+                  className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+                  style={{
+                    background:
+                      "color-mix(in srgb, var(--bg) 70%, transparent)",
+                  }}
+                >
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div
+                      className="inline-block w-6 h-6 rounded-full animate-spin"
+                      style={{
+                        border: "2px solid var(--line)",
+                        borderTopColor: "var(--accent)",
+                      }}
+                    />
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--ink-3)" }}
+                    >
                       Linearizing PDF...
                     </p>
                   </div>
@@ -277,30 +364,51 @@ export default function LinearizePage() {
 
               {showViewer ? (
                 <>
-                  {/* Tab bar */}
-                  <div className="flex items-center border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020] overflow-x-auto flex-shrink-0">
-                    {TABS.map((tab) => (
-                      <div
-                        key={tab.id}
-                        className={
-                          "flex items-center px-4 py-2.5 text-sm border-r border-gray-200 dark:border-gray-700 cursor-pointer transition-colors " +
-                          (tab.id === activeTabId
-                            ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1414]")
-                        }
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setActiveTabId(tab.id)}
-                          className="cursor-pointer"
+                  <div
+                    className="flex items-center overflow-x-auto shrink-0"
+                    style={{
+                      background: "var(--surface)",
+                      borderBottom: "1px solid var(--line)",
+                    }}
+                  >
+                    {TABS.map((tab) => {
+                      const isActive = tab.id === activeTabId;
+                      return (
+                        <div
+                          key={tab.id}
+                          className="flex items-center px-4 py-2.5 text-sm cursor-pointer transition-colors"
+                          style={{
+                            background: isActive
+                              ? "var(--bg-elev)"
+                              : "transparent",
+                            color: isActive ? "var(--ink)" : "var(--ink-3)",
+                            fontWeight: isActive ? 500 : 400,
+                            borderRight: "1px solid var(--line)",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background =
+                                "var(--accent-tint)";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = "transparent";
+                            }
+                          }}
                         >
-                          {tab.label}
-                        </button>
-                      </div>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() => setActiveTabId(tab.id)}
+                            className="cursor-pointer"
+                          >
+                            {tab.label}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  {/* Viewer */}
                   <div className="flex-1 min-h-0">
                     {activeBlob && (
                       <Viewer key={activeTabId} blob={activeBlob} />
@@ -308,11 +416,15 @@ export default function LinearizePage() {
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                <div
+                  className="flex-1 flex items-center justify-center"
+                  style={{ color: "var(--ink-4)" }}
+                >
                   <div className="text-center space-y-2">
                     <p className="text-sm">Run linearize to see the result.</p>
                     <p className="text-xs">
-                      Original and linearized PDFs will appear in side-by-side tabs.
+                      Original and linearized PDFs will appear in side-by-side
+                      tabs.
                     </p>
                   </div>
                 </div>

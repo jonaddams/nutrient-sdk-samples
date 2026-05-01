@@ -75,7 +75,7 @@ export default function DigitalSignaturePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="Digital Signature"
         description="Apply a digital signature to a PDF document using a server-side certificate with the Nutrient Java SDK."

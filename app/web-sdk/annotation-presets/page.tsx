@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { PresetConfig } from "./viewer";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -276,111 +276,93 @@ export default function AnnotationPresetsPage() {
     properties: presetValues[def.key] ?? def.defaults,
   }));
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Annotation Presets"
-        description="Customize default properties for annotation tools. Changes apply instantly when you draw new annotations. Configure colors, sizes, fonts, line styles, and more."
-      />
+  const sidebar = (
+    <div className="flex flex-col overflow-y-auto h-full">
+      <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
+        <h3 className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+          Annotation Presets
+        </h3>
+        <p className="text-xs mt-1" style={{ color: "var(--ink-3)" }}>
+          Configure defaults for each annotation tool
+        </p>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="flex h-full">
-            {/* Sidebar */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0 overflow-y-auto">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Annotation Presets
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Configure defaults for each annotation tool
-                </p>
-              </div>
+      {PRESET_DEFINITIONS.map((def) => (
+        <div key={def.key} style={{ borderBottom: "1px solid var(--line)" }}>
+          <button
+            type="button"
+            onClick={() =>
+              setExpandedPreset((prev) =>
+                prev === def.key ? null : def.key,
+              )
+            }
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors cursor-pointer"
+            style={{ color: "var(--ink)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--accent-tint)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+            }}
+          >
+            <span>{def.label}</span>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                transform:
+                  expandedPreset === def.key
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                transition: "transform 0.2s",
+              }}
+            >
+              <title>Toggle</title>
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
 
-              {PRESET_DEFINITIONS.map((def) => (
-                <div
-                  key={def.key}
-                  className="border-b border-gray-200 dark:border-gray-700"
-                >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setExpandedPreset((prev) =>
-                        prev === def.key ? null : def.key,
-                      )
-                    }
-                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#1a1414] transition-colors cursor-pointer"
-                  >
-                    <span>{def.label}</span>
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{
-                        transform:
-                          expandedPreset === def.key
-                            ? "rotate(180deg)"
-                            : "rotate(0deg)",
-                        transition: "transform 0.2s",
-                      }}
-                    >
-                      <title>Toggle</title>
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                  </button>
-
-                  {expandedPreset === def.key && (
-                    <div className="px-4 pb-4 space-y-3">
-                      {def.fields.map((field) => (
-                        <FieldControl
-                          key={field.key}
-                          field={field}
-                          value={presetValues[def.key]?.[field.key]}
-                          onChange={(val) =>
-                            updateProperty(def.key, field.key, val)
-                          }
-                        />
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => resetPreset(def)}
-                        className="text-xs font-semibold px-3 py-1 rounded-md transition-colors cursor-pointer"
-                        style={{
-                          color: "var(--digital-pollen)",
-                          border: "1px solid var(--digital-pollen)",
-                          background: "transparent",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background =
-                            "var(--digital-pollen)";
-                          e.currentTarget.style.color = "var(--black)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "transparent";
-                          e.currentTarget.style.color = "var(--digital-pollen)";
-                        }}
-                      >
-                        Reset Defaults
-                      </button>
-                    </div>
-                  )}
-                </div>
+          {expandedPreset === def.key && (
+            <div className="px-4 pb-4 space-y-3">
+              {def.fields.map((field) => (
+                <FieldControl
+                  key={field.key}
+                  field={field}
+                  value={presetValues[def.key]?.[field.key]}
+                  onChange={(val) =>
+                    updateProperty(def.key, field.key, val)
+                  }
+                />
               ))}
+              <button
+                type="button"
+                onClick={() => resetPreset(def)}
+                className="btn ghost btn-sm"
+              >
+                Reset Defaults
+              </button>
             </div>
-
-            {/* Viewer */}
-            <div className="flex-1 min-w-0">
-              <Viewer presets={presetConfigs} />
-            </div>
-          </div>
+          )}
         </div>
-      </main>
+      ))}
     </div>
+  );
+
+  return (
+    <SampleFrame
+      title="Annotation Presets"
+      description="Customize default properties for annotation tools. Changes apply instantly when you draw new annotations. Configure colors, sizes, fonts, line styles, and more."
+      sidebar={sidebar}
+      sidebarSide="left"
+    >
+      <Viewer presets={presetConfigs} />
+    </SampleFrame>
   );
 }
 
@@ -393,22 +375,34 @@ function FieldControl({
   value: unknown;
   onChange: (val: unknown) => void;
 }) {
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "var(--text-xs)",
+    color: "var(--ink-3)",
+    marginBottom: 4,
+  };
+
   if (field.type === "color") {
     const colorVal = value as { r: number; g: number; b: number } | undefined;
     const hex = colorVal ? rgbToHex(colorVal) : "#000000";
     return (
       <div>
-        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-          {field.label}
-        </label>
+        <label style={labelStyle}>{field.label}</label>
         <div className="flex items-center gap-2">
           <input
             type="color"
             value={hex}
             onChange={(e) => onChange(hexToRgb(e.target.value))}
-            className="w-8 h-8 rounded cursor-pointer border border-gray-300 dark:border-gray-600"
+            className="w-8 h-8 cursor-pointer"
+            style={{
+              borderRadius: "var(--r-1)",
+              border: "1px solid var(--line)",
+            }}
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+          <span
+            className="text-xs font-mono"
+            style={{ color: "var(--ink-3)" }}
+          >
             {hex}
           </span>
         </div>
@@ -420,9 +414,7 @@ function FieldControl({
     const numVal = (value as number) ?? 0;
     return (
       <div>
-        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-          {field.label}
-        </label>
+        <label style={labelStyle}>{field.label}</label>
         <div className="flex items-center gap-2">
           <input
             type="range"
@@ -432,9 +424,12 @@ function FieldControl({
             value={numVal}
             onChange={(e) => onChange(Number(e.target.value))}
             className="flex-1"
-            style={{ accentColor: "var(--digital-pollen)" }}
+            style={{ accentColor: "var(--accent)" }}
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-8 text-right">
+          <span
+            className="text-xs font-mono tabular-nums w-8 text-right"
+            style={{ color: "var(--ink-3)" }}
+          >
             {field.step && field.step < 1 ? numVal.toFixed(1) : numVal}
           </span>
         </div>
@@ -449,16 +444,20 @@ function FieldControl({
     );
     return (
       <div>
-        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-          {field.label}
-        </label>
+        <label style={labelStyle}>{field.label}</label>
         <select
           value={currentIdx >= 0 ? currentIdx : 0}
           onChange={(e) => {
             const idx = Number(e.target.value);
             onChange(options[idx]?.value);
           }}
-          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
+          className="w-full px-2 py-1.5 text-sm focus:outline-none"
+          style={{
+            background: "var(--bg-elev)",
+            color: "var(--ink)",
+            border: "1px solid var(--line)",
+            borderRadius: "var(--r-2)",
+          }}
         >
           {options.map((opt, i) => (
             <option key={opt.label} value={i}>

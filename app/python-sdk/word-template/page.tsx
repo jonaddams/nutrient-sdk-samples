@@ -111,7 +111,7 @@ export default function WordTemplatePage() {
   const viewerDocument = pdfUrl || selected.templatePath;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Word Template Generation"
         description="Generate PDF documents from Word templates populated with JSON data using the Nutrient Python SDK."

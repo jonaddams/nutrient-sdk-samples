@@ -486,7 +486,7 @@ export default function FormFieldAnnotationsViewer() {
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-[280px] flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-[#1a1414]">
+      <div className="w-[280px] flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto" style={{ background: "var(--bg)" }}>
         {/* Role Switcher */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">

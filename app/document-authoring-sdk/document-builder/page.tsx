@@ -146,7 +146,13 @@ export default function DocumentBuilderPage() {
 
       <div className="flex-1 min-h-0 grid grid-cols-[38%_1fr]">
         {/* Left: Form Panel */}
-        <div className="bg-gray-900 border-r border-gray-700 overflow-hidden">
+        <div
+          className="overflow-hidden"
+          style={{
+            background: "var(--surface)",
+            borderRight: "1px solid var(--line)",
+          }}
+        >
           <ReportForm
             formState={formState}
             onChange={setFormState}

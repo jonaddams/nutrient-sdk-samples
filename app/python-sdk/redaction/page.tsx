@@ -236,7 +236,7 @@ export default function RedactionPage() {
   const viewerDocument = pdfUrl || SAMPLE_DOC.path;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="PDF Redaction"
         description="Permanently remove sensitive content from PDF documents using the Nutrient Python SDK."

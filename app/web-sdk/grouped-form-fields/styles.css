@@ -21,12 +21,6 @@
   gap: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-sidebar {
-    background-color: var(--warm-gray-950);
-    border-right-color: var(--warm-gray-800);
-  }
-}
 
 /* Section */
 .stamp-section {
@@ -44,11 +38,6 @@
   margin-bottom: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-label {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Creator Mode Toggle */
 .stamp-toggle-label {
@@ -84,11 +73,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-toggle-text {
-    color: var(--warm-gray-200);
-  }
-}
 
 /* Template Cards */
 .stamp-templates {
@@ -132,20 +116,6 @@
   opacity: 0.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-template-card {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-
-  .stamp-template-card:hover {
-    border-color: var(--warm-gray-500);
-  }
-
-  .stamp-template-active {
-    background-color: rgba(201, 183, 45, 0.08);
-  }
-}
 
 .stamp-template-color {
   width: 12px;
@@ -174,15 +144,6 @@
   line-height: 1.4;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-template-name {
-    color: var(--warm-gray-200);
-  }
-
-  .stamp-template-desc {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Placed Stamps List */
 .stamp-list {
@@ -226,23 +187,7 @@
   color: var(--code-coral);
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-delete-btn {
-    color: var(--warm-gray-500);
-  }
 
-  .stamp-delete-btn:hover {
-    background: rgba(244, 114, 91, 0.15);
-    color: var(--code-coral);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .stamp-list-item {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-}
 
 .stamp-list-color {
   width: 10px;
@@ -270,15 +215,6 @@
   font-family: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-list-name {
-    color: var(--warm-gray-300);
-  }
-
-  .stamp-list-meta {
-    color: var(--warm-gray-600);
-  }
-}
 
 /* Empty State */
 .stamp-empty {
@@ -289,11 +225,6 @@
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-empty {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Info box */
 .stamp-info {
@@ -310,17 +241,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .stamp-info {
-    color: var(--warm-gray-500);
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-
-  .stamp-info strong {
-    color: var(--warm-gray-300);
-  }
-}
 
 /* Viewer */
 .stamp-viewer-container {

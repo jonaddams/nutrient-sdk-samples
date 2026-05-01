@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { LayerInfo } from "./viewer";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -120,140 +120,201 @@ export default function LayerManagementPage() {
     [layers, visibleLayerIds],
   );
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Layer Management"
-        description="Toggle PDF layer groups (OCGs) to show or hide building systems on a construction floor plan. Use presets to quickly isolate specific systems."
-      />
+  const sidebar = (
+    <>
+      {/* Header */}
+      <div
+        className="p-4"
+        style={{ borderBottom: "1px solid var(--line)" }}
+      >
+        <div className="flex items-center justify-between">
+          <h3
+            className="text-sm font-semibold"
+            style={{ color: "var(--ink)" }}
+          >
+            Layers
+          </h3>
+          <span className="text-xs" style={{ color: "var(--ink-3)" }}>
+            {visibleCount} of {totalCount} visible
+          </span>
+        </div>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="flex h-full">
-            {/* Sidebar */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              {/* Header */}
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Layers
-                  </h3>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {visibleCount} of {totalCount} visible
+      {/* Layer toggles */}
+      <div className="flex-1 overflow-y-auto">
+        {layers.length === 0 ? (
+          <div
+            className="p-4 text-sm text-center"
+            style={{ color: "var(--ink-4)" }}
+          >
+            Loading layers...
+          </div>
+        ) : (
+          <div className="p-3 space-y-1">
+            {layersWithVisibility.map((layer) => (
+              <button
+                key={layer.id}
+                type="button"
+                onClick={() => toggleLayer(layer.id)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer"
+                style={{
+                  background: layer.visible
+                    ? "var(--bg-elev)"
+                    : "transparent",
+                  opacity: layer.visible ? 1 : 0.55,
+                  borderRadius: "var(--r-2)",
+                  border: "1px solid var(--line)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--accent-tint)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = layer.visible
+                    ? "var(--bg-elev)"
+                    : "transparent";
+                }}
+              >
+                {/* Color indicator */}
+                <span
+                  className={`w-3 h-3 rounded-full shrink-0 ${
+                    LAYER_COLORS[layer.name] ?? "bg-gray-400"
+                  } ${!layer.visible ? "opacity-30" : ""}`}
+                />
+
+                {/* Icon + name */}
+                <span className="flex items-center gap-2 flex-1 min-w-0">
+                  <LayerIcon
+                    icon={LAYER_ICONS[layer.name] ?? "layer"}
+                    visible={layer.visible}
+                  />
+                  <span
+                    className="truncate"
+                    style={{
+                      color: layer.visible ? "var(--ink)" : "var(--ink-4)",
+                      fontWeight: layer.visible ? 500 : 400,
+                    }}
+                  >
+                    {layer.name}
                   </span>
-                </div>
-              </div>
+                </span>
 
-              {/* Layer toggles */}
-              <div className="flex-1 overflow-y-auto">
-                {layers.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-500 dark:text-gray-500 text-center">
-                    Loading layers...
-                  </div>
-                ) : (
-                  <div className="p-3 space-y-1">
-                    {layersWithVisibility.map((layer) => (
-                      <button
-                        key={layer.id}
-                        type="button"
-                        onClick={() => toggleLayer(layer.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
-                          layer.visible
-                            ? "bg-gray-50 dark:bg-[#1a1414]"
-                            : "opacity-50 hover:opacity-75"
-                        } hover:bg-gray-100 dark:hover:bg-[#1a1414]`}
+                {/* Toggle indicator */}
+                <span
+                  className="w-8 h-5 flex items-center transition-colors shrink-0"
+                  style={{
+                    background: layer.visible
+                      ? "var(--accent)"
+                      : "var(--line-strong)",
+                    justifyContent: layer.visible ? "flex-end" : "flex-start",
+                    borderRadius: "var(--r-pill)",
+                  }}
+                >
+                  <span
+                    className="w-3.5 h-3.5 mx-0.5"
+                    style={{
+                      background: "#fff",
+                      borderRadius: "var(--r-pill)",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+                    }}
+                  />
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Presets */}
+        {layers.length > 0 && (
+          <div className="px-3 pb-3">
+            <div
+              className="pt-3 mt-1"
+              style={{ borderTop: "1px solid var(--line)" }}
+            >
+              <h4
+                className="text-xs font-semibold uppercase tracking-wider px-3 mb-2"
+                style={{ color: "var(--ink-3)" }}
+              >
+                Presets
+              </h4>
+              <div className="space-y-1">
+                {PRESETS.map((preset) => {
+                  const isActive = activePreset === preset.name;
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => applyPreset(preset)}
+                      className="w-full text-left px-3 py-2 text-sm transition-colors cursor-pointer"
+                      style={{
+                        background: isActive
+                          ? "var(--accent-tint)"
+                          : "transparent",
+                        color: isActive ? "var(--accent)" : "var(--ink-2)",
+                        borderRadius: "var(--r-2)",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background =
+                            "var(--accent-tint)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = "transparent";
+                        }
+                      }}
+                    >
+                      <div className="font-medium">{preset.name}</div>
+                      <div
+                        className="text-xs mt-0.5"
+                        style={{
+                          color: isActive
+                            ? "var(--accent)"
+                            : "var(--ink-3)",
+                          opacity: isActive ? 0.8 : 1,
+                        }}
                       >
-                        {/* Color indicator */}
-                        <span
-                          className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                            LAYER_COLORS[layer.name] ?? "bg-gray-400"
-                          } ${!layer.visible ? "opacity-30" : ""}`}
-                        />
-
-                        {/* Icon + name */}
-                        <span className="flex items-center gap-2 flex-1 min-w-0">
-                          <LayerIcon
-                            icon={LAYER_ICONS[layer.name] ?? "layer"}
-                            visible={layer.visible}
-                          />
-                          <span
-                            className={`truncate ${
-                              layer.visible
-                                ? "text-gray-900 dark:text-white font-medium"
-                                : "text-gray-400 dark:text-gray-500"
-                            }`}
-                          >
-                            {layer.name}
-                          </span>
-                        </span>
-
-                        {/* Toggle indicator */}
-                        <span
-                          className={`w-8 h-5 rounded-full flex items-center transition-colors flex-shrink-0 ${
-                            layer.visible
-                              ? "bg-blue-500 justify-end"
-                              : "bg-gray-300 dark:bg-gray-600 justify-start"
-                          }`}
-                        >
-                          <span className="w-3.5 h-3.5 bg-white rounded-full mx-0.5 shadow-sm" />
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Presets */}
-                {layers.length > 0 && (
-                  <div className="px-3 pb-3">
-                    <div className="border-t border-[var(--warm-gray-400)] pt-3 mt-1">
-                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 mb-2">
-                        Presets
-                      </h4>
-                      <div className="space-y-1">
-                        {PRESETS.map((preset) => (
-                          <button
-                            key={preset.name}
-                            type="button"
-                            onClick={() => applyPreset(preset)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                              activePreset === preset.name
-                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1414]"
-                            }`}
-                          >
-                            <div className="font-medium">{preset.name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                              {preset.description}
-                            </div>
-                          </button>
-                        ))}
+                        {preset.description}
                       </div>
-                    </div>
-                  </div>
-                )}
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-
-            {/* Viewer */}
-            <div className="flex-1 min-w-0">
-              <Viewer
-                visibleLayerIds={visibleLayerIds}
-                onLayers={handleLayers}
-              />
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <SampleFrame
+      title="Layer Management"
+      description="Toggle PDF layer groups (OCGs) to show or hide building systems on a construction floor plan. Use presets to quickly isolate specific systems."
+      sidebar={sidebar}
+      sidebarSide="left"
+    >
+      <Viewer
+        visibleLayerIds={visibleLayerIds}
+        onLayers={handleLayers}
+      />
+    </SampleFrame>
   );
 }
 
 function LayerIcon({ icon, visible }: { icon: string; visible: boolean }) {
-  const cls = `w-4 h-4 flex-shrink-0 ${
-    visible
-      ? "text-gray-600 dark:text-gray-300"
-      : "text-gray-300 dark:text-gray-600"
-  }`;
+  const cls = "w-4 h-4 shrink-0";
+  return (
+    <span
+      className="inline-flex shrink-0"
+      style={{ color: visible ? "var(--ink-2)" : "var(--ink-4)" }}
+    >
+      {renderLayerIcon(icon, cls)}
+    </span>
+  );
+}
+
+function renderLayerIcon(icon: string, cls: string) {
 
   switch (icon) {
     case "wall":

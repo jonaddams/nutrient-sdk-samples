@@ -154,10 +154,10 @@ export default function DataStep() {
       container.appendChild(textarea);
       console.log("📝 Textarea added to container");
 
-      // Initialize CodeMirror with theme based on dark mode
-      const isDarkMode = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
+      // Initialize CodeMirror with theme based on the app's data-theme
+      // (set by the Tweaks toggle), not the OS preference.
+      const isDarkMode =
+        document.documentElement.dataset.theme === "dark";
       const editor = window.CodeMirror.fromTextArea(textarea, {
         mode: { name: "javascript", json: true },
         theme: isDarkMode ? "material-darker" : "default",

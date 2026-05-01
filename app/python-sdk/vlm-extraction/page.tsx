@@ -139,7 +139,7 @@ export default function VlmExtractionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="VLM-Enhanced Extraction"
         description="Extract structured data from documents using VLM-enhanced ICR with Claude as the Vision Language Model provider."

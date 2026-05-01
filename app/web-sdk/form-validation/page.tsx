@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useRef, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import { TOTAL_RULE_FIELDS, type ValidationState } from "./viewer";
 import "./styles.css";
 
@@ -60,15 +60,11 @@ export default function FormValidationPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Form Validation"
-        description="Client-side validation rules with visual feedback on PDF form fields. Edit fields to see real-time validation, or click Validate All for a full check."
-      />
-
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="validation-wrapper">
+    <SampleFrame
+      title="Form Validation"
+      description="Client-side validation rules with visual feedback on PDF form fields. Edit fields to see real-time validation, or click Validate All for a full check."
+    >
+      <div className="validation-wrapper">
             {/* Sidebar */}
             <div className="validation-sidebar">
               {/* Header */}
@@ -190,9 +186,7 @@ export default function FormValidationPage() {
                 navigateToFieldRef={navigateToFieldRef}
               />
             </div>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </SampleFrame>
   );
 }

@@ -103,6 +103,42 @@ export default function Viewer({ document }: ViewerProps) {
   const [statsMessage, setStatsMessage] = useState<string>("");
   const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
 
+  // Promise-resolving custom confirm dialog state. Replaces window.confirm()
+  // so the prompt picks up the design system instead of the OS chrome.
+  const [confirmState, setConfirmState] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    resolve: (ok: boolean) => void;
+  } | null>(null);
+
+  const requestConfirm = React.useCallback(
+    (
+      message: string,
+      opts: { title?: string; confirmLabel?: string } = {},
+    ): Promise<boolean> => {
+      return new Promise<boolean>((resolve) => {
+        setConfirmState({
+          title: opts.title ?? "Confirm",
+          message,
+          confirmLabel: opts.confirmLabel ?? "Confirm",
+          resolve,
+        });
+      });
+    },
+    [],
+  );
+
+  const closeConfirm = React.useCallback(
+    (ok: boolean) => {
+      setConfirmState((current) => {
+        if (current) current.resolve(ok);
+        return null;
+      });
+    },
+    [],
+  );
+
   // Generate stable IDs for form elements
   const findInputId = useId();
   const replaceInputId = useId();
@@ -802,10 +838,12 @@ export default function Viewer({ document }: ViewerProps) {
               return;
             }
 
-            // Warn that Replace Text cannot be undone
+            // Warn that Replace Text cannot be undone — uses our styled
+            // dialog instead of the OS-default window.confirm().
             const blockCount = selectedRef.current.length;
-            const confirmed = window.confirm(
-              `Replace text in ${blockCount} selected block${blockCount > 1 ? "s" : ""}?\n\nThis action cannot be undone.`,
+            const confirmed = await requestConfirm(
+              `Replace text in ${blockCount} selected block${blockCount > 1 ? "s" : ""}? This action cannot be undone.`,
+              { title: "Replace text?", confirmLabel: "Replace" },
             );
             if (!confirmed) return;
 
@@ -1174,43 +1212,34 @@ export default function Viewer({ document }: ViewerProps) {
       {/* Find & Replace Panel */}
       {showFindReplace && (
         <div
+          className="panel floating"
           style={{
             position: "absolute",
             top: "20px",
             left: "20px",
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "16px",
-            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.25)",
             zIndex: 1000,
-            minWidth: "300px",
+            minWidth: "320px",
           }}
         >
-          <div style={{ marginBottom: "12px" }}>
-            <h3
-              style={{
-                margin: "0 0 12px 0",
-                fontSize: "16px",
-                fontWeight: "bold",
-                color: "#111827",
-              }}
+          <div className="panel-head">
+            <strong>Find & Replace</strong>
+            <button
+              type="button"
+              className="panel-close"
+              aria-label="Close"
+              onClick={() => setShowFindReplace(false)}
             >
-              Find & Replace
-            </h3>
-
-            <div style={{ marginBottom: "12px" }}>
+              ×
+            </button>
+          </div>
+          <div className="panel-body">
+            <div className="panel-row">
               <label
                 htmlFor={findInputId}
-                style={{
-                  display: "block",
-                  marginBottom: "4px",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: "#374151",
-                }}
+                className="panel-row-label"
+                style={{ fontWeight: 500 }}
               >
-                Find:
+                Find
               </label>
               <input
                 id={findInputId}
@@ -1218,86 +1247,61 @@ export default function Viewer({ document }: ViewerProps) {
                 type="text"
                 value={findText}
                 onChange={(e) => setFindText(e.target.value)}
+                placeholder="Enter text to find"
                 style={{
                   width: "100%",
-                  padding: "8px",
-                  border: "2px solid #d1d5db",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  color: "#111827",
-                  backgroundColor: "#ffffff",
+                  padding: "8px 10px",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  borderRadius: "var(--r-2)",
+                  fontSize: "var(--text-sm)",
+                  outline: "none",
                 }}
-                placeholder="Enter text to find"
               />
             </div>
 
-            <div style={{ marginBottom: "12px" }}>
+            <div className="panel-row">
               <label
                 htmlFor={replaceInputId}
-                style={{
-                  display: "block",
-                  marginBottom: "4px",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: "#374151",
-                }}
+                className="panel-row-label"
+                style={{ fontWeight: 500 }}
               >
-                Replace with:
+                Replace with
               </label>
               <input
                 id={replaceInputId}
                 type="text"
                 value={replaceText}
                 onChange={(e) => setReplaceText(e.target.value)}
+                placeholder="Enter replacement text"
                 style={{
                   width: "100%",
-                  padding: "8px",
-                  border: "2px solid #d1d5db",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  color: "#111827",
-                  backgroundColor: "#ffffff",
+                  padding: "8px 10px",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  borderRadius: "var(--r-2)",
+                  fontSize: "var(--text-sm)",
+                  outline: "none",
                 }}
-                placeholder="Enter replacement text"
               />
             </div>
 
-            <div style={{ display: "flex", gap: "8px" }}>
+            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
               <button
                 type="button"
                 onClick={handleFindReplace}
                 disabled={isProcessing || !findText.trim()}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor:
-                    isProcessing || !findText.trim() ? "#ccc" : "#007bff",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor:
-                    isProcessing || !findText.trim()
-                      ? "not-allowed"
-                      : "pointer",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
+                className="panel-button primary"
+                style={{ flex: 1 }}
               >
                 {isProcessing ? "Processing..." : "Replace All"}
               </button>
-
               <button
                 type="button"
                 onClick={() => setShowFindReplace(false)}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#6c757d",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
+                className="panel-button"
               >
                 Close
               </button>
@@ -1306,18 +1310,20 @@ export default function Viewer({ document }: ViewerProps) {
             {replacementResult && (
               <div
                 style={{
-                  marginTop: "12px",
-                  padding: "8px",
-                  backgroundColor: replacementResult.includes("Error")
-                    ? "#fef2f2"
-                    : "#f0f9ff",
-                  border: `2px solid ${replacementResult.includes("Error") ? "#f87171" : "#3b82f6"}`,
-                  borderRadius: "4px",
-                  fontSize: "14px",
+                  padding: 10,
+                  borderRadius: "var(--r-2)",
+                  fontSize: "var(--text-sm)",
+                  background: replacementResult.includes("Error")
+                    ? "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))"
+                    : "color-mix(in srgb, var(--accent) 12%, var(--bg-elev))",
+                  border: `1px solid ${
+                    replacementResult.includes("Error")
+                      ? "color-mix(in srgb, var(--code-coral) 40%, var(--line))"
+                      : "color-mix(in srgb, var(--accent) 40%, var(--line))"
+                  }`,
                   color: replacementResult.includes("Error")
-                    ? "#991b1b"
-                    : "#1e40af",
-                  fontWeight: "500",
+                    ? "var(--code-coral)"
+                    : "var(--accent)",
                 }}
               >
                 {replacementResult}
@@ -1327,63 +1333,167 @@ export default function Viewer({ document }: ViewerProps) {
         </div>
       )}
 
-      {/* Statistics Popup */}
-      {showStatsPopup && (
+      {/* Custom confirm dialog (replaces window.confirm) */}
+      {confirmState && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={confirmState.title}
           style={{
             position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#28a745",
-            color: "white",
-            padding: "20px 32px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            zIndex: 2000,
-            fontSize: "16px",
-            fontWeight: "500",
-            textAlign: "center",
-            minWidth: "300px",
-            animation: "fadeIn 0.3s ease-out",
+            inset: 0,
+            zIndex: 2100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.45)",
+            padding: 16,
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeConfirm(false);
           }}
         >
-          <div style={{ marginBottom: "12px" }}>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              style={{
-                display: "inline-block",
-                marginRight: "8px",
-                verticalAlign: "middle",
-              }}
-            >
-              <title>Success</title>
-              <path
-                fill="white"
-                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-              />
-            </svg>
-            Success!
-          </div>
-          <div>{statsMessage}</div>
-          <button
-            type="button"
-            onClick={() => setShowStatsPopup(false)}
-            style={{
-              marginTop: "12px",
-              padding: "6px 12px",
-              background: "rgba(255, 255, 255, 0.2)",
-              color: "white",
-              border: "1px solid rgba(255, 255, 255, 0.3)",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-            }}
+          <div
+            className="panel floating"
+            style={{ width: "min(420px, 100%)" }}
           >
-            Close
-          </button>
+            <div className="panel-head">
+              <strong>{confirmState.title}</strong>
+              <button
+                type="button"
+                className="panel-close"
+                aria-label="Cancel"
+                onClick={() => closeConfirm(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="panel-body">
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--ink-2)",
+                  fontSize: "var(--text-sm)",
+                  lineHeight: 1.5,
+                }}
+              >
+                {confirmState.message}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  justifyContent: "flex-end",
+                  marginTop: 4,
+                }}
+              >
+                <button
+                  type="button"
+                  className="panel-button"
+                  onClick={() => closeConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="panel-button primary"
+                  onClick={() => closeConfirm(true)}
+                  autoFocus
+                >
+                  {confirmState.confirmLabel}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success / stats popup */}
+      {showStatsPopup && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Success"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 2000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.45)",
+            padding: 16,
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowStatsPopup(false);
+          }}
+        >
+          <div
+            className="panel floating"
+            style={{ width: "min(420px, 100%)" }}
+          >
+            <div className="panel-head">
+              <strong
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: "var(--data-green)",
+                }}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Success
+              </strong>
+              <button
+                type="button"
+                className="panel-close"
+                aria-label="Close"
+                onClick={() => setShowStatsPopup(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="panel-body">
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--ink-2)",
+                  fontSize: "var(--text-sm)",
+                  lineHeight: 1.5,
+                }}
+              >
+                {statsMessage}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: 4,
+                }}
+              >
+                <button
+                  type="button"
+                  className="panel-button primary"
+                  onClick={() => setShowStatsPopup(false)}
+                  autoFocus
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

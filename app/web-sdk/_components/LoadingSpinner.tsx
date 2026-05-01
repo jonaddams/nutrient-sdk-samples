@@ -31,10 +31,16 @@ export function LoadingSpinner({
     <div className={containerClasses}>
       <div className="flex flex-col items-center gap-3">
         <Loader2
-          className={`${sizeClasses[size]} animate-spin text-[var(--digital-pollen)]`}
+          className={`${sizeClasses[size]} animate-spin`}
+          style={{ color: "var(--accent)" }}
         />
         {message && (
-          <p className="text-sm text-[var(--warm-gray-600)] !mb-0">{message}</p>
+          <p
+            className="text-sm !mb-0"
+            style={{ color: "var(--ink-3)" }}
+          >
+            {message}
+          </p>
         )}
       </div>
     </div>

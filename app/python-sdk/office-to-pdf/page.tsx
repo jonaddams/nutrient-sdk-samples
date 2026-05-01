@@ -87,7 +87,7 @@ export default function OfficeToPdfPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Office to PDF"
         description="Convert Word, Excel, and PowerPoint documents to PDF using the Nutrient Python SDK."

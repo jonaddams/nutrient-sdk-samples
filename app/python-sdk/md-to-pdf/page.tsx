@@ -90,7 +90,7 @@ export default function MdToPdfPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Markdown to PDF"
         description="Convert Markdown documents to PDF using the Nutrient Python SDK. Edit the source before converting."
