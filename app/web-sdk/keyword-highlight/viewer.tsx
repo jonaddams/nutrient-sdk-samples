@@ -2,6 +2,7 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 
 const DOCUMENT = "/documents/macaques.pdf";
 
@@ -33,6 +34,7 @@ export default function KeywordHighlightViewer({
   const instanceRef = useRef<Instance | null>(null);
   const [isHighlighting, setIsHighlighting] = useState(false);
   const prevKeywordsRef = useRef<string[]>([]);
+  const appTheme = useAppTheme();
 
   const highlightKeywords = useCallback(
     async (inst: Instance, terms: string[]) => {
@@ -142,9 +144,10 @@ export default function KeywordHighlightViewer({
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? NutrientViewer.Theme.DARK
-        : NutrientViewer.Theme.AUTO,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
       toolbarItems: (NutrientViewer.defaultToolbarItems ?? []).filter(
         (item: { type: string }) =>
           ["pager", "zoom-out", "zoom-in", "zoom-mode"].includes(item.type),
@@ -160,7 +163,7 @@ export default function KeywordHighlightViewer({
       instanceRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, []);
+  }, [appTheme]);
 
   // Re-highlight when keywords change
   useEffect(() => {

@@ -70,7 +70,7 @@ export default function OcrExtractionPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="OCR Text Extraction"
         description="Extract text from scanned documents using OCR via the Nutrient Java SDK Vision API."

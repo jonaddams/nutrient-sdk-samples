@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 
 interface PdfBlobViewerProps {
   blob: Blob;
@@ -8,6 +9,7 @@ interface PdfBlobViewerProps {
 
 export default function PdfBlobViewer({ blob }: PdfBlobViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const appTheme = useAppTheme();
 
   // Derive an object URL from the blob; revoke when blob changes or on unmount
   const objectUrl = useMemo(() => URL.createObjectURL(blob), [blob]);
@@ -29,6 +31,10 @@ export default function PdfBlobViewer({ blob }: PdfBlobViewerProps) {
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
     }).catch((err: Error) => {
       console.error("Viewer load error:", err);
     });
@@ -36,7 +42,7 @@ export default function PdfBlobViewer({ blob }: PdfBlobViewerProps) {
     return () => {
       NutrientViewer.unload(container);
     };
-  }, [objectUrl]);
+  }, [objectUrl, appTheme]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

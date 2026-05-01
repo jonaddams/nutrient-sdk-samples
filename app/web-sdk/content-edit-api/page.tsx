@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useId, useMemo, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 
 // Intersection observer lazy loading for maximum performance
 const Viewer = dynamic(() => import("@/app/web-sdk/content-edit-api/viewer"), {
@@ -99,18 +99,18 @@ export default function ContentEditApiPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--warm-gray-100)] dark:bg-[#1a1414]">
-      {/* Header */}
-      <SampleHeader
-        title="Content Editing API"
-        description="Detect text blocks, find & replace text, replace content, and edit text directly in PDF documents"
-      />
-
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto w-full px-6 pt-6 pb-8">
-        <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-12rem)] rounded-xl shadow-lg border border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] overflow-hidden">
-          {/* Mobile: Top buttons, Desktop: Sidebar */}
-          <aside className="bg-white dark:bg-[var(--warm-gray-950)] border-b lg:border-r lg:border-b-0 border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] lg:w-64 shrink-0">
+    <SampleFrame
+      title="Content Editing API"
+      description="Detect text blocks, find & replace text, replace content, and edit text directly in PDF documents"
+    >
+      <div className="flex flex-1 flex-col lg:flex-row h-full">
+        <aside
+          className="lg:w-64 shrink-0"
+          style={{
+            background: "var(--surface)",
+            borderBottom: "1px solid var(--line)",
+          }}
+        >
             <div className="px-4 py-3 lg:py-6 lg:h-full">
               <h2 className="sr-only">PDF Editing Tools</h2>
               <nav
@@ -125,10 +125,10 @@ export default function ContentEditApiPage() {
                   disabled={isContentEditing}
                   className={`w-auto lg:w-full shrink-0 flex items-center px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                     isContentEditing
-                      ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                      ? "bg-[var(--warm-gray-200)] text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] cursor-not-allowed"
                       : isEditing
                         ? "bg-[var(--data-green)] text-[var(--black)] border-[var(--data-green)] hover:opacity-90 shadow-sm cursor-pointer"
-                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] text-[var(--black)] border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-400)] cursor-pointer"
                   }`}
                   title={
                     isContentEditing
@@ -180,9 +180,22 @@ export default function ContentEditApiPage() {
                   disabled={!isEditing || selectedCount > 0 || isContentEditing}
                   className={`w-auto lg:w-full shrink-0 flex items-center px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                     isEditing && selectedCount === 0 && !isContentEditing
-                      ? "bg-[var(--black)] dark:bg-[var(--digital-pollen)] text-white dark:text-[var(--black)] border-[var(--black)] dark:border-[var(--digital-pollen)] hover:opacity-90 shadow-sm cursor-pointer"
-                      : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                      ? "shadow-sm cursor-pointer hover:opacity-90"
+                      : "cursor-not-allowed"
                   }`}
+                  style={
+                    isEditing && selectedCount === 0 && !isContentEditing
+                      ? {
+                          background: "var(--accent)",
+                          color: "var(--bg)",
+                          borderColor: "var(--accent)",
+                        }
+                      : {
+                          background: "var(--surface)",
+                          color: "var(--ink-3)",
+                          borderColor: "var(--line)",
+                        }
+                  }
                   title={
                     isContentEditing
                       ? "Cannot use Find & Replace while Edit Text is active"
@@ -240,7 +253,7 @@ export default function ContentEditApiPage() {
                   className={`w-auto lg:w-full shrink-0 flex items-center px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                     isEditing && selectedCount > 0 && !isContentEditing
                       ? "bg-[var(--code-coral)] text-[var(--black)] border-[var(--code-coral)] hover:opacity-90 shadow-sm cursor-pointer"
-                      : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                      : "bg-[var(--warm-gray-200)] text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] cursor-not-allowed"
                   }`}
                   title={
                     isContentEditing
@@ -284,10 +297,10 @@ export default function ContentEditApiPage() {
                   disabled={isEditing}
                   className={`w-auto lg:w-full shrink-0 flex items-center px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                     isEditing
-                      ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                      ? "bg-[var(--warm-gray-200)] text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] cursor-not-allowed"
                       : isContentEditing
                         ? "bg-[var(--disc-pink)] text-[var(--black)] border-[var(--disc-pink)] hover:opacity-90 shadow-sm cursor-pointer"
-                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] text-[var(--black)] border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-400)] cursor-pointer"
                   }`}
                   title={
                     isEditing
@@ -318,7 +331,7 @@ export default function ContentEditApiPage() {
                 </button>
 
                 {/* Separator */}
-                <div className="hidden lg:block border-t border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] my-2" />
+                <div className="hidden lg:block border-t border-[var(--warm-gray-400)] my-2" />
 
                 {/* Undo / Redo */}
                 <div className="flex flex-row lg:flex-col gap-2 lg:gap-3">
@@ -328,8 +341,8 @@ export default function ContentEditApiPage() {
                     disabled={!canUndo}
                     className={`flex-1 lg:flex-none lg:w-full flex items-center justify-center lg:justify-start px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                       canUndo
-                        ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
-                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                        ? "bg-[var(--warm-gray-200)] text-[var(--black)] border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-400)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] cursor-not-allowed"
                     }`}
                     title={
                       canUndo ? "Undo last change (Ctrl+Z)" : "Nothing to undo"
@@ -359,8 +372,8 @@ export default function ContentEditApiPage() {
                     disabled={!canRedo}
                     className={`flex-1 lg:flex-none lg:w-full flex items-center justify-center lg:justify-start px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium rounded-lg border transition-all duration-200 whitespace-nowrap ${
                       canRedo
-                        ? "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-900)] text-[var(--black)] dark:text-[var(--warm-gray-400)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] hover:bg-[var(--warm-gray-400)] dark:hover:bg-[var(--warm-gray-800)] cursor-pointer"
-                        : "bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-[var(--warm-gray-600)] dark:text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] dark:border-[var(--warm-gray-800)] cursor-not-allowed"
+                        ? "bg-[var(--warm-gray-200)] text-[var(--black)] border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-400)] cursor-pointer"
+                        : "bg-[var(--warm-gray-200)] text-[var(--warm-gray-600)] border-[var(--warm-gray-400)] cursor-not-allowed"
                     }`}
                     title={
                       canRedo
@@ -391,19 +404,17 @@ export default function ContentEditApiPage() {
             </div>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 overflow-hidden">
-            <div className="h-full">
-              {useMemo(
-                () => (
-                  <Viewer document="/documents/sample-doc-with-google-fonts.pdf" />
-                ),
-                [],
-              )}
-            </div>
-          </main>
-        </div>
+        <main className="flex-1 overflow-hidden">
+          <div className="h-full">
+            {useMemo(
+              () => (
+                <Viewer document="/documents/sample-doc-with-google-fonts.pdf" />
+              ),
+              [],
+            )}
+          </div>
+        </main>
       </div>
-    </div>
+    </SampleFrame>
   );
 }

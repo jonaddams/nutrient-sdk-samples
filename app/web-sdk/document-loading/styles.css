@@ -16,10 +16,9 @@
   flex-direction: column;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: white;
-  border: 1px solid var(--warm-gray-200);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .control-section {
@@ -28,14 +27,15 @@
   gap: var(--spacing-xs);
 }
 
+/* Eyebrow-style section headers — match the .panel-section aesthetic. */
 .control-section h3 {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--warm-gray-800);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-4);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
 }
 
 .control-section h4 {
@@ -43,13 +43,13 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--ink);
 }
 
 .control-section p {
   margin: var(--spacing-2xs) 0 0 0;
   font-size: 0.875rem;
-  color: var(--warm-gray-800);
+  color: var(--ink-3);
   line-height: 1.5;
 }
 
@@ -69,8 +69,8 @@
   align-items: center;
   gap: var(--spacing-2xs);
   padding: var(--spacing-sm);
-  background: white;
-  border: 2px solid var(--warm-gray-200);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
   border-radius: var(--radius-xs);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -79,20 +79,31 @@
 }
 
 .method-button:hover:not(:disabled) {
-  border-color: var(--black);
-  background: var(--warm-gray-100);
+  border-color: var(--accent);
+  background: var(--accent-tint);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
 .method-button.active {
-  border-color: var(--black);
-  background: var(--black);
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
-.method-button.active .method-label,
-.method-button.active .method-icon {
-  color: var(--digital-pollen);
+.method-button.active .method-label {
+  color: var(--bg);
+}
+
+/* Hovering an already-active card must keep the solid-accent surface so
+   the white label stays legible. Without this, the generic hover rule
+   (which has higher specificity than `.active`) drops the bg to the faint
+   accent-tint and the label vanishes. */
+.method-button.active:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.method-button.active:hover:not(:disabled) .method-label {
+  color: var(--bg);
 }
 
 .method-button:disabled {
@@ -107,7 +118,7 @@
 .method-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--ink);
 }
 
 /* ============================================================================
@@ -129,9 +140,9 @@
   align-items: center;
   gap: var(--spacing-2xs);
   padding: var(--spacing-2xs) var(--spacing-sm);
-  background: var(--black);
-  color: var(--white);
-  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
   border-radius: var(--radius-xs);
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -143,9 +154,9 @@
 }
 
 .file-upload-button:hover {
-  background: var(--warm-gray-900);
+  opacity: 0.85;
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .uploaded-file-info {
@@ -153,15 +164,15 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs);
-  background: var(--warm-gray-100);
-  border: 1px solid var(--warm-gray-200);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius-xs);
 }
 
 .file-name {
   flex: 1;
   font-size: 0.875rem;
-  color: var(--black);
+  color: var(--ink);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -170,22 +181,22 @@
 
 .reset-button {
   padding: var(--spacing-3xs) var(--spacing-xs);
-  background: white;
-  border: 1px solid var(--warm-gray-400);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
   border-radius: var(--radius-xxs);
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 600;
-  color: var(--warm-gray-800);
+  color: var(--ink-2);
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .reset-button:hover:not(:disabled) {
-  background: var(--warm-gray-100);
-  border-color: var(--black);
-  color: var(--black);
+  background: var(--surface);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .reset-button:disabled {
@@ -205,9 +216,9 @@
 
 .code-toggle-button {
   padding: var(--spacing-3xs) var(--spacing-xs);
-  background: var(--black);
-  color: var(--white);
-  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
   border-radius: var(--radius-xxs);
   font-family: var(--font-mono);
   font-size: 0.625rem;
@@ -216,24 +227,24 @@
   transition: all 0.2s ease;
 }
 
-.code-toggle-button:hover {
-  background: var(--warm-gray-900);
-}
+.code-toggle-button:hover { opacity: 0.85; }
 
+/* Code blocks always render against a dark surface for legibility, regardless
+   of theme — that's the convention developers expect for syntax-style output. */
 .code-example {
   margin: 0;
   padding: var(--spacing-sm);
-  background: var(--black);
+  background: #0f1115;
   border-radius: var(--radius-xs);
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
-  border: 1px solid var(--warm-gray-900);
+  border: 1px solid #1f2128;
 }
 
 .code-example code {
-  color: var(--warm-gray-200);
+  color: #d4d4d4;
 }
 
 /* ============================================================================
@@ -242,17 +253,17 @@
 
 .info-box {
   padding: var(--spacing-sm);
-  background: var(--digital-pollen-dark);
-  border: 1px solid var(--digital-pollen);
+  background: var(--accent-tint);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
   border-radius: var(--radius-xs);
 }
 
 .info-box h4 {
-  color: var(--digital-pollen);
+  color: var(--accent);
 }
 
 .info-box p {
-  color: var(--warm-gray-200);
+  color: var(--ink-2);
 }
 
 /* ============================================================================
@@ -284,10 +295,10 @@
   position: relative;
   flex: 1;
   min-height: 0;
-  border: 1px solid var(--warm-gray-200);
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: white;
+  background: var(--bg-elev);
 }
 
 .viewer-container {
@@ -343,119 +354,6 @@
    Dark Mode
    ========================================================================= */
 
-@media (prefers-color-scheme: dark) {
-  .controls-panel {
-    background: var(--warm-gray-950);
-    border-color: var(--warm-gray-900);
-  }
-
-  .control-section h3 {
-    color: var(--warm-gray-400);
-  }
-
-  .control-section h4 {
-    color: var(--digital-pollen);
-  }
-
-  .control-section p {
-    color: var(--warm-gray-400);
-  }
-
-  .method-button {
-    background: var(--warm-gray-950);
-    border-color: var(--warm-gray-800);
-  }
-
-  .method-button:hover:not(:disabled) {
-    background: var(--warm-gray-900);
-    border-color: var(--digital-pollen);
-  }
-
-  .method-button.active {
-    background: var(--black);
-    border-color: var(--digital-pollen);
-  }
-
-  .method-label {
-    color: var(--warm-gray-200);
-  }
-
-  .method-button.active .method-label {
-    color: var(--digital-pollen);
-  }
-
-  .file-upload-button {
-    background: var(--digital-pollen);
-    color: var(--black);
-  }
-
-  .file-upload-button:hover {
-    background: var(--digital-pollen);
-    opacity: 0.9;
-  }
-
-  .uploaded-file-info {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-800);
-  }
-
-  .file-name {
-    color: var(--warm-gray-200);
-  }
-
-  .reset-button {
-    background: var(--warm-gray-950);
-    border-color: var(--warm-gray-800);
-    color: var(--warm-gray-400);
-  }
-
-  .reset-button:hover:not(:disabled) {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-600);
-    color: var(--warm-gray-200);
-  }
-
-  .code-toggle-button {
-    background: var(--digital-pollen);
-    color: var(--black);
-  }
-
-  .code-toggle-button:hover {
-    opacity: 0.9;
-  }
-
-  .info-box {
-    background: var(--digital-pollen-dark);
-    border-color: var(--digital-pollen);
-  }
-
-  .info-box p {
-    color: var(--warm-gray-200);
-  }
-
-  .error-message {
-    background: var(--code-coral-dark);
-    border-color: var(--code-coral);
-  }
-
-  .viewer-wrapper {
-    background: var(--warm-gray-950);
-    border-color: var(--warm-gray-900);
-  }
-
-  .loading-overlay {
-    background: rgba(26, 20, 20, 0.95);
-  }
-
-  .loading-spinner {
-    border-color: var(--warm-gray-800);
-    border-top-color: var(--digital-pollen);
-  }
-
-  .loading-overlay p {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* ============================================================================
    Responsive Design

@@ -127,64 +127,101 @@ export default function DocumentMarkupViewer({ document }: ViewerProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Markup Mode Controls */}
-      <div className="mb-6 p-4 border border-[var(--warm-gray-400)] rounded-lg bg-white dark:bg-[#2a2020]">
-        <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+      <div
+        className="mb-6 p-4"
+        style={{
+          background: "var(--bg-elev)",
+          border: "1px solid var(--line)",
+          borderRadius: "var(--r-2)",
+        }}
+      >
+        <div
+          className="panel-section"
+          style={{ paddingTop: 0, marginBottom: 12 }}
+        >
           Document Markup Mode
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          {markupModes.map((mode) => (
-            <button
-              key={mode.value}
-              type="button"
-              onClick={() => handleModeChange(mode.value)}
-              disabled={isLoading}
-              className={`p-3 rounded-lg border-2 transition-all text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                selectedMode === mode.value
-                  ? "border-[var(--digital-pollen)] bg-[var(--digital-pollen)] dark:border-[#d4a574] dark:bg-[#2d2418]"
-                  : "border-[var(--warm-gray-400)] hover:border-[var(--digital-pollen)] hover:bg-[var(--warm-gray-200)] dark:hover:bg-[#3a3030]"
-              }`}
-            >
-              <div className="flex items-start">
-                <div
-                  className={`w-4 h-4 rounded-full border-2 mt-0.5 mr-2 flex-shrink-0 ${
-                    selectedMode === mode.value
-                      ? "border-(--black) dark:border-white bg-(--black) dark:bg-white"
-                      : "border-[var(--warm-gray-400)]"
-                  }`}
-                >
-                  {selectedMode === mode.value && (
-                    <div className="w-full h-full rounded-full bg-(--digital-pollen) scale-50" />
-                  )}
-                </div>
-                <div className="flex-1">
+          {markupModes.map((mode) => {
+            const isActive = selectedMode === mode.value;
+            return (
+              <button
+                key={mode.value}
+                type="button"
+                onClick={() => handleModeChange(mode.value)}
+                disabled={isLoading}
+                className="p-3 transition-all text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: isActive
+                    ? "var(--accent-tint)"
+                    : "var(--bg-elev)",
+                  border: `1px solid ${
+                    isActive ? "var(--accent)" : "var(--line)"
+                  }`,
+                  borderRadius: "var(--r-2)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive && !isLoading) {
+                    e.currentTarget.style.background = "var(--accent-tint)";
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive && !isLoading) {
+                    e.currentTarget.style.background = "var(--bg-elev)";
+                    e.currentTarget.style.borderColor = "var(--line)";
+                  }
+                }}
+              >
+                <div className="flex items-start">
+                  {/* Radio dot */}
                   <div
-                    className={`font-semibold text-sm mb-1 ${
-                      selectedMode === mode.value
-                        ? "text-(--black) dark:text-white"
-                        : "text-gray-900 dark:text-white"
-                    }`}
+                    className="w-4 h-4 rounded-full mt-0.5 mr-2 shrink-0 flex items-center justify-center"
+                    style={{
+                      border: `2px solid ${
+                        isActive ? "var(--accent)" : "var(--ink-4)"
+                      }`,
+                    }}
                   >
-                    {mode.label}
+                    {isActive && (
+                      <div
+                        className="rounded-full"
+                        style={{
+                          width: 8,
+                          height: 8,
+                          background: "var(--accent)",
+                        }}
+                      />
+                    )}
                   </div>
-                  <div
-                    className={`text-xs ${
-                      selectedMode === mode.value
-                        ? "text-gray-900 dark:text-gray-300"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    {mode.description}
+                  <div className="flex-1">
+                    <div
+                      className="font-semibold text-sm mb-1"
+                      style={{
+                        color: isActive ? "var(--ink)" : "var(--ink)",
+                      }}
+                    >
+                      {mode.label}
+                    </div>
+                    <div
+                      className="text-xs"
+                      style={{
+                        color: isActive ? "var(--ink-2)" : "var(--ink-3)",
+                      }}
+                    >
+                      {mode.description}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Loading Indicator */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white dark:bg-[#1a1414] bg-opacity-80 flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-opacity-80 flex items-center justify-center z-10" style={{ background: "var(--bg)" }}>
           <div className="text-center">
             <svg
               className="animate-spin h-10 w-10 mx-auto mb-3"

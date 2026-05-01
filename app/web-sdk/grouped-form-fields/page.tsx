@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useRef, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { PlacedStamp } from "./viewer";
 import { STAMP_TEMPLATES } from "./viewer";
 import "./styles.css";
@@ -41,15 +41,11 @@ export default function StampAnnotationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Grouped Form Fields"
-        description="Toggle Creator Mode to drag and drop grouped form fields onto a document. Each group contains an image background, company logo, signature, checkboxes, and date field. Toggle off to lock groups in place — form fields remain interactive."
-      />
-
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="stamp-wrapper">
+    <SampleFrame
+      title="Grouped Form Fields"
+      description="Toggle Creator Mode to drag and drop grouped form fields onto a document. Each group contains an image background, company logo, signature, checkboxes, and date field. Toggle off to lock groups in place — form fields remain interactive."
+    >
+      <div className="stamp-wrapper">
             {/* Sidebar */}
             <div className="stamp-sidebar">
               {/* Creator Mode Toggle */}
@@ -200,9 +196,7 @@ export default function StampAnnotationsPage() {
                 deleteStampRef={deleteStampRef}
               />
             </section>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </SampleFrame>
   );
 }

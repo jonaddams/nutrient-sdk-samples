@@ -279,7 +279,7 @@ export default function IcrExtractionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="ICR Data Extraction"
         description="Extract structured data from documents using intelligent content recognition with local ONNX models — runs entirely offline."

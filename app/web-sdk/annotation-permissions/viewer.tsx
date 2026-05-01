@@ -2,6 +2,7 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 import {
   STUDENTS,
   USERS,
@@ -43,6 +44,7 @@ export default function AnnotationPermissionsViewer() {
     () => new Set(),
   );
   const [isLoading, setIsLoading] = useState(true);
+  const appTheme = useAppTheme();
 
   // Keep ref in sync with state for use in callbacks
   currentRoleRef.current = currentRole;
@@ -108,9 +110,10 @@ export default function AnnotationPermissionsViewer() {
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? NutrientViewer.Theme.DARK
-        : NutrientViewer.Theme.AUTO,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
       toolbarItems: (NutrientViewer.defaultToolbarItems ?? []).filter(
         (item: { type: string }) => ALLOWED_TOOLBAR_ITEMS.includes(item.type),
       ),
@@ -152,9 +155,9 @@ export default function AnnotationPermissionsViewer() {
         console.error("Failed to load viewer:", error);
         setIsLoading(false);
       });
-  }, [currentRole, getVisibleStudentIds]);
+  }, [currentRole, getVisibleStudentIds, appTheme]);
 
-  // Load viewer on role/visibility change
+  // Load viewer on role/visibility/theme change
   useEffect(() => {
     loadViewer();
 
@@ -169,7 +172,7 @@ export default function AnnotationPermissionsViewer() {
       }
       instanceRef.current = null;
     };
-  }, [currentRole, visibleStudents, loadViewer]);
+  }, [currentRole, visibleStudents, appTheme, loadViewer]);
 
   // Role switch handler — save current annotations first
   const handleRoleChange = async (newRole: string) => {
@@ -212,17 +215,30 @@ export default function AnnotationPermissionsViewer() {
   return (
     <div className="flex flex-col h-full">
       {/* Control Bar */}
-      <div className="flex items-center gap-4 px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020]">
+      <div
+        className="flex items-center gap-4 px-4 py-2.5"
+        style={{
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--line)",
+        }}
+      >
         {/* Role Dropdown */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+          <span
+            className="text-xs whitespace-nowrap"
+            style={{ color: "var(--ink-3)" }}
+          >
             Viewing as:
           </span>
           <select
             value={currentRole}
             onChange={(e) => handleRoleChange(e.target.value)}
-            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] cursor-pointer"
+            className="px-3 py-1.5 text-sm font-medium cursor-pointer focus:outline-none"
             style={{
+              background: "var(--bg-elev)",
+              color: "var(--ink)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-2)",
               borderLeftColor: currentUser?.color,
               borderLeftWidth: "3px",
             }}
@@ -242,14 +258,21 @@ export default function AnnotationPermissionsViewer() {
               const isVisible = visibleStudents.has(student.id);
               return (
                 <button
+                  type="button"
                   key={student.id}
                   onClick={() => toggleStudentVisibility(student.id)}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium transition-all cursor-pointer"
                   style={{
-                    backgroundColor: isVisible ? student.color : "transparent",
-                    color: isVisible ? "white" : student.color,
-                    border: `1.5px solid ${student.color}`,
-                    opacity: isVisible ? 1 : 0.5,
+                    backgroundColor: isVisible
+                      ? student.color
+                      : `color-mix(in srgb, ${student.color} 14%, var(--bg-elev))`,
+                    color: isVisible ? "#fff" : student.color,
+                    border: `1.5px solid ${
+                      isVisible
+                        ? student.color
+                        : `color-mix(in srgb, ${student.color} 45%, var(--bg-elev))`
+                    }`,
+                    borderRadius: "var(--r-pill)",
                   }}
                 >
                   <span>{isVisible ? "\u2713" : "\u2717"}</span>
@@ -262,15 +285,29 @@ export default function AnnotationPermissionsViewer() {
       </div>
 
       {/* Status Bar */}
-      <div className="px-4 py-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#1e1818] border-b border-gray-200 dark:border-gray-700">
+      <div
+        className="px-4 py-1.5 text-xs"
+        style={{
+          color: "var(--ink-3)",
+          background: "var(--bg-elev)",
+          borderBottom: "1px solid var(--line)",
+        }}
+      >
         {getStatusText()}
       </div>
 
       {/* Viewer */}
       <div className="flex-1 relative">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-black/30 z-10">
-            <div className="text-sm text-gray-500">Switching role...</div>
+          <div
+            className="absolute inset-0 flex items-center justify-center z-10"
+            style={{
+              background: "color-mix(in srgb, var(--bg) 60%, transparent)",
+            }}
+          >
+            <div className="text-sm" style={{ color: "var(--ink-3)" }}>
+              Switching role...
+            </div>
           </div>
         )}
         <div ref={containerRef} className="h-full w-full" />

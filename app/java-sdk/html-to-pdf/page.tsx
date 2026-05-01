@@ -72,7 +72,7 @@ export default function HtmlToPdfPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="HTML to PDF"
         description="Convert HTML documents to PDF using the Nutrient Java SDK."
