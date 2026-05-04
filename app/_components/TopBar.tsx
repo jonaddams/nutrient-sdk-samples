@@ -13,9 +13,6 @@ export function TopBar() {
           <Link href="/web-sdk" className="nav-link-collapse">
             Samples
           </Link>
-          <Link href="/design-system" className="nav-link-collapse">
-            System
-          </Link>
           <a
             href="https://github.com/jonaddams/nutrient-sdk-samples"
             target="_blank"
