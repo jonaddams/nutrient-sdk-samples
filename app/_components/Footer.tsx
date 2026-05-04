@@ -14,7 +14,6 @@ export function Footer() {
           >
             Repo
           </a>
-          <Link href="/design-system">Design system</Link>
         </div>
       </div>
     </footer>
