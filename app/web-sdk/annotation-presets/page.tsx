@@ -292,9 +292,7 @@ export default function AnnotationPresetsPage() {
           <button
             type="button"
             onClick={() =>
-              setExpandedPreset((prev) =>
-                prev === def.key ? null : def.key,
-              )
+              setExpandedPreset((prev) => (prev === def.key ? null : def.key))
             }
             className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors cursor-pointer"
             style={{ color: "var(--ink)" }}
@@ -335,9 +333,7 @@ export default function AnnotationPresetsPage() {
                   key={field.key}
                   field={field}
                   value={presetValues[def.key]?.[field.key]}
-                  onChange={(val) =>
-                    updateProperty(def.key, field.key, val)
-                  }
+                  onChange={(val) => updateProperty(def.key, field.key, val)}
                 />
               ))}
               <button
@@ -360,6 +356,7 @@ export default function AnnotationPresetsPage() {
       description="Customize default properties for annotation tools. Changes apply instantly when you draw new annotations. Configure colors, sizes, fonts, line styles, and more."
       sidebar={sidebar}
       sidebarSide="left"
+      wide
     >
       <Viewer presets={presetConfigs} />
     </SampleFrame>
@@ -399,10 +396,7 @@ function FieldControl({
               border: "1px solid var(--line)",
             }}
           />
-          <span
-            className="text-xs font-mono"
-            style={{ color: "var(--ink-3)" }}
-          >
+          <span className="text-xs font-mono" style={{ color: "var(--ink-3)" }}>
             {hex}
           </span>
         </div>

@@ -82,30 +82,30 @@ export default function DigitalSignaturePage() {
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)] flex flex-col gap-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-80 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)] flex flex-col gap-3">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Document
                 </h3>
-                <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
+                <div className="text-sm text-[var(--ink-3)] bg-[var(--surface)] rounded-md p-3">
                   <span className="font-mono text-xs">
                     service-agreement.pdf
                   </span>
                 </div>
               </div>
 
-              <div className="p-4 border-b border-[var(--warm-gray-400)] flex flex-col gap-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <div className="p-4 border-b border-[var(--line)] flex flex-col gap-3">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Certificate
                 </h3>
-                <div className="text-xs text-gray-500 dark:text-gray-400 space-y-2">
+                <div className="text-xs text-[var(--ink-3)] space-y-2">
                   <p>
                     Self-signed demo certificate stored securely on the server.
                     The private key never leaves the server.
                   </p>
-                  <div className="bg-gray-50 dark:bg-[#1a1414] rounded-md p-2 font-mono">
+                  <div className="bg-[var(--surface)] rounded-md p-2 font-mono">
                     <p>Signer: Nutrient SDK Demo</p>
                     <p>Type: PKCS#12</p>
                   </div>
@@ -120,19 +120,19 @@ export default function DigitalSignaturePage() {
                     disabled={processing}
                     className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: "var(--digital-pollen)",
-                      color: "var(--black)",
+                      background: "var(--accent)",
+                      color: "#fff",
                     }}
                   >
                     {processing ? "Signing..." : "Sign Document"}
                   </button>
                 ) : (
                   <>
-                    <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-md space-y-1">
-                      <span className="text-green-600 dark:text-green-400 text-xs font-semibold">
+                    <div className="p-2 bg-[color-mix(in_srgb,var(--data-green)_12%,var(--bg-elev))] rounded-md space-y-1">
+                      <span className="text-[var(--data-green)] text-xs font-semibold">
                         Document signed successfully
                       </span>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-[var(--ink-3)]">
                         The viewer may show a signature warning because it
                         applies stricter CA validation than Adobe. Opening the
                         downloaded PDF in Adobe Acrobat will confirm a valid
@@ -142,14 +142,14 @@ export default function DigitalSignaturePage() {
                     <button
                       type="button"
                       onClick={handleDownload}
-                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Download Signed PDF ({(resultSize / 1024).toFixed(1)} KB)
                     </button>
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer text-[var(--digital-pollen)] border border-[var(--digital-pollen)] bg-transparent hover:bg-[var(--digital-pollen)] hover:text-[var(--black)]"
+                      className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer text-[var(--accent)] border border-[var(--accent)] bg-transparent hover:bg-[var(--accent)] hover:text-white"
                     >
                       Reset
                     </button>
@@ -160,7 +160,7 @@ export default function DigitalSignaturePage() {
 
             <div className="flex-1 min-w-0 relative">
               {error && (
-                <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
+                <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] border-b border-[color-mix(in_srgb,var(--code-coral)_35%,var(--line))] text-[var(--code-coral)] text-sm">
                   {error}
                 </div>
               )}
@@ -168,8 +168,8 @@ export default function DigitalSignaturePage() {
               {processing && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-[var(--ink-3)]">
                       Applying digital signature...
                     </p>
                   </div>

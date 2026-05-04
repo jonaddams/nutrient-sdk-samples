@@ -90,8 +90,7 @@ export default function TextExtractionPage() {
             style={{
               background:
                 viewMode === "current" ? "var(--bg-elev)" : "transparent",
-              color:
-                viewMode === "current" ? "var(--ink)" : "var(--ink-3)",
+              color: viewMode === "current" ? "var(--ink)" : "var(--ink-3)",
               borderRadius: "var(--r-1)",
               boxShadow:
                 viewMode === "current"
@@ -106,8 +105,7 @@ export default function TextExtractionPage() {
             onClick={() => setViewMode("all")}
             className="flex-1 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
             style={{
-              background:
-                viewMode === "all" ? "var(--bg-elev)" : "transparent",
+              background: viewMode === "all" ? "var(--bg-elev)" : "transparent",
               color: viewMode === "all" ? "var(--ink)" : "var(--ink-3)",
               borderRadius: "var(--r-1)",
               boxShadow:
@@ -142,7 +140,10 @@ export default function TextExtractionPage() {
             className="btn btn-sm flex-1"
             style={
               copied
-                ? { background: "var(--data-green)", borderColor: "var(--data-green)" }
+                ? {
+                    background: "var(--data-green)",
+                    borderColor: "var(--data-green)",
+                  }
                 : undefined
             }
           >
@@ -199,6 +200,7 @@ export default function TextExtractionPage() {
       sidebar={sidebar}
       sidebarSide="left"
       sidebarWidth={384}
+      wide
     >
       <Viewer
         onPageTexts={handlePageTexts}

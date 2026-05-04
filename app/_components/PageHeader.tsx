@@ -28,7 +28,16 @@ export function PageHeader({
     <section className="shell">
       <div
         className="page-head"
-        style={sticky ? { position: "sticky", top: 0, zIndex: 40, background: "var(--bg)" } : undefined}
+        style={
+          sticky
+            ? {
+                position: "sticky",
+                top: 0,
+                zIndex: 40,
+                background: "var(--bg)",
+              }
+            : undefined
+        }
       >
         <div className="breadcrumb">
           {trail.map((crumb, i) => (
@@ -56,10 +65,16 @@ export function PageHeader({
         >
           <div style={{ flex: "1 1 480px", minWidth: 0 }}>
             <h1 className="h1">{title}</h1>
-            {description && <p className="lede" style={{ marginTop: "var(--space-3)" }}>{description}</p>}
+            {description && (
+              <p className="lede" style={{ marginTop: "var(--space-3)" }}>
+                {description}
+              </p>
+            )}
           </div>
           {actions && (
-            <div style={{ display: "flex", gap: "var(--space-3)", flexShrink: 0 }}>
+            <div
+              style={{ display: "flex", gap: "var(--space-3)", flexShrink: 0 }}
+            >
               {actions}
             </div>
           )}

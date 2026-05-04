@@ -151,10 +151,7 @@ export function PythonSampleLayout({
                 </button>
 
                 {resultSize > 0 && (
-                  <div
-                    className="text-xs"
-                    style={{ color: "var(--ink-3)" }}
-                  >
+                  <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                     Output: {(resultSize / 1024).toFixed(1)} KB
                   </div>
                 )}

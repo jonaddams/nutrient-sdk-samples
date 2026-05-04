@@ -56,10 +56,7 @@ export default function KeywordHighlightPage() {
   const sidebar = (
     <>
       {/* Add keyword input */}
-      <div
-        className="p-4"
-        style={{ borderBottom: "1px solid var(--line)" }}
-      >
+      <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
         <label
           htmlFor="keyword-input"
           className="block text-sm font-medium mb-2"
@@ -194,6 +191,7 @@ export default function KeywordHighlightPage() {
       description="Automatically search and highlight keywords in a document with color-coded annotations. Add or remove keywords to update highlights in real time."
       sidebar={sidebar}
       sidebarSide="left"
+      wide
     >
       <Viewer keywords={keywords} onHighlightResults={handleHighlightResults} />
     </SampleFrame>

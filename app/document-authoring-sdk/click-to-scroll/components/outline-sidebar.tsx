@@ -16,12 +16,28 @@ export default function OutlineSidebar({
   isLoading,
 }: OutlineSidebarProps) {
   return (
-    <aside className="h-full flex flex-col bg-gray-900 border-r border-gray-700 text-gray-100">
-      <header className="px-4 py-4 border-b border-gray-700">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white">
+    <aside
+      className="h-full flex flex-col overflow-hidden"
+      style={{
+        background: "var(--bg-elev)",
+        borderRight: "1px solid var(--line)",
+        color: "var(--ink)",
+      }}
+    >
+      <header
+        className="px-4 py-4"
+        style={{ borderBottom: "1px solid var(--line)" }}
+      >
+        <div
+          className="panel-section"
+          style={{ paddingTop: 0, marginBottom: 8 }}
+        >
           Outline
-        </h2>
-        <p className="mt-1 text-xs text-gray-400 leading-relaxed">
+        </div>
+        <p
+          className="text-xs leading-relaxed"
+          style={{ color: "var(--ink-3)" }}
+        >
           Click a heading to jump to it. Position is approximated from the
           document model — the SDK has no public scroll-to API yet.
         </p>
@@ -32,12 +48,12 @@ export default function OutlineSidebar({
         className="flex-1 min-h-0 overflow-y-auto px-2 py-3"
       >
         {isLoading && (
-          <p className="px-3 py-2 text-xs text-gray-400">
+          <p className="px-3 py-2 text-xs" style={{ color: "var(--ink-3)" }}>
             Reading document structure…
           </p>
         )}
         {!isLoading && headings.length === 0 && (
-          <p className="px-3 py-2 text-xs text-gray-400">
+          <p className="px-3 py-2 text-xs" style={{ color: "var(--ink-3)" }}>
             No headings detected.
           </p>
         )}
@@ -46,20 +62,41 @@ export default function OutlineSidebar({
             {headings.map((h, i) => {
               const isActive = i === activeIndex;
               const indent = h.level === 1 ? "pl-3" : "pl-7";
+              const isLevel1 = h.level === 1;
               return (
                 <li key={`${i}-${h.text}`}>
                   <button
                     type="button"
                     onClick={() => onSelect(i)}
-                    className={`w-full text-left ${indent} pr-3 py-1.5 rounded-md text-sm transition-colors cursor-pointer ${
-                      h.level === 1 ? "font-medium" : "font-normal"
-                    } ${
-                      isActive
-                        ? "bg-blue-500 text-white"
-                        : h.level === 1
-                          ? "text-gray-100 hover:bg-gray-800 hover:text-white"
-                          : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    className={`w-full text-left ${indent} pr-3 py-1.5 text-sm transition-colors cursor-pointer ${
+                      isLevel1 ? "font-medium" : "font-normal"
                     }`}
+                    style={{
+                      background: isActive
+                        ? "color-mix(in srgb, var(--accent) 14%, var(--bg-elev))"
+                        : "transparent",
+                      color: isActive
+                        ? "var(--accent)"
+                        : isLevel1
+                          ? "var(--ink-2)"
+                          : "var(--ink-3)",
+                      border: `1px solid ${
+                        isActive
+                          ? "color-mix(in srgb, var(--accent) 35%, var(--line))"
+                          : "transparent"
+                      }`,
+                      borderRadius: "var(--r-2)",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = "var(--surface)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = "transparent";
+                      }
+                    }}
                   >
                     {h.text}
                   </button>
@@ -70,7 +107,13 @@ export default function OutlineSidebar({
         )}
       </nav>
 
-      <footer className="px-4 py-3 border-t border-gray-700 text-[11px] text-gray-400 leading-relaxed">
+      <footer
+        className="px-4 py-3 text-[11px] leading-relaxed"
+        style={{
+          borderTop: "1px solid var(--line)",
+          color: "var(--ink-4)",
+        }}
+      >
         Heuristic: paragraphs with bold formatting and pointSize ≥ 14 are
         treated as headings. Scroll target is weighted by character count.
       </footer>

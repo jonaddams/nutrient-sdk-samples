@@ -7,8 +7,8 @@ export default function StepIndicator() {
 
   return (
     <div
-      className="px-2 md:px-8 py-3 md:py-6 border-b"
-      style={{ borderColor: "var(--warm-gray-400)" }}
+      className="px-2 md:px-8 py-3 md:py-6"
+      style={{ borderBottom: "1px solid var(--line)" }}
     >
       <nav aria-label="Progress">
         {/* Steps with circles and labels */}
@@ -21,22 +21,20 @@ export default function StepIndicator() {
                   type="button"
                   onClick={() => goToStep(stepIdx)}
                   className={`group relative w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 cursor-pointer ${
-                    step.isComplete ? "" : "bg-white dark:bg-[#2a2020]"
-                  } ${
                     !step.isComplete && !step.isActive
                       ? "cursor-not-allowed opacity-50"
                       : ""
                   }`}
                   style={{
                     background: step.isComplete
-                      ? "var(--digital-pollen)"
-                      : undefined,
+                      ? "var(--accent)"
+                      : "var(--bg-elev)",
                     borderWidth:
                       step.isActive || !step.isComplete ? "2px" : "0",
                     borderStyle: "solid",
                     borderColor: step.isActive
-                      ? "var(--digital-pollen)"
-                      : "var(--warm-gray-400)",
+                      ? "var(--accent)"
+                      : "var(--line-strong)",
                   }}
                   disabled={!step.isComplete && !step.isActive}
                 >
@@ -46,7 +44,7 @@ export default function StepIndicator() {
                       className="w-5 h-5"
                       viewBox="0 0 20 20"
                       fill="currentColor"
-                      style={{ color: "var(--white)" }}
+                      style={{ color: "var(--bg-elev)" }}
                     >
                       <title>Step completed</title>
                       <path
@@ -58,12 +56,12 @@ export default function StepIndicator() {
                   ) : step.isActive ? (
                     <span
                       className="w-3 h-3 rounded-full"
-                      style={{ background: "var(--digital-pollen)" }}
+                      style={{ background: "var(--accent)" }}
                     />
                   ) : (
                     <span
                       className="w-3 h-3 rounded-full"
-                      style={{ background: "var(--warm-gray-400)" }}
+                      style={{ background: "var(--ink-4)" }}
                     />
                   )}
                 </button>
@@ -71,12 +69,12 @@ export default function StepIndicator() {
 
               {/* Step Labels */}
               <div
-                className="text-sm font-bold mb-1"
+                className="text-sm font-semibold mb-1"
                 style={{
                   color:
                     step.isActive || step.isComplete
-                      ? "var(--digital-pollen)"
-                      : "var(--foreground)",
+                      ? "var(--accent)"
+                      : "var(--ink)",
                 }}
               >
                 {/* Desktop: Full title, Mobile: Short title */}
@@ -84,7 +82,10 @@ export default function StepIndicator() {
                 <span className="md:hidden">{step.mobileTitle}</span>
               </div>
               {/* Description - Hidden on mobile */}
-              <div className="hidden md:block text-xs leading-tight text-gray-600 dark:text-gray-300">
+              <div
+                className="hidden md:block text-xs leading-tight"
+                style={{ color: "var(--ink-3)" }}
+              >
                 {step.description}
               </div>
             </div>

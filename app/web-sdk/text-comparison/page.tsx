@@ -6,6 +6,7 @@ import type {
   Instance,
 } from "@nutrient-sdk/viewer";
 import { useEffect, useRef, useState } from "react";
+import { LockIcon, UnlockIcon } from "@/app/_components/icons";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
 type Operation = DocumentComparison.Operation;
@@ -835,10 +836,7 @@ export default function Page() {
         {/* original document viewer */}
         <div className="min-h-fit col-span-5" style={cardChrome}>
           <div>
-            <p
-              className="text-center p-3"
-              style={{ color: "var(--ink-2)" }}
-            >
+            <p className="text-center p-3" style={{ color: "var(--ink-2)" }}>
               {originalDoc}
             </p>
           </div>
@@ -851,10 +849,7 @@ export default function Page() {
         {/* changed document viewer */}
         <div className="min-h-fit col-span-5" style={cardChrome}>
           <div>
-            <p
-              className="text-center p-3"
-              style={{ color: "var(--ink-2)" }}
-            >
+            <p className="text-center p-3" style={{ color: "var(--ink-2)" }}>
               {changedDoc}
             </p>
           </div>
@@ -900,7 +895,11 @@ export default function Page() {
                     isScrollLocked ? "Unlock scroll sync" : "Lock scroll sync"
                   }
                 >
-                  {isScrollLocked ? "🔒" : "🔓"}
+                  {isScrollLocked ? (
+                    <LockIcon width={14} height={14} />
+                  ) : (
+                    <UnlockIcon width={14} height={14} />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -996,7 +995,8 @@ export default function Page() {
                             }}
                             onMouseLeave={(e) => {
                               if (!isSelected) {
-                                e.currentTarget.style.background = "transparent";
+                                e.currentTarget.style.background =
+                                  "transparent";
                               }
                             }}
                             onClick={() => handleChangeClick(value, index)}

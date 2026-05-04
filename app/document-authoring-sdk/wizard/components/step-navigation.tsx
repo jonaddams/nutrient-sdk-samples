@@ -42,9 +42,10 @@ export default function StepNavigation({
 
   return (
     <div
-      className="flex items-center justify-between pt-4 border-t mt-4 bg-white dark:bg-[#2a2020]"
+      className="flex items-center justify-between pt-4 mt-4"
       style={{
-        borderColor: "var(--warm-gray-400)",
+        background: "var(--bg-elev)",
+        borderTop: "1px solid var(--line)",
       }}
     >
       <div>
@@ -52,11 +53,7 @@ export default function StepNavigation({
           <button
             type="button"
             onClick={handlePrevious}
-            className="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors cursor-pointer btn btn-secondary"
-            style={{
-              borderColor: "var(--warm-gray-400)",
-              boxShadow: "var(--shadow-sm)",
-            }}
+            className="btn ghost btn-sm inline-flex items-center"
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -79,7 +76,7 @@ export default function StepNavigation({
 
       <div className="flex items-center space-x-4">
         {/* Progress Info */}
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+        <span className="text-sm font-medium" style={{ color: "var(--ink-2)" }}>
           Step {state.currentStep + 1} of {state.steps.length}
         </span>
 
@@ -89,18 +86,13 @@ export default function StepNavigation({
             type="button"
             onClick={handleNext}
             disabled={!canProceed}
-            className={`inline-flex items-center px-6 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-              canProceed
-                ? "cursor-pointer btn btn-primary"
-                : "cursor-not-allowed"
-            }`}
+            className="btn btn-sm inline-flex items-center"
             style={{
-              background: canProceed
-                ? "var(--digital-pollen)"
-                : "var(--warm-gray-400)",
-              color: canProceed ? "var(--black)" : "var(--foreground)",
-              opacity: canProceed ? 1 : 0.5,
-              boxShadow: "var(--shadow-sm)",
+              background: canProceed ? "var(--accent)" : "var(--ink-5)",
+              borderColor: canProceed ? "var(--accent)" : "var(--ink-5)",
+              color: canProceed ? "#fff" : "var(--ink-3)",
+              opacity: canProceed ? 1 : 0.6,
+              cursor: canProceed ? "pointer" : "not-allowed",
             }}
           >
             {isLastStep ? "Finish" : nextLabel}

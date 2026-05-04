@@ -156,8 +156,7 @@ export default function DataStep() {
 
       // Initialize CodeMirror with theme based on the app's data-theme
       // (set by the Tweaks toggle), not the OS preference.
-      const isDarkMode =
-        document.documentElement.dataset.theme === "dark";
+      const isDarkMode = document.documentElement.dataset.theme === "dark";
       const editor = window.CodeMirror.fromTextArea(textarea, {
         mode: { name: "javascript", json: true },
         theme: isDarkMode ? "material-darker" : "default",
@@ -744,10 +743,10 @@ export default function DataStep() {
     <div className="h-full flex flex-col space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--ink)" }}>
           Add Your Data
         </h2>
-        <p className="text-lg text-gray-700 dark:text-gray-300">
+        <p className="text-lg" style={{ color: "var(--ink-2)" }}>
           Provide the data that will populate your document template
         </p>
       </div>
@@ -908,11 +907,21 @@ export default function DataStep() {
               <button
                 type="button"
                 onClick={() => setPreviewMode("interactive")}
-                className={`px-3 py-1 text-xs font-medium border cursor-pointer ${
-                  previewMode === "interactive"
-                    ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700"
-                    : "bg-white dark:bg-[#2a2020] text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                } rounded-l-md`}
+                className="px-3 py-1 text-xs font-medium border cursor-pointer rounded-l-md"
+                style={{
+                  background:
+                    previewMode === "interactive"
+                      ? "var(--accent-tint)"
+                      : "var(--bg-elev)",
+                  color:
+                    previewMode === "interactive"
+                      ? "var(--accent)"
+                      : "var(--ink-3)",
+                  borderColor:
+                    previewMode === "interactive"
+                      ? "var(--accent)"
+                      : "var(--line)",
+                }}
                 aria-pressed={previewMode === "interactive"}
                 aria-describedby="preview-mode-help"
               >
@@ -921,11 +930,17 @@ export default function DataStep() {
               <button
                 type="button"
                 onClick={() => setPreviewMode("simple")}
-                className={`px-3 py-1 text-xs font-medium border-t border-r border-b cursor-pointer ${
-                  previewMode === "simple"
-                    ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700"
-                    : "bg-white dark:bg-[#2a2020] text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                } rounded-r-md`}
+                className="px-3 py-1 text-xs font-medium border-t border-r border-b cursor-pointer rounded-r-md"
+                style={{
+                  background:
+                    previewMode === "simple"
+                      ? "var(--accent-tint)"
+                      : "var(--bg-elev)",
+                  color:
+                    previewMode === "simple" ? "var(--accent)" : "var(--ink-3)",
+                  borderColor:
+                    previewMode === "simple" ? "var(--accent)" : "var(--line)",
+                }}
                 aria-pressed={previewMode === "simple"}
                 aria-describedby="preview-mode-help"
               >

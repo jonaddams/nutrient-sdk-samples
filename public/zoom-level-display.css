@@ -1,0 +1,15 @@
+/* public/zoom-level-display.css */
+
+/* Style the custom zoom-display toolbar button using the design-system
+   accent (cool palette default). Replaces the SDK's selected-state
+   purple with a brand-aligned blue-gray. */
+.PSPDFKit-Toolbar-Button.zoom-display-btn,
+.PSPDFKit-Toolbar-Button.zoom-display-btn:hover {
+  background: #4d6391; /* --accent (cool palette) */
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.PSPDFKit-Toolbar-Button.zoom-display-btn:hover {
+  background: #38486b; /* --accent (warm palette) — slightly deeper on hover */
+}

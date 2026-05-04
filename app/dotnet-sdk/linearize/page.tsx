@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
-import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
+import { type SampleOption, SamplePicker } from "../_components/SamplePicker";
 
 const Viewer = dynamic(() => import("../_components/PdfBlobViewer"), {
   ssr: false,
@@ -103,7 +103,9 @@ export default function LinearizePage() {
 
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+        throw new Error(
+          text || `Server returned ${res.status} ${res.statusText}`,
+        );
       }
 
       const resultBlob = await res.blob();
@@ -155,6 +157,7 @@ export default function LinearizePage() {
         style={{
           paddingTop: "var(--space-6)",
           paddingBottom: "var(--space-8)",
+          maxWidth: 1800,
         }}
       >
         <div style={cardStyle}>
@@ -352,10 +355,7 @@ export default function LinearizePage() {
                         borderTopColor: "var(--accent)",
                       }}
                     />
-                    <p
-                      className="text-sm"
-                      style={{ color: "var(--ink-3)" }}
-                    >
+                    <p className="text-sm" style={{ color: "var(--ink-3)" }}>
                       Linearizing PDF...
                     </p>
                   </div>

@@ -14,23 +14,28 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
 
   return (
     <div
-      className={`md:rounded-2xl overflow-hidden flex flex-col min-h-[700px] bg-white dark:bg-[#2a2020] ${isCustomizeStep && isMobile ? "w-screen max-w-none" : ""}`}
+      className={`overflow-hidden flex flex-col min-h-[700px] ${isCustomizeStep && isMobile ? "w-screen max-w-none" : ""}`}
       style={{
-        boxShadow: "var(--shadow-xl)",
+        background: "var(--bg-elev)",
+        border: "1px solid var(--line)",
+        borderRadius: "var(--r-3)",
       }}
     >
       {/* Loading Overlay */}
       {state.isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center z-50 rounded-2xl bg-white/75 dark:bg-black/75">
+        <div
+          className="absolute inset-0 flex items-center justify-center z-50"
+          style={{
+            background: "color-mix(in srgb, var(--bg-elev) 75%, transparent)",
+            borderRadius: "var(--r-3)",
+          }}
+        >
           <div className="flex flex-col items-center space-y-4">
             <div
               className="animate-spin rounded-full h-12 w-12 border-b-2"
-              style={{ borderColor: "var(--digital-pollen)" }}
+              style={{ borderColor: "var(--accent)" }}
             />
-            <p
-              className="font-medium"
-              style={{ color: "var(--foreground)", opacity: 0.85 }}
-            >
+            <p className="font-medium" style={{ color: "var(--ink-2)" }}>
               Processing...
             </p>
           </div>
@@ -40,10 +45,11 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
       {/* Error Message */}
       {state.error && (
         <div
-          className="border-l-4 p-4 mb-6"
+          className="p-4 mb-6"
           style={{
-            backgroundColor: "var(--color-error-bg)",
-            borderColor: "var(--code-coral)",
+            background:
+              "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+            borderLeft: "4px solid var(--code-coral)",
           }}
         >
           <div className="flex">
@@ -63,10 +69,7 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
               </svg>
             </div>
             <div className="ml-3">
-              <p
-                className="text-sm"
-                style={{ color: "var(--color-error-text)" }}
-              >
+              <p className="text-sm" style={{ color: "var(--code-coral)" }}>
                 {state.error}
               </p>
             </div>

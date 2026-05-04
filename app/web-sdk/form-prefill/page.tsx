@@ -283,10 +283,7 @@ export default function FormPrefillPage() {
   const sidebar = (
     <>
       {/* Presets */}
-      <div
-        className="p-4"
-        style={{ borderBottom: "1px solid var(--line)" }}
-      >
+      <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
           Data Presets
         </h3>
@@ -395,6 +392,7 @@ export default function FormPrefillPage() {
       description="Programmatically populate PDF form fields from JSON data. Load preset data profiles or edit individual fields, then apply values to the form."
       sidebar={sidebar}
       sidebarSide="left"
+      wide
     >
       <Viewer onFieldsDiscovered={handleFieldsDiscovered} />
     </SampleFrame>

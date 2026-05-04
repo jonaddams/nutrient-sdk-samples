@@ -187,12 +187,12 @@ export default function FormFillPage() {
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
             {/* Left Panel — Form Fields */}
-            <div className="w-96 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)] flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-96 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)] flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Form Fields
                   {fields.length > 0 && (
                     <span className="ml-2 text-xs font-normal text-gray-500">
@@ -204,14 +204,14 @@ export default function FormFillPage() {
                   <button
                     type="button"
                     onClick={handlePreset}
-                    className="px-2 py-1 text-[10px] font-medium rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    className="px-2 py-1 text-[10px] font-medium rounded border border-[var(--line-strong)] text-[var(--ink-3)] hover:bg-[var(--surface)] cursor-pointer"
                   >
                     Load Sample
                   </button>
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="px-2 py-1 text-[10px] font-medium rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    className="px-2 py-1 text-[10px] font-medium rounded border border-[var(--line-strong)] text-[var(--ink-3)] hover:bg-[var(--surface)] cursor-pointer"
                   >
                     Clear
                   </button>
@@ -220,10 +220,41 @@ export default function FormFillPage() {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {loadingFields && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[var(--ink-3)]">
                     Loading form fields...
                   </p>
                 )}
+
+                {!loadingFields && error && (
+                  <div
+                    className="p-3 rounded-md text-xs space-y-2"
+                    style={{
+                      background:
+                        "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+                      border:
+                        "1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line))",
+                      color: "var(--code-coral)",
+                    }}
+                  >
+                    <div className="font-semibold">
+                      Could not load form fields
+                    </div>
+                    <div style={{ color: "var(--ink-3)" }}>{error}</div>
+                    <div style={{ color: "var(--ink-3)" }}>
+                      The Python SDK server must be running at{" "}
+                      <code className="font-mono">{API_BASE}</code>.
+                    </div>
+                  </div>
+                )}
+
+                {!loadingFields &&
+                  !error &&
+                  editableFields.length === 0 &&
+                  fields.length === 0 && (
+                    <p className="text-xs text-[var(--ink-3)]">
+                      No form fields detected in this PDF.
+                    </p>
+                  )}
 
                 {editableFields.map((field) => {
                   const label = field.name.replace(/_/g, " ");
@@ -245,9 +276,9 @@ export default function FormFillPage() {
                               e.target.checked ? "Yes" : "",
                             )
                           }
-                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 accent-[var(--digital-pollen)]"
+                          className="w-4 h-4 rounded border-[var(--line-strong)] accent-[var(--accent)]"
                         />
-                        <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 capitalize">
+                        <span className="text-[11px] font-medium text-[var(--ink-3)] capitalize">
                           {label}
                         </span>
                       </label>
@@ -258,7 +289,7 @@ export default function FormFillPage() {
                   if (field.fieldType === "radio" && options) {
                     return (
                       <fieldset key={field.name}>
-                        <legend className="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1.5 capitalize">
+                        <legend className="block text-[11px] font-medium text-[var(--ink-3)] mb-1.5 capitalize">
                           {label}
                         </legend>
                         <div className="flex flex-wrap gap-2">
@@ -272,9 +303,9 @@ export default function FormFillPage() {
                                 name={field.name}
                                 checked={values[field.name] === opt}
                                 onChange={() => updateValue(field.name, opt)}
-                                className="w-3.5 h-3.5 accent-[var(--digital-pollen)]"
+                                className="w-3.5 h-3.5 accent-[var(--accent)]"
                               />
-                              <span className="text-xs text-gray-700 dark:text-gray-300">
+                              <span className="text-xs text-[var(--ink-2)]">
                                 {opt}
                               </span>
                             </label>
@@ -288,7 +319,7 @@ export default function FormFillPage() {
                   if (field.fieldType === "combobox" && options) {
                     return (
                       <div key={field.name}>
-                        <label className="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1 capitalize">
+                        <label className="block text-[11px] font-medium text-[var(--ink-3)] mb-1 capitalize">
                           {label}
                         </label>
                         <select
@@ -296,7 +327,7 @@ export default function FormFillPage() {
                           onChange={(e) =>
                             updateValue(field.name, e.target.value)
                           }
-                          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
+                          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                         >
                           <option value="">Select...</option>
                           {options.map((opt) => (
@@ -313,7 +344,7 @@ export default function FormFillPage() {
                   if (field.fieldType === "listbox" && options) {
                     return (
                       <div key={field.name}>
-                        <label className="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1 capitalize">
+                        <label className="block text-[11px] font-medium text-[var(--ink-3)] mb-1 capitalize">
                           {label}
                         </label>
                         <select
@@ -321,7 +352,7 @@ export default function FormFillPage() {
                           onChange={(e) =>
                             updateValue(field.name, e.target.value)
                           }
-                          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
+                          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                         >
                           <option value="">Select...</option>
                           {options.map((opt) => (
@@ -337,7 +368,7 @@ export default function FormFillPage() {
                   // Default: text input
                   return (
                     <div key={field.name}>
-                      <label className="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1 capitalize">
+                      <label className="block text-[11px] font-medium text-[var(--ink-3)] mb-1 capitalize">
                         {label}
                       </label>
                       <input
@@ -349,22 +380,22 @@ export default function FormFillPage() {
                           updateValue(field.name, e.target.value)
                         }
                         placeholder={label}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)] placeholder:text-[var(--ink-4)]"
                       />
                     </div>
                   );
                 })}
               </div>
 
-              <div className="p-4 border-t border-[var(--warm-gray-400)] space-y-2">
+              <div className="p-4 border-t border-[var(--line)] space-y-2">
                 <button
                   type="button"
                   onClick={handleFill}
                   disabled={processing || filledCount === 0}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
+                    background: "var(--accent)",
+                    color: "#fff",
                   }}
                 >
                   {processing ? "Filling..." : "Fill Form & Generate PDF"}
@@ -380,7 +411,7 @@ export default function FormFillPage() {
                         a.download = "filled-form.pdf";
                         a.click();
                       }}
-                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Download
                     </button>
@@ -390,7 +421,7 @@ export default function FormFillPage() {
                         URL.revokeObjectURL(pdfUrl);
                         setPdfUrl(null);
                       }}
-                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Back to Blank
                     </button>
@@ -398,7 +429,7 @@ export default function FormFillPage() {
                 )}
 
                 {error && (
-                  <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
+                  <div className="p-2 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
                     {error}
                   </div>
                 )}
@@ -414,8 +445,8 @@ export default function FormFillPage() {
               {processing && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-[var(--ink-3)]">
                       Filling form fields...
                     </p>
                   </div>
