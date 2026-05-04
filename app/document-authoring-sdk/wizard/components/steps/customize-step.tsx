@@ -397,18 +397,26 @@ export default function CustomizeStep() {
     <div className="h-full flex flex-col gap-6">
       {/* Header */}
       <div className="text-center flex-shrink-0">
-        <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--ink)" }}>
           Customize Your Template
         </h2>
-        <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        <p className="text-lg font-medium" style={{ color: "var(--ink-2)" }}>
           Edit the template design and layout to match your needs
         </p>
       </div>
 
-      {/* Template Editor Container */}
+      {/* Template Editor Container — force a light surface so the SDK's
+          built-in toolbar (which assumes a light theme) reads clearly even
+          when the page is in dark mode. */}
       <div
-        className="relative overflow-hidden bg-white border border-gray-200 dark:border-[var(--warm-gray-600)] rounded-xl flex-1"
-        style={{ minHeight: "700px" }}
+        className="relative overflow-hidden flex-1"
+        data-theme="light"
+        style={{
+          background: "#ffffff",
+          border: "1px solid var(--line)",
+          borderRadius: "var(--r-3)",
+          minHeight: "700px",
+        }}
       >
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/75 dark:bg-black/75">

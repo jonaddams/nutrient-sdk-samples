@@ -9,11 +9,29 @@ const Viewer = dynamic(() => import("./viewer"), {
   loading: () => (
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Loading viewer...</p>
+        <div
+          className="inline-block animate-spin rounded-full h-8 w-8 mb-4"
+          style={{
+            border: "2px solid var(--line)",
+            borderBottomColor: "var(--accent)",
+          }}
+        />
+        <p style={{ color: "var(--ink-3)" }}>Loading viewer...</p>
       </div>
     </div>
   ),
+});
+
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+};
+
+const featureIconBg = (token: string): React.CSSProperties => ({
+  background: `color-mix(in srgb, ${token} 18%, var(--bg-elev))`,
+  color: token,
+  borderRadius: "var(--r-2)",
 });
 
 export default function DigitalSignaturePage() {
@@ -29,7 +47,7 @@ export default function DigitalSignaturePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PageHeader
         title="Web SDK Digital Signature with DWS API"
         description="Sign documents directly in the Nutrient Web SDK viewer using DWS API for secure digital signatures"
@@ -43,7 +61,7 @@ export default function DigitalSignaturePage() {
               href="https://www.nutrient.io/api/signing-api/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
+              className="btn ghost btn-sm"
             >
               API Documentation
             </a>
@@ -51,7 +69,7 @@ export default function DigitalSignaturePage() {
               href="https://www.nutrient.io/guides/web/signatures/digital-signatures/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-secondary"
+              className="btn ghost btn-sm"
             >
               Digital Signatures Guide
             </a>
@@ -59,14 +77,22 @@ export default function DigitalSignaturePage() {
         }
       />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+        }}
+      >
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--disc-pink)")}
+            >
               <svg
-                className="w-6 h-6 text-purple-600 dark:text-purple-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -80,19 +106,25 @@ export default function DigitalSignaturePage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               Web SDK Integration
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Sign documents digitally via DWS API directly in the Nutrient Web
               SDK viewer
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--accent)")}
+            >
               <svg
-                className="w-6 h-6 text-indigo-600 dark:text-indigo-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -106,19 +138,25 @@ export default function DigitalSignaturePage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               DWS API Signing
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Secure digital signatures powered by Nutrient DWS API with
               token-based authentication
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--data-green)")}
+            >
               <svg
-                className="w-6 h-6 text-green-600 dark:text-green-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -132,10 +170,13 @@ export default function DigitalSignaturePage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ color: "var(--ink)" }}
+            >
               Trusted Certificates
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-center" style={{ color: "var(--ink-3)" }}>
               Configured to trust Nutrient signing certificates for proper
               signature validation
             </p>
@@ -143,7 +184,7 @@ export default function DigitalSignaturePage() {
         </div>
 
         {/* Viewer Container */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
+        <div className="overflow-hidden mb-8" style={cardStyle}>
           <div className="h-[calc(100vh-32rem)]">
             {useMemo(
               () => (
@@ -155,11 +196,17 @@ export default function DigitalSignaturePage() {
         </div>
 
         {/* How It Works */}
-        <details className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
-          <summary className="text-xl font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:opacity-80">
+        <details className="p-6 mb-8" style={cardStyle}>
+          <summary
+            className="text-xl font-semibold cursor-pointer hover:opacity-80"
+            style={{ color: "var(--ink)" }}
+          >
             How It Works
           </summary>
-          <ol className="mt-4 ml-5 space-y-2 text-gray-600 dark:text-gray-400 list-decimal">
+          <ol
+            className="mt-4 ml-5 space-y-2 list-decimal"
+            style={{ color: "var(--ink-2)" }}
+          >
             <li>
               Click the signature button in the toolbar to initiate the signing
               process
@@ -184,7 +231,10 @@ export default function DigitalSignaturePage() {
         </details>
 
         {/* Footer Note */}
-        <div className="text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
+        <div
+          className="text-sm text-center space-y-2"
+          style={{ color: "var(--ink-3)" }}
+        >
           <p>
             This sample demonstrates digital signature integration with Nutrient
             DWS API. Requires NUTRIENT_API_KEY environment variable to be

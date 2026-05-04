@@ -11,6 +11,25 @@ const DocumentComparisonViewer = dynamic(
   },
 );
 
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+};
+
+const featureIconBg = (token: string): React.CSSProperties => ({
+  background: `color-mix(in srgb, ${token} 18%, var(--bg-elev))`,
+  color: token,
+  borderRadius: "var(--r-2)",
+});
+
+const inputStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  color: "var(--ink)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-2)",
+};
+
 export default function MarkdownComparisonPage() {
   const [doc1, setDoc1] = useState<string>(
     "/text-comparison/text-comparison-a.pdf",
@@ -30,7 +49,7 @@ export default function MarkdownComparisonPage() {
 
   if (isComparing) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+      <div className="min-h-screen" style={{ background: "var(--bg)" }}>
         <PageHeader
           title="Markdown Comparison"
           description="Compare documents using Nutrient DWS API markdown conversion"
@@ -40,27 +59,32 @@ export default function MarkdownComparisonPage() {
           ]}
         />
 
-        {/* Comparison Container */}
-        <div className="max-w-7xl mx-auto px-6 pb-8">
+        <main
+          className="shell"
+          style={{
+            paddingTop: "var(--space-6)",
+            paddingBottom: "var(--space-8)",
+          }}
+        >
           <div className="mb-4 flex justify-end">
             <button
               type="button"
               onClick={resetComparison}
-              className="btn btn-sm btn-secondary"
+              className="btn ghost btn-sm"
             >
               Back to Selection
             </button>
           </div>
-          <div className="h-[calc(100vh-16rem)]">
+          <div className="h-[calc(100vh-16rem)] overflow-hidden" style={cardStyle}>
             <DocumentComparisonViewer document1={doc1} document2={doc2} />
           </div>
-        </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PageHeader
         title="Markdown Comparison"
         description="Compare documents using Nutrient DWS API to convert PDFs to Markdown, preserving semantic structure while enabling accurate text comparison across pages."
@@ -70,14 +94,22 @@ export default function MarkdownComparisonPage() {
         ]}
       />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+        }}
+      >
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--disc-pink)")}
+            >
               <svg
-                className="w-6 h-6 text-purple-600 dark:text-purple-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -91,19 +123,25 @@ export default function MarkdownComparisonPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h3
+              className="text-lg font-semibold mb-2"
+              style={{ color: "var(--ink)" }}
+            >
               Semantic Structure
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p style={{ color: "var(--ink-3)" }}>
               Preserves document structure like headings, lists, and paragraphs
               through markdown conversion.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--accent-2)")}
+            >
               <svg
-                className="w-6 h-6 text-indigo-600 dark:text-indigo-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -117,18 +155,24 @@ export default function MarkdownComparisonPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h3
+              className="text-lg font-semibold mb-2"
+              style={{ color: "var(--ink)" }}
+            >
               Nutrient DWS API
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p style={{ color: "var(--ink-3)" }}>
               Uses Nutrient DWS API for high-quality PDF to Markdown conversion.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="p-6" style={cardStyle}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={featureIconBg("var(--accent)")}
+            >
               <svg
-                className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -142,10 +186,13 @@ export default function MarkdownComparisonPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h3
+              className="text-lg font-semibold mb-2"
+              style={{ color: "var(--ink)" }}
+            >
               Cross-Page Comparison
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p style={{ color: "var(--ink-3)" }}>
               Compares full document content regardless of page boundaries or
               layout changes.
             </p>
@@ -153,17 +200,26 @@ export default function MarkdownComparisonPage() {
         </div>
 
         {/* Document Selection */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        <div className="p-8" style={cardStyle}>
+          <h3
+            className="text-2xl font-bold mb-6"
+            style={{ color: "var(--ink)" }}
+          >
             Select Documents to Compare
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Document 1 */}
-            <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <div
+              className="p-6"
+              style={{
+                border: "2px solid var(--line)",
+                borderRadius: "var(--r-2)",
+              }}
+            >
               <label
                 htmlFor="doc1-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+                className="block text-sm font-medium mb-3"
+                style={{ color: "var(--ink-2)" }}
               >
                 Original Document
               </label>
@@ -171,7 +227,8 @@ export default function MarkdownComparisonPage() {
                 id="doc1-select"
                 value={doc1}
                 onChange={(e) => setDoc1(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-4 py-2 focus:outline-none"
+                style={inputStyle}
               >
                 <option value="/text-comparison/text-comparison-a.pdf">
                   Text Comparison Document A
@@ -180,9 +237,13 @@ export default function MarkdownComparisonPage() {
                   Text Comparison Document B
                 </option>
               </select>
-              <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <div
+                className="mt-4 flex items-center text-sm"
+                style={{ color: "var(--ink-3)" }}
+              >
                 <svg
-                  className="w-5 h-5 mr-2 text-purple-500"
+                  className="w-5 h-5 mr-2"
+                  style={{ color: "var(--accent)" }}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -197,11 +258,17 @@ export default function MarkdownComparisonPage() {
               </div>
             </div>
 
-            {/* Document 2 */}
-            <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <div
+              className="p-6"
+              style={{
+                border: "2px solid var(--line)",
+                borderRadius: "var(--r-2)",
+              }}
+            >
               <label
                 htmlFor="doc2-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+                className="block text-sm font-medium mb-3"
+                style={{ color: "var(--ink-2)" }}
               >
                 Modified Document
               </label>
@@ -209,7 +276,8 @@ export default function MarkdownComparisonPage() {
                 id="doc2-select"
                 value={doc2}
                 onChange={(e) => setDoc2(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-4 py-2 focus:outline-none"
+                style={inputStyle}
               >
                 <option value="/text-comparison/text-comparison-a.pdf">
                   Text Comparison Document A
@@ -218,9 +286,13 @@ export default function MarkdownComparisonPage() {
                   Text Comparison Document B
                 </option>
               </select>
-              <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <div
+                className="mt-4 flex items-center text-sm"
+                style={{ color: "var(--ink-3)" }}
+              >
                 <svg
-                  className="w-5 h-5 mr-2 text-indigo-500"
+                  className="w-5 h-5 mr-2"
+                  style={{ color: "var(--data-green)" }}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -240,7 +312,7 @@ export default function MarkdownComparisonPage() {
             <button
               type="button"
               onClick={startComparison}
-              className="btn btn-primary"
+              className="btn"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -260,19 +332,24 @@ export default function MarkdownComparisonPage() {
             </button>
           </div>
 
-          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div
+            className="mt-6 text-center text-sm"
+            style={{ color: "var(--ink-3)" }}
+          >
             <p>
               Tip: For best results, compare two versions of the same document
             </p>
             <p className="mt-2">
               Note: Requires Nutrient DWS API key (configured in environment
-              variables).
+              variables)
             </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
+        <div
+          className="mt-12 text-center text-sm"
+          style={{ color: "var(--ink-4)" }}
+        >
           <p>Powered by Nutrient DWS API • Markdown-based comparison</p>
         </div>
       </main>
