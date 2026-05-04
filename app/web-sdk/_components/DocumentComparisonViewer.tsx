@@ -53,6 +53,7 @@ export default function DocumentComparisonViewer({
           allowLinearizedLoading: false,
           pageRendering: "next",
           headless: true,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         });
 
         if (!isMounted) {
@@ -93,6 +94,7 @@ export default function DocumentComparisonViewer({
           allowLinearizedLoading: false,
           pageRendering: "next",
           headless: true,
+          licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
         });
 
         if (!isMounted) {
@@ -214,24 +216,82 @@ export default function DocumentComparisonViewer({
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-      {/* Header with stats */}
-      <div className="bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-700 dark:to-teal-700 text-white px-6 py-4">
+    <div
+      className="h-full flex flex-col overflow-hidden"
+      style={{
+        background: "var(--bg-elev)",
+        border: "1px solid var(--line)",
+        borderRadius: "var(--r-3)",
+      }}
+    >
+      {/* Header with stats — uses the same panel-head treatment as our
+          dialogs so the comparison view feels consistent with the rest of
+          the design system. */}
+      <div
+        className="px-6 py-4"
+        style={{
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--line)",
+        }}
+      >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold">Text Comparison Results</h2>
-            <p className="text-sm text-green-100 mt-1">
+            <div className="flex items-center gap-2">
+              <h2
+                className="text-lg font-semibold"
+                style={{ color: "var(--ink)" }}
+              >
+                Text Comparison Results
+              </h2>
+              <span
+                className="panel-section"
+                style={{
+                  color: "var(--data-green)",
+                  border: "1px solid color-mix(in srgb, var(--data-green) 40%, var(--line))",
+                  borderRadius: "var(--r-pill)",
+                  padding: "2px 8px",
+                  background:
+                    "color-mix(in srgb, var(--data-green) 12%, var(--bg-elev))",
+                }}
+              >
+                Complete
+              </span>
+            </div>
+            <p
+              className="text-sm mt-1"
+              style={{ color: "var(--ink-3)" }}
+            >
               Complete text document comparison
             </p>
           </div>
-          <div className="flex space-x-6">
+          <div className="flex gap-6">
             <div className="text-right">
-              <div className="text-2xl font-bold">{text1.length}</div>
-              <div className="text-xs text-green-100">Doc 1 chars</div>
+              <div
+                className="text-2xl font-bold tabular-nums"
+                style={{ color: "var(--ink)" }}
+              >
+                {text1.length.toLocaleString()}
+              </div>
+              <div
+                className="panel-section"
+                style={{ padding: 0, marginTop: 2 }}
+              >
+                Doc 1 chars
+              </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">{text2.length}</div>
-              <div className="text-xs text-green-100">Doc 2 chars</div>
+              <div
+                className="text-2xl font-bold tabular-nums"
+                style={{ color: "var(--ink)" }}
+              >
+                {text2.length.toLocaleString()}
+              </div>
+              <div
+                className="panel-section"
+                style={{ padding: 0, marginTop: 2 }}
+              >
+                Doc 2 chars
+              </div>
             </div>
           </div>
         </div>

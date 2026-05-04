@@ -70,19 +70,19 @@ export default function OcrExtractionPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader
         title="OCR Text Extraction"
         description="Extract text from scanned documents using OCR via the Nutrient Java SDK Vision API."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
             {/* Left Panel */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-80 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)]">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Source Image
                 </h3>
               </div>
@@ -91,7 +91,7 @@ export default function OcrExtractionPage() {
                 <select
                   value={selectedIndex}
                   onChange={(e) => handleImageChange(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
                   {SAMPLE_IMAGES.map((img, i) => (
                     <option key={img.path} value={i}>
@@ -106,25 +106,25 @@ export default function OcrExtractionPage() {
                   disabled={processing}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
+                    background: "var(--accent)",
+                    color: "#fff",
                   }}
                 >
                   {processing ? "Extracting..." : "Extract Text"}
                 </button>
 
                 {error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
+                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
                     {error}
                   </div>
                 )}
 
                 {extractedText && (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                       Extracted Text
                     </h3>
-                    <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3 whitespace-pre-wrap font-mono leading-relaxed max-h-[calc(100vh-30rem)] overflow-y-auto">
+                    <pre className="text-xs text-[var(--ink-3)] bg-[var(--surface)] rounded-md p-3 whitespace-pre-wrap font-mono leading-relaxed max-h-[calc(100vh-30rem)] overflow-y-auto">
                       {extractedText}
                     </pre>
                   </div>
@@ -137,8 +137,8 @@ export default function OcrExtractionPage() {
               {processing && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-[var(--ink-3)]">
                       Running OCR extraction...
                     </p>
                   </div>

@@ -2,6 +2,7 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 
 const DOCUMENT = "/documents/service-agreement.pdf";
 
@@ -60,6 +61,7 @@ export default function CollaborationViewer({
   // Keep refs in sync with latest props
   activeAuthorRef.current = activeAuthor;
   onThreadsChangedRef.current = onThreadsChanged;
+  const appTheme = useAppTheme();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -93,9 +95,10 @@ export default function CollaborationViewer({
       document: DOCUMENT,
       useCDN: true,
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? NutrientViewer.Theme.DARK
-        : NutrientViewer.Theme.AUTO,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
       pageRendering: "next",
       mentionableUsers,
       customRenderers: {

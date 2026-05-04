@@ -18,6 +18,6 @@ export interface FieldCustomData {
 export interface FieldPaletteItem {
   type: FieldType;
   label: string;
-  icon: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   defaultSize: { width: number; height: number };
 }

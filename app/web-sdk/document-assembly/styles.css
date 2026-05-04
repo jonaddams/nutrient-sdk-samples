@@ -18,12 +18,6 @@
   flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-toolbar {
-    background-color: var(--warm-gray-950);
-    border-bottom-color: var(--warm-gray-800);
-  }
-}
 
 .assembly-toolbar-group {
   display: flex;
@@ -37,11 +31,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-toolbar-title {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Main content area */
 .assembly-panels {
@@ -58,11 +47,6 @@
   cursor: col-resize;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-divider {
-    background-color: var(--warm-gray-700);
-  }
-}
 
 /* Panel (source or target) */
 .assembly-panel {
@@ -84,12 +68,6 @@
   flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-panel-header {
-    background-color: var(--warm-gray-950);
-    border-bottom-color: var(--warm-gray-800);
-  }
-}
 
 .assembly-panel-title {
   font-size: 12px;
@@ -99,11 +77,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-panel-title {
-    color: var(--warm-gray-400);
-  }
-}
 
 .assembly-panel-subtitle {
   font-size: 11px;
@@ -111,11 +84,6 @@
   margin-left: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-panel-subtitle {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Thumbnail grid */
 .assembly-thumbnails {
@@ -160,20 +128,6 @@
   opacity: 0.4;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-thumb {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-
-  .assembly-thumb:hover {
-    border-color: var(--warm-gray-500);
-  }
-
-  .assembly-thumb.selected-multi {
-    background-color: rgba(69, 55, 222, 0.15);
-  }
-}
 
 .assembly-thumb img {
   display: block;
@@ -189,11 +143,6 @@
   margin-top: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-thumb-label {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Three-dot menu */
 .assembly-thumb-menu {
@@ -218,13 +167,6 @@
   opacity: 1;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-thumb-menu {
-    background: var(--warm-gray-800);
-    border-color: var(--warm-gray-600);
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Drop indicator */
 .assembly-drop-indicator {
@@ -264,15 +206,6 @@
   color: var(--warm-gray-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-empty-drop {
-    border-color: var(--warm-gray-700);
-  }
-
-  .assembly-empty-drop p {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Panel footer with actions */
 .assembly-panel-footer {
@@ -285,12 +218,6 @@
   flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-panel-footer {
-    background-color: var(--warm-gray-950);
-    border-top-color: var(--warm-gray-800);
-  }
-}
 
 /* Multi-select input */
 .assembly-multiselect-input {
@@ -308,13 +235,6 @@
   color: var(--warm-gray-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-multiselect-input {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-600);
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Buttons */
 .assembly-btn {
@@ -350,12 +270,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-btn-secondary {
-    background: var(--warm-gray-700);
-    color: var(--warm-gray-300);
-  }
-}
 
 .assembly-btn-danger {
   background: var(--code-coral);
@@ -390,12 +304,6 @@
   opacity: 0.8;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-upload-label {
-    background: var(--warm-gray-700);
-    color: var(--warm-gray-300);
-  }
-}
 
 /* Context menu */
 .assembly-context-menu {
@@ -409,12 +317,6 @@
   padding: 4px 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-context-menu {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-}
 
 .assembly-context-item {
   display: flex;
@@ -434,15 +336,6 @@
   background-color: var(--warm-gray-200);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-context-item {
-    color: var(--warm-gray-400);
-  }
-
-  .assembly-context-item:hover {
-    background-color: var(--warm-gray-800);
-  }
-}
 
 .assembly-context-item.danger {
   color: var(--code-coral);
@@ -454,11 +347,6 @@
   margin: 4px 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-context-separator {
-    background-color: var(--warm-gray-700);
-  }
-}
 
 /* Loading overlay */
 .assembly-loading {
@@ -502,12 +390,3 @@
   margin-top: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .assembly-loading-text {
-    color: var(--warm-gray-400);
-  }
-
-  .assembly-loading-subtext {
-    color: var(--warm-gray-500);
-  }
-}

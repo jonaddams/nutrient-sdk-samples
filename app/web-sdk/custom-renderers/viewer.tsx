@@ -254,48 +254,91 @@ export default function CustomRenderersViewer() {
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-72 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
+      <div
+        className="w-72 flex flex-col overflow-y-auto"
+        style={{
+          background: "var(--bg-elev)",
+          borderRight: "1px solid var(--line)",
+        }}
+      >
         <div className="p-5">
-          <p className="text-sm text-gray-600 dark:text-gray-400 pb-5">
+          <div className="panel-section" style={{ paddingTop: 0, marginBottom: 8 }}>
+            Categories
+          </div>
+          <p
+            className="text-sm pb-5"
+            style={{ color: "var(--ink-3)" }}
+          >
             Select a category to see different custom annotation renderers
             applied to the document.
           </p>
 
           {/* Category Tabs */}
           <div className="space-y-2">
-            {categories.map((category, index) => (
-              <button
-                key={category.name}
-                type="button"
-                className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all cursor-pointer ${
-                  activeCategory === index
-                    ? "border-[var(--digital-pollen)] bg-[var(--digital-pollen)]/10 font-semibold"
-                    : "border-[var(--warm-gray-400)] hover:border-[var(--warm-gray-600)]"
-                }`}
-                onClick={() => handleTabClick(index)}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-900 dark:text-white">
-                    {category.name}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {category.renderers.length}
-                  </span>
-                </div>
-                {activeCategory === index && (
-                  <div className="mt-2 space-y-1">
-                    {category.renderers.map((renderer) => (
-                      <div
-                        key={renderer.rendererType}
-                        className="text-xs text-gray-600 dark:text-gray-400 pl-2 border-l-2 border-[var(--digital-pollen)]"
-                      >
-                        {renderer.label}
-                      </div>
-                    ))}
+            {categories.map((category, index) => {
+              const isActive = activeCategory === index;
+              return (
+                <button
+                  key={category.name}
+                  type="button"
+                  className="w-full text-left px-4 py-3 transition-all cursor-pointer"
+                  style={{
+                    background: isActive
+                      ? "var(--accent-tint)"
+                      : "transparent",
+                    border: `1px solid ${
+                      isActive ? "var(--accent)" : "var(--line)"
+                    }`,
+                    borderRadius: "var(--r-2)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = "var(--accent-tint)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = "transparent";
+                    }
+                  }}
+                  onClick={() => handleTabClick(index)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="text-sm"
+                      style={{
+                        color: "var(--ink)",
+                        fontWeight: isActive ? 600 : 400,
+                      }}
+                    >
+                      {category.name}
+                    </span>
+                    <span
+                      className="text-xs font-mono tabular-nums"
+                      style={{ color: "var(--ink-4)" }}
+                    >
+                      {category.renderers.length}
+                    </span>
                   </div>
-                )}
-              </button>
-            ))}
+                  {isActive && (
+                    <div className="mt-2 space-y-1">
+                      {category.renderers.map((renderer) => (
+                        <div
+                          key={renderer.rendererType}
+                          className="text-xs pl-2"
+                          style={{
+                            color: "var(--ink-3)",
+                            borderLeft: "2px solid var(--accent)",
+                          }}
+                        >
+                          {renderer.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

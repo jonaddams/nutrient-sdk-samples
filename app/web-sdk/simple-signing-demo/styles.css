@@ -21,12 +21,6 @@
   gap: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .signing-demo-sidebar {
-    background-color: var(--warm-gray-950);
-    border-right-color: var(--warm-gray-800);
-  }
-}
 
 .sidebar-section {
   display: flex;
@@ -43,11 +37,6 @@
   margin-bottom: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .sidebar-label {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* User Selector Styles */
 .user-selector {
@@ -72,22 +61,6 @@
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  .user-selector {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-600);
-    color: var(--warm-gray-400);
-  }
-
-  .user-selector:hover {
-    border-color: var(--white);
-  }
-
-  .user-selector:focus {
-    border-color: var(--white);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-  }
-}
 
 /* Assign To Selector */
 .assign-to-row {
@@ -126,26 +99,6 @@
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  .assign-to-label {
-    color: var(--warm-gray-400);
-  }
-
-  .assign-to-selector {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-600);
-    color: var(--warm-gray-400);
-  }
-
-  .assign-to-selector:hover {
-    border-color: var(--white);
-  }
-
-  .assign-to-selector:focus {
-    border-color: var(--white);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-  }
-}
 
 /* Form Fields Styles */
 .form-fields-list {
@@ -181,17 +134,6 @@
   transform: translateY(0);
 }
 
-@media (prefers-color-scheme: dark) {
-  .draggable-field {
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-600);
-  }
-
-  .draggable-field:hover {
-    background-color: var(--warm-gray-800);
-    border-color: var(--warm-gray-500);
-  }
-}
 
 .field-icon {
   font-size: 18px;
@@ -226,19 +168,6 @@
   letter-spacing: 1px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .field-label {
-    color: var(--warm-gray-400);
-  }
-
-  .field-hint {
-    color: var(--warm-gray-600);
-  }
-
-  .or-divider {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Viewer Styles */
 .signing-demo-viewer {
@@ -253,12 +182,6 @@
   box-shadow: inset 0 0 0 2px var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .signing-demo-viewer.drop-zone-active {
-    background-color: var(--warm-gray-900);
-    box-shadow: inset 0 0 0 2px var(--white);
-  }
-}
 
 /* Nutrient-branded buttons */
 .load-defaults-btn,
@@ -293,12 +216,6 @@
   opacity: 0.7;
 }
 
-@media (prefers-color-scheme: dark) {
-  .load-defaults-btn {
-    background: var(--data-green);
-    color: var(--black);
-  }
-}
 
 /* Digital Signature Section - Visual separation */
 .digital-signature-section {
@@ -307,11 +224,6 @@
   border-top: 2px solid var(--warm-gray-300);
 }
 
-@media (prefers-color-scheme: dark) {
-  .digital-signature-section {
-    border-top-color: var(--warm-gray-700);
-  }
-}
 
 /* Delete All Form Fields Button - Code Coral (destructive action) */
 .delete-all-fields-btn {
@@ -346,17 +258,6 @@
   cursor: not-allowed;
 }
 
-@media (prefers-color-scheme: dark) {
-  .delete-all-fields-btn {
-    background: var(--code-coral);
-    color: var(--black);
-  }
-
-  .delete-all-fields-btn:hover:not(:disabled) {
-    opacity: 0.85;
-    color: var(--black);
-  }
-}
 
 /* Digital Signature Button - Primary (Black) variant */
 
@@ -376,16 +277,6 @@
   cursor: not-allowed;
 }
 
-@media (prefers-color-scheme: dark) {
-  .digital-signature-btn {
-    background: var(--white);
-    color: var(--black);
-  }
-
-  .digital-signature-btn:hover:not(:disabled) {
-    color: var(--black);
-  }
-}
 
 /* Date field input padding */
 /* biome-ignore lint/complexity/noImportantStyles: Need to override PSPDFKit default styles */

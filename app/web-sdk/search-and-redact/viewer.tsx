@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 
 const DOCUMENT = "/documents/acme-bank.pdf";
 
@@ -48,6 +49,7 @@ const SearchAndRedactViewer = forwardRef<SearchAndRedactHandle, ViewerProps>(
     const instanceRef = useRef<Instance | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
     const [isReady, setIsReady] = useState(false);
+    const appTheme = useAppTheme();
 
     const reportCount = useCallback(async () => {
       const inst = instanceRef.current;
@@ -193,9 +195,10 @@ const SearchAndRedactViewer = forwardRef<SearchAndRedactHandle, ViewerProps>(
         useCDN: true,
         pageRendering: "next",
         licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-        theme: window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? NutrientViewer.Theme.DARK
-          : NutrientViewer.Theme.AUTO,
+        theme:
+          appTheme === "dark"
+            ? NutrientViewer.Theme.DARK
+            : NutrientViewer.Theme.LIGHT,
         toolbarItems: [
           ...(NutrientViewer.defaultToolbarItems ?? []),
           { type: "redact-rectangle" },
@@ -211,7 +214,7 @@ const SearchAndRedactViewer = forwardRef<SearchAndRedactHandle, ViewerProps>(
         setIsReady(false);
         NutrientViewer.unload(container);
       };
-    }, [reloadKey]);
+    }, [reloadKey, appTheme]);
 
     return (
       <div style={{ position: "relative", height: "100%" }}>

@@ -1,238 +1,202 @@
 import Link from "next/link";
 
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      {/* Header */}
-      <header className="border-b border-[var(--warm-gray-400)] bg-white dark:bg-[#1a1414]">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="!mb-0">Nutrient SDK Samples</h1>
-          <a
-            href="https://github.com/jonaddams/nutrient-sdk-samples"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--warm-gray-300)] hover:text-[var(--digital-pollen)] transition-colors no-underline"
-          >
-            GitHub
-          </a>
-        </div>
-      </header>
+interface SdkEntry {
+  id: string;
+  num: string;
+  title: string;
+  desc: string;
+  foot: string;
+  comingSoon?: boolean;
+}
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-16">
-        {/* Introduction */}
-        <div className="mb-16">
-          <p className="text-xl !mb-6">
-            Explore interactive demos and code samples for Nutrient's SDKs and
-            APIs. Each example demonstrates key features and implementation
-            patterns to help you integrate document processing capabilities into
-            your applications.
+const SDKS: SdkEntry[] = [
+  {
+    id: "web-sdk",
+    num: "01",
+    title: "Web SDK",
+    desc: "In-browser PDF viewing, annotations, forms, signatures, redaction, and comparison.",
+    foot: "33 samples",
+  },
+  {
+    id: "document-engine",
+    num: "02",
+    title: "Document Engine",
+    desc: "Server-side document processing API for hosted or self-hosted deployments.",
+    foot: "Coming soon",
+    comingSoon: true,
+  },
+  {
+    id: "ai-document-processing",
+    num: "03",
+    title: "AI Document Processing",
+    desc: "Classify and extract structured data from invoices, receipts, and POs.",
+    foot: "1 sample",
+  },
+  {
+    id: "java-sdk",
+    num: "04",
+    title: "Java SDK",
+    desc: "Server-side conversion, OCR, and digital signing for JVM applications.",
+    foot: "5 samples",
+  },
+  {
+    id: "python-sdk",
+    num: "05",
+    title: "Python SDK",
+    desc: "Document conversion, redaction, form fill, and template generation.",
+    foot: "7 samples",
+  },
+  {
+    id: "dotnet-sdk",
+    num: "06",
+    title: ".NET SDK",
+    desc: "File optimization, linearization, and OCR for .NET workloads.",
+    foot: "3 samples",
+  },
+  {
+    id: "api",
+    num: "07",
+    title: "Nutrient DWS API",
+    desc: "Document Web Services — signing, conversion, and comparison via REST.",
+    foot: "5 samples",
+  },
+  {
+    id: "document-authoring-sdk",
+    num: "08",
+    title: "Document Authoring SDK",
+    desc: "Programmatic document generation with templates, variables, and live preview.",
+    foot: "3 samples",
+  },
+];
+
+export default function Home() {
+  const total = SDKS.reduce((n, s) => {
+    const m = s.foot.match(/^(\d+)/);
+    return n + (m ? Number(m[1]) : 0);
+  }, 0);
+
+  return (
+    <section className="shell">
+      <div className="hero">
+        <div className="eyebrow" style={{ marginBottom: "var(--space-5)" }}>
+          <span style={{ color: "var(--accent)" }}>●</span> Solutions Lab
+        </div>
+        <h1 className="display">
+          A staged showcase for <em>document</em> SDK patterns.
+        </h1>
+        <p className="lede">
+          Interactive demos and code samples for evaluating document SDKs and APIs.
+          Each example is self-contained — copy a folder, swap the brand tokens, ship.
+        </p>
+        <div className="hero-meta">
+          <span><span className="dot">●</span> {SDKS.filter((s) => !s.comingSoon).length} SDKs</span>
+          <span>{total} working samples</span>
+          <span>Light + dark</span>
+          <span>MIT-licensed scaffold</span>
+        </div>
+      </div>
+
+      <div className="section-label">
+        <div className="num">/ Index</div>
+        <div className="title">Pick an SDK</div>
+      </div>
+
+      <div className="sdk-grid">
+        {SDKS.map((s) =>
+          s.comingSoon ? (
+            <div key={s.id} className="sdk-card coming-soon">
+              <div className="top">
+                <span className="id">
+                  {s.num} — {s.id.replace(/-/g, " ")}
+                </span>
+                <span className="tag">Coming soon</span>
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+              <div className="foot">
+                <span>{s.foot}</span>
+              </div>
+            </div>
+          ) : (
+            <Link key={s.id} href={`/${s.id}`} className="sdk-card">
+              <div className="top">
+                <span className="id">
+                  {s.num} — {s.id.replace(/-/g, " ")}
+                </span>
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+              <div className="foot">
+                <span>{s.foot}</span>
+                <span className="arrow">→</span>
+              </div>
+            </Link>
+          )
+        )}
+      </div>
+
+      <div className="divider-eyebrow">/ Notes</div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: "var(--space-6)",
+          paddingBottom: "var(--space-7)",
+        }}
+      >
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>
+            What this is
+          </div>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "var(--text-sm)",
+              color: "var(--ink-2)",
+              lineHeight: 1.6,
+              maxWidth: "40ch",
+            }}
+          >
+            A solutions-engineering laboratory. Each sample links to its source so
+            you can fork the file and adapt it to your stack.
           </p>
         </div>
-
-        {/* SDK Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Web SDK */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Web SDK</h2>
-            <p className="!mb-6">
-              Client-side JavaScript SDK for viewing, annotating, and editing
-              PDF documents in web browsers.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/web-sdk"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/web/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>
+            How to use
           </div>
-
-          {/* Document Engine */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Document Engine</h2>
-            <p className="!mb-6">
-              Server-side API for document generation, conversion, and
-              processing at scale.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/document-engine"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/document-engine/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* AI Document Processing */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">AI Document Processing</h2>
-            <p className="!mb-6">
-              AI-powered document understanding, extraction, and classification
-              capabilities.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/ai-document-processing"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/ai-document-processing/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* Java SDK */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Java SDK</h2>
-            <p className="!mb-6">
-              Server-side Java library for PDF conversion, editing, form
-              filling, signatures, and text extraction.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/java-sdk"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/java/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* Python SDK */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Python SDK</h2>
-            <p className="!mb-6">
-              Server-side Python library for PDF conversion, editing, form
-              filling, signatures, and text extraction.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/python-sdk"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/python/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* .NET SDK */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">.NET SDK</h2>
-            <p className="!mb-6">
-              Native .NET library for document processing, form filling, and PDF
-              manipulation in .NET applications.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/dotnet-sdk"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/guides/dotnet/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* API */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Nutrient DWS API</h2>
-            <p className="!mb-6">
-              RESTful API for document operations without SDK installation or
-              server management.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/api"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/api/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
-
-          {/* Document Authoring SDK */}
-          <div className="border border-[var(--warm-gray-400)] rounded-lg p-6 hover:border-[var(--digital-pollen)] transition-colors">
-            <h2 className="!mb-4">Document Authoring SDK</h2>
-            <p className="!mb-6">
-              Create, edit, and collaborate on documents with rich formatting
-              and templates.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link
-                href="/document-authoring-sdk"
-                className="btn btn-yellow no-underline !text-[var(--black)]"
-              >
-                View Samples
-              </Link>
-              <a
-                href="https://www.nutrient.io/sdk/document-authoring/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-yellow-outline no-underline"
-              >
-                Documentation
-              </a>
-            </div>
-          </div>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "var(--text-sm)",
+              color: "var(--ink-2)",
+              lineHeight: 1.6,
+              maxWidth: "40ch",
+            }}
+          >
+            Pick an SDK, browse the samples, open one in the viewer. The repo is
+            structured so a single sample folder is enough to read end to end.
+          </p>
         </div>
-      </main>
-    </div>
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>
+            Theming
+          </div>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "var(--text-sm)",
+              color: "var(--ink-2)",
+              lineHeight: 1.6,
+              maxWidth: "40ch",
+            }}
+          >
+            The whole vocabulary lives in CSS variables on{" "}
+            <code>{`<html>`}</code>. Override <code>data-palette</code>,{" "}
+            <code>data-theme</code>, or the tokens directly to rebrand.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

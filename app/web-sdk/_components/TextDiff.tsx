@@ -272,40 +272,66 @@ export default function TextDiff({ text1, text2 }: TextDiffProps) {
     };
   }, [changeItems]);
 
+  // Map each change type to a token-based accent color so we can drive
+  // every per-type style (icon, badge, hover, active) from one source.
+  const accentFor = (type: ChangeItem["type"]) =>
+    type === "inserted"
+      ? "var(--data-green)"
+      : type === "deleted"
+        ? "var(--code-coral)"
+        : "var(--accent)";
+
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-80 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex-shrink-0">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+      <div
+        className="w-80 overflow-y-auto shrink-0"
+        style={{
+          background: "var(--bg-elev)",
+          borderRight: "1px solid var(--line)",
+        }}
+      >
+        <div
+          className="p-4"
+          style={{ borderBottom: "1px solid var(--line)" }}
+        >
+          <div className="panel-section" style={{ paddingTop: 0, marginBottom: 12 }}>
             Changes
-          </h3>
+          </div>
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">
-                Total changes:
+              <span style={{ color: "var(--ink-3)" }}>Total changes</span>
+              <span
+                className="font-semibold tabular-nums"
+                style={{ color: "var(--ink)" }}
+              >
+                {changeItems.length}
               </span>
-              <span className="font-semibold">{changeItems.length}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">
-                Inserted:
-              </span>
-              <span className="font-semibold text-green-700 dark:text-green-400">
+              <span style={{ color: "var(--ink-3)" }}>Inserted</span>
+              <span
+                className="font-semibold tabular-nums"
+                style={{ color: "var(--data-green)" }}
+              >
                 {categorizedChanges.inserted.length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Deleted:</span>
-              <span className="font-semibold text-red-700 dark:text-red-400">
+              <span style={{ color: "var(--ink-3)" }}>Deleted</span>
+              <span
+                className="font-semibold tabular-nums"
+                style={{ color: "var(--code-coral)" }}
+              >
                 {categorizedChanges.deleted.length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">
-                Replaced:
-              </span>
-              <span className="font-semibold text-yellow-700 dark:text-yellow-400">
+              <span style={{ color: "var(--ink-3)" }}>Replaced</span>
+              <span
+                className="font-semibold tabular-nums"
+                style={{ color: "var(--accent)" }}
+              >
                 {categorizedChanges.replaced.length}
               </span>
             </div>
@@ -313,32 +339,10 @@ export default function TextDiff({ text1, text2 }: TextDiffProps) {
         </div>
 
         {/* Sequential Changes List */}
-        <div className="overflow-y-auto p-2">
+        <div className="p-2">
           {changeItems.map((item) => {
-            const bgColor =
-              item.type === "inserted"
-                ? "bg-white dark:bg-gray-900 hover:bg-green-50 dark:hover:bg-green-900/20"
-                : item.type === "deleted"
-                  ? "bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  : "bg-white dark:bg-gray-900 hover:bg-yellow-50 dark:hover:bg-yellow-900/20";
-            const activeBgColor =
-              item.type === "inserted"
-                ? "bg-green-100 dark:bg-green-900/40"
-                : item.type === "deleted"
-                  ? "bg-red-100 dark:bg-red-900/40"
-                  : "bg-yellow-100 dark:bg-yellow-900/40";
-            const textColor =
-              item.type === "inserted"
-                ? "text-green-700 dark:text-green-400"
-                : item.type === "deleted"
-                  ? "text-red-700 dark:text-red-400"
-                  : "text-yellow-700 dark:text-yellow-400";
-            const badgeColor =
-              item.type === "inserted"
-                ? "bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200"
-                : item.type === "deleted"
-                  ? "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200"
-                  : "bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200";
+            const accent = accentFor(item.type);
+            const isActive = highlightedChange === item.diffIndex;
             const labelText =
               item.type === "inserted"
                 ? "INSERTED"
@@ -352,25 +356,53 @@ export default function TextDiff({ text1, text2 }: TextDiffProps) {
                 id={`change-item-${item.diffIndex}`}
                 type="button"
                 onClick={() => handleChangeClick(item.diffIndex)}
-                className={`w-full text-left px-3 py-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700 transition-all cursor-pointer ${
-                  highlightedChange === item.diffIndex ? activeBgColor : bgColor
-                }`}
+                className="w-full text-left px-3 py-2 mb-2 transition-all cursor-pointer"
+                style={{
+                  background: isActive
+                    ? `color-mix(in srgb, ${accent} 14%, var(--bg-elev))`
+                    : "var(--bg-elev)",
+                  border: `1px solid ${
+                    isActive
+                      ? `color-mix(in srgb, ${accent} 50%, var(--line))`
+                      : "var(--line)"
+                  }`,
+                  borderRadius: "var(--r-2)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = `color-mix(in srgb, ${accent} 8%, var(--bg-elev))`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "var(--bg-elev)";
+                  }
+                }}
               >
-                <div className="flex items-start">
+                <div className="flex items-start gap-2">
                   <span
-                    className={`text-xs font-medium ${textColor} mr-2 mt-0.5`}
+                    className="text-xs font-mono font-medium tabular-nums shrink-0 mt-0.5"
+                    style={{ color: "var(--ink-4)" }}
                   >
                     {item.id}.
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded ${badgeColor}`}
-                      >
-                        {labelText}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-700 dark:text-gray-300 truncate font-mono">
+                    <span
+                      className="text-[10px] font-medium px-2 py-0.5 font-mono tracking-wider"
+                      style={{
+                        background: `color-mix(in srgb, ${accent} 14%, var(--bg-elev))`,
+                        color: accent,
+                        border: `1px solid color-mix(in srgb, ${accent} 35%, var(--line))`,
+                        borderRadius: "var(--r-pill)",
+                        display: "inline-block",
+                      }}
+                    >
+                      {labelText}
+                    </span>
+                    <p
+                      className="text-xs truncate font-mono mt-1"
+                      style={{ color: "var(--ink-2)" }}
+                    >
                       {item.preview}
                     </p>
                   </div>
@@ -385,45 +417,67 @@ export default function TextDiff({ text1, text2 }: TextDiffProps) {
       <div className="flex-1 overflow-y-auto">
         <div className="p-6">
           {/* Statistics Bar */}
-          <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+          <div
+            className="mb-6 p-4"
+            style={{
+              background: "var(--bg-elev)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-2)",
+            }}
+          >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <h3
+                className="text-sm font-semibold"
+                style={{ color: "var(--ink)" }}
+              >
                 Change Summary
               </h3>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm" style={{ color: "var(--ink-3)" }}>
                 {stats.changedPercent.toFixed(1)}% changed
               </span>
             </div>
             <div className="grid grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div
+                  className="text-2xl font-bold tabular-nums"
+                  style={{ color: "var(--data-green)" }}
+                >
                   +{stats.additions}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                   words added
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                <div
+                  className="text-2xl font-bold tabular-nums"
+                  style={{ color: "var(--code-coral)" }}
+                >
                   -{stats.deletions}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                   words removed
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                <div
+                  className="text-2xl font-bold tabular-nums"
+                  style={{ color: "var(--accent)" }}
+                >
                   {stats.replacements}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                   replacements
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                <div
+                  className="text-2xl font-bold tabular-nums"
+                  style={{ color: "var(--ink-3)" }}
+                >
                   {stats.unchanged}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                   words unchanged
                 </div>
               </div>
@@ -431,9 +485,25 @@ export default function TextDiff({ text1, text2 }: TextDiffProps) {
           </div>
 
           {/* Unified Diff View */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-            <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <div
+            style={{
+              background: "var(--bg-elev)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-2)",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              className="px-4 py-2"
+              style={{
+                background: "var(--surface)",
+                borderBottom: "1px solid var(--line)",
+              }}
+            >
+              <h3
+                className="text-sm font-semibold"
+                style={{ color: "var(--ink)" }}
+              >
                 Unified Comparison View
               </h3>
             </div>

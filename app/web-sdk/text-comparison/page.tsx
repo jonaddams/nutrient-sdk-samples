@@ -6,6 +6,7 @@ import type {
   Instance,
 } from "@nutrient-sdk/viewer";
 import { useEffect, useRef, useState } from "react";
+import { LockIcon, UnlockIcon } from "@/app/_components/icons";
 import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
 
 type Operation = DocumentComparison.Operation;
@@ -809,21 +810,35 @@ export default function Page() {
     }
   }
 
+  // Mount-only setup. compareDocuments() handles its own pre-load unload
+  // for repeat invocations (line ~173). We deliberately do NOT add a
+  // useEffect cleanup that unloads viewers — in dev Strict Mode that
+  // cleanup races the in-flight async load and aborts comparison setup.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mount-only setup
   useEffect(() => {
     compareDocuments();
   }, []);
 
+  const cardChrome: React.CSSProperties = {
+    background: "var(--bg-elev)",
+    border: "1px solid var(--line)",
+    borderRadius: "var(--r-3)",
+    overflow: "hidden",
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <SampleHeader
         title="Text Comparison"
         description="Compare two PDF documents side-by-side with highlighted text changes"
       />
-      <div className="mx-4 mt-6 mb-4 grid grid-cols-12">
+      <div className="mx-4 mt-6 mb-4 grid grid-cols-12 gap-3">
         {/* original document viewer */}
-        <div className="min-h-fit col-span-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="min-h-fit col-span-5" style={cardChrome}>
           <div>
-            <p className="text-center p-3">{originalDoc}</p>
+            <p className="text-center p-3" style={{ color: "var(--ink-2)" }}>
+              {originalDoc}
+            </p>
           </div>
           <div
             id="original-document-viewer"
@@ -832,9 +847,11 @@ export default function Page() {
           />
         </div>
         {/* changed document viewer */}
-        <div className="min-h-fit col-span-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="min-h-fit col-span-5" style={cardChrome}>
           <div>
-            <p className="text-center p-3">{changedDoc}</p>
+            <p className="text-center p-3" style={{ color: "var(--ink-2)" }}>
+              {changedDoc}
+            </p>
           </div>
           <div
             id="changed-document-viewer"
@@ -844,27 +861,56 @@ export default function Page() {
         </div>
         {/* changes sidebar */}
         <div className="col-span-2">
-          <div className="sm:block border border-gray-300 dark:border-gray-700">
-            <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-[#26221E]">
-              <p>
-                {operationsMap.size} Change{operationsMap.size !== 1 ? "s" : ""}
+          <div
+            className="sm:block"
+            style={{
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-3)",
+              overflow: "hidden",
+              background: "var(--bg-elev)",
+            }}
+          >
+            <div
+              className="flex justify-between items-center p-3"
+              style={{
+                borderBottom: "1px solid var(--line)",
+                background: "var(--surface)",
+              }}
+            >
+              <p style={{ color: "var(--ink)" }}>
+                {operationsMap.size} Change
+                {operationsMap.size !== 1 ? "s" : ""}
               </p>
               <div className="flex gap-1">
                 <button
                   type="button"
                   onClick={toggleScrollLock}
-                  className="p-1 px-2 border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  className="p-1 px-2 transition-colors cursor-pointer"
+                  style={{
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-1)",
+                    color: "var(--ink-2)",
+                  }}
                   title={
                     isScrollLocked ? "Unlock scroll sync" : "Lock scroll sync"
                   }
                 >
-                  {isScrollLocked ? "🔒" : "🔓"}
+                  {isScrollLocked ? (
+                    <LockIcon width={14} height={14} />
+                  ) : (
+                    <UnlockIcon width={14} height={14} />
+                  )}
                 </button>
                 <button
                   type="button"
                   onClick={handlePreviousChange}
                   disabled={selectedChangeIndex === 0}
-                  className="p-1 px-2 border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-1 px-2 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-1)",
+                    color: "var(--ink-2)",
+                  }}
                   title="Previous change"
                 >
                   ←
@@ -873,7 +919,12 @@ export default function Page() {
                   type="button"
                   onClick={handleNextChange}
                   disabled={selectedChangeIndex === operationsMap.size - 1}
-                  className="p-1 px-2 border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-1 px-2 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-1)",
+                    color: "var(--ink-2)",
+                  }}
                   title="Next change"
                 >
                   →
@@ -881,9 +932,7 @@ export default function Page() {
               </div>
             </div>
             <div>
-              {/* display individual operations grouped by page */}
               {(() => {
-                // Group changes by page
                 const changesByPage = new Map<
                   number,
                   Array<[string, ChangeOperation, number]>
@@ -899,7 +948,6 @@ export default function Page() {
                   }
                 });
 
-                // Sort pages
                 const sortedPages = Array.from(changesByPage.keys()).sort(
                   (a, b) => a - b,
                 );
@@ -910,48 +958,81 @@ export default function Page() {
 
                   return (
                     <div key={`page-${pageIndex}`}>
-                      <div className="bg-gray-100 dark:bg-[#26221E] p-2 text-sm font-medium text-gray-700 dark:text-gray-300 sticky top-0">
+                      <div
+                        className="p-2 text-sm font-medium sticky top-0"
+                        style={{
+                          background: "var(--surface)",
+                          color: "var(--ink-2)",
+                          borderBottom: "1px solid var(--line)",
+                        }}
+                      >
                         Page {pageIndex + 1}
                       </div>
-                      {pageChanges.map(([key, value, index]) => (
-                        <button
-                          key={key}
-                          type="button"
-                          className={`p-2 border rounded mx-auto mb-2 w-11/12 cursor-pointer transition-all text-left block ${
-                            selectedChangeIndex === index
-                              ? "border-blue-600 bg-blue-50 dark:bg-[hsla(317,30%,24%,1)] dark:border-[#E095CB] border-2 shadow-md"
-                              : "border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500"
-                          }`}
-                          onClick={() => handleChangeClick(value, index)}
-                        >
-                          <div className="flex justify-between p-1 pl-0">
-                            <div className="text-gray-400 text-xs">
-                              {value.insert && value.del
-                                ? "replaced"
-                                : value.insert
-                                  ? "inserted"
-                                  : "deleted"}
+                      {pageChanges.map(([key, value, index]) => {
+                        const isSelected = selectedChangeIndex === index;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className="p-2 mx-auto mb-2 w-11/12 cursor-pointer transition-all text-left block"
+                            style={{
+                              border: `${isSelected ? "2px" : "1px"} solid ${
+                                isSelected ? "var(--accent)" : "var(--line)"
+                              }`,
+                              background: isSelected
+                                ? "var(--accent-tint)"
+                                : "transparent",
+                              borderRadius: "var(--r-2)",
+                              boxShadow: isSelected
+                                ? "0 1px 3px rgba(0,0,0,0.08)"
+                                : "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.background =
+                                  "var(--accent-tint)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.background =
+                                  "transparent";
+                              }
+                            }}
+                            onClick={() => handleChangeClick(value, index)}
+                          >
+                            <div className="flex justify-between p-1 pl-0">
+                              <div
+                                className="text-xs uppercase tracking-wider font-mono"
+                                style={{ color: "var(--ink-2)" }}
+                              >
+                                {value.insert && value.del
+                                  ? "replaced"
+                                  : value.insert
+                                    ? "inserted"
+                                    : "deleted"}
+                              </div>
+                              {plusMinusDisplayText(value)}
                             </div>
-                            {plusMinusDisplayText(value)}
-                          </div>
-                          <div>
-                            {value.deleteText && (
-                              <p className="text-xs mb-0.5">
-                                <span className="bg-delete-highlight">
-                                  {value.deleteText}
-                                </span>
-                              </p>
-                            )}
-                            {value.insertText && (
-                              <p className="text-xs">
-                                <span className="bg-insert-highlight">
-                                  {value.insertText}
-                                </span>
-                              </p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                            <div>
+                              {value.deleteText && (
+                                <p className="text-xs mb-0.5">
+                                  <span className="bg-delete-highlight">
+                                    {value.deleteText}
+                                  </span>
+                                </p>
+                              )}
+                              {value.insertText && (
+                                <p className="text-xs">
+                                  <span className="bg-insert-highlight">
+                                    {value.insertText}
+                                  </span>
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   );
                 });

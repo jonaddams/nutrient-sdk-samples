@@ -118,10 +118,10 @@ export default function DocumentAuthoringSdkPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PageHeader
         title="Document Generator"
-        description="Create professional documents in just a few steps"
+        description="Create professional documents from a template using a guided wizard"
         breadcrumbs={[
           { label: "Home", href: "/" },
           {
@@ -129,27 +129,16 @@ export default function DocumentAuthoringSdkPage() {
             href: "/document-authoring-sdk",
           },
         ]}
-        sticky={true}
       />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <h1
-            className="text-4xl font-bold mb-2"
-            style={{ color: "var(--foreground)" }}
-          >
-            Document Generator
-          </h1>
-          <p
-            className="text-lg font-medium"
-            style={{ color: "var(--foreground)" }}
-          >
-            Create professional documents in just a few steps
-          </p>
-        </div>
-
-        {/* Wizard */}
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+          maxWidth: 1800,
+        }}
+      >
         <WizardProvider>
           <WizardLayout>
             <StepIndicator />

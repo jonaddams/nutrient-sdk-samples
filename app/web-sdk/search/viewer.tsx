@@ -270,7 +270,14 @@ export default function SearchViewer({
     return (
       <>
         {before}
-        <span className="bg-[var(--digital-pollen)] text-[var(--black)] font-semibold px-0.5 rounded">
+        <span
+          className="font-semibold px-0.5"
+          style={{
+            background: "var(--accent)",
+            color: "var(--bg)",
+            borderRadius: "var(--r-1)",
+          }}
+        >
           {match}
         </span>
         {after}
@@ -281,13 +288,27 @@ export default function SearchViewer({
   return (
     <div className="flex h-full">
       {/* Sidebar for search */}
-      <div className="w-96 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col">
+      <div
+        className="w-96 flex flex-col"
+        style={{
+          background: "var(--bg-elev)",
+          borderRight: "1px solid var(--line)",
+        }}
+      >
         {/* Search Input */}
-        <div className="p-4 border-b border-[var(--warm-gray-400)]">
+        <div
+          className="p-4"
+          style={{ borderBottom: "1px solid var(--line)" }}
+        >
           <div className="mb-4">
             <label
               htmlFor="search-input"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="panel-section"
+              style={{
+                paddingTop: 0,
+                marginBottom: 8,
+                display: "block",
+              }}
             >
               Search in Document
             </label>
@@ -299,20 +320,29 @@ export default function SearchViewer({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter search term..."
-                className="flex-1 px-3 py-2 border border-[var(--warm-gray-400)] rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] focus:border-[var(--digital-pollen)]"
+                className="flex-1 px-3 py-2 focus:outline-none"
+                style={{
+                  background: "var(--surface)",
+                  color: "var(--ink)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-2)",
+                  fontSize: "var(--text-sm)",
+                }}
                 disabled={isSearching}
               />
               <button
                 type="button"
                 onClick={() => performSearch()}
                 disabled={isSearching || !searchTerm.trim()}
-                className="px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none"
                 style={{
                   background:
                     isSearching || !searchTerm.trim()
-                      ? "var(--warm-gray-400)"
-                      : "var(--digital-pollen)",
-                  color: "var(--black)",
+                      ? "var(--line-strong)"
+                      : "var(--accent)",
+                  color: "var(--bg)",
+                  border: "1px solid transparent",
+                  borderRadius: "var(--r-2)",
                 }}
               >
                 {isSearching ? (
@@ -359,7 +389,10 @@ export default function SearchViewer({
           {/* Example Search Terms */}
           {exampleSearchTerms.length > 0 && !searchResults.length && (
             <div className="mb-4">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <p
+                className="text-xs font-medium mb-2"
+                style={{ color: "var(--ink-3)" }}
+              >
                 Try searching for:
               </p>
               <div className="flex flex-wrap gap-2">
@@ -368,7 +401,23 @@ export default function SearchViewer({
                     key={term}
                     type="button"
                     onClick={() => performSearch(term)}
-                    className="px-3 py-1.5 text-sm font-semibold rounded-full border border-[var(--digital-pollen)] text-gray-800 dark:text-[var(--digital-pollen)] bg-transparent hover:bg-[var(--digital-pollen)] hover:text-[var(--black)] transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--ink-2)",
+                      border: "1px solid var(--line)",
+                      borderRadius: "var(--r-pill)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "var(--accent)";
+                      e.currentTarget.style.color = "var(--bg)";
+                      e.currentTarget.style.borderColor = "var(--accent)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "var(--surface)";
+                      e.currentTarget.style.color = "var(--ink-2)";
+                      e.currentTarget.style.borderColor = "var(--line)";
+                    }}
                   >
                     {term}
                   </button>
@@ -379,27 +428,14 @@ export default function SearchViewer({
 
           {searchResults.length > 0 && (
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm" style={{ color: "var(--ink-3)" }}>
                 Found {searchResults.length} result
                 {searchResults.length !== 1 ? "s" : ""}
               </div>
               <button
                 type="button"
                 onClick={clearSearch}
-                className="text-xs font-semibold px-3 py-1 rounded-md transition-colors cursor-pointer"
-                style={{
-                  color: "var(--digital-pollen)",
-                  border: "1px solid var(--digital-pollen)",
-                  background: "transparent",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "var(--digital-pollen)";
-                  e.currentTarget.style.color = "var(--black)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "var(--digital-pollen)";
-                }}
+                className="panel-button"
               >
                 New Search
               </button>
@@ -410,42 +446,72 @@ export default function SearchViewer({
         {/* Search Results */}
         <div className="flex-1 overflow-y-auto">
           {searchResults.length === 0 && !isSearching && searchTerm && (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-500">
-              No results found for "{searchTerm}"
+            <div
+              className="p-4 text-center text-sm"
+              style={{ color: "var(--ink-4)" }}
+            >
+              No results found for &quot;{searchTerm}&quot;
             </div>
           )}
 
-          {searchResults.map((result, index) => (
-            <button
-              key={`${result.pageIndex}-${index}`}
-              type="button"
-              onClick={() => jumpToResult(index)}
-              className={`w-full text-left p-4 border-b border-[var(--warm-gray-400)] hover:bg-[var(--warm-gray-200)] dark:hover:bg-[#3a3030] transition-colors cursor-pointer ${
-                currentResultIndex === index
-                  ? "bg-[var(--warm-gray-200)] dark:bg-[#3a3030]"
-                  : ""
-              }`}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <span
-                  className="text-xs font-semibold uppercase"
-                  style={{ color: "var(--digital-pollen)" }}
+          {searchResults.map((result, index) => {
+            const isActive = currentResultIndex === index;
+            return (
+              <button
+                key={`${result.pageIndex}-${index}`}
+                type="button"
+                onClick={() => jumpToResult(index)}
+                className="w-full text-left p-4 transition-colors cursor-pointer"
+                style={{
+                  background: isActive
+                    ? "var(--accent-tint)"
+                    : "transparent",
+                  borderBottom: "1px solid var(--line)",
+                  borderLeft: `3px solid ${
+                    isActive ? "var(--accent)" : "transparent"
+                  }`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "var(--accent-tint)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "transparent";
+                  }
+                }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <span
+                    className="panel-section"
+                    style={{
+                      padding: 0,
+                      color: "var(--accent)",
+                    }}
+                  >
+                    Page {result.pageIndex + 1}
+                  </span>
+                  <span
+                    className="text-xs font-mono tabular-nums"
+                    style={{ color: "var(--ink-4)" }}
+                  >
+                    {index + 1} / {searchResults.length}
+                  </span>
+                </div>
+                <div
+                  className="text-sm leading-relaxed"
+                  style={{ color: "var(--ink-2)" }}
                 >
-                  Page {result.pageIndex + 1}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-500">
-                  Result {index + 1} of {searchResults.length}
-                </span>
-              </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                {highlightSearchTerm(
-                  result.contextSnippet,
-                  result.locationInPreview,
-                  result.lengthInPreview,
-                )}
-              </div>
-            </button>
-          ))}
+                  {highlightSearchTerm(
+                    result.contextSnippet,
+                    result.locationInPreview,
+                    result.lengthInPreview,
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 

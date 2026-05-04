@@ -471,18 +471,25 @@ export default function PreviewStep() {
     <div className="h-full flex flex-col gap-6">
       {/* Header */}
       <div className="text-center flex-shrink-0">
-        <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--ink)" }}>
           Preview & Edit
         </h2>
-        <p className="text-lg text-gray-700 dark:text-gray-300">
+        <p className="text-lg" style={{ color: "var(--ink-2)" }}>
           Review your generated document and make final adjustments
         </p>
       </div>
 
-      {/* Document Editor */}
+      {/* Document Editor — force a light surface so the SDK's built-in
+          toolbar reads clearly even when the page is in dark mode. */}
       <div
-        className="relative overflow-hidden bg-white border border-gray-200 dark:border-[var(--warm-gray-600)] rounded-xl flex-1"
-        style={{ minHeight: "700px" }}
+        className="relative overflow-hidden flex-1"
+        data-theme="light"
+        style={{
+          background: "#ffffff",
+          border: "1px solid var(--line)",
+          borderRadius: "var(--r-3)",
+          minHeight: "700px",
+        }}
       >
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/75 dark:bg-black/75">

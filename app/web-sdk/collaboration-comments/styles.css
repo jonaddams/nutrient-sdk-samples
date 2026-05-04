@@ -21,12 +21,6 @@
   gap: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-sidebar {
-    background-color: var(--warm-gray-950);
-    border-right-color: var(--warm-gray-800);
-  }
-}
 
 /* Section */
 .collab-section {
@@ -44,11 +38,6 @@
   margin-bottom: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-label {
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Author Picker (dropdown) */
 .collab-author-picker {
@@ -87,17 +76,6 @@
   border-color: var(--warm-gray-500);
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-author-select {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-    color: var(--warm-gray-200);
-  }
-
-  .collab-author-select:hover {
-    border-color: var(--warm-gray-500);
-  }
-}
 
 /* Display Mode Toggle */
 .collab-display-modes {
@@ -130,22 +108,6 @@
   font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-display-btn {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-    color: var(--warm-gray-300);
-  }
-
-  .collab-display-btn:hover {
-    border-color: var(--warm-gray-500);
-  }
-
-  .collab-display-btn-active {
-    background: var(--digital-pollen);
-    color: var(--black);
-  }
-}
 
 /* Toolbar Hint */
 .collab-hint {
@@ -159,13 +121,6 @@
   border-radius: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-hint {
-    color: var(--warm-gray-500);
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-}
 
 /* Thread List */
 .collab-threads {
@@ -194,16 +149,6 @@
   border-color: var(--warm-gray-400);
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-thread-card {
-    background: var(--warm-gray-900);
-    border-color: var(--warm-gray-700);
-  }
-
-  .collab-thread-card:hover {
-    border-color: var(--warm-gray-500);
-  }
-}
 
 .collab-thread-header {
   display: flex;
@@ -237,14 +182,6 @@
   margin-left: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-thread-author {
-    color: var(--warm-gray-200);
-  }
-  .collab-thread-time {
-    color: var(--warm-gray-600);
-  }
-}
 
 .collab-thread-text {
   font-size: 12px;
@@ -260,14 +197,6 @@
   color: var(--warm-gray-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-thread-text {
-    color: var(--warm-gray-400);
-  }
-  .collab-thread-replies {
-    color: var(--warm-gray-600);
-  }
-}
 
 .collab-empty {
   font-size: 13px;
@@ -277,11 +206,6 @@
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-empty {
-    color: var(--warm-gray-500);
-  }
-}
 
 /* Thread count badge */
 .collab-count {
@@ -294,12 +218,6 @@
   margin-left: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .collab-count {
-    background: var(--warm-gray-800);
-    color: var(--warm-gray-400);
-  }
-}
 
 /* Viewer */
 .collab-viewer-container {

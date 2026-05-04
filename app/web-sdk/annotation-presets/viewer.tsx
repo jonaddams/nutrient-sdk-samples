@@ -2,6 +2,7 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef } from "react";
+import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
 
 const DOCUMENT = "/documents/jacques-torres-chocolate-chip-cookies-recipe.pdf";
 
@@ -22,6 +23,7 @@ export default function AnnotationPresetsViewer({
   const instanceRef = useRef<Instance | null>(null);
   const presetsRef = useRef(presets);
   presetsRef.current = presets;
+  const appTheme = useAppTheme();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -48,9 +50,10 @@ export default function AnnotationPresetsViewer({
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
-      theme: window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? NutrientViewer.Theme.DARK
-        : NutrientViewer.Theme.AUTO,
+      theme:
+        appTheme === "dark"
+          ? NutrientViewer.Theme.DARK
+          : NutrientViewer.Theme.LIGHT,
       annotationPresets,
     }).then((instance: Instance) => {
       instanceRef.current = instance;
@@ -60,7 +63,7 @@ export default function AnnotationPresetsViewer({
       instanceRef.current = null;
       NutrientViewer.unload(container);
     };
-  }, []);
+  }, [appTheme]);
 
   // Apply preset changes after load
   useEffect(() => {

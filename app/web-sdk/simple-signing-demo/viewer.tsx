@@ -36,6 +36,11 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef, useState } from "react";
+import {
+  CalendarIcon,
+  InitialIcon,
+  SignatureIcon,
+} from "@/app/_components/icons";
 import type { FieldType, Signer, User } from "./_lib/types";
 import "./styles.css";
 
@@ -247,10 +252,14 @@ const DEFAULT_SIGNERS: Signer[] = [
  * - initial: Initial field (smaller, shows initials)
  * - date: Date field with formatted input
  */
-const FIELD_TYPES: Array<{ type: FieldType; label: string; icon: string }> = [
-  { type: "signature", label: "Signature", icon: "✍️" },
-  { type: "initial", label: "Initial", icon: "✓" },
-  { type: "date", label: "Date", icon: "📅" },
+const FIELD_TYPES: Array<{
+  type: FieldType;
+  label: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}> = [
+  { type: "signature", label: "Signature", Icon: SignatureIcon },
+  { type: "initial", label: "Initial", Icon: InitialIcon },
+  { type: "date", label: "Date", Icon: CalendarIcon },
 ];
 
 export default function SigningDemoViewer() {
@@ -1590,7 +1599,9 @@ export default function SigningDemoViewer() {
                       borderLeftColor: selectedSigner?.color || "#ccc",
                     }}
                   >
-                    <span className="field-icon">{field.icon}</span>
+                    <span className="field-icon">
+                      <field.Icon />
+                    </span>
                     <span className="field-label">{field.label}</span>
                   </button>
                 );

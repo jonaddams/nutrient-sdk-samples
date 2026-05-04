@@ -19,6 +19,13 @@ interface JavaSampleLayoutProps {
   buildFormData?: (file: File, formData: FormData) => void;
 }
 
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+  overflow: "hidden",
+};
+
 export function JavaSampleLayout({
   title,
   description,
@@ -75,7 +82,6 @@ export function JavaSampleLayout({
         setResult(html);
         setResultSize(html.length);
       } else {
-        // PDF or download — create blob URL
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         setResult(url);
@@ -97,77 +103,112 @@ export function JavaSampleLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <JavaSampleHeader title={title} description={description} />
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+        }}
+      >
+        <div style={{ ...cardStyle, height: "calc(100vh - 12rem)" }}>
           <div className="flex h-full">
             {/* Left Panel — Controls */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div
+              className="w-80 flex flex-col shrink-0"
+              style={{
+                background: "var(--surface)",
+                borderRight: "1px solid var(--line)",
+              }}
+            >
+              <div
+                className="p-4"
+                style={{ borderBottom: "1px solid var(--line)" }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--ink)" }}
+                >
                   Input Document
                 </h3>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* File source toggle */}
-                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#1a1414] rounded-lg">
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(false)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      !useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Sample File
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUseCustomFile(true)}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      useCustomFile
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Upload File
-                  </button>
+                <div
+                  className="flex gap-1 p-1"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-2)",
+                  }}
+                >
+                  {(
+                    [
+                      { v: false, label: "Sample File" },
+                      { v: true, label: "Upload File" },
+                    ] as const
+                  ).map(({ v, label }) => {
+                    const isActive = useCustomFile === v;
+                    return (
+                      <button
+                        key={String(v)}
+                        type="button"
+                        onClick={() => setUseCustomFile(v)}
+                        className="flex-1 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
+                        style={{
+                          background: isActive
+                            ? "var(--bg-elev)"
+                            : "transparent",
+                          color: isActive ? "var(--ink)" : "var(--ink-3)",
+                          borderRadius: "var(--r-1)",
+                          boxShadow: isActive
+                            ? "0 1px 2px rgba(0,0,0,0.06)"
+                            : undefined,
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {useCustomFile ? (
                   <input
                     type="file"
                     onChange={(e) => setCustomFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm text-gray-600 dark:text-gray-400"
+                    className="w-full text-sm"
+                    style={{ color: "var(--ink-2)" }}
                   />
                 ) : (
-                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1414] rounded-md p-3">
+                  <div
+                    className="text-sm p-3"
+                    style={{
+                      background: "var(--bg-elev)",
+                      color: "var(--ink-2)",
+                      border: "1px solid var(--line)",
+                      borderRadius: "var(--r-2)",
+                    }}
+                  >
                     <span className="font-mono text-xs">{sampleFileName}</span>
                   </div>
                 )}
 
                 {extraFields}
 
-                {/* Process button */}
                 <button
                   type="button"
                   onClick={processDocument}
                   disabled={processing || (useCustomFile && !customFile)}
-                  className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
-                  }}
+                  className="btn btn-sm w-full"
                 >
                   {processing ? "Processing..." : "Process Document"}
                 </button>
 
                 {resultSize > 0 && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs" style={{ color: "var(--ink-3)" }}>
                     Output: {(resultSize / 1024).toFixed(1)} KB
                   </div>
                 )}
@@ -177,13 +218,25 @@ export function JavaSampleLayout({
             {/* Right Panel — Result */}
             <div className="flex-1 min-w-0 flex flex-col">
               {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
+                <div
+                  className="p-4 text-sm"
+                  style={{
+                    background:
+                      "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+                    borderBottom:
+                      "1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line))",
+                    color: "var(--code-coral)",
+                  }}
+                >
                   {error}
                 </div>
               )}
 
               {!result && !error && !processing && (
-                <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                <div
+                  className="flex-1 flex items-center justify-center"
+                  style={{ color: "var(--ink-4)" }}
+                >
                   <p className="text-sm">
                     Click &quot;Process Document&quot; to see the result
                   </p>
@@ -191,14 +244,25 @@ export function JavaSampleLayout({
               )}
 
               {processing && (
-                <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                <div
+                  className="flex-1 flex items-center justify-center"
+                  style={{ color: "var(--ink-3)" }}
+                >
                   <p className="text-sm">Processing document...</p>
                 </div>
               )}
 
               {result && resultType === "json" && (
                 <div className="flex-1 overflow-auto p-4">
-                  <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
+                  <pre
+                    className="text-sm whitespace-pre-wrap font-mono leading-relaxed"
+                    style={{
+                      color: "var(--ink-2)",
+                      background: "transparent",
+                      border: 0,
+                      padding: 0,
+                    }}
+                  >
                     {JSON.stringify(JSON.parse(result), null, 2)}
                   </pre>
                 </div>
@@ -206,7 +270,15 @@ export function JavaSampleLayout({
 
               {result && resultType === "text" && (
                 <div className="flex-1 overflow-auto p-4">
-                  <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
+                  <pre
+                    className="text-sm whitespace-pre-wrap font-mono leading-relaxed"
+                    style={{
+                      color: "var(--ink-2)",
+                      background: "transparent",
+                      border: 0,
+                      padding: 0,
+                    }}
+                  >
                     {result}
                   </pre>
                 </div>
@@ -215,7 +287,8 @@ export function JavaSampleLayout({
               {result && resultType === "html" && (
                 <iframe
                   srcDoc={result}
-                  className="flex-1 w-full border-0 bg-white"
+                  className="flex-1 w-full border-0"
+                  style={{ background: "#fff" }}
                   title="Converted HTML"
                 />
               )}
@@ -223,18 +296,14 @@ export function JavaSampleLayout({
               {result &&
                 (resultType === "pdf" || resultType === "download") && (
                   <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: "var(--ink-3)" }}>
                       Document processed successfully (
                       {(resultSize / 1024).toFixed(1)} KB)
                     </p>
                     <button
                       type="button"
                       onClick={handleDownload}
-                      className="px-6 py-2.5 text-sm font-semibold rounded-md cursor-pointer"
-                      style={{
-                        background: "var(--digital-pollen)",
-                        color: "var(--black)",
-                      }}
+                      className="btn"
                     >
                       Download Result
                     </button>

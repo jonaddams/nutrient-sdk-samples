@@ -46,6 +46,8 @@ next-env.d.ts
 
 .claude
 .superpowers
+.worktrees
 docs/superpowers/
 PROJECT.md
+Claude Design - Nutrient SDK Samples Website/
 

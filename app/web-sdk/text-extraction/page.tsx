@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 
 const Viewer = dynamic(() => import("./viewer"), {
   ssr: false,
@@ -67,128 +67,146 @@ export default function TextExtractionPage() {
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Text Extraction"
-        description="Extract text from PDF pages using the textLinesForPageIndex API. View text for the current page or the entire document, with copy and download options."
-      />
-
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="flex h-full">
-            {/* Sidebar */}
-            <div className="w-96 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              {/* Controls */}
-              <div className="p-4 border-b border-[var(--warm-gray-400)] space-y-3">
-                {/* View mode toggle */}
-                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#1a1414] rounded-lg">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("current")}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      viewMode === "current"
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    Current Page
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("all")}
-                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                      viewMode === "all"
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    All Pages
-                  </button>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>
-                    {viewMode === "current"
-                      ? `Page ${currentPage + 1} of ${totalPages}`
-                      : `${totalPages} pages`}
-                  </span>
-                  <span className="tabular-nums">
-                    {wordCount} word{wordCount !== 1 ? "s" : ""}
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleCopy}
-                    disabled={!displayText}
-                    className="flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background: copied ? "#22c55e" : "var(--digital-pollen)",
-                      color: "var(--black)",
-                    }}
-                  >
-                    {copied ? "Copied!" : "Copy to Clipboard"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDownload}
-                    disabled={!displayText}
-                    className="px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      color: "var(--digital-pollen)",
-                      border: "1px solid var(--digital-pollen)",
-                      background: "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (displayText) {
-                        e.currentTarget.style.background =
-                          "var(--digital-pollen)";
-                        e.currentTarget.style.color = "var(--black)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--digital-pollen)";
-                    }}
-                  >
-                    Download .txt
-                  </button>
-                </div>
-              </div>
-
-              {/* Extracted text */}
-              <div className="flex-1 overflow-y-auto p-4">
-                {pageTexts.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-500 text-center py-8">
-                    Extracting text from document...
-                  </p>
-                ) : displayText ? (
-                  <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
-                    {displayText}
-                  </pre>
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-500 text-center py-8">
-                    No text found on this page.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Viewer */}
-            <div className="flex-1 min-w-0">
-              <Viewer
-                onPageTexts={handlePageTexts}
-                onTotalPages={handleTotalPages}
-                onCurrentPage={handleCurrentPage}
-              />
-            </div>
-          </div>
+  const sidebar = (
+    <>
+      {/* Controls */}
+      <div
+        className="p-4 space-y-3"
+        style={{ borderBottom: "1px solid var(--line)" }}
+      >
+        {/* View mode toggle */}
+        <div
+          className="flex gap-1 p-1"
+          style={{
+            background: "var(--surface)",
+            borderRadius: "var(--r-2)",
+            border: "1px solid var(--line)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setViewMode("current")}
+            className="flex-1 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
+            style={{
+              background:
+                viewMode === "current" ? "var(--bg-elev)" : "transparent",
+              color: viewMode === "current" ? "var(--ink)" : "var(--ink-3)",
+              borderRadius: "var(--r-1)",
+              boxShadow:
+                viewMode === "current"
+                  ? "0 1px 2px rgba(0,0,0,0.06)"
+                  : undefined,
+            }}
+          >
+            Current Page
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("all")}
+            className="flex-1 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
+            style={{
+              background: viewMode === "all" ? "var(--bg-elev)" : "transparent",
+              color: viewMode === "all" ? "var(--ink)" : "var(--ink-3)",
+              borderRadius: "var(--r-1)",
+              boxShadow:
+                viewMode === "all" ? "0 1px 2px rgba(0,0,0,0.06)" : undefined,
+            }}
+          >
+            All Pages
+          </button>
         </div>
-      </main>
-    </div>
+
+        {/* Stats */}
+        <div
+          className="flex items-center justify-between text-xs"
+          style={{ color: "var(--ink-3)" }}
+        >
+          <span>
+            {viewMode === "current"
+              ? `Page ${currentPage + 1} of ${totalPages}`
+              : `${totalPages} pages`}
+          </span>
+          <span className="tabular-nums">
+            {wordCount} word{wordCount !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            disabled={!displayText}
+            className="btn btn-sm flex-1"
+            style={
+              copied
+                ? {
+                    background: "var(--data-green)",
+                    borderColor: "var(--data-green)",
+                  }
+                : undefined
+            }
+          >
+            {copied ? "Copied!" : "Copy to Clipboard"}
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={!displayText}
+            className="btn btn-sm ghost"
+          >
+            Download .txt
+          </button>
+        </div>
+      </div>
+
+      {/* Extracted text */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {pageTexts.length === 0 ? (
+          <p
+            className="text-sm text-center py-8"
+            style={{ color: "var(--ink-4)" }}
+          >
+            Extracting text from document...
+          </p>
+        ) : displayText ? (
+          <pre
+            className="text-sm whitespace-pre-wrap font-mono leading-relaxed"
+            style={{
+              color: "var(--ink-2)",
+              background: "transparent",
+              border: 0,
+              padding: 0,
+            }}
+          >
+            {displayText}
+          </pre>
+        ) : (
+          <p
+            className="text-sm text-center py-8"
+            style={{ color: "var(--ink-4)" }}
+          >
+            No text found on this page.
+          </p>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <SampleFrame
+      title="Text Extraction"
+      description="Extract text from PDF pages using the textLinesForPageIndex API. View text for the current page or the entire document, with copy and download options."
+      sidebar={sidebar}
+      sidebarSide="left"
+      sidebarWidth={384}
+      wide
+    >
+      <Viewer
+        onPageTexts={handlePageTexts}
+        onTotalPages={handleTotalPages}
+        onCurrentPage={handleCurrentPage}
+      />
+    </SampleFrame>
   );
 }
