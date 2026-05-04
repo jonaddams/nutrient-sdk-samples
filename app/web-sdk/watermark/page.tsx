@@ -148,7 +148,10 @@ export default function WatermarkPage() {
               className="flex-1"
               style={{ accentColor: "var(--accent)" }}
             />
-            <span className="text-xs tabular-nums w-8 text-right" style={valueText}>
+            <span
+              className="text-xs tabular-nums w-8 text-right"
+              style={valueText}
+            >
               {config.fontSize}
             </span>
           </div>
@@ -165,7 +168,10 @@ export default function WatermarkPage() {
               value={rgbToHex(config.color)}
               onChange={(e) => update("color", hexToRgb(e.target.value))}
               className="w-8 h-8 cursor-pointer"
-              style={{ borderRadius: "var(--r-1)", border: "1px solid var(--line)" }}
+              style={{
+                borderRadius: "var(--r-1)",
+                border: "1px solid var(--line)",
+              }}
             />
             <span className="text-xs" style={valueText}>
               {rgbToHex(config.color)}
@@ -189,7 +195,10 @@ export default function WatermarkPage() {
               className="flex-1"
               style={{ accentColor: "var(--accent)" }}
             />
-            <span className="text-xs tabular-nums w-10 text-right" style={valueText}>
+            <span
+              className="text-xs tabular-nums w-10 text-right"
+              style={valueText}
+            >
               {Math.round(config.opacity * 100)}%
             </span>
           </div>
@@ -211,7 +220,10 @@ export default function WatermarkPage() {
               className="flex-1"
               style={{ accentColor: "var(--accent)" }}
             />
-            <span className="text-xs tabular-nums w-10 text-right" style={valueText}>
+            <span
+              className="text-xs tabular-nums w-10 text-right"
+              style={valueText}
+            >
               {config.rotation}&deg;
             </span>
           </div>
@@ -234,6 +246,7 @@ export default function WatermarkPage() {
       description="Add configurable text watermarks to every page of a document. Customize text, font size, color, opacity, and rotation angle."
       sidebar={sidebar}
       sidebarSide="left"
+      wide
     >
       <Viewer config={debouncedConfig} />
     </SampleFrame>

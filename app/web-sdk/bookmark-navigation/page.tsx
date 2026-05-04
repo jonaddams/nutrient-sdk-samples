@@ -44,10 +44,7 @@ export default function BookmarkNavigationPage() {
   const sidebar = (
     <>
       {/* Tab toggle */}
-      <div
-        className="p-4"
-        style={{ borderBottom: "1px solid var(--line)" }}
-      >
+      <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
         <div
           className="flex gap-1 p-1"
           style={{
@@ -61,14 +58,11 @@ export default function BookmarkNavigationPage() {
             onClick={() => setTab("outline")}
             className="flex-1 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
             style={{
-              background:
-                tab === "outline" ? "var(--bg-elev)" : "transparent",
+              background: tab === "outline" ? "var(--bg-elev)" : "transparent",
               color: tab === "outline" ? "var(--ink)" : "var(--ink-3)",
               borderRadius: "var(--r-1)",
               boxShadow:
-                tab === "outline"
-                  ? "0 1px 2px rgba(0,0,0,0.06)"
-                  : undefined,
+                tab === "outline" ? "0 1px 2px rgba(0,0,0,0.06)" : undefined,
             }}
           >
             Outline ({outline.length})
@@ -83,18 +77,13 @@ export default function BookmarkNavigationPage() {
               color: tab === "bookmarks" ? "var(--ink)" : "var(--ink-3)",
               borderRadius: "var(--r-1)",
               boxShadow:
-                tab === "bookmarks"
-                  ? "0 1px 2px rgba(0,0,0,0.06)"
-                  : undefined,
+                tab === "bookmarks" ? "0 1px 2px rgba(0,0,0,0.06)" : undefined,
             }}
           >
             Bookmarks ({bookmarks.length})
           </button>
         </div>
-        <div
-          className="mt-2 text-xs"
-          style={{ color: "var(--ink-3)" }}
-        >
+        <div className="mt-2 text-xs" style={{ color: "var(--ink-3)" }}>
           Page {currentPage + 1} of {totalPages}
         </div>
       </div>
@@ -154,10 +143,7 @@ export default function BookmarkNavigationPage() {
                     }
                   }}
                 >
-                  <span
-                    className="truncate"
-                    style={{ color: "var(--ink)" }}
-                  >
+                  <span className="truncate" style={{ color: "var(--ink)" }}>
                     {bm.name}
                   </span>
                   {bm.pageIndex !== null && (
@@ -183,6 +169,7 @@ export default function BookmarkNavigationPage() {
       description="Browse the document's table of contents (outline) and bookmarks in a custom sidebar. Click any entry to navigate directly to that page."
       sidebar={sidebar}
       sidebarSide="left"
+      wide
     >
       <Viewer
         onOutline={handleOutline}

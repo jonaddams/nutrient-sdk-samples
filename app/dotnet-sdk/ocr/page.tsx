@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
-import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
+import { type SampleOption, SamplePicker } from "../_components/SamplePicker";
 
 const Viewer = dynamic(() => import("../_components/PdfBlobViewer"), {
   ssr: false,
@@ -155,7 +155,9 @@ export default function OcrPage() {
 
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+        throw new Error(
+          text || `Server returned ${res.status} ${res.statusText}`,
+        );
       }
 
       if (mode === "pdf") {
@@ -230,6 +232,7 @@ export default function OcrPage() {
         style={{
           paddingTop: "var(--space-6)",
           paddingBottom: "var(--space-8)",
+          maxWidth: 1800,
         }}
       >
         <div style={cardStyle}>
@@ -407,10 +410,7 @@ export default function OcrPage() {
                         borderTopColor: "var(--accent)",
                       }}
                     />
-                    <p
-                      className="text-sm"
-                      style={{ color: "var(--ink-3)" }}
-                    >
+                    <p className="text-sm" style={{ color: "var(--ink-3)" }}>
                       {isRunning ? "Running OCR..." : "Loading preview..."}
                     </p>
                   </div>
@@ -496,8 +496,8 @@ export default function OcrPage() {
                           borderTop: "1px solid var(--line)",
                         }}
                       >
-                        This PDF now has a selectable text layer — try
-                        selecting a word.
+                        This PDF now has a selectable text layer — try selecting
+                        a word.
                       </p>
                     )}
                   </div>

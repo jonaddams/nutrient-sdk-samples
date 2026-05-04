@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PageHeader } from "@/app/_components/PageHeader";
+import { SampleCanvas } from "@/app/_components/SampleCanvas";
 import type { DocAuthEditor, DocAuthSystem } from "../types";
 import DocumentPreview from "./components/document-preview";
 import ReportForm from "./components/report-form";
@@ -128,23 +128,22 @@ export default function DocumentBuilderPage() {
   const currentDocument = editor?.currentDocument() ?? null;
 
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ background: "var(--background)" }}
+    <SampleCanvas
+      title="Document Builder"
+      description="Build documents programmatically using the transaction API"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        {
+          label: "Document Authoring SDK",
+          href: "/document-authoring-sdk",
+        },
+      ]}
+      wide
     >
-      <PageHeader
-        title="Document Builder"
-        description="Build documents programmatically using the transaction API"
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          {
-            label: "Document Authoring SDK",
-            href: "/document-authoring-sdk",
-          },
-        ]}
-      />
-
-      <div className="flex-1 min-h-0 grid grid-cols-[38%_1fr]">
+      <div
+        className="h-full"
+        style={{ display: "grid", gridTemplateColumns: "38% 1fr" }}
+      >
         {/* Left: Form Panel */}
         <div
           className="overflow-hidden"
@@ -168,6 +167,6 @@ export default function DocumentBuilderPage() {
           />
         </div>
       </div>
-    </div>
+    </SampleCanvas>
   );
 }

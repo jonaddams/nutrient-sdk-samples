@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  CopyIcon,
+  MoveIcon,
+  RotateIcon,
+  TrashIcon,
+} from "@/app/_components/icons";
+
 interface QueuedOperation {
   id: string;
   type: "delete" | "rotate" | "duplicate" | "move";
@@ -28,15 +35,15 @@ export default function OperationQueue({
   const getOperationIcon = (type: string) => {
     switch (type) {
       case "delete":
-        return "🗑️";
+        return <TrashIcon width={14} height={14} />;
       case "rotate":
-        return "↻";
+        return <RotateIcon width={14} height={14} />;
       case "duplicate":
-        return "📋";
+        return <CopyIcon width={14} height={14} />;
       case "move":
-        return "↕️";
+        return <MoveIcon width={14} height={14} />;
       default:
-        return "•";
+        return null;
     }
   };
 
@@ -110,7 +117,9 @@ export default function OperationQueue({
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{getOperationIcon(op.type)}</span>
+                  <span className="inline-flex items-center justify-center">
+                    {getOperationIcon(op.type)}
+                  </span>
                   <span
                     className="text-sm"
                     style={{ color: "var(--foreground)" }}

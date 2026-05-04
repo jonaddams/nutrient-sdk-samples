@@ -295,17 +295,24 @@ export default function DownloadStep() {
     <div className="h-full flex flex-col space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--ink)" }}>
           🎉 Your Document is Ready!
         </h2>
-        <p className="text-lg text-gray-700 dark:text-gray-300">
+        <p className="text-lg" style={{ color: "var(--ink-2)" }}>
           Preview your document and download it in your preferred format
         </p>
       </div>
 
       {/* PDF Viewer */}
       {state.pdfDocument && (
-        <div className="bg-white border border-gray-200 dark:border-[var(--warm-gray-600)] rounded-xl min-h-[600px] relative overflow-hidden">
+        <div
+          className="min-h-[600px] relative overflow-hidden"
+          style={{
+            background: "var(--bg-elev)",
+            border: "1px solid var(--line)",
+            borderRadius: "var(--r-3)",
+          }}
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-600">
             <h3 className="text-lg font-medium text-gray-900">
               Document Preview
@@ -343,13 +350,29 @@ export default function DownloadStep() {
       )}
 
       {/* Download Options */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-8 text-center">
-        <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+      <div
+        className="p-8 text-center"
+        style={{
+          background:
+            "color-mix(in srgb, var(--data-green) 8%, var(--bg-elev))",
+          border:
+            "1px solid color-mix(in srgb, var(--data-green) 30%, var(--line))",
+          borderRadius: "var(--r-3)",
+        }}
+      >
+        <div
+          className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
+          style={{
+            background:
+              "color-mix(in srgb, var(--data-green) 18%, var(--bg-elev))",
+          }}
+        >
           <svg
-            className="w-8 h-8 text-green-600"
+            className="w-8 h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            style={{ color: "var(--data-green)" }}
           >
             <title>Success checkmark</title>
             <path
@@ -360,10 +383,13 @@ export default function DownloadStep() {
             />
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3
+          className="text-xl font-semibold mb-2"
+          style={{ color: "var(--ink)" }}
+        >
           Document Generated Successfully
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="mb-6" style={{ color: "var(--ink-3)" }}>
           Your {state.template} document has been created with your custom data
         </p>
 
@@ -372,12 +398,15 @@ export default function DownloadStep() {
           <button
             type="button"
             onClick={handleDownloadPdf}
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="btn inline-flex items-center"
             disabled={isDownloading || !state.pdfDocument}
           >
             {isDownloading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div
+                  className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2"
+                  style={{ borderColor: "var(--bg-elev)" }}
+                />
                 Downloading...
               </>
             ) : (
@@ -403,12 +432,15 @@ export default function DownloadStep() {
           <button
             type="button"
             onClick={handleDownloadDocx}
-            className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-[#2a2020] hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="btn ghost inline-flex items-center"
             disabled={isDownloading || !state.docxDocument}
           >
             {isDownloading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600 mr-2"></div>
+                <div
+                  className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2"
+                  style={{ borderColor: "var(--ink-2)" }}
+                />
                 Downloading...
               </>
             ) : (
@@ -424,7 +456,7 @@ export default function DownloadStep() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5l7-7 7 7M9 20h6"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
                 Download DOCX
@@ -436,42 +468,52 @@ export default function DownloadStep() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="text-center p-4 bg-white dark:bg-[#2a2020] border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {state.template || "N/A"}
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            Template Used
-          </div>
-        </div>
-        <div className="text-center p-4 bg-white dark:bg-[#2a2020] border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {state.dataJson
+        {[
+          { value: state.template || "N/A", label: "Template Used" },
+          {
+            value: state.dataJson
               ? Object.keys(state.dataJson.model || {}).length
-              : 0}
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            Data Fields
-          </div>
-        </div>
-        <div className="text-center p-4 bg-white dark:bg-[#2a2020] border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {state.pdfDocument
+              : 0,
+            label: "Data Fields",
+          },
+          {
+            value: state.pdfDocument
               ? `${Math.round(state.pdfDocument.byteLength / 1024)} KB`
-              : "N/A"}
+              : "N/A",
+            label: "PDF Size",
+          },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className="text-center p-4"
+            style={{
+              background: "var(--bg-elev)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-2)",
+            }}
+          >
+            <div
+              className="text-2xl font-bold"
+              style={{ color: "var(--accent)" }}
+            >
+              {stat.value}
+            </div>
+            <div className="text-sm" style={{ color: "var(--ink-3)" }}>
+              {stat.label}
+            </div>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            PDF Size
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Actions */}
-      <div className="flex justify-center pt-8 border-t border-gray-200 dark:border-gray-700">
+      <div
+        className="flex justify-center pt-8"
+        style={{ borderTop: "1px solid var(--line)" }}
+      >
         <button
           type="button"
           onClick={handleReset}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-[#2a2020] hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+          className="btn ghost btn-sm inline-flex items-center"
         >
           <svg
             className="mr-2 h-4 w-4"

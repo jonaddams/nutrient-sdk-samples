@@ -2,6 +2,11 @@
 
 import type { Instance, List, ViewState } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  CalendarIcon,
+  InitialIcon,
+  SignatureIcon,
+} from "@/app/_components/icons";
 
 type EventHandler = (event: Event) => void;
 
@@ -407,31 +412,15 @@ export default function FormDesignerViewer() {
     }
   }, [formCreatorMode, cleanupDragAndDrop, setupDragAndDrop]);
 
-  // Field-card definitions — each maps a draggable id to its label + SVG path.
+  // Field-card definitions — each maps a draggable id to its label + icon.
   const fieldDefs: {
     id: "Signature" | "DateSigned" | "Initials";
     label: string;
-    title: string;
-    path: string;
+    Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   }[] = [
-    {
-      id: "Signature",
-      label: "Signature",
-      title: "Signature icon",
-      path: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z",
-    },
-    {
-      id: "DateSigned",
-      label: "Date Signed",
-      title: "Calendar icon",
-      path: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-    },
-    {
-      id: "Initials",
-      label: "Initials",
-      title: "Pen icon",
-      path: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z",
-    },
+    { id: "Signature", label: "Signature", Icon: SignatureIcon },
+    { id: "DateSigned", label: "Date Signed", Icon: CalendarIcon },
+    { id: "Initials", label: "Initials", Icon: InitialIcon },
   ];
 
   return (
@@ -507,8 +496,8 @@ export default function FormDesignerViewer() {
                   tabIndex={0}
                   className="p-4 transition-all"
                   style={{
-                    background: "var(--bg-elev)",
-                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--line-strong)",
                     borderRadius: "var(--r-2)",
                     cursor: formCreatorMode ? "grab" : "not-allowed",
                     opacity: !formCreatorMode || isDragging ? 0.5 : 1,
@@ -524,27 +513,16 @@ export default function FormDesignerViewer() {
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "var(--line)";
-                    e.currentTarget.style.background = "var(--bg-elev)";
+                    e.currentTarget.style.borderColor = "var(--line-strong)";
+                    e.currentTarget.style.background = "var(--surface)";
                   }}
                 >
                   <div className="flex items-center">
-                    <div className="w-8 h-8 flex items-center justify-center mr-3">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        style={{ color: "var(--accent)" }}
-                      >
-                        <title>{field.title}</title>
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d={field.path}
-                        />
-                      </svg>
+                    <div
+                      className="w-8 h-8 flex items-center justify-center mr-3"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      <field.Icon width={24} height={24} />
                     </div>
                     <span
                       className="font-semibold"

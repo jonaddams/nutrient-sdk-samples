@@ -118,21 +118,21 @@ export default function WordTemplatePage() {
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
             {/* Left Panel — Controls */}
-            <div className="w-96 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-96 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)]">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Template &amp; Data
                 </h3>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="p-4 space-y-2 border-b border-[var(--line)]">
                 <select
                   value={selectedIndex}
                   onChange={(e) => handleTemplateChange(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
                   {SAMPLE_TEMPLATES.map((t, i) => (
                     <option key={t.templatePath} value={i}>
@@ -140,26 +140,27 @@ export default function WordTemplatePage() {
                     </option>
                   ))}
                 </select>
+                <label className="block text-xs font-medium text-[var(--ink-3)] pt-1">
+                  JSON Data Model
+                </label>
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    JSON Data Model
-                  </label>
-                  <textarea
-                    value={modelJson}
-                    onChange={(e) => setModelJson(e.target.value)}
-                    className="w-full h-48 px-3 py-2 text-xs font-mono rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100 resize-none"
-                  />
-                </div>
+              <textarea
+                value={modelJson}
+                onChange={(e) => setModelJson(e.target.value)}
+                spellCheck={false}
+                className="flex-1 w-full p-4 text-xs font-mono leading-relaxed bg-[var(--bg-elev)] text-[var(--ink)] border-0 outline-none resize-none"
+              />
 
+              <div className="p-4 space-y-2 border-t border-[var(--line)]">
                 <button
                   type="button"
                   onClick={handleGenerate}
                   disabled={processing || !modelJson}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
+                    background: "var(--accent)",
+                    color: "#fff",
                   }}
                 >
                   {processing ? "Generating..." : "Generate PDF"}
@@ -170,7 +171,7 @@ export default function WordTemplatePage() {
                     <button
                       type="button"
                       onClick={handleDownload}
-                      className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Download PDF
                     </button>
@@ -180,7 +181,7 @@ export default function WordTemplatePage() {
                         URL.revokeObjectURL(pdfUrl);
                         setPdfUrl(null);
                       }}
-                      className="px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Back to Template
                     </button>
@@ -188,7 +189,7 @@ export default function WordTemplatePage() {
                 )}
 
                 {error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
+                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
                     {error}
                   </div>
                 )}
@@ -205,8 +206,8 @@ export default function WordTemplatePage() {
               {processing && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-[var(--ink-3)]">
                       Populating template and converting to PDF...
                     </p>
                   </div>

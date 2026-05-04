@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
+import { ConfirmDialog } from "@/app/_components/ConfirmDialog";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
 import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { MarkSummary, SearchAndRedactHandle } from "./viewer";
@@ -77,6 +78,7 @@ export default function SearchAndRedactPage() {
   const [lastSummary, setLastSummary] = useState<MarkSummary | null>(null);
   const [busy, setBusy] = useState<null | "mark" | "clear" | "apply">(null);
   const [applied, setApplied] = useState(false);
+  const [showApplyConfirm, setShowApplyConfirm] = useState(false);
 
   const togglePreset = (key: string) => {
     setSelectedPresets((prev) => {
@@ -126,13 +128,15 @@ export default function SearchAndRedactPage() {
     }
   };
 
-  const handleApply = async () => {
+  const handleApply = () => {
     if (!viewerRef.current) return;
     if (markCount === 0) return;
-    const ok = window.confirm(
-      `Apply ${markCount} redaction${markCount === 1 ? "" : "s"}? This permanently removes the underlying content from the in-memory document.`,
-    );
-    if (!ok) return;
+    setShowApplyConfirm(true);
+  };
+
+  const handleApplyConfirmed = async () => {
+    setShowApplyConfirm(false);
+    if (!viewerRef.current) return;
     setBusy("apply");
     try {
       await viewerRef.current.applyRedactions();
@@ -307,10 +311,7 @@ export default function SearchAndRedactPage() {
             </div>
           )}
 
-          <div
-            className="space-y-2 text-xs"
-            style={{ color: "var(--ink-2)" }}
-          >
+          <div className="space-y-2 text-xs" style={{ color: "var(--ink-2)" }}>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -353,10 +354,7 @@ export default function SearchAndRedactPage() {
             >
               Last Run
             </div>
-            <div
-              className="text-xs mb-2"
-              style={{ color: "var(--ink-3)" }}
-            >
+            <div className="text-xs mb-2" style={{ color: "var(--ink-3)" }}>
               {lastSummary.totalMarks} redaction
               {lastSummary.totalMarks === 1 ? "" : "s"} marked
             </div>
@@ -460,18 +458,30 @@ export default function SearchAndRedactPage() {
   );
 
   return (
-    <SampleFrame
-      title="Search & Redact"
-      description="Permanently redact sensitive information using preset patterns (SSN, credit card, email, phone, etc.), custom search terms, or regular expressions. Includes toolbar tools for manual rectangle and text-highlighter redactions."
-      sidebar={sidebar}
-      sidebarSide="left"
-      sidebarWidth={384}
-    >
-      <Viewer
-        ref={viewerRef}
-        onRedactionCountChange={setMarkCount}
-        onApplied={() => setApplied(true)}
+    <>
+      <SampleFrame
+        title="Search & Redact"
+        description="Permanently redact sensitive information using preset patterns (SSN, credit card, email, phone, etc.), custom search terms, or regular expressions. Includes toolbar tools for manual rectangle and text-highlighter redactions."
+        sidebar={sidebar}
+        sidebarSide="left"
+        sidebarWidth={384}
+        wide
+      >
+        <Viewer
+          ref={viewerRef}
+          onRedactionCountChange={setMarkCount}
+          onApplied={() => setApplied(true)}
+        />
+      </SampleFrame>
+      <ConfirmDialog
+        open={showApplyConfirm}
+        title="Apply redactions?"
+        message={`Apply ${markCount} redaction${markCount === 1 ? "" : "s"}? This permanently removes the underlying content from the in-memory document.`}
+        confirmLabel="Apply"
+        destructive
+        onConfirm={handleApplyConfirmed}
+        onCancel={() => setShowApplyConfirm(false)}
       />
-    </SampleFrame>
+    </>
   );
 }

@@ -127,7 +127,7 @@ export default function VlmExtractionPage() {
   };
 
   const confidenceColor = (c: number) => {
-    if (c >= 0.7) return "text-green-600 dark:text-green-400";
+    if (c >= 0.7) return "text-[var(--data-green)]";
     if (c >= 0.4) return "text-yellow-600 dark:text-yellow-400";
     return "text-red-500 dark:text-red-400";
   };
@@ -146,12 +146,12 @@ export default function VlmExtractionPage() {
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
             {/* Left Panel — Controls */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-80 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)]">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Source Document
                 </h3>
               </div>
@@ -160,7 +160,7 @@ export default function VlmExtractionPage() {
                 <select
                   value={selectedIndex}
                   onChange={(e) => handleDocumentChange(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1414] text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
                   {SAMPLE_DOCUMENTS.map((doc, i) => (
                     <option key={doc.path} value={i}>
@@ -175,15 +175,15 @@ export default function VlmExtractionPage() {
                   disabled={processing}
                   className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
+                    background: "var(--accent)",
+                    color: "#fff",
                   }}
                 >
                   {processing ? "Extracting..." : "Extract Content"}
                 </button>
 
                 {error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
+                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
                     {error}
                   </div>
                 )}
@@ -199,8 +199,8 @@ export default function VlmExtractionPage() {
                 {processing && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                     <div className="text-center space-y-2">
-                      <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                      <p className="text-sm text-[var(--ink-3)]">
                         Running VLM-enhanced extraction...
                       </p>
                     </div>
@@ -216,14 +216,14 @@ export default function VlmExtractionPage() {
               {/* Extracted Content Panel */}
               {result && (
                 <div
-                  className={`border-t border-gray-200 dark:border-gray-700 flex flex-col ${resultExpanded ? "flex-1" : "h-[45%]"}`}
+                  className={`border-t border-[var(--line)] flex flex-col ${resultExpanded ? "flex-1" : "h-[45%]"}`}
                 >
-                  <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-[#1a1414] border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                  <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                         Extracted Content
                       </h3>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-[var(--ink-3)]">
                         {result.statistics.textElements} text regions
                         {" | "}
                         <span
@@ -239,14 +239,14 @@ export default function VlmExtractionPage() {
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <div className="flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden">
+                      <div className="flex rounded-md border border-[var(--line-strong)] overflow-hidden">
                         <button
                           type="button"
                           onClick={() => setViewMode("formatted")}
                           className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
                             viewMode === "formatted"
-                              ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              ? "bg-[var(--surface)] text-[var(--ink)]"
+                              : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
                           }`}
                         >
                           Formatted
@@ -256,8 +256,8 @@ export default function VlmExtractionPage() {
                           onClick={() => setViewMode("json")}
                           className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
                             viewMode === "json"
-                              ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              ? "bg-[var(--surface)] text-[var(--ink)]"
+                              : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
                           }`}
                         >
                           JSON
@@ -266,14 +266,14 @@ export default function VlmExtractionPage() {
                       <button
                         type="button"
                         onClick={handleDownload}
-                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
                       >
                         Download
                       </button>
                       <button
                         type="button"
                         onClick={() => setResultExpanded(!resultExpanded)}
-                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
                       >
                         {resultExpanded ? "Collapse" : "Expand"}
                       </button>
@@ -281,17 +281,17 @@ export default function VlmExtractionPage() {
                   </div>
 
                   {viewMode === "formatted" ? (
-                    <div className="flex-1 overflow-auto p-4 bg-white dark:bg-gray-900 space-y-3">
+                    <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)] space-y-3">
                       {result.textElements.map((el) => (
                         <div
                           key={el.readingOrder}
-                          className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                          className="rounded-lg border border-[var(--line)] overflow-hidden"
                         >
-                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-[#1a1414] border-b border-gray-200 dark:border-gray-700">
-                            <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500 w-5 text-right">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface)] border-b border-[var(--line)]">
+                            <span className="text-[10px] font-mono text-[var(--ink-4)] w-5 text-right">
                               {el.readingOrder}
                             </span>
-                            <span className="text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--ink-3)]">
                               {el.role || el.type}
                             </span>
                             <span
@@ -327,7 +327,7 @@ export default function VlmExtractionPage() {
                       ))}
                     </div>
                   ) : (
-                    <pre className="flex-1 overflow-auto p-4 text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 whitespace-pre-wrap font-mono leading-relaxed">
+                    <pre className="flex-1 overflow-auto p-4 text-xs text-[var(--ink-3)] bg-[var(--bg-elev)] whitespace-pre-wrap font-mono leading-relaxed">
                       {JSON.stringify(result, null, 2)}
                     </pre>
                   )}

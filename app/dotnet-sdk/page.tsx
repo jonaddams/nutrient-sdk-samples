@@ -1,4 +1,4 @@
-import { SamplesIndex, type Sample } from "@/app/_components/SamplesIndex";
+import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
 
 const samples: Sample[] = [
   {

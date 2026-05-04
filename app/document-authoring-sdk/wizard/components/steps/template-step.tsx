@@ -181,10 +181,10 @@ export default function TemplateStep() {
     <div className="h-full flex flex-col space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--ink)" }}>
           Choose Your Template
         </h2>
-        <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        <p className="text-lg font-medium" style={{ color: "var(--ink-2)" }}>
           Select a template to get started with your document
         </p>
       </div>
@@ -195,16 +195,15 @@ export default function TemplateStep() {
           <button
             key={template.id}
             type="button"
-            className="relative group cursor-pointer rounded-xl border-2 transition-all duration-200 overflow-hidden w-full text-left bg-white dark:bg-[#2a2020]"
+            className="relative group cursor-pointer transition-all duration-200 overflow-hidden w-full text-left"
             style={{
-              borderColor:
+              background: "var(--bg-elev)",
+              border: `2px solid ${
                 selectedTemplate === template.id
-                  ? "var(--digital-pollen)"
-                  : "var(--warm-gray-400)",
-              boxShadow:
-                selectedTemplate === template.id
-                  ? "var(--shadow-lg)"
-                  : "var(--shadow-sm)",
+                  ? "var(--accent)"
+                  : "var(--line-strong)"
+              }`,
+              borderRadius: "var(--r-3)",
             }}
             onClick={() => handleTemplateSelect(template.id)}
             aria-pressed={selectedTemplate === template.id}
@@ -213,7 +212,7 @@ export default function TemplateStep() {
             {/* Preview Image */}
             <div
               className="aspect-[3/4] overflow-hidden"
-              style={{ background: "var(--warm-gray-200)" }}
+              style={{ background: "var(--surface)" }}
             >
               <Image
                 src={template.preview}
@@ -227,14 +226,25 @@ export default function TemplateStep() {
             {/* Template Info */}
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold flex-1 text-black dark:text-white">
+                <h3
+                  className="font-semibold flex-1"
+                  style={{ color: "var(--ink)" }}
+                >
                   {template.name}
                 </h3>
-                <span className="text-xs px-2 py-1 rounded-full whitespace-nowrap ml-2 bg-[var(--warm-gray-200)] dark:bg-[var(--warm-gray-800)] text-black dark:text-white">
+                <span
+                  className="text-xs px-2 py-1 whitespace-nowrap ml-2"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--line)",
+                    color: "var(--ink-2)",
+                    borderRadius: "var(--r-pill)",
+                  }}
+                >
                   {template.category}
                 </span>
               </div>
-              <p className="text-sm text-black dark:text-[var(--warm-gray-400)]">
+              <p className="text-sm" style={{ color: "var(--ink-3)" }}>
                 {template.description}
               </p>
             </div>
@@ -243,13 +253,13 @@ export default function TemplateStep() {
             {selectedTemplate === template.id && (
               <div
                 className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ background: "var(--digital-pollen)" }}
+                style={{ background: "var(--accent)" }}
               >
                 <svg
                   className="w-4 h-4"
                   fill="currentColor"
                   viewBox="0 0 20 20"
-                  style={{ color: "var(--white)" }}
+                  style={{ color: "var(--bg-elev)" }}
                 >
                   <title>Selected</title>
                   <path
