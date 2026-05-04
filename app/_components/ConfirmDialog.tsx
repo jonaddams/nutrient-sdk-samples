@@ -11,6 +11,8 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   /** Style the confirm button as a destructive action (uses --code-coral). */
   destructive?: boolean;
+  /** Hide the cancel button — the dialog acts as an acknowledge-only alert. */
+  dismissOnly?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -22,6 +24,7 @@ export function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   destructive,
+  dismissOnly,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -87,9 +90,11 @@ export function ConfirmDialog({
               marginTop: 4,
             }}
           >
-            <button type="button" className="panel-button" onClick={onCancel}>
-              {cancelLabel}
-            </button>
+            {!dismissOnly && (
+              <button type="button" className="panel-button" onClick={onCancel}>
+                {cancelLabel}
+              </button>
+            )}
             <button
               type="button"
               className="panel-button primary"
