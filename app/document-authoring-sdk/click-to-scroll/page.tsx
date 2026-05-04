@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PageHeader } from "@/app/_components/PageHeader";
+import { SampleCanvas } from "@/app/_components/SampleCanvas";
 import type { DocAuthEditor, DocAuthSystem } from "../types";
 import EditorPanel from "./components/editor-panel";
 import OutlineSidebar from "./components/outline-sidebar";
@@ -86,23 +86,21 @@ export default function ClickToScrollPage() {
   );
 
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ background: "var(--background)" }}
+    <SampleCanvas
+      title="Click-to-Scroll Outline"
+      description="Sidebar outline that jumps to headings. Approximate — see notes in the sidebar."
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        {
+          label: "Document Authoring SDK",
+          href: "/document-authoring-sdk",
+        },
+      ]}
     >
-      <PageHeader
-        title="Click-to-Scroll Outline"
-        description="Sidebar outline that jumps to headings. Approximate — see notes in the sidebar."
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          {
-            label: "Document Authoring SDK",
-            href: "/document-authoring-sdk",
-          },
-        ]}
-      />
-
-      <div className="flex-1 min-h-0 grid grid-cols-[280px_1fr]">
+      <div
+        className="h-full"
+        style={{ display: "grid", gridTemplateColumns: "280px 1fr" }}
+      >
         <OutlineSidebar
           headings={headings}
           activeIndex={activeIndex}
@@ -116,6 +114,6 @@ export default function ClickToScrollPage() {
           />
         </div>
       </div>
-    </div>
+    </SampleCanvas>
   );
 }

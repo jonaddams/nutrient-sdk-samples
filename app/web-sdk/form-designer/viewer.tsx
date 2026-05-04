@@ -2,6 +2,11 @@
 
 import type { Instance, List, ViewState } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  CalendarIcon,
+  InitialIcon,
+  SignatureIcon,
+} from "@/app/_components/icons";
 
 type EventHandler = (event: Event) => void;
 
@@ -407,15 +412,40 @@ export default function FormDesignerViewer() {
     }
   }, [formCreatorMode, cleanupDragAndDrop, setupDragAndDrop]);
 
+  // Field-card definitions — each maps a draggable id to its label + icon.
+  const fieldDefs: {
+    id: "Signature" | "DateSigned" | "Initials";
+    label: string;
+    Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  }[] = [
+    { id: "Signature", label: "Signature", Icon: SignatureIcon },
+    { id: "DateSigned", label: "Date Signed", Icon: CalendarIcon },
+    { id: "Initials", label: "Initials", Icon: InitialIcon },
+  ];
+
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col overflow-y-auto">
+      <div
+        className="w-80 flex flex-col overflow-y-auto"
+        style={{
+          background: "var(--bg-elev)",
+          borderRight: "1px solid var(--line)",
+        }}
+      >
         <div className="p-6">
-          <h2 className="mb-6 text-gray-900 dark:text-white">Form Fields</h2>
+          <div
+            className="panel-section"
+            style={{ paddingTop: 0, marginBottom: 16 }}
+          >
+            Form Fields
+          </div>
 
           {/* Form Creator Mode Toggle */}
-          <div className="mb-6 pb-6 border-b border-[var(--warm-gray-400)]">
+          <div
+            className="mb-6 pb-6"
+            style={{ borderBottom: "1px solid var(--line)" }}
+          >
             <label className="inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -424,23 +454,31 @@ export default function FormDesignerViewer() {
                 onChange={toggleFormCreatorMode}
               />
               <div
-                className="relative w-11 h-6 rounded-full peer transition-colors"
+                className="relative w-11 h-6 transition-colors"
                 style={{
                   background: formCreatorMode
-                    ? "var(--digital-pollen)"
-                    : "var(--warm-gray-400)",
+                    ? "var(--accent)"
+                    : "var(--line-strong)",
+                  borderRadius: "var(--r-pill)",
                 }}
               >
                 <div
-                  className="absolute top-[2px] start-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform"
+                  className="absolute top-[2px] start-[2px] h-5 w-5 transition-transform"
                   style={{
+                    background: "var(--bg-elev)",
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-pill)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
                     transform: formCreatorMode
                       ? "translateX(1.25rem)"
                       : "translateX(0)",
                   }}
                 />
               </div>
-              <span className="ml-3 text-sm font-semibold text-gray-900 dark:text-white">
+              <span
+                className="ml-3 text-sm font-semibold"
+                style={{ color: "var(--ink)" }}
+              >
                 Form Creator Mode
               </span>
             </label>
@@ -448,122 +486,60 @@ export default function FormDesignerViewer() {
 
           {/* Form Field Items */}
           <div className="space-y-3">
-            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
-            <div
-              role="button"
-              tabIndex={0}
-              className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
-                formCreatorMode
-                  ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
-                  : "cursor-not-allowed opacity-50 border-[var(--warm-gray-400)]"
-              } ${draggingItem === "Signature" ? "opacity-50" : ""}`}
-              draggable={formCreatorMode}
-              onDragStart={(e) => handleDragStart(e, "Signature")}
-              onDragEnd={handleDragEnd}
-              onKeyDown={() => {}}
-            >
-              <div className="flex items-center">
-                <div className="w-8 h-8 flex items-center justify-center mr-3">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    style={{ color: "var(--digital-pollen)" }}
-                  >
-                    <title>Signature icon</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                    />
-                  </svg>
+            {fieldDefs.map((field) => {
+              const isDragging = draggingItem === field.id;
+              return (
+                // biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute
+                <div
+                  key={field.id}
+                  role="button"
+                  tabIndex={0}
+                  className="p-4 transition-all"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--line-strong)",
+                    borderRadius: "var(--r-2)",
+                    cursor: formCreatorMode ? "grab" : "not-allowed",
+                    opacity: !formCreatorMode || isDragging ? 0.5 : 1,
+                  }}
+                  draggable={formCreatorMode}
+                  onDragStart={(e) => handleDragStart(e, field.id)}
+                  onDragEnd={handleDragEnd}
+                  onKeyDown={() => {}}
+                  onMouseEnter={(e) => {
+                    if (formCreatorMode) {
+                      e.currentTarget.style.borderColor = "var(--accent)";
+                      e.currentTarget.style.background = "var(--accent-tint)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line-strong)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
+                >
+                  <div className="flex items-center">
+                    <div
+                      className="w-8 h-8 flex items-center justify-center mr-3"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      <field.Icon width={24} height={24} />
+                    </div>
+                    <span
+                      className="font-semibold"
+                      style={{ color: "var(--ink)" }}
+                    >
+                      {field.label}
+                    </span>
+                  </div>
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  Signature
-                </span>
-              </div>
-            </div>
-
-            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
-            <div
-              role="button"
-              tabIndex={0}
-              className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
-                formCreatorMode
-                  ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
-                  : "cursor-not-allowed opacity-50 border-[var(--warm-gray-400)]"
-              } ${draggingItem === "DateSigned" ? "opacity-50" : ""}`}
-              draggable={formCreatorMode}
-              onDragStart={(e) => handleDragStart(e, "DateSigned")}
-              onDragEnd={handleDragEnd}
-              onKeyDown={() => {}}
-            >
-              <div className="flex items-center">
-                <div className="w-8 h-8 flex items-center justify-center mr-3">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    style={{ color: "var(--digital-pollen)" }}
-                  >
-                    <title>Calendar icon</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  Date Signed
-                </span>
-              </div>
-            </div>
-
-            {/* biome-ignore lint/a11y/useSemanticElements: div element required for draggable attribute */}
-            <div
-              role="button"
-              tabIndex={0}
-              className={`p-4 bg-white dark:bg-[#1a1414] rounded-lg border-2 transition-all ${
-                formCreatorMode
-                  ? "cursor-grab hover:border-[var(--digital-pollen)] border-[var(--warm-gray-400)]"
-                  : "cursor-not-allowed opacity-50 border-[var(--warm-gray-400)]"
-              } ${draggingItem === "Initials" ? "opacity-50" : ""}`}
-              draggable={formCreatorMode}
-              onDragStart={(e) => handleDragStart(e, "Initials")}
-              onDragEnd={handleDragEnd}
-              onKeyDown={() => {}}
-            >
-              <div className="flex items-center">
-                <div className="w-8 h-8 flex items-center justify-center mr-3">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    style={{ color: "var(--digital-pollen)" }}
-                  >
-                    <title>Pen icon</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                    />
-                  </svg>
-                </div>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  Initials
-                </span>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
-          <div className="mt-6 text-sm text-gray-600 dark:text-gray-400">
+          <div
+            className="mt-6 text-sm leading-relaxed"
+            style={{ color: "var(--ink-3)" }}
+          >
             <p>
               Enable Form Creator Mode to drag and drop form fields. Drag and
               drop form fields onto the document to add them.

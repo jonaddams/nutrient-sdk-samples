@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import { LoadingSpinner } from "@/app/web-sdk/_components/LoadingSpinner";
-import { SampleHeader } from "@/app/web-sdk/_components/SampleHeader";
+import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { FormFieldInfo } from "./viewer";
 
 const Viewer = dynamic(() => import("./viewer"), {
@@ -266,144 +266,135 @@ export default function FormPrefillPage() {
       .trim();
   };
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
-      <SampleHeader
-        title="Form Data Pre-Fill"
-        description="Programmatically populate PDF form fields from JSON data. Load preset data profiles or edit individual fields, then apply values to the form."
-      />
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "var(--text-xs)",
+    color: "var(--ink-3)",
+    marginBottom: 4,
+  };
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
-          <div className="flex h-full">
-            {/* Sidebar */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              {/* Presets */}
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Data Presets
-                </h3>
-                <div className="flex flex-wrap gap-2 pt-3">
-                  {Object.keys(PRESETS).map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => handleApplyPreset(name)}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors cursor-pointer border-[var(--digital-pollen)] text-gray-800 dark:text-[var(--digital-pollen)] bg-transparent hover:bg-[var(--digital-pollen)] hover:text-[var(--black)]"
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
-                {filledCount > 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Filled {filledCount} field{filledCount !== 1 ? "s" : ""}
-                  </p>
-                )}
-              </div>
+  const inputStyle: React.CSSProperties = {
+    background: "var(--bg-elev)",
+    color: "var(--ink)",
+    border: "1px solid var(--line)",
+    borderRadius: "var(--r-2)",
+  };
 
-              {/* Field list */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {fields.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-500 text-center py-4">
-                    Discovering form fields...
-                  </p>
-                ) : (
-                  <>
-                    {textFields.map((field) => (
-                      <div key={field.name}>
-                        <label
-                          htmlFor={`ff-${field.name}`}
-                          className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
-                        >
-                          {friendlyLabel(field.name)}
-                        </label>
-                        <input
-                          id={`ff-${field.name}`}
-                          type="text"
-                          value={fieldValues[field.name] ?? ""}
-                          onChange={(e) =>
-                            handleUpdateField(field.name, e.target.value)
-                          }
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
-                        />
-                      </div>
-                    ))}
-                    {CHECKBOX_GROUPS.map((group) => (
-                      <div key={group.label}>
-                        <label
-                          htmlFor={`ff-${group.label}`}
-                          className="block text-xs text-gray-600 dark:text-gray-400 mb-1"
-                        >
-                          {group.label}
-                        </label>
-                        <select
-                          id={`ff-${group.label}`}
-                          value={fieldValues[group.label] ?? ""}
-                          onChange={(e) =>
-                            handleUpdateField(group.label, e.target.value)
-                          }
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)]"
-                        >
-                          <option value="">— Select —</option>
-                          {group.options.map((opt) => (
-                            <option key={opt.label} value={opt.label}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
-
-              {/* Actions */}
-              {fields.length > 0 && (
-                <div className="p-4 border-t border-[var(--warm-gray-400)] flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleApplyAll}
-                    className="flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer"
-                    style={{
-                      background: "var(--digital-pollen)",
-                      color: "var(--black)",
-                    }}
-                  >
-                    Apply All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleClearAll}
-                    className="px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer"
-                    style={{
-                      color: "var(--digital-pollen)",
-                      border: "1px solid var(--digital-pollen)",
-                      background: "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background =
-                        "var(--digital-pollen)";
-                      e.currentTarget.style.color = "var(--black)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--digital-pollen)";
-                    }}
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Viewer */}
-            <div className="flex-1 min-w-0">
-              <Viewer onFieldsDiscovered={handleFieldsDiscovered} />
-            </div>
-          </div>
+  const sidebar = (
+    <>
+      {/* Presets */}
+      <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
+        <h3 className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+          Data Presets
+        </h3>
+        <div className="flex flex-wrap gap-2 pt-3">
+          {Object.keys(PRESETS).map((name) => (
+            <button
+              key={name}
+              type="button"
+              onClick={() => handleApplyPreset(name)}
+              className="btn ghost btn-sm"
+            >
+              {name}
+            </button>
+          ))}
         </div>
-      </main>
-    </div>
+        {filledCount > 0 && (
+          <p className="text-xs mt-2" style={{ color: "var(--ink-3)" }}>
+            Filled {filledCount} field{filledCount !== 1 ? "s" : ""}
+          </p>
+        )}
+      </div>
+
+      {/* Field list */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {fields.length === 0 ? (
+          <p
+            className="text-sm text-center py-4"
+            style={{ color: "var(--ink-4)" }}
+          >
+            Discovering form fields...
+          </p>
+        ) : (
+          <>
+            {textFields.map((field) => (
+              <div key={field.name}>
+                <label htmlFor={`ff-${field.name}`} style={labelStyle}>
+                  {friendlyLabel(field.name)}
+                </label>
+                <input
+                  id={`ff-${field.name}`}
+                  type="text"
+                  value={fieldValues[field.name] ?? ""}
+                  onChange={(e) =>
+                    handleUpdateField(field.name, e.target.value)
+                  }
+                  className="w-full px-2 py-1.5 text-sm focus:outline-none"
+                  style={inputStyle}
+                />
+              </div>
+            ))}
+            {CHECKBOX_GROUPS.map((group) => (
+              <div key={group.label}>
+                <label htmlFor={`ff-${group.label}`} style={labelStyle}>
+                  {group.label}
+                </label>
+                <select
+                  id={`ff-${group.label}`}
+                  value={fieldValues[group.label] ?? ""}
+                  onChange={(e) =>
+                    handleUpdateField(group.label, e.target.value)
+                  }
+                  className="w-full px-2 py-1.5 text-sm focus:outline-none"
+                  style={inputStyle}
+                >
+                  <option value="">— Select —</option>
+                  {group.options.map((opt) => (
+                    <option key={opt.label} value={opt.label}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      {/* Actions */}
+      {fields.length > 0 && (
+        <div
+          className="p-4 flex gap-2"
+          style={{ borderTop: "1px solid var(--line)" }}
+        >
+          <button
+            type="button"
+            onClick={handleApplyAll}
+            className="btn btn-sm flex-1"
+          >
+            Apply All
+          </button>
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="btn ghost btn-sm"
+          >
+            Clear All
+          </button>
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <SampleFrame
+      title="Form Data Pre-Fill"
+      description="Programmatically populate PDF form fields from JSON data. Load preset data profiles or edit individual fields, then apply values to the form."
+      sidebar={sidebar}
+      sidebarSide="left"
+      wide
+    >
+      <Viewer onFieldsDiscovered={handleFieldsDiscovered} />
+    </SampleFrame>
   );
 }

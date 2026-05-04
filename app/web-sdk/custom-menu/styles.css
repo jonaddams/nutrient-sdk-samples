@@ -67,12 +67,6 @@
   overflow: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-container {
-    background-color: var(--warm-gray-950);
-    border-color: var(--warm-gray-800);
-  }
-}
 
 .toolbar-scroll-content {
   display: flex;
@@ -109,31 +103,12 @@
   background: var(--warm-gray-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-container:hover .toolbar-scroll-content::-webkit-scrollbar-track {
-    background: var(--warm-gray-900);
-  }
-
-  .toolbar-container:hover .toolbar-scroll-content::-webkit-scrollbar-thumb {
-    background: var(--warm-gray-600);
-  }
-
-  .toolbar-container:hover
-    .toolbar-scroll-content::-webkit-scrollbar-thumb:hover {
-    background: var(--warm-gray-400);
-  }
-}
 
 .toolbar-container:hover .toolbar-scroll-content {
   scrollbar-width: thin;
   scrollbar-color: var(--warm-gray-400) var(--warm-gray-200);
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-container:hover .toolbar-scroll-content {
-    scrollbar-color: var(--warm-gray-600) var(--warm-gray-900);
-  }
-}
 
 /* Responsive toolbar adjustments */
 @media (max-height: 700px) {
@@ -193,11 +168,6 @@
   flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-separator {
-    background-color: var(--warm-gray-800);
-  }
-}
 
 .toolbar-button {
   width: 48px;
@@ -224,21 +194,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-button {
-    background-color: var(--warm-gray-900);
-    color: var(--white);
-  }
-
-  .toolbar-button:hover {
-    background-color: var(--warm-gray-800);
-  }
-
-  .toolbar-button.active {
-    background-color: var(--digital-pollen);
-    color: var(--black);
-  }
-}
 
 .toolbar-button-icon {
   width: 24px;
@@ -246,15 +201,14 @@
   filter: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  .toolbar-button-icon {
-    filter: invert(1);
-  }
-
-  .toolbar-button.active .toolbar-button-icon {
-    filter: none;
-  }
+/* The icons are static <img src="/icons/*.svg"> with dark fills baked in.
+   When the app is in dark mode they vanish into the dark button surface, so
+   invert them — except on the active button, whose light-accent background
+   wants the icon to remain dark for contrast. */
+[data-theme="dark"] .toolbar-button:not(.active) .toolbar-button-icon {
+  filter: invert(1);
 }
+
 
 /* Comparison Configuration Modal Styles */
 .comparison-config-modal-overlay {
@@ -270,11 +224,6 @@
   z-index: 10000;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-modal-overlay {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
-}
 
 .comparison-config-modal {
   background-color: var(--white);
@@ -287,12 +236,6 @@
   font-family: var(--font-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-modal {
-    background-color: var(--warm-gray-950);
-    border-color: var(--warm-gray-800);
-  }
-}
 
 @keyframes modalFadeIn {
   from {
@@ -315,12 +258,6 @@
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-modal-header {
-    background-color: var(--warm-gray-900);
-    border-bottom-color: var(--warm-gray-800);
-  }
-}
 
 .comparison-config-modal-header h3 {
   margin: 0;
@@ -329,11 +266,6 @@
   font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-modal-header h3 {
-    color: var(--white);
-  }
-}
 
 .comparison-config-close {
   background: none;
@@ -356,16 +288,6 @@
   color: var(--black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-close {
-    color: var(--warm-gray-400);
-  }
-
-  .comparison-config-close:hover {
-    background-color: var(--warm-gray-800);
-    color: var(--white);
-  }
-}
 
 .comparison-config-modal-body {
   padding: var(--spacing-md);
@@ -378,11 +300,6 @@
   opacity: 0.9;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-description {
-    color: var(--warm-gray-400);
-  }
-}
 
 .comparison-config-inputs {
   display: flex;
@@ -403,11 +320,6 @@
   font-weight: 500;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-input-group label {
-    color: var(--white);
-  }
-}
 
 .comparison-input-wrapper {
   display: flex;
@@ -424,11 +336,6 @@
   background: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-color-input {
-    border-color: var(--warm-gray-800);
-  }
-}
 
 .comparison-color-value {
   color: var(--warm-gray-600);
@@ -440,13 +347,6 @@
   border-radius: var(--radius-xxs);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-color-value {
-    color: var(--warm-gray-400);
-    background-color: var(--warm-gray-900);
-    border-color: var(--warm-gray-800);
-  }
-}
 
 .comparison-config-section {
   margin-top: var(--spacing-md);
@@ -454,11 +354,6 @@
   border-top: 1px solid var(--warm-gray-200);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-section {
-    border-top-color: var(--warm-gray-800);
-  }
-}
 
 .comparison-config-label {
   display: block;
@@ -468,11 +363,6 @@
   margin-bottom: var(--spacing-2xs);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-label {
-    color: var(--white);
-  }
-}
 
 .comparison-config-select {
   width: 100%;
@@ -497,17 +387,6 @@
   box-shadow: 0 0 0 2px rgba(245, 191, 79, 0.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-select {
-    background-color: var(--warm-gray-900);
-    color: var(--white);
-    border-color: var(--warm-gray-800);
-  }
-
-  .comparison-config-select:hover {
-    border-color: var(--warm-gray-600);
-  }
-}
 
 .comparison-config-hint {
   color: var(--warm-gray-600);
@@ -516,11 +395,6 @@
   margin-bottom: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-hint {
-    color: var(--warm-gray-400);
-  }
-}
 
 .comparison-config-actions {
   display: flex;
@@ -531,11 +405,6 @@
   border-top: 1px solid var(--warm-gray-200);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-actions {
-    border-top-color: var(--warm-gray-800);
-  }
-}
 
 .comparison-config-apply-button,
 .comparison-config-cancel-button {
@@ -558,16 +427,6 @@
   background-color: var(--warm-gray-900);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-apply-button {
-    background-color: var(--digital-pollen);
-    color: var(--black);
-  }
-
-  .comparison-config-apply-button:hover {
-    opacity: 0.85;
-  }
-}
 
 .comparison-config-cancel-button {
   background-color: transparent;
@@ -579,13 +438,3 @@
   background-color: var(--warm-gray-100);
 }
 
-@media (prefers-color-scheme: dark) {
-  .comparison-config-cancel-button {
-    color: var(--white);
-    border-color: var(--warm-gray-800);
-  }
-
-  .comparison-config-cancel-button:hover {
-    background-color: var(--warm-gray-900);
-  }
-}

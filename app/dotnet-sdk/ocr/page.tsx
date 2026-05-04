@@ -3,12 +3,15 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
-import { SamplePicker, type SampleOption } from "../_components/SamplePicker";
+import { type SampleOption, SamplePicker } from "../_components/SamplePicker";
 
 const Viewer = dynamic(() => import("../_components/PdfBlobViewer"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full text-sm text-gray-400 dark:text-gray-500">
+    <div
+      className="flex items-center justify-center h-full text-sm"
+      style={{ color: "var(--ink-4)" }}
+    >
       Loading viewer...
     </div>
   ),
@@ -43,8 +46,32 @@ function formatCount(n: number): string {
   return n.toLocaleString();
 }
 
+const cardStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-3)",
+  overflow: "hidden",
+};
+
+const inputStyle: React.CSSProperties = {
+  background: "var(--bg-elev)",
+  color: "var(--ink)",
+  border: "1px solid var(--line)",
+  borderRadius: "var(--r-2)",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: "var(--text-xs)",
+  fontWeight: 600,
+  color: "var(--ink-2)",
+  marginBottom: 6,
+};
+
 export default function OcrPage() {
-  const [selectedSampleId, setSelectedSampleId] = useState<string>(SAMPLES[0].id);
+  const [selectedSampleId, setSelectedSampleId] = useState<string>(
+    SAMPLES[0].id,
+  );
   const [mode, setMode] = useState<Mode>("pdf");
   const [language, setLanguage] = useState<string>("eng");
 
@@ -58,8 +85,6 @@ export default function OcrPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Fetch the selected sample as a Blob whenever the selection changes so the
-  // viewer can show the input document before the user clicks Run.
   useEffect(() => {
     let cancelled = false;
     const sample = SAMPLES.find((s) => s.id === selectedSampleId);
@@ -84,7 +109,9 @@ export default function OcrPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load sample");
+          setError(
+            err instanceof Error ? err.message : "Failed to load sample",
+          );
         }
       })
       .finally(() => {
@@ -96,7 +123,6 @@ export default function OcrPage() {
     };
   }, [selectedSampleId]);
 
-  // Clear results (but keep the preview blob) when switching mode or language.
   function clearResultsKeepPreview() {
     setSearchableBlob(null);
     setExtractedText(null);
@@ -114,7 +140,10 @@ export default function OcrPage() {
       const sample = SAMPLES.find((s) => s.id === selectedSampleId)!;
       const fileName = sample.url.split("/").pop() ?? "document.pdf";
       const formData = new FormData();
-      formData.append("file", new File([originalBlob], fileName, { type: "application/pdf" }));
+      formData.append(
+        "file",
+        new File([originalBlob], fileName, { type: "application/pdf" }),
+      );
 
       const queryParams = new URLSearchParams({ lang: language });
       if (mode === "text") queryParams.set("format", "json");
@@ -126,7 +155,9 @@ export default function OcrPage() {
 
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+        throw new Error(
+          text || `Server returned ${res.status} ${res.statusText}`,
+        );
       }
 
       if (mode === "pdf") {
@@ -172,13 +203,15 @@ export default function OcrPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard API may be unavailable in some contexts
+      // clipboard API may be unavailable
     }
   };
 
   const showTextResult = mode === "text" && extractedText !== null;
-  const showTabbedPdfViewer = mode === "pdf" && searchableBlob !== null && originalBlob !== null;
-  const showPreviewOnly = !showTextResult && !showTabbedPdfViewer && originalBlob !== null;
+  const showTabbedPdfViewer =
+    mode === "pdf" && searchableBlob !== null && originalBlob !== null;
+  const showPreviewOnly =
+    !showTextResult && !showTabbedPdfViewer && originalBlob !== null;
 
   const activeBlob = activeTabId === "original" ? originalBlob : searchableBlob;
 
@@ -188,25 +221,43 @@ export default function OcrPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1414]">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <DotNetSampleHeader
         title="OCR"
         description="Run optical character recognition on a scanned PDF using the Nutrient .NET SDK. Choose Searchable PDF to add a selectable text layer, or Extracted Text to pull out the raw recognized text."
       />
 
-      <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <main
+        className="shell"
+        style={{
+          paddingTop: "var(--space-6)",
+          paddingBottom: "var(--space-8)",
+          maxWidth: 1800,
+        }}
+      >
+        <div style={cardStyle}>
           <div className="flex">
             {/* Left Panel — Controls */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0 min-h-[calc(100vh-12rem)]">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div
+              className="w-80 flex flex-col shrink-0 min-h-[calc(100vh-12rem)]"
+              style={{
+                background: "var(--surface)",
+                borderRight: "1px solid var(--line)",
+              }}
+            >
+              <div
+                className="p-4"
+                style={{ borderBottom: "1px solid var(--line)" }}
+              >
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--ink)" }}
+                >
                   Input Document
                 </h3>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Sample picker */}
                 <SamplePicker
                   samples={SAMPLES}
                   selectedId={selectedSampleId}
@@ -216,51 +267,47 @@ export default function OcrPage() {
 
                 {/* Mode toggle */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Output Mode
-                  </label>
-                  <div className="flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("pdf");
-                        clearResultsKeepPreview();
-                      }}
-                      disabled={isRunning}
-                      className={
-                        "flex-1 px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer disabled:cursor-not-allowed " +
-                        (mode === "pdf"
-                          ? "bg-[var(--digital-pollen)] text-[var(--black)]"
-                          : "bg-white dark:bg-[#1a1414] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900")
-                      }
-                    >
-                      Searchable PDF
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("text");
-                        clearResultsKeepPreview();
-                      }}
-                      disabled={isRunning}
-                      className={
-                        "flex-1 px-3 py-1.5 text-xs font-semibold border-l border-gray-300 dark:border-gray-600 transition-colors cursor-pointer disabled:cursor-not-allowed " +
-                        (mode === "text"
-                          ? "bg-[var(--digital-pollen)] text-[var(--black)]"
-                          : "bg-white dark:bg-[#1a1414] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900")
-                      }
-                    >
-                      Extracted Text
-                    </button>
+                  <span style={labelStyle}>Output Mode</span>
+                  <div
+                    className="flex overflow-hidden"
+                    style={{
+                      border: "1px solid var(--line)",
+                      borderRadius: "var(--r-2)",
+                    }}
+                  >
+                    {(["pdf", "text"] as Mode[]).map((m, i) => {
+                      const isActive = mode === m;
+                      const label =
+                        m === "pdf" ? "Searchable PDF" : "Extracted Text";
+                      return (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => {
+                            setMode(m);
+                            clearResultsKeepPreview();
+                          }}
+                          disabled={isRunning}
+                          className="flex-1 px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer disabled:cursor-not-allowed"
+                          style={{
+                            background: isActive
+                              ? "var(--accent)"
+                              : "var(--bg-elev)",
+                            color: isActive ? "var(--bg)" : "var(--ink-2)",
+                            borderLeft:
+                              i === 0 ? "none" : "1px solid var(--line)",
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Language dropdown */}
+                {/* Language */}
                 <div>
-                  <label
-                    htmlFor="language"
-                    className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                  >
+                  <label htmlFor="language" style={labelStyle}>
                     Language
                   </label>
                   <select
@@ -271,7 +318,8 @@ export default function OcrPage() {
                       clearResultsKeepPreview();
                     }}
                     disabled={isRunning}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1414] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--digital-pollen)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-2 py-1.5 text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={inputStyle}
                   >
                     {LANGUAGES.map((l) => (
                       <option key={l.value} value={l.value}>
@@ -279,58 +327,63 @@ export default function OcrPage() {
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-snug">
-                    Select the language of the document text. Mismatched language
-                    will degrade recognition quality.
+                  <p
+                    className="mt-1 text-xs leading-snug"
+                    style={{ color: "var(--ink-3)" }}
+                  >
+                    Select the language of the document text. Mismatched
+                    language will degrade recognition quality.
                   </p>
                 </div>
 
-                {/* Run button */}
                 <button
                   type="button"
                   onClick={handleRun}
                   disabled={isRunning || !originalBlob}
-                  className="w-full px-4 py-2.5 text-sm font-semibold rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: "var(--digital-pollen)",
-                    color: "var(--black)",
-                  }}
+                  className="btn btn-sm w-full"
                 >
                   {isRunning ? "Running OCR..." : "Run OCR"}
                 </button>
 
-                {/* Error */}
                 {error && (
-                  <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-xs text-red-700 dark:text-red-300">
+                  <div
+                    className="p-3 text-xs"
+                    style={{
+                      background:
+                        "color-mix(in srgb, var(--code-coral) 12%, var(--bg-elev))",
+                      border:
+                        "1px solid color-mix(in srgb, var(--code-coral) 35%, var(--line))",
+                      borderRadius: "var(--r-2)",
+                      color: "var(--code-coral)",
+                    }}
+                  >
                     {error}
                   </div>
                 )}
 
-                {/* Download button — PDF mode */}
                 {searchableBlob && mode === "pdf" && (
                   <button
                     type="button"
                     onClick={handleDownloadPdf}
-                    className="w-full px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="btn ghost btn-sm w-full"
                   >
                     Download Searchable PDF
                   </button>
                 )}
 
-                {/* Download + Copy buttons — text mode */}
                 {extractedText !== null && mode === "text" && (
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={handleDownloadTxt}
-                      className="flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="btn ghost btn-sm flex-1"
                     >
                       Download .txt
                     </button>
                     <button
                       type="button"
                       onClick={handleCopy}
-                      className="flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="btn ghost btn-sm flex-1"
                     >
                       {copied ? "Copied!" : "Copy to clipboard"}
                     </button>
@@ -342,10 +395,22 @@ export default function OcrPage() {
             {/* Right Panel — Results */}
             <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-12rem)] relative">
               {(isRunning || isLoadingPreview) && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60 pointer-events-none">
+                <div
+                  className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+                  style={{
+                    background:
+                      "color-mix(in srgb, var(--bg) 70%, transparent)",
+                  }}
+                >
                   <div className="text-center space-y-2">
-                    <div className="inline-block w-6 h-6 border-2 border-[var(--digital-pollen)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div
+                      className="inline-block w-6 h-6 rounded-full animate-spin"
+                      style={{
+                        border: "2px solid var(--line)",
+                        borderTopColor: "var(--accent)",
+                      }}
+                    />
+                    <p className="text-sm" style={{ color: "var(--ink-3)" }}>
                       {isRunning ? "Running OCR..." : "Loading preview..."}
                     </p>
                   </div>
@@ -354,64 +419,111 @@ export default function OcrPage() {
 
               {showTextResult ? (
                 <div className="flex-1 min-h-0 flex flex-col p-4 gap-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">
+                  <p
+                    className="text-xs font-medium shrink-0"
+                    style={{ color: "var(--ink-3)" }}
+                  >
                     Extracted {formatCount(extractedText.length)} characters
                   </p>
-                  <pre className="flex-1 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1414] p-4 text-xs font-mono text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre">
+                  <pre
+                    className="flex-1 overflow-auto p-4 text-xs font-mono leading-relaxed whitespace-pre"
+                    style={{
+                      background: "var(--surface)",
+                      border: "1px solid var(--line)",
+                      borderRadius: "var(--r-2)",
+                      color: "var(--ink-2)",
+                    }}
+                  >
                     {extractedText}
                   </pre>
                 </div>
               ) : showTabbedPdfViewer ? (
                 <>
-                  {/* Tab bar */}
-                  <div className="flex items-center border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020] overflow-x-auto flex-shrink-0">
-                    {TABS.map((tab) => (
-                      <div
-                        key={tab.id}
-                        className={
-                          "flex items-center px-4 py-2.5 text-sm border-r border-gray-200 dark:border-gray-700 cursor-pointer transition-colors " +
-                          (tab.id === activeTabId
-                            ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1414]")
-                        }
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setActiveTabId(tab.id)}
-                          className="cursor-pointer"
+                  <div
+                    className="flex items-center overflow-x-auto shrink-0"
+                    style={{
+                      background: "var(--surface)",
+                      borderBottom: "1px solid var(--line)",
+                    }}
+                  >
+                    {TABS.map((tab) => {
+                      const isActive = tab.id === activeTabId;
+                      return (
+                        <div
+                          key={tab.id}
+                          className="flex items-center px-4 py-2.5 text-sm cursor-pointer transition-colors"
+                          style={{
+                            background: isActive
+                              ? "var(--bg-elev)"
+                              : "transparent",
+                            color: isActive ? "var(--ink)" : "var(--ink-3)",
+                            fontWeight: isActive ? 500 : 400,
+                            borderRight: "1px solid var(--line)",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background =
+                                "var(--accent-tint)";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = "transparent";
+                            }
+                          }}
                         >
-                          {tab.label}
-                        </button>
-                      </div>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() => setActiveTabId(tab.id)}
+                            className="cursor-pointer"
+                          >
+                            {tab.label}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  {/* PDF viewer */}
                   <div className="flex-1 min-h-0 flex flex-col">
                     {activeBlob && (
                       <Viewer key={activeTabId} blob={activeBlob} />
                     )}
                     {activeTabId === "searchable" && (
-                      <p className="flex-shrink-0 px-4 py-2 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800">
-                        This PDF now has a selectable text layer — try selecting a word.
+                      <p
+                        className="shrink-0 px-4 py-2 text-xs"
+                        style={{
+                          color: "var(--ink-4)",
+                          borderTop: "1px solid var(--line)",
+                        }}
+                      >
+                        This PDF now has a selectable text layer — try selecting
+                        a word.
                       </p>
                     )}
                   </div>
                 </>
               ) : showPreviewOnly ? (
                 <>
-                  {/* Preview banner */}
-                  <div className="flex-shrink-0 px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2020]">
-                    Preview of input document — try selecting text to confirm it&apos;s an image-based PDF, then run OCR.
+                  <div
+                    className="shrink-0 px-4 py-2 text-xs"
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--ink-3)",
+                      borderBottom: "1px solid var(--line)",
+                    }}
+                  >
+                    Preview of input document — try selecting text to confirm
+                    it&apos;s an image-based PDF, then run OCR.
                   </div>
-
-                  {/* PDF viewer */}
                   <div className="flex-1 min-h-0">
                     <Viewer key={selectedSampleId} blob={originalBlob!} />
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                <div
+                  className="flex-1 flex items-center justify-center"
+                  style={{ color: "var(--ink-4)" }}
+                >
                   <div className="text-center space-y-2">
                     <p className="text-sm">Select a sample to preview.</p>
                   </div>
