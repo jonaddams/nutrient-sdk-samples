@@ -29,6 +29,7 @@ export default function SearchViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const [instance, setInstance] = useState<Instance | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [lastSearchedTerm, setLastSearchedTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentResultIndex, setCurrentResultIndex] = useState<number | null>(
@@ -143,6 +144,7 @@ export default function SearchViewer({
       });
 
       setSearchResults(results);
+      setLastSearchedTerm(searchQuery);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -296,10 +298,7 @@ export default function SearchViewer({
         }}
       >
         {/* Search Input */}
-        <div
-          className="p-4"
-          style={{ borderBottom: "1px solid var(--line)" }}
-        >
+        <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
           <div className="mb-4">
             <label
               htmlFor="search-input"
@@ -317,7 +316,10 @@ export default function SearchViewer({
                 id="search-input"
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setLastSearchedTerm("");
+                }}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter search term..."
                 className="flex-1 px-3 py-2 focus:outline-none"
@@ -445,12 +447,12 @@ export default function SearchViewer({
 
         {/* Search Results */}
         <div className="flex-1 overflow-y-auto">
-          {searchResults.length === 0 && !isSearching && searchTerm && (
+          {searchResults.length === 0 && !isSearching && lastSearchedTerm && (
             <div
               className="p-4 text-center text-sm"
               style={{ color: "var(--ink-4)" }}
             >
-              No results found for &quot;{searchTerm}&quot;
+              No results found for &quot;{lastSearchedTerm}&quot;
             </div>
           )}
 
@@ -463,9 +465,7 @@ export default function SearchViewer({
                 onClick={() => jumpToResult(index)}
                 className="w-full text-left p-4 transition-colors cursor-pointer"
                 style={{
-                  background: isActive
-                    ? "var(--accent-tint)"
-                    : "transparent",
+                  background: isActive ? "var(--accent-tint)" : "transparent",
                   borderBottom: "1px solid var(--line)",
                   borderLeft: `3px solid ${
                     isActive ? "var(--accent)" : "transparent"
