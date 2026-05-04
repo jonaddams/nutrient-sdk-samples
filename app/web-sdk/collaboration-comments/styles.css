@@ -102,9 +102,9 @@
 }
 
 .collab-display-btn-active {
-  background: var(--digital-pollen);
-  border-color: var(--digital-pollen);
-  color: var(--black);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
   font-weight: 600;
 }
 
