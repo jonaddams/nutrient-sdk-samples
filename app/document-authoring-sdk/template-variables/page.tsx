@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PageHeader } from "@/app/_components/PageHeader";
+import { SampleCanvas } from "@/app/_components/SampleCanvas";
 import type { DocAuthEditor, DocAuthSystem } from "../types";
 import EditorPanel from "./components/editor-panel";
 import ExportBar from "./components/export-bar";
@@ -190,23 +190,21 @@ export default function TemplateVariablesPage() {
   const currentDocument = editor?.currentDocument() ?? null;
 
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ background: "var(--background)" }}
+    <SampleCanvas
+      title="Template Variables"
+      description="Insert template variables from a sidebar instead of typing them manually"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        {
+          label: "Document Authoring SDK",
+          href: "/document-authoring-sdk",
+        },
+      ]}
     >
-      <PageHeader
-        title="Template Variables"
-        description="Insert template variables from a sidebar instead of typing them manually"
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          {
-            label: "Document Authoring SDK",
-            href: "/document-authoring-sdk",
-          },
-        ]}
-      />
-
-      <div className="flex-1 min-h-0 grid grid-cols-[320px_1fr]">
+      <div
+        className="h-full"
+        style={{ display: "grid", gridTemplateColumns: "320px 1fr" }}
+      >
         {/* Left: Variable Sidebar */}
         <div className="bg-gray-900 border-r border-gray-700 overflow-hidden flex flex-col">
           <div className="flex-1 overflow-hidden">
@@ -247,6 +245,6 @@ export default function TemplateVariablesPage() {
           />
         </div>
       </div>
-    </div>
+    </SampleCanvas>
   );
 }

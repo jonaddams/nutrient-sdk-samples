@@ -15,35 +15,54 @@ export default function ZoomLevelDisplayViewer() {
 
     const { NutrientViewer } = window;
 
+    // Minimal toolbar focused on zoom interactions — keeps the custom
+    // "100%" zoom-display button visible at any viewer width. Custom
+    // className applies the design-system accent via styleSheets below.
+    const zoomDisplayItem = {
+      type: "custom",
+      title: "100%",
+      id: "zoom-display",
+      className: "zoom-display-btn",
+      tooltip: "Reset to 100%",
+    };
+
+    const toolbarItems = [
+      { type: "pager" },
+      { type: "pan" },
+      { type: "zoom-out" },
+      { type: "zoom-in" },
+      { type: "zoom-mode" },
+      zoomDisplayItem,
+    ];
+
     NutrientViewer.load({
       container,
       document: DOCUMENT,
       useCDN: true,
       pageRendering: "next",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+      toolbarItems: toolbarItems as any,
+      styleSheets: ["/zoom-level-display.css"],
     }).then((instance: Instance) => {
       instanceRef.current = instance;
 
       // Set the default zoom level to 100% on load
       instance.setViewState((viewState: any) => viewState.set("zoom", 1));
 
-      // Create a custom toolbar item to display zoom percentage
-      const toolbarItems = [
-        {
-          type: "custom",
-          title: "100%",
-          id: "zoom-display",
-          dropdownGroup: "zoomGroup",
-          selected: true,
-          tooltip: "Reset to 100%",
-          onPress: () => {
-            instance.setViewState((viewState: any) => viewState.set("zoom", 1));
-          },
-        },
-      ];
-
-      // Add the custom toolbar item to the toolbar
-      instance.setToolbarItems((items: any[]) => items.concat(toolbarItems));
+      // Wire the click handler now that we have an instance.
+      instance.setToolbarItems((items: any[]) =>
+        items.map((item) =>
+          item.id === "zoom-display"
+            ? {
+                ...item,
+                onPress: () =>
+                  instance.setViewState((viewState: any) =>
+                    viewState.set("zoom", 1),
+                  ),
+              }
+            : item,
+        ),
+      );
 
       // Update zoom display dynamically when zoom changes
       instance.addEventListener("viewState.zoom.change", (zoom: unknown) => {

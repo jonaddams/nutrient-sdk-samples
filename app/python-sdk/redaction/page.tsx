@@ -243,12 +243,12 @@ export default function RedactionPage() {
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-12rem)]">
+        <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
           <div className="flex h-full">
             {/* Left Panel */}
-            <div className="w-80 border-r border-[var(--warm-gray-400)] bg-white dark:bg-[#2a2020] flex flex-col flex-shrink-0">
-              <div className="p-4 border-b border-[var(--warm-gray-400)]">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="w-80 border-r border-[var(--line)] bg-[var(--bg-elev)] flex flex-col flex-shrink-0">
+              <div className="p-4 border-b border-[var(--line)]">
+                <h3 className="text-sm font-semibold text-[var(--ink-2)]">
                   Redaction Regions
                   <span className="ml-2 text-xs font-normal text-gray-500">
                     {selected.size}/{PRESET_REGIONS.length}
@@ -260,7 +260,7 @@ export default function RedactionPage() {
                 <button
                   type="button"
                   onClick={selectAll}
-                  className="w-full px-2 py-1.5 text-[11px] font-medium rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  className="w-full px-2 py-1.5 text-[11px] font-medium rounded border border-[var(--line-strong)] text-[var(--ink-3)] hover:bg-[var(--surface)] cursor-pointer"
                 >
                   {selected.size === PRESET_REGIONS.length
                     ? "Deselect All"
@@ -287,7 +287,7 @@ export default function RedactionPage() {
                           onChange={() => selectCategory(category)}
                           className="w-3.5 h-3.5 rounded accent-red-600"
                         />
-                        <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <span className="text-[11px] font-semibold text-[var(--ink-2)] uppercase tracking-wider">
                           {category}
                         </span>
                       </label>
@@ -303,7 +303,7 @@ export default function RedactionPage() {
                               onChange={() => toggleRegion(region.id)}
                               className="w-3.5 h-3.5 rounded accent-red-600"
                             />
-                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                            <span className="text-xs text-[var(--ink-3)]">
                               {region.label}
                             </span>
                           </label>
@@ -314,7 +314,7 @@ export default function RedactionPage() {
                 })}
               </div>
 
-              <div className="p-4 border-t border-[var(--warm-gray-400)] space-y-2">
+              <div className="p-4 border-t border-[var(--line)] space-y-2">
                 <button
                   type="button"
                   onClick={handleRedact}
@@ -336,7 +336,7 @@ export default function RedactionPage() {
                         a.download = "redacted-document.pdf";
                         a.click();
                       }}
-                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Download
                     </button>
@@ -346,7 +346,7 @@ export default function RedactionPage() {
                         URL.revokeObjectURL(pdfUrl);
                         setPdfUrl(null);
                       }}
-                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex-1 px-4 py-2 text-xs font-semibold rounded-md cursor-pointer border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)]"
                     >
                       Back to Original
                     </button>
@@ -354,7 +354,7 @@ export default function RedactionPage() {
                 )}
 
                 {error && (
-                  <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-300 text-xs">
+                  <div className="p-2 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
                     {error}
                   </div>
                 )}
@@ -371,7 +371,7 @@ export default function RedactionPage() {
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                   <div className="text-center space-y-2">
                     <div className="inline-block w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[var(--ink-3)]">
                       Applying redactions...
                     </p>
                   </div>

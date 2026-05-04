@@ -341,82 +341,85 @@ export default function FormFieldAnnotationsViewer() {
   }, [setupDragDrop]);
 
   // ─── Role Switching ───────────────────────────────────────────────
-  const switchView = useCallback(async (view: ActiveView) => {
-    setActiveView(view);
-    activeViewRef.current = view;
-    setSelectedAnnotationId(null);
-    setSelectedFieldData(null);
+  const switchView = useCallback(
+    async (view: ActiveView) => {
+      setActiveView(view);
+      activeViewRef.current = view;
+      setSelectedAnnotationId(null);
+      setSelectedFieldData(null);
 
-    const instance = instanceRef.current;
-    const sdk = NV.current;
-    if (!instance || !sdk) return;
+      const instance = instanceRef.current;
+      const sdk = NV.current;
+      if (!instance || !sdk) return;
 
-    // Toggle drag-and-drop based on editor mode
-    setupDragDrop(instance, view === "editor");
+      // Toggle drag-and-drop based on editor mode
+      setupDragDrop(instance, view === "editor");
 
-    // Set interaction mode
-    if (view === "editor") {
-      instance.setViewState((viewState) =>
-        viewState.set("interactionMode", sdk.InteractionMode.FORM_CREATOR),
-      );
-    } else {
-      instance.setViewState((viewState) =>
-        viewState.set("interactionMode", null),
-      );
-    }
+      // Set interaction mode
+      if (view === "editor") {
+        instance.setViewState((viewState) =>
+          viewState.set("interactionMode", sdk.InteractionMode.FORM_CREATOR),
+        );
+      } else {
+        instance.setViewState((viewState) =>
+          viewState.set("interactionMode", null),
+        );
+      }
 
-    // Force re-render of custom overlays first (before permission changes)
-    try {
-      const totalPages = await instance.totalPageCount;
-      for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
-        const annotations = await instance.getAnnotations(pageIndex);
-        for (const annotation of annotations) {
-          if ((annotation as any).customData?.roleId) {
-            await instance.update(annotation);
+      // Force re-render of custom overlays first (before permission changes)
+      try {
+        const totalPages = await instance.totalPageCount;
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+          const annotations = await instance.getAnnotations(pageIndex);
+          for (const annotation of annotations) {
+            if ((annotation as any).customData?.roleId) {
+              await instance.update(annotation);
+            }
           }
         }
-      }
-    } catch (error) {
-      console.error("Error re-rendering annotations:", error);
-    }
-
-    // Update field permissions (after re-render so updates aren't overwritten)
-    try {
-      const formFields = await instance.getFormFields();
-      const totalPages2 = await instance.totalPageCount;
-      let allAnnotations: any[] = [];
-      for (let pageIndex = 0; pageIndex < totalPages2; pageIndex++) {
-        const pageAnnotations = await instance.getAnnotations(pageIndex);
-        allAnnotations = allAnnotations.concat(pageAnnotations.toArray());
+      } catch (error) {
+        console.error("Error re-rendering annotations:", error);
       }
 
-      for (const field of formFields) {
-        const widget = allAnnotations.find(
-          (ann: any) => ann.formFieldName === field.name,
-        );
-        if (!widget?.customData?.roleId) continue;
-
-        const fieldRoleId = widget.customData.roleId as RoleId;
-        let isEditable: boolean;
-
-        if (view === "editor") {
-          isEditable = true;
-        } else {
-          isEditable = fieldRoleId === view || fieldRoleId === "either";
+      // Update field permissions (after re-render so updates aren't overwritten)
+      try {
+        const formFields = await instance.getFormFields();
+        const totalPages2 = await instance.totalPageCount;
+        let allAnnotations: any[] = [];
+        for (let pageIndex = 0; pageIndex < totalPages2; pageIndex++) {
+          const pageAnnotations = await instance.getAnnotations(pageIndex);
+          allAnnotations = allAnnotations.concat(pageAnnotations.toArray());
         }
 
-        const currentReadOnly = field.readOnly || false;
-        const newReadOnly = !isEditable;
+        for (const field of formFields) {
+          const widget = allAnnotations.find(
+            (ann: any) => ann.formFieldName === field.name,
+          );
+          if (!widget?.customData?.roleId) continue;
 
-        if (currentReadOnly !== newReadOnly) {
-          const updatedField = field.set("readOnly", newReadOnly);
-          await instance.update(updatedField);
+          const fieldRoleId = widget.customData.roleId as RoleId;
+          let isEditable: boolean;
+
+          if (view === "editor") {
+            isEditable = true;
+          } else {
+            isEditable = fieldRoleId === view || fieldRoleId === "either";
+          }
+
+          const currentReadOnly = field.readOnly || false;
+          const newReadOnly = !isEditable;
+
+          if (currentReadOnly !== newReadOnly) {
+            const updatedField = field.set("readOnly", newReadOnly);
+            await instance.update(updatedField);
+          }
         }
+      } catch (error) {
+        console.error("Error updating field permissions:", error);
       }
-    } catch (error) {
-      console.error("Error updating field permissions:", error);
-    }
-  }, [setupDragDrop]);
+    },
+    [setupDragDrop],
+  );
 
   // ─── Property Updates ───────────────────────────────────────────
   const updateFieldProperty = useCallback(
@@ -486,7 +489,10 @@ export default function FormFieldAnnotationsViewer() {
   return (
     <div className="flex h-full">
       {/* Sidebar */}
-      <div className="w-[280px] flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto" style={{ background: "var(--bg)" }}>
+      <div
+        className="w-[280px] flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto"
+        style={{ background: "var(--bg)" }}
+      >
         {/* Role Switcher */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
@@ -555,7 +561,10 @@ export default function FormFieldAnnotationsViewer() {
             <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
               Drag onto document
             </div>
-            <ul className="flex flex-col gap-1.5 list-none m-0" style={{ padding: 0 }}>
+            <ul
+              className="flex flex-col gap-1.5 list-none m-0"
+              style={{ padding: 0 }}
+            >
               {FIELD_PALETTE.map((item) => (
                 <li
                   key={item.type}
@@ -565,18 +574,27 @@ export default function FormFieldAnnotationsViewer() {
                     setDraggingItem(item.type);
                   }}
                   onDragEnd={() => setDraggingItem(null)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md border transition-all cursor-grab active:cursor-grabbing ${
-                    draggingItem === item.type
-                      ? "opacity-50 border-gray-300 dark:border-gray-600"
-                      : "border-gray-200 dark:border-gray-700 hover:border-[var(--digital-pollen)] hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all cursor-grab active:cursor-grabbing ${
+                    draggingItem === item.type ? "opacity-50" : ""
                   }`}
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--line-strong)",
+                    color: "var(--ink)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.background = "var(--accent-tint)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line-strong)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
                 >
-                  <span className="text-lg w-6 text-center flex-shrink-0">
-                    {item.icon}
+                  <span className="w-6 flex items-center justify-center flex-shrink-0">
+                    <item.Icon />
                   </span>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {item.label}
-                  </span>
+                  <span className="text-sm">{item.label}</span>
                 </li>
               ))}
             </ul>
