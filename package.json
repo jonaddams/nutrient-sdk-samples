@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "pnpm index",
     "build": "next build --turbopack",
     "start": "next start",
+    "index": "tsx scripts/build-search-index.ts",
     "lint": "biome check",
     "format": "biome format --write",
     "test": "vitest run",
@@ -16,6 +18,7 @@
   "dependencies": {
     "@nutrient-sdk/viewer": "^1.14.0",
     "lucide-react": "^1.12.0",
+    "minisearch": "^7.2.0",
     "next": "16.2.4",
     "react": "19.2.5",
     "react-dom": "19.2.5"
@@ -32,9 +35,14 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/ui": "^4.1.5",
     "happy-dom": "^20.9.0",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^5.7.284",
     "shx": "^0.4.0",
     "tailwindcss": "^4.2.4",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "xlsx": "^0.18.5"
   }
 }

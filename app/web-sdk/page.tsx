@@ -115,6 +115,13 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Indexed Cross-Document Search",
+    category: "User Interface",
+    description:
+      "Search a corpus of mixed PDFs and Office documents using a prebuilt full-text index, then jump straight to the matching page in the viewer with the term highlighted",
+    path: "/web-sdk/indexed-search",
+  },
+  {
     name: "Form Data Pre-Fill",
     category: "Forms",
     description:
@@ -253,7 +260,7 @@ export default function WebSDKPage() {
   return (
     <SamplesIndex
       title="Web SDK"
-      description="In-browser PDF viewing, annotations, forms, signatures, and redaction. 33 samples spanning every major UI surface."
+      description="In-browser PDF viewing, annotations, forms, signatures, and redaction. 34 samples spanning every major UI surface."
       samples={samples}
       categories={categories}
       productHomeUrl="https://www.nutrient.io/sdk/web/"
