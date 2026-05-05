@@ -1,45 +1,53 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import type MiniSearch from "minisearch";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { SearchViewer } from "./SearchViewer";
-import { formatBadgeColor, loadIndex, runQuery } from "./lib";
-import type { Format, IndexUnit, ManifestEntry, SearchHit } from "./types";
+import { fetchHits, formatBadgeColor, splitHeadline } from "./lib";
+import type { Format, ServerSearchHit } from "./types";
 
 const EXAMPLE_QUERIES = ["toad", "invoice", "chocolate", "consultant"];
 
-export function IndexedSearchClient() {
-  const [ms, setMs] = useState<MiniSearch<IndexUnit> | null>(null);
-  const [manifest, setManifest] = useState<ManifestEntry[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
+export function IndexedSearchServerClient() {
   const [input, setInput] = useState("");
-  const [query, setQuery] = useState(""); // committed query (after Enter / button)
-  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [query, setQuery] = useState(""); // committed query
+  const [hits, setHits] = useState<ServerSearchHit[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const search = async (q: string) => {
+    setQuery(q);
+    if (!q.trim()) {
+      setHits([]);
+      setSelectedIdx(null);
+      setStatus("idle");
+      return;
+    }
+
+    // Cancel any in-flight request before issuing a new one.
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setStatus("loading");
+    setErrorMsg(null);
+    try {
+      const results = await fetchHits(q, controller.signal);
+      if (controller.signal.aborted) return;
+      setHits(results);
+      setSelectedIdx(results.length > 0 ? 0 : null);
+      setStatus("idle");
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "search failed");
+    }
+  };
 
   useEffect(() => {
-    loadIndex()
-      .then(({ ms, manifest }) => {
-        setMs(ms);
-        setManifest(manifest);
-      })
-      .catch((err: Error) => setLoadError(err.message));
+    return () => abortRef.current?.abort();
   }, []);
-
-  const formatCounts = useMemo(() => {
-    const counts: Record<Format, number> = { pdf: 0, docx: 0, xlsx: 0, pptx: 0 };
-    for (const m of manifest) counts[m.format] += 1;
-    return counts;
-  }, [manifest]);
-
-  const search = (q: string) => {
-    setQuery(q);
-    if (!ms) return;
-    const results = runQuery(ms, q);
-    setHits(results);
-    setSelectedIdx(results.length > 0 ? 0 : null);
-  };
 
   const selected = selectedIdx != null ? hits[selectedIdx] : null;
 
@@ -57,14 +65,12 @@ export function IndexedSearchClient() {
         <div className="p-4" style={{ borderBottom: "1px solid var(--line)" }}>
           <SearchInput
             value={input}
-            disabled={!ms}
+            disabled={status === "loading"}
+            loading={status === "loading"}
             onChange={setInput}
             onSubmit={() => search(input)}
           />
-          {!query && manifest.length > 0 && (
-            <CorpusSummary manifest={manifest} counts={formatCounts} />
-          )}
-          {!query && manifest.length > 0 && (
+          {!query && (
             <ExampleQueries
               terms={EXAMPLE_QUERIES}
               onPick={(q) => {
@@ -73,14 +79,18 @@ export function IndexedSearchClient() {
               }}
             />
           )}
-          {query && (
+          {query && status !== "error" && (
             <div
               className="mt-3 flex items-center justify-between text-sm"
               style={{ color: "var(--ink-3)" }}
             >
               <span>
-                {hits.length} match{hits.length === 1 ? "" : "es"} for{" "}
-                <span style={{ color: "var(--ink)" }}>“{query}”</span>
+                {status === "loading"
+                  ? "Searching…"
+                  : `${hits.length} match${hits.length === 1 ? "" : "es"} for `}
+                {status !== "loading" && (
+                  <span style={{ color: "var(--ink)" }}>“{query}”</span>
+                )}
               </span>
               <button
                 type="button"
@@ -90,6 +100,7 @@ export function IndexedSearchClient() {
                   setQuery("");
                   setHits([]);
                   setSelectedIdx(null);
+                  setStatus("idle");
                 }}
               >
                 Reset
@@ -99,17 +110,12 @@ export function IndexedSearchClient() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {loadError && (
+          {status === "error" && (
             <div className="p-4 text-sm" style={{ color: "var(--danger, #b91c1c)" }}>
-              {loadError}
+              {errorMsg ?? "Search failed."}
             </div>
           )}
-          {!ms && !loadError && (
-            <div className="p-4 text-sm" style={{ color: "var(--ink-4)" }}>
-              Loading index…
-            </div>
-          )}
-          {ms && query && hits.length === 0 && (
+          {status === "idle" && query && hits.length === 0 && (
             <div className="p-4 text-sm" style={{ color: "var(--ink-4)" }}>
               No matches across the corpus.
             </div>
@@ -122,12 +128,12 @@ export function IndexedSearchClient() {
       <div style={{ flex: 1, minWidth: 0, height: "100%" }}>
         {selected ? (
           <SearchViewer
-            filename={selected.unit.filename}
+            filename={selected.filename}
             query={query}
-            locator={selected.unit.locator}
+            locator={selected.locator}
           />
         ) : (
-          <EmptyViewerState ready={ms != null} />
+          <EmptyViewerState />
         )}
       </div>
     </div>
@@ -139,19 +145,19 @@ export function IndexedSearchClient() {
 function SearchInput({
   value,
   disabled,
+  loading,
   onChange,
   onSubmit,
 }: {
   value: string;
   disabled: boolean;
+  loading: boolean;
   onChange: (v: string) => void;
   onSubmit: () => void;
 }) {
-  const ref = useRef<HTMLInputElement>(null);
   return (
     <div className="flex gap-2">
       <input
-        ref={ref}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -159,7 +165,7 @@ function SearchInput({
           if (e.key === "Enter") onSubmit();
         }}
         disabled={disabled}
-        placeholder="Search across the indexed corpus…"
+        placeholder="Search the server-side index…"
         className="flex-1 px-3 py-2 focus:outline-none"
         style={{
           background: "var(--surface)",
@@ -179,39 +185,11 @@ function SearchInput({
           color: "var(--bg)",
           border: "1px solid transparent",
           borderRadius: "var(--r-2)",
+          minWidth: 80,
         }}
       >
-        Search
+        {loading ? "…" : "Search"}
       </button>
-    </div>
-  );
-}
-
-function CorpusSummary({
-  manifest,
-  counts,
-}: {
-  manifest: ManifestEntry[];
-  counts: Record<Format, number>;
-}) {
-  const totalUnits = manifest.reduce((acc, m) => acc + m.unitCount, 0);
-  return (
-    <div className="mt-4">
-      <p className="panel-section" style={{ paddingTop: 0, marginBottom: 6 }}>
-        Indexed Corpus
-      </p>
-      <p className="text-xs" style={{ color: "var(--ink-3)" }}>
-        {manifest.length} files · {totalUnits.toLocaleString()} indexed units
-      </p>
-      <div className="flex flex-wrap gap-1.5 mt-2">
-        {(["pdf", "docx", "xlsx", "pptx"] as Format[]).map((f) =>
-          counts[f] === 0 ? null : (
-            <FormatBadge key={f} format={f}>
-              {counts[f]} {f.toUpperCase()}
-            </FormatBadge>
-          ),
-        )}
-      </div>
     </div>
   );
 }
@@ -225,10 +203,7 @@ function ExampleQueries({
 }) {
   return (
     <div className="mt-4">
-      <p
-        className="text-xs font-medium mb-2"
-        style={{ color: "var(--ink-3)" }}
-      >
+      <p className="text-xs font-medium mb-2" style={{ color: "var(--ink-3)" }}>
         Try a query:
       </p>
       <div className="flex flex-wrap gap-2">
@@ -258,7 +233,7 @@ function ResultRow({
   active,
   onClick,
 }: {
-  hit: SearchHit;
+  hit: ServerSearchHit;
   active: boolean;
   onClick: () => void;
 }) {
@@ -283,84 +258,72 @@ function ResultRow({
         className="panel-section"
         style={{ padding: 0, color: "var(--accent)", marginBottom: 6 }}
       >
-        {hit.unit.unitLabel}
+        {hit.unitLabel}
       </div>
       <div
         className="text-sm leading-relaxed"
         style={{ color: "var(--ink-2)" }}
       >
-        <HighlightedSnippet snippet={hit.snippet} matches={hit.matches} />
+        <HighlightedSnippet snippet={hit.snippet} />
       </div>
     </button>
   );
 }
 
-function HighlightedSnippet({
-  snippet,
-  matches,
-}: {
-  snippet: string;
-  matches: Array<{ start: number; length: number }>;
-}) {
-  if (matches.length === 0) return <>{snippet}</>;
-  const parts: React.ReactNode[] = [];
-  let cursor = 0;
-  matches.forEach((m, i) => {
-    if (m.start > cursor) parts.push(snippet.slice(cursor, m.start));
-    parts.push(
-      <mark
-        key={i}
-        style={{
-          background: "var(--accent)",
-          color: "var(--bg)",
-          padding: "0 2px",
-          borderRadius: "var(--r-1)",
-        }}
-      >
-        {snippet.slice(m.start, m.start + m.length)}
-      </mark>,
-    );
-    cursor = m.start + m.length;
-  });
-  if (cursor < snippet.length) parts.push(snippet.slice(cursor));
-  return <>{parts}</>;
+function HighlightedSnippet({ snippet }: { snippet: string }) {
+  const parts = splitHeadline(snippet);
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.match ? (
+          <mark
+            key={i}
+            style={{
+              background: "var(--accent)",
+              color: "var(--bg)",
+              padding: "0 2px",
+              borderRadius: "var(--r-1)",
+            }}
+          >
+            {p.text}
+          </mark>
+        ) : (
+          <span key={i}>{p.text}</span>
+        ),
+      )}
+    </>
+  );
 }
 
 /**
  * Renders the result list as file groups: a header per file followed by
- * its hits in score order. Hits arrive already grouped from runQuery —
- * this just inserts headers at file boundaries.
+ * its hits in score order. Hits arrive already grouped from /api/search,
+ * which orders by file-max-score then within-file by score.
  */
 function renderGroupedHits(
-  hits: SearchHit[],
+  hits: ServerSearchHit[],
   selectedIdx: number | null,
   onSelect: (idx: number) => void,
 ) {
   const nodes: React.ReactNode[] = [];
   let lastFile: string | null = null;
-  let groupCount = 0;
-  let groupStart = 0;
 
   hits.forEach((hit, idx) => {
-    if (hit.unit.filename !== lastFile) {
-      // Close any open group by flushing its count into the header we
-      // already pushed (we wrote a placeholder; rewrite with the real
-      // count). Simpler: precompute counts upfront.
-      lastFile = hit.unit.filename;
-      groupStart = idx;
-      groupCount = hits.filter((h) => h.unit.filename === hit.unit.filename).length;
+    if (hit.filename !== lastFile) {
+      lastFile = hit.filename;
+      const count = hits.filter((h) => h.filename === hit.filename).length;
       nodes.push(
         <GroupHeader
-          key={`hdr-${hit.unit.filename}-${groupStart}`}
-          title={hit.unit.title}
-          format={hit.unit.format}
-          count={groupCount}
+          key={`hdr-${hit.filename}-${idx}`}
+          title={hit.title}
+          format={hit.format}
+          count={count}
         />,
       );
     }
     nodes.push(
       <ResultRow
-        key={hit.unit.id}
+        key={hit.id}
         hit={hit}
         active={idx === selectedIdx}
         onClick={() => onSelect(idx)}
@@ -434,7 +397,7 @@ function FormatBadge({
   );
 }
 
-function EmptyViewerState({ ready }: { ready: boolean }) {
+function EmptyViewerState() {
   return (
     <div
       className="flex h-full items-center justify-center text-center px-8"
@@ -442,12 +405,13 @@ function EmptyViewerState({ ready }: { ready: boolean }) {
     >
       <div style={{ maxWidth: 480 }}>
         <p className="panel-section" style={{ marginBottom: 8 }}>
-          Cross-document Search
+          Server-side Cross-Document Search
         </p>
         <p className="text-sm" style={{ color: "var(--ink-2)" }}>
-          {ready
-            ? "Enter a query in the sidebar. Click any result to load that file in the viewer with the term highlighted in place."
-            : "Loading the prebuilt search index…"}
+          Enter a query in the sidebar. Each search hits a Postgres-backed{" "}
+          <code>/api/search</code> endpoint that returns hits with{" "}
+          <code>ts_headline</code>-generated snippets, then loads the matching
+          file in the viewer with the term highlighted in place.
         </p>
       </div>
     </div>
