@@ -28,6 +28,12 @@ export function SearchViewer({ filename, query, locator }: SearchViewerProps) {
   // highlight effect checks this to avoid calling into an instance that has
   // already been unloaded by a concurrent file-change.
   const instanceReadyRef = useRef(false);
+  // For DOCX (section) and XLSX (sheet) locators we have no native page
+  // mapping into the viewer's pagination, so we cycle through Nutrient's
+  // search results — every distinct sidebar click for the same file
+  // advances to the next in-document match. Resets on file change.
+  const cycleIndexRef = useRef(0);
+  const lastLocatorKeyRef = useRef<string | null>(null);
 
   // Load (and unload) the viewer when the file changes.
   useEffect(() => {
@@ -39,6 +45,8 @@ export function SearchViewer({ filename, query, locator }: SearchViewerProps) {
     instanceReadyRef.current = false;
     setInstance(null);
     currentHighlightRef.current = null;
+    cycleIndexRef.current = 0;
+    lastLocatorKeyRef.current = null;
 
     NutrientViewer.load({
       container,
@@ -104,11 +112,29 @@ export function SearchViewer({ filename, query, locator }: SearchViewerProps) {
       const all = searchResults.toArray();
       if (all.length === 0) return;
 
-      // Prefer a hit on the indexed page (PDF/PPTX); otherwise take the first.
-      const chosen =
-        (targetPageHint != null
-          ? all.find((r: any) => r.pageIndex === targetPageHint)
-          : null) ?? all[0];
+      // PDF/PPTX: locator carries a real pageIndex — pick the match on
+      //   that page when one exists.
+      // DOCX/XLSX: no native page mapping. Cycle through search results
+      //   so distinct sidebar clicks within the same file advance to the
+      //   next in-document match instead of always landing on match 0.
+      const locatorKey = JSON.stringify(locator);
+      const isCyclingFormat =
+        locator.type === "section" || locator.type === "sheet";
+      let chosen: any;
+      if (targetPageHint != null) {
+        chosen = all.find((r: any) => r.pageIndex === targetPageHint) ?? all[0];
+      } else if (isCyclingFormat) {
+        if (
+          lastLocatorKeyRef.current !== null &&
+          lastLocatorKeyRef.current !== locatorKey
+        ) {
+          cycleIndexRef.current = (cycleIndexRef.current + 1) % all.length;
+        }
+        chosen = all[cycleIndexRef.current % all.length];
+      } else {
+        chosen = all[0];
+      }
+      lastLocatorKeyRef.current = locatorKey;
       const obj = chosen.toObject();
       const pageIndex: number = obj.pageIndex ?? 0;
 
@@ -133,7 +159,7 @@ export function SearchViewer({ filename, query, locator }: SearchViewerProps) {
       if (cancelled) return;
 
       // Build and apply the new highlight.
-      const rectsArr = obj.rectsOnPage.toArray();
+      const rectsArr = obj.rectsOnPage.toArray() as any[];
       if (rectsArr.length === 0) return;
       const rects = NutrientViewer.Immutable.List(
         rectsArr.map(
@@ -145,7 +171,7 @@ export function SearchViewer({ filename, query, locator }: SearchViewerProps) {
               height: r.height,
             }),
         ),
-      );
+      ) as any;
       const annotation = new NutrientViewer.Annotations.HighlightAnnotation({
         pageIndex: pageIndex,
         rects,
