@@ -115,13 +115,6 @@ const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
-    name: "Indexed Cross-Document Search",
-    category: "User Interface",
-    description:
-      "Search a corpus of mixed PDFs and Office documents using a prebuilt full-text index, then jump straight to the matching page in the viewer with the term highlighted",
-    path: "/web-sdk/indexed-search",
-  },
-  {
     name: "Form Data Pre-Fill",
     category: "Forms",
     description:
@@ -148,6 +141,20 @@ const samples: Sample[] = [
     description:
       "Drag and drop grouped form fields with image backgrounds, company logos, checkboxes, signatures, and date fields. Moving or deleting any element affects the entire group.",
     path: "/web-sdk/grouped-form-fields",
+  },
+  {
+    name: "Indexed Cross-Document Search",
+    category: "User Interface",
+    description:
+      "Search a corpus of mixed PDFs and Office documents using a prebuilt full-text index, then jump straight to the matching page in the viewer with the term highlighted",
+    path: "/web-sdk/indexed-search",
+  },
+  {
+    name: "Indexed Cross-Document Search (Server-Side)",
+    category: "User Interface",
+    description:
+      "Same cross-document search, but with the index in Postgres and queries served by an API route. Demonstrates the production path beyond a static JSON dump",
+    path: "/web-sdk/indexed-search-server",
   },
   {
     name: "Keyword Highlight",
@@ -260,7 +267,7 @@ export default function WebSDKPage() {
   return (
     <SamplesIndex
       title="Web SDK"
-      description="In-browser PDF viewing, annotations, forms, signatures, and redaction. 34 samples spanning every major UI surface."
+      description="In-browser PDF viewing, annotations, forms, signatures, and redaction. 35 samples spanning every major UI surface."
       samples={samples}
       categories={categories}
       productHomeUrl="https://www.nutrient.io/sdk/web/"

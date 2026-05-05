@@ -48,7 +48,7 @@ export function runQuery(ms: MiniSearch<IndexUnit>, query: string, max = 50): Se
   const results = ms.search(trimmed).slice(0, max);
   const terms = tokenize(trimmed);
 
-  return results.map((r) => {
+  const hits: SearchHit[] = results.map((r) => {
     const unit: IndexUnit = {
       id: r.id as string,
       filename: r.filename,
@@ -60,6 +60,26 @@ export function runQuery(ms: MiniSearch<IndexUnit>, query: string, max = 50): Se
     };
     const { snippet, matches } = buildSnippet(unit.text, terms);
     return { unit, score: r.score, snippet, matches };
+  });
+
+  // Group by file: most-relevant file's hits first (ranked by its top
+  // hit's score), then next file, with each file's run kept contiguous
+  // and ranked internally by score. Same model the server-side sample
+  // uses — keeps the sidebar tidy and lets the viewer reuse the loaded
+  // doc across consecutive same-file clicks.
+  const fileScore = new Map<string, number>();
+  for (const h of hits) {
+    const cur = fileScore.get(h.unit.filename) ?? -Infinity;
+    if (h.score > cur) fileScore.set(h.unit.filename, h.score);
+  }
+  return hits.sort((a, b) => {
+    const fa = fileScore.get(a.unit.filename) ?? 0;
+    const fb = fileScore.get(b.unit.filename) ?? 0;
+    if (fa !== fb) return fb - fa;
+    if (a.unit.filename !== b.unit.filename) {
+      return a.unit.filename.localeCompare(b.unit.filename);
+    }
+    return b.score - a.score;
   });
 }
 
