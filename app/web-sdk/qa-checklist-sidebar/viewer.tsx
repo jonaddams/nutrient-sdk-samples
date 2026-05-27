@@ -173,12 +173,12 @@ export default function Viewer() {
       }),
       ui: {
         sidebar: {
-          qaChecklist: (_instance: Instance | null, _id: string) => ({
+          qaChecklist: (_getInstance: () => Instance | null, _id: string) => ({
             render: () => buildSidebarDOM(instanceRef),
           }),
         },
         commentThread: {
-          header: (_instance: Instance | null, id: string) => ({
+          header: (_getInstance: () => Instance | null, id: string) => ({
             render: () => {
               const meta = threadMeta[id];
               if (!meta) return null;
@@ -196,7 +196,7 @@ export default function Viewer() {
               return badge;
             },
           }),
-          footer: (_instance: Instance | null, id: string) => ({
+          footer: (_getInstance: () => Instance | null, id: string) => ({
             render: () => {
               const resolved = !!threadResolved[id];
               const btn = document.createElement("button");
@@ -214,7 +214,7 @@ export default function Viewer() {
             },
           }),
           comment: {
-            header: (_instance: Instance | null, id: string) => ({
+            header: (_getInstance: () => Instance | null, id: string) => ({
               render: () => {
                 const meta = commentMeta[id];
                 if (!meta) return null;
@@ -231,7 +231,7 @@ export default function Viewer() {
                 return badge;
               },
             }),
-            footer: (_instance: Instance | null, id: string) => ({
+            footer: (_getInstance: () => Instance | null, id: string) => ({
               render: () => {
                 const flagged = !!commentFlagged[id];
                 const btn = document.createElement("button");
