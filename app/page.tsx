@@ -97,6 +97,115 @@ export default function Home() {
       </div>
 
       <div className="section-label">
+        <div className="num">/ Apps</div>
+        <div className="title">Reference applications</div>
+      </div>
+
+      <a
+        href="https://sign-sage.vercel.app"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sdk-card"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: "var(--space-4)",
+          padding: "var(--space-6) var(--space-5)",
+          borderBottom: "1px solid var(--line)",
+          transition: "background .15s var(--ease)",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto",
+            gap: "var(--space-5)",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: "var(--accent)",
+                }}
+              ></span>
+              <span
+                className="id"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-xs)",
+                  letterSpacing: ".14em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-4)",
+                }}
+              >
+                App 01 — sign
+              </span>
+            </div>
+            <h3
+              style={{
+                fontFamily: "var(--font-display)",
+                fontStyle: "var(--display-style)",
+                fontWeight: "var(--display-weight)" as React.CSSProperties["fontWeight"],
+                fontSize: 32,
+                letterSpacing: "-.015em",
+                lineHeight: 1.05,
+                margin: "0 0 8px",
+                color: "var(--ink)",
+              }}
+            >
+              Sign
+            </h3>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--ink-3)",
+                fontSize: "var(--text-sm)",
+                maxWidth: "52ch",
+                lineHeight: 1.55,
+              }}
+            >
+              A full e-signing application — dashboard, inbox, 5-step send wizard,
+              recipient signing, success. Re-themable through the same tokens as
+              everything else here.
+            </p>
+            <p
+              style={{
+                margin: "8px 0 0",
+                color: "var(--ink-2)",
+                fontSize: "var(--text-sm)",
+                fontStyle: "italic",
+              }}
+            >
+              Ask your Nutrient contact about source code access.
+            </p>
+            <div
+              style={{
+                marginTop: 16,
+                display: "flex",
+                gap: "var(--space-4)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-xs)",
+                letterSpacing: ".1em",
+                textTransform: "uppercase",
+                color: "var(--ink-3)",
+                flexWrap: "wrap",
+              }}
+            >
+              <span>11 screens</span>
+              <span>Light + dark</span>
+              <span>Mobile responsive</span>
+              <span>Workflow preserved</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <div className="section-label">
         <div className="num">/ Index</div>
         <div className="title">Pick an SDK</div>
       </div>
@@ -194,6 +303,31 @@ export default function Home() {
             The whole vocabulary lives in CSS variables on{" "}
             <code>{`<html>`}</code>. Override <code>data-palette</code>,{" "}
             <code>data-theme</code>, or the tokens directly to rebrand.
+          </p>
+        </div>
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>
+            See also
+          </div>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "var(--text-sm)",
+              color: "var(--ink-2)",
+              lineHeight: 1.6,
+              maxWidth: "40ch",
+            }}
+          >
+            <a
+              href="https://github.com/PSPDFKit/awesome-nutrient"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--accent)", textDecoration: "underline" }}
+            >
+              awesome-nutrient
+            </a>{" "}
+            — a curated list of Nutrient integrations, community projects, and
+            further reading.
           </p>
         </div>
       </div>
