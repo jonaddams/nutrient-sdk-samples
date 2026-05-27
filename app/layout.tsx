@@ -5,6 +5,7 @@ import "./globals.css";
 import { ErrorBoundary } from "@/lib/components/ErrorBoundary";
 import { TopBar } from "./_components/TopBar";
 import { Footer } from "./_components/Footer";
+import { NutrientViewerScript } from "./_components/NutrientViewerScript";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -92,9 +93,7 @@ export default function RootLayout({
         />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js" />
-        <script
-          src={`https://cdn.cloud.pspdfkit.com/pspdfkit-web@${process.env.NEXT_PUBLIC_WEB_SDK_VERSION || "1.10.0"}/nutrient-viewer.js`}
-        />
+        <NutrientViewerScript />
       </head>
       <body className="antialiased">
         <ErrorBoundary>
