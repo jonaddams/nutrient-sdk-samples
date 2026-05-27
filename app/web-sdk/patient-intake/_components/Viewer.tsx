@@ -494,6 +494,8 @@ export default function Viewer({ document, onInstanceReady }: ViewerProps) {
       NutrientViewer.load({
         container,
         document: document,
+        licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+        useCDN: true,
         pageRendering: "next",
         toolbarItems: NutrientViewer.defaultToolbarItems?.filter(
           (item: { type: string }) =>

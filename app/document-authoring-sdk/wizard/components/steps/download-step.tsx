@@ -135,6 +135,7 @@ export default function DownloadStep() {
               container: `#${containerId}`, // Use CSS selector as expected by NutrientViewer
               document: pdfDocumentCopy,
               licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+              useCDN: true,
               pageRendering: "next" as const,
               initialViewState: new window.NutrientViewer.ViewState({
                 zoom: {

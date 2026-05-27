@@ -108,6 +108,7 @@ export default function DocumentEditorViewer() {
           pageRendering: "next",
           allowLinearizedLoading: false,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          useCDN: true,
         });
 
         if (!isMounted) {
