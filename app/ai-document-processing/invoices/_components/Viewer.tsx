@@ -99,6 +99,7 @@ export default function Viewer({
           container: container as HTMLElement,
           document: document,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          useCDN: true,
           pageRendering: "next" as const,
         };
 

@@ -54,6 +54,7 @@ export default function DocumentComparisonViewer({
           pageRendering: "next",
           headless: true,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          useCDN: true,
         });
 
         if (!isMounted) {
@@ -95,6 +96,7 @@ export default function DocumentComparisonViewer({
           pageRendering: "next",
           headless: true,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          useCDN: true,
         });
 
         if (!isMounted) {

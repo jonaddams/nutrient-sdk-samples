@@ -497,6 +497,7 @@ const Viewer = () => {
       container,
       document: "/documents/Drawing1.pdf",
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+      useCDN: true,
       pageRendering: "next",
       theme:
         appTheme === "dark"

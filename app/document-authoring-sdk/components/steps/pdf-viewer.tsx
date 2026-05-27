@@ -41,6 +41,7 @@ export default function PdfViewer({
           container: `#${containerId}`,
           document: pdfBuffer,
           licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          useCDN: true,
           pageRendering: "next" as const,
           initialViewState: new window.NutrientViewer.ViewState({
             zoom: {
