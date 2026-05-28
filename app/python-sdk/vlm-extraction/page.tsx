@@ -94,7 +94,13 @@ export default function VlmExtractionPage() {
           body: formData,
         });
 
-        if (!res.ok) throw new Error(`API returned ${res.status}`);
+        if (!res.ok) {
+          const detail = await res
+            .json()
+            .then((b) => (typeof b?.detail === "string" ? b.detail : null))
+            .catch(() => null);
+          throw new Error(detail ?? `API returned ${res.status}`);
+        }
 
         const data: ExtractionResult = await res.json();
         setResult(data);
