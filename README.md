@@ -308,6 +308,60 @@ pnpm start
 
 [Your License Here]
 
+## Python SDK Samples
+
+Demos calling the Nutrient Python SDK backend. Source for the backend API:
+https://github.com/jonaddams/python-fast-api
+
+### Setup
+
+The Python backend runs locally on `localhost:8080` during development. Clone
+and start it:
+
+```bash
+git clone https://github.com/jonaddams/python-fast-api.git
+cd python-fast-api
+python3.12 -m venv .venv
+make install
+cp .env.example .env  # add your NUTRIENT_LICENSE_KEY
+make dev              # uvicorn on :8080 with --reload
+```
+
+Then point this app at it in `.env.local`:
+
+```
+NEXT_PUBLIC_PYTHON_SDK_API_URL=http://localhost:8080
+```
+
+Or set it inline for one run:
+
+```bash
+NEXT_PUBLIC_PYTHON_SDK_API_URL=http://localhost:8080 pnpm dev
+```
+
+### Available demos
+
+Visit `/python-sdk` for the index. Pages live under `app/python-sdk/`.
+
+- **Form Field Detection** — Run the Nutrient SDK's ML-based form-field
+  detector on an unfielded IRS Form 940. Includes a confidence-threshold
+  slider so you can see the precision/recall tradeoff directly.
+- **PDF Form Fill** — Detect existing form fields in a sample PDF, fill them
+  with user-entered values, return the filled document.
+- **Digital Signature** — Apply a digital signature using a bundled demo
+  certificate, returning the signed PDF.
+- **VLM Extraction** — Send a PDF to the backend's VLM_ENHANCED_ICR engine
+  (requires a local VLM server such as LM Studio on `localhost:1234`; if
+  unavailable, the backend returns a structured 503).
+- **Office to PDF**, **Markdown to PDF**, **PDF to HTML**, **PDF to Office**
+  — Document format conversions.
+- **PDF Redaction** — Permanently remove sensitive content.
+- **Word Template Generation** — Generate PDFs from Word templates populated
+  with JSON data.
+
+The backend's full endpoint list is at `http://localhost:8080/docs` once
+`make dev` is running.
+
 ## .NET SDK Samples
 
 Demos calling the Nutrient .NET SDK backend deployed on Railway. Source for
