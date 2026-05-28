@@ -38,6 +38,13 @@ const samples: Sample[] = [
     path: "/python-sdk/redaction",
   },
   {
+    name: "Form Field Detection",
+    category: "Forms",
+    description:
+      "Detect form fields in an unfielded PDF with the Nutrient SDK's ML detector",
+    path: "/python-sdk/form-detection",
+  },
+  {
     name: "PDF Form Fill",
     category: "Forms",
     description:
