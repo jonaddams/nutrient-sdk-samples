@@ -161,19 +161,21 @@ export default function FormDetectionPage() {
                       </p>
                     </div>
 
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-[var(--ink-3)] mb-1">
-                        Breakdown
-                      </p>
-                      <ul className="text-sm text-[var(--ink-2)] space-y-1">
-                        {breakdown.map((b) => (
-                          <li key={b.type} className="flex justify-between">
-                            <span>{b.type}</span>
-                            <span className="font-medium">{b.count}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {breakdown.length > 1 && (
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-[var(--ink-3)] mb-1">
+                          Breakdown
+                        </p>
+                        <ul className="text-sm text-[var(--ink-2)] space-y-1">
+                          {breakdown.map((b) => (
+                            <li key={b.type} className="flex justify-between">
+                              <span>{b.type}</span>
+                              <span className="font-medium">{b.count}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
