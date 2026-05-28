@@ -8,10 +8,12 @@ const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
 
 const SAMPLE_PDF = {
-  label: "Form Detection Sample",
-  path: "/documents/input_forms_detection.pdf",
-  filename: "input_forms_detection.pdf",
+  label: "IRS Form 940 (Federal Unemployment Tax)",
+  path: "/documents/f940-flat.pdf",
+  filename: "f940-flat.pdf",
 };
+
+const DEFAULT_CONFIDENCE = 0.75;
 
 const TOOLBAR_ITEMS = [
   { type: "zoom-out" },
@@ -58,6 +60,7 @@ export default function FormDetectionPage() {
   const [pdfUrl, setPdfUrl] = useState<string>(SAMPLE_PDF.path);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState<number>(DEFAULT_CONFIDENCE);
 
   // Revoke object URL on unmount or when it changes
   useEffect(() => {
@@ -79,10 +82,13 @@ export default function FormDetectionPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const apiRes = await fetch(`${API_BASE}/api/forms/detect`, {
-        method: "POST",
-        body: formData,
-      });
+      const apiRes = await fetch(
+        `${API_BASE}/api/forms/detect?confidence=${confidence}`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!apiRes.ok) {
         const detail = await apiRes
@@ -111,6 +117,7 @@ export default function FormDetectionPage() {
     setPdfUrl(SAMPLE_PDF.path);
     setResult(null);
     setError(null);
+    setConfidence(DEFAULT_CONFIDENCE);
   }, [pdfUrl]);
 
   const breakdown = result ? summarizeFieldTypes(result.addedFields) : [];
@@ -119,7 +126,7 @@ export default function FormDetectionPage() {
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="PDF Form Field Detection"
-        description="Detect form fields in an unfielded PDF using the Nutrient Python SDK's machine-learning detector."
+        description="Detect form fields in an unfielded PDF using the Nutrient Python SDK's machine-learning detector. Adjust the confidence threshold to trade false positives for misses."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
@@ -136,8 +143,9 @@ export default function FormDetectionPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {!result && !error && (
                   <p className="text-sm text-[var(--ink-3)]">
-                    The sample PDF has <strong>0</strong> form fields. Click
-                    "Detect form fields" to run ML detection on the document.
+                    Sample: <strong>{SAMPLE_PDF.label}</strong>. The unfielded
+                    PDF has <strong>0</strong> form fields. Click "Detect form
+                    fields" to run ML detection at the threshold below.
                   </p>
                 )}
 
@@ -180,7 +188,32 @@ export default function FormDetectionPage() {
                 )}
               </div>
 
-              <div className="p-4 border-t border-[var(--line)] space-y-2">
+              <div className="p-4 border-t border-[var(--line)] space-y-3">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs text-[var(--ink-3)]">
+                    <label htmlFor="confidence-slider" className="font-medium">
+                      Confidence threshold
+                    </label>
+                    <span className="font-mono text-[var(--ink-2)]">
+                      {confidence.toFixed(2)}
+                    </span>
+                  </div>
+                  <input
+                    id="confidence-slider"
+                    type="range"
+                    min={0.1}
+                    max={0.95}
+                    step={0.05}
+                    value={confidence}
+                    onChange={(e) => setConfidence(parseFloat(e.target.value))}
+                    disabled={processing || result !== null}
+                    className="w-full accent-[var(--accent)] disabled:opacity-50"
+                  />
+                  <p className="text-[10px] text-[var(--ink-3)]">
+                    Lower = more detections (more false positives). Higher = fewer
+                    detections (more misses).
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={handleDetect}
