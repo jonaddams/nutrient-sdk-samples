@@ -9,10 +9,9 @@ const API_BASE =
 
 const SAMPLE_DOCUMENTS = [
   {
-    label: "Account Registration Form",
-    path: "/documents/account-registration-form.pdf",
-    filename: "account-registration-form.pdf",
-    cachedResult: "/documents/account-registration-form-vlm-result.json",
+    label: "Sakura Design Studio Invoice (SD-2025-0041)",
+    path: "/invoices/Invoice SD-2025-0041.pdf",
+    filename: "Invoice SD-2025-0041.pdf",
   },
 ];
 
@@ -66,7 +65,6 @@ export default function VlmExtractionPage() {
     label: string;
     path: string;
     filename: string;
-    cachedResult?: string;
   };
 
   const handleProcess = async () => {
@@ -76,35 +74,31 @@ export default function VlmExtractionPage() {
     setResultExpanded(false);
 
     try {
-      if (selected.cachedResult) {
-        const res = await fetch(selected.cachedResult);
-        if (!res.ok) throw new Error(`Failed to load cached result`);
-        const data: ExtractionResult = await res.json();
-        setResult(data);
-      } else {
-        const response = await fetch(selected.path);
-        const blob = await response.blob();
-        const file = new File([blob], selected.filename);
+      const response = await fetch(selected.path);
+      const blob = await response.blob();
+      const file = new File([blob], selected.filename);
 
-        const formData = new FormData();
-        formData.append("file", file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-        const res = await fetch(`${API_BASE}/api/extraction/vlm`, {
+      const res = await fetch(
+        `${API_BASE}/api/extraction/vlm?provider=claude`,
+        {
           method: "POST",
           body: formData,
-        });
+        },
+      );
 
-        if (!res.ok) {
-          const detail = await res
-            .json()
-            .then((b) => (typeof b?.detail === "string" ? b.detail : null))
-            .catch(() => null);
-          throw new Error(detail ?? `API returned ${res.status}`);
-        }
-
-        const data: ExtractionResult = await res.json();
-        setResult(data);
+      if (!res.ok) {
+        const detail = await res
+          .json()
+          .then((b) => (typeof b?.detail === "string" ? b.detail : null))
+          .catch(() => null);
+        throw new Error(detail ?? `API returned ${res.status}`);
       }
+
+      const data: ExtractionResult = await res.json();
+      setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "VLM extraction failed");
     } finally {
@@ -148,7 +142,7 @@ export default function VlmExtractionPage() {
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="VLM-Enhanced Extraction"
-        description="Extract structured data from documents using VLM-enhanced ICR with Claude as the Vision Language Model provider."
+        description="Extract structured content from documents that don't have native form fields. Calls VLM-enhanced ICR with Claude live against the deployed backend — no localhost VLM required."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
