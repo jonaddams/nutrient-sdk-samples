@@ -9,6 +9,11 @@ const API_BASE =
 
 const SAMPLE_DOCUMENTS = [
   {
+    label: "Multi-language printed page (from the Python ICR guide)",
+    path: "/documents/input_ocr_multiple_languages.png",
+    filename: "input_ocr_multiple_languages.png",
+  },
+  {
     label: "Employment Application (print handwriting)",
     path: "/documents/handwritten-employment-application.jpg",
     filename: "handwritten-employment-application.jpg",
@@ -138,8 +143,8 @@ export default function IcrExtractionPage() {
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
-        title="ICR Extraction (Handwriting)"
-        description="Run the Nutrient SDK's ICR engine on a handwritten document. ICR is tuned for clean print handwriting in structured forms; cursive narrative content is currently outside its strength."
+        title="Extracting data from images using ICR"
+        description="Use the Nutrient SDK's ICR engine to extract structured document data from images with local models. Best on printed pages and clean print handwriting in structured layouts; cursive narrative content is outside its current strength."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
@@ -185,10 +190,11 @@ export default function IcrExtractionPage() {
                     What ICR is good at
                   </p>
                   <p>
-                    Clean, hand-printed text in known form layouts — labels and
-                    short field values like names, addresses, and phone numbers.
-                    Cursive, narrative pages, and decorative calligraphy are
-                    outside the engine's current strength.
+                    Printed text on multi-language pages, and clean hand-printed
+                    text in known form layouts — labels and short field values
+                    like names, addresses, and phone numbers. Cursive, narrative
+                    pages, and decorative calligraphy are outside the engine's
+                    current strength.
                   </p>
                 </div>
 
