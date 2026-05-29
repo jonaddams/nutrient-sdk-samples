@@ -9,6 +9,11 @@ const API_BASE =
 
 const SAMPLE_DOCUMENTS = [
   {
+    label: "Scanned invoice (multi-page PDF)",
+    path: "/documents/ocr-invoice.pdf",
+    filename: "ocr-invoice.pdf",
+  },
+  {
     label: "Multi-language printed page (from the Python OCR guide)",
     path: "/documents/input_ocr_multiple_languages.png",
     filename: "input_ocr_multiple_languages.png",
