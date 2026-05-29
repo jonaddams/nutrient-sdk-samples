@@ -59,10 +59,10 @@ const samples: Sample[] = [
     path: "/python-sdk/vlm-transcription",
   },
   {
-    name: "ICR Extraction (Handwriting)",
+    name: "ICR Extraction",
     category: "Extraction",
     description:
-      "Extract text from handwriting with the SDK's ICR engine; best on clean print-handwritten forms",
+      "Extract structured document data from images using the Nutrient SDK's ICR engine — printed pages and hand-printed forms",
     path: "/python-sdk/icr-extraction",
   },
   {
