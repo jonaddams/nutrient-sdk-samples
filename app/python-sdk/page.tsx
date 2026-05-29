@@ -52,6 +52,20 @@ const samples: Sample[] = [
     path: "/python-sdk/form-fill",
   },
   {
+    name: "ICR Extraction (Handwriting)",
+    category: "Extraction",
+    description:
+      "Extract text from handwriting with the SDK's ICR engine; best on clean print-handwritten forms",
+    path: "/python-sdk/icr-extraction",
+  },
+  {
+    name: "VLM Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured content from documents using VLM-enhanced ICR with Claude as the model provider",
+    path: "/python-sdk/vlm-extraction",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
@@ -66,6 +80,7 @@ const categories = [
   "Editor",
   "Signatures",
   "Forms",
+  "Extraction",
   "Templates",
 ];
 
