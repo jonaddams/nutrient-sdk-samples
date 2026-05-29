@@ -292,9 +292,9 @@ export default function IcrExtractionPage() {
 
                   {viewMode === "formatted" ? (
                     <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)] space-y-3">
-                      {result.textElements.map((el) => (
+                      {result.textElements.map((el, idx) => (
                         <div
-                          key={el.readingOrder}
+                          key={`${idx}-${el.readingOrder}`}
                           className="rounded-lg border border-[var(--line)] overflow-hidden"
                         >
                           <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface)] border-b border-[var(--line)]">
