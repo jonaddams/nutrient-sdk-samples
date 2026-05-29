@@ -182,7 +182,7 @@ export default function IcrExtractionPage() {
                     color: "#fff",
                   }}
                 >
-                  {processing ? "Extracting..." : "Extract handwriting"}
+                  {processing ? "Extracting..." : "Extract data with ICR"}
                 </button>
 
                 <div className="p-3 rounded-md border border-[var(--line)] bg-[var(--surface)] text-xs text-[var(--ink-3)] leading-relaxed">
