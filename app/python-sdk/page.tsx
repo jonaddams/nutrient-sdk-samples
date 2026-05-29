@@ -52,6 +52,13 @@ const samples: Sample[] = [
     path: "/python-sdk/form-fill",
   },
   {
+    name: "VLM Transcription",
+    category: "Extraction",
+    description:
+      "Transcribe handwriting via Vision.describe() with a custom prompt — works on cursive where ICR doesn't",
+    path: "/python-sdk/vlm-transcription",
+  },
+  {
     name: "ICR Extraction (Handwriting)",
     category: "Extraction",
     description:
