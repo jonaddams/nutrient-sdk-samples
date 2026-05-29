@@ -59,6 +59,13 @@ const samples: Sample[] = [
     path: "/python-sdk/vlm-transcription",
   },
   {
+    name: "OCR Extraction",
+    category: "Extraction",
+    description:
+      "Extract printed text from images with Adaptive OCR — high-throughput, optimized for purely printed content",
+    path: "/python-sdk/ocr-extraction",
+  },
+  {
     name: "ICR Extraction",
     category: "Extraction",
     description:
