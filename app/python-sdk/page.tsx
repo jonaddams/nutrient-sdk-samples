@@ -69,7 +69,7 @@ const samples: Sample[] = [
     name: "VLM Extraction",
     category: "Extraction",
     description:
-      "Extract structured content from documents using VLM-enhanced ICR with Claude as the model provider",
+      "Extract structured content from documents without native form fields (e.g. invoices) via VLM-enhanced ICR with Claude",
     path: "/python-sdk/vlm-extraction",
   },
   {
