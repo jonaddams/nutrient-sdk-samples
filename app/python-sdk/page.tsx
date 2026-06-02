@@ -101,6 +101,13 @@ const samples: Sample[] = [
     path: "/python-sdk/field-extraction",
   },
   {
+    name: "Image Alt Text",
+    category: "Extraction",
+    description:
+      "Generate WCAG-style accessibility descriptions for images at standard or detailed level",
+    path: "/python-sdk/alt-text",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
