@@ -80,6 +80,13 @@ const samples: Sample[] = [
     path: "/python-sdk/vlm-extraction",
   },
   {
+    name: "Table Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured tables (rows, columns, spanning cells) from an invoice via VLM-enhanced extraction with Claude",
+    path: "/python-sdk/table-extraction",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
