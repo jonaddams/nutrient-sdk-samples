@@ -100,7 +100,7 @@ export default function AltTextPage() {
     () => (
       <div className="p-4">
         <div
-          className={`grid gap-4 ${results && results.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}
+          className={`grid gap-4 ${(results?.length ?? 0) > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}
         >
           {results?.map((r) => (
             <div
@@ -228,7 +228,7 @@ export default function AltTextPage() {
                 {/* biome-ignore lint/performance/noImgElement: static sample image shown as-is; Next.js Image is not needed here */}
                 <img
                   src={selected.path}
-                  alt="Sample to be described"
+                  alt={selected.label}
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
