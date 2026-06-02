@@ -94,6 +94,13 @@ const samples: Sample[] = [
     path: "/python-sdk/markdown-extraction",
   },
   {
+    name: "Field Extraction",
+    category: "Extraction",
+    description:
+      "Pull labeled fields into clean values — native key-value regions plus schema-driven extraction with a custom prompt",
+    path: "/python-sdk/field-extraction",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
