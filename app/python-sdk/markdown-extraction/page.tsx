@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
@@ -86,11 +87,13 @@ export default function MarkdownExtractionPage() {
       <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
         {result && (
           <>
-            {/* rehype-raw renders the embedded HTML tables in the SDK's Markdown. Safe here: the
-                Markdown is Claude's transcription of a curated sample doc, not user-supplied HTML. */}
+            {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
+                rehype-sanitize (after raw) strips scripts and event-handler attributes so a
+                malicious/uploaded document transcribed by the VLM cannot inject active HTML.
+                The default sanitize schema still permits table/thead/tr/td/th. */}
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
+              rehypePlugins={[rehypeRaw, rehypeSanitize]}
             >
               {result.markdown}
             </ReactMarkdown>
