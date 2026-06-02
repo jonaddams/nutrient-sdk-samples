@@ -137,9 +137,10 @@ export default function FieldExtractionPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {result?.requestedFields.map((name) => (
+              {result?.requestedFields.map((name, i) => (
                 <div
-                  key={name}
+                  // biome-ignore lint/suspicious/noArrayIndexKey: field names are user-editable and may duplicate
+                  key={`${name}-${i}`}
                   className="rounded-lg border border-[var(--line)] px-3 py-2"
                 >
                   <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-4)]">
