@@ -80,6 +80,34 @@ const samples: Sample[] = [
     path: "/python-sdk/vlm-extraction",
   },
   {
+    name: "Table Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured tables (rows, columns, spanning cells) from an invoice via VLM-enhanced extraction with Claude",
+    path: "/python-sdk/table-extraction",
+  },
+  {
+    name: "Document to Markdown",
+    category: "Extraction",
+    description:
+      "Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines",
+    path: "/python-sdk/markdown-extraction",
+  },
+  {
+    name: "Field Extraction",
+    category: "Extraction",
+    description:
+      "Pull labeled fields into clean values — native key-value regions plus schema-driven extraction with a custom prompt",
+    path: "/python-sdk/field-extraction",
+  },
+  {
+    name: "Image Alt Text",
+    category: "Extraction",
+    description:
+      "Generate WCAG-style accessibility descriptions for images at standard or detailed level",
+    path: "/python-sdk/alt-text",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
