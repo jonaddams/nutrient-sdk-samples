@@ -17,9 +17,6 @@ export interface ExtractionResultPanelProps {
   secondary: React.ReactNode;
   /** Triggered by the Download button. */
   onDownload: () => void;
-  /** When provided, renders an Expand/Collapse button driven by the page. */
-  expanded?: boolean;
-  onToggleExpand?: () => void;
 }
 
 const toggleBtn = (active: boolean) =>
@@ -40,8 +37,6 @@ export function ExtractionResultPanel({
   secondaryLabel,
   secondary,
   onDownload,
-  expanded,
-  onToggleExpand,
 }: ExtractionResultPanelProps) {
   const [view, setView] = useState<"primary" | "secondary">("primary");
 
@@ -74,15 +69,6 @@ export function ExtractionResultPanel({
           <button type="button" onClick={onDownload} className={actionBtn}>
             Download
           </button>
-          {onToggleExpand && (
-            <button
-              type="button"
-              onClick={onToggleExpand}
-              className={actionBtn}
-            >
-              {expanded ? "Collapse" : "Expand"}
-            </button>
-          )}
         </div>
       </div>
       <div className="flex-1 overflow-auto bg-[var(--bg-elev)]">
