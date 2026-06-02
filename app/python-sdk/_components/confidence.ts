@@ -1,3 +1,6 @@
+// Confidence thresholds calibrated against Nutrient OCR/VLM output:
+// >= 0.7 reliable (green), 0.4-0.7 marginal (yellow), < 0.4 low (red).
+
 /** Tailwind text-color class for an OCR/VLM confidence score in [0,1]. */
 export function confidenceColor(c: number): string {
   if (c >= 0.7) return "text-[var(--data-green)]";
