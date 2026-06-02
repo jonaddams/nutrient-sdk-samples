@@ -69,4 +69,16 @@ describe("buildGrid", () => {
     expect(grid).toHaveLength(1);
     expect(grid[0]).toHaveLength(1);
   });
+
+  it("drops a covered anchor when a spanning cell overlaps it (spanning cell wins)", () => {
+    const cells = [cell(0, 0, "wide", { colSpan: 2 }), cell(0, 1, "covered")];
+    const grid = buildGrid(cells, 1, 2);
+    expect(grid[0][0]?.text).toBe("wide");
+    expect(grid[0][1]).toBeNull(); // the "covered" anchor is dropped
+  });
+
+  it("returns an empty array for non-positive dimensions", () => {
+    expect(buildGrid([cell(0, 0, "x")], 0, 3)).toEqual([]);
+    expect(buildGrid([cell(0, 0, "x")], -1, 2)).toEqual([]);
+  });
 });

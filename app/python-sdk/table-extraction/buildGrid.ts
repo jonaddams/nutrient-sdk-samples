@@ -32,6 +32,8 @@ export function buildGrid(
   rowCount: number,
   columnCount: number,
 ): (Cell | null)[][] {
+  if (rowCount <= 0 || columnCount <= 0) return [];
+
   const grid: (Cell | null)[][] = Array.from({ length: rowCount }, () =>
     Array.from({ length: columnCount }, () => null as Cell | null),
   );
@@ -49,6 +51,8 @@ export function buildGrid(
   }
 
   // Null out positions covered by a span, leaving only the anchor cell.
+  // If two anchor cells overlap, the spanning cell wins and the covered
+  // anchor is dropped (acceptable for well-formed SDK output).
   for (const c of cells) {
     if (
       c.row < 0 ||

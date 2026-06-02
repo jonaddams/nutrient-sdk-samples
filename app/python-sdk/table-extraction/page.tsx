@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
 import { confidenceBg, confidenceColor } from "../_components/confidence";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
@@ -85,62 +85,75 @@ export default function TableExtractionPage() {
     ? result.tables.reduce((n, t) => n + t.cells.length, 0)
     : 0;
 
-  const renderCellText = (c: Cell) =>
-    c.confidence < 0.7 ? (
-      <span
-        className="underline decoration-dotted decoration-yellow-500 dark:decoration-yellow-400"
-        title={`${Math.round(c.confidence * 100)}% confidence`}
-      >
-        {c.text}
-      </span>
-    ) : (
-      c.text
-    );
-
-  const formatted = (
-    <div className="p-4 space-y-6">
-      {result?.tables.map((table, ti) => {
-        const grid = buildGrid(table.cells, table.rowCount, table.columnCount);
-        return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: table index is stable positional key
-          <div key={ti} className="space-y-1">
-            <div className="text-xs text-[var(--ink-3)]">
-              Table {ti + 1} — {table.rowCount}×{table.columnCount}
-            </div>
-            <table className="border-collapse text-sm text-[var(--ink-2)]">
-              <tbody>
-                {grid.map((row, ri) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: row index is stable grid position
-                  <tr key={ri}>
-                    {row.map((c, ci) =>
-                      c === null ? null : (
-                        <td
-                          // biome-ignore lint/suspicious/noArrayIndexKey: column index is stable grid position
-                          key={ci}
-                          rowSpan={c.rowSpan > 1 ? c.rowSpan : undefined}
-                          colSpan={c.colSpan > 1 ? c.colSpan : undefined}
-                          className={`border border-[var(--line)] px-2 py-1 align-top ${confidenceBg(
-                            c.confidence,
-                          )} ${confidenceColor(c.confidence)}`}
-                        >
-                          {renderCellText(c)}
-                        </td>
-                      ),
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
-    </div>
+  const renderCellText = useCallback(
+    (c: Cell) =>
+      c.confidence < 0.7 ? (
+        <span
+          className="underline decoration-dotted decoration-yellow-500 dark:decoration-yellow-400"
+          title={`${Math.round(c.confidence * 100)}% confidence`}
+        >
+          {c.text}
+        </span>
+      ) : (
+        c.text
+      ),
+    [],
   );
 
-  const raw = (
-    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-      {result ? JSON.stringify(result, null, 2) : ""}
-    </pre>
+  const formatted = useMemo(
+    () => (
+      <div className="p-4 space-y-6">
+        {result?.tables.map((table, ti) => {
+          const grid = buildGrid(
+            table.cells,
+            table.rowCount,
+            table.columnCount,
+          );
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: table index is stable positional key
+            <div key={ti} className="space-y-1">
+              <div className="text-xs text-[var(--ink-3)]">
+                Table {ti + 1} — {table.rowCount}×{table.columnCount}
+              </div>
+              <table className="border-collapse text-sm text-[var(--ink-2)]">
+                <tbody>
+                  {grid.map((row, ri) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: row index is stable grid position
+                    <tr key={ri}>
+                      {row.map((c, ci) =>
+                        c === null ? null : (
+                          <td
+                            // biome-ignore lint/suspicious/noArrayIndexKey: column index is stable grid position
+                            key={ci}
+                            rowSpan={c.rowSpan > 1 ? c.rowSpan : undefined}
+                            colSpan={c.colSpan > 1 ? c.colSpan : undefined}
+                            className={`border border-[var(--line)] px-2 py-1 align-top ${confidenceBg(
+                              c.confidence,
+                            )} ${confidenceColor(c.confidence)}`}
+                          >
+                            {renderCellText(c)}
+                          </td>
+                        ),
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    ),
+    [result, renderCellText],
+  );
+
+  const raw = useMemo(
+    () => (
+      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+        {result ? JSON.stringify(result, null, 2) : ""}
+      </pre>
+    ),
+    [result],
   );
 
   return (
@@ -160,6 +173,7 @@ export default function TableExtractionPage() {
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 <select
+                  aria-label="Source document"
                   value={selectedIndex}
                   onChange={(e) => {
                     setSelectedIndex(Number(e.target.value));
@@ -193,7 +207,11 @@ export default function TableExtractionPage() {
             <div className="flex-1 min-w-0 flex flex-col">
               <div className={`relative ${result ? "h-[55%]" : "flex-1"}`}>
                 {processing && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
+                  <div
+                    className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60"
+                    role="status"
+                    aria-label="Extracting tables, please wait"
+                  >
                     <div className="text-center space-y-2">
                       <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                       <p className="text-sm text-[var(--ink-3)]">
