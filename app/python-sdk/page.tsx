@@ -87,6 +87,13 @@ const samples: Sample[] = [
     path: "/python-sdk/table-extraction",
   },
   {
+    name: "Document to Markdown",
+    category: "Extraction",
+    description:
+      "Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines",
+    path: "/python-sdk/markdown-extraction",
+  },
+  {
     name: "Word Template Generation",
     category: "Templates",
     description:
