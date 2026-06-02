@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -81,20 +81,33 @@ export default function MarkdownExtractionPage() {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
-  const formatted = (
-    <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
-      {result && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-          {result.markdown}
-        </ReactMarkdown>
-      )}
-    </div>
+  const formatted = useMemo(
+    () => (
+      <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
+        {result && (
+          <>
+            {/* rehype-raw renders the embedded HTML tables in the SDK's Markdown. Safe here: the
+                Markdown is Claude's transcription of a curated sample doc, not user-supplied HTML. */}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            >
+              {result.markdown}
+            </ReactMarkdown>
+          </>
+        )}
+      </div>
+    ),
+    [result],
   );
 
-  const raw = (
-    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-      {result?.markdown ?? ""}
-    </pre>
+  const raw = useMemo(
+    () => (
+      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+        {result?.markdown ?? ""}
+      </pre>
+    ),
+    [result],
   );
 
   return (
