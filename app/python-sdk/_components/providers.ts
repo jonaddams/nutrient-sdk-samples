@@ -52,5 +52,7 @@ export function outcomeEntries<T>(
 
 /** "4234 -> 4.2s" — per-provider timing badge text. */
 export function formatTiming(ms: number): string {
+  // Math.round half-up first: a plain (ms / 1000).toFixed(1) fails at e.g.
+  // 950ms because IEEE-754 stores 0.95 as 0.9499... and toFixed rounds DOWN.
   return `${(Math.round(ms / 100) / 10).toFixed(1)}s`;
 }
