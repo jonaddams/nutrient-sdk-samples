@@ -21,7 +21,8 @@ export function ProviderErrorCard({
       </div>
       <div className="flex-1 overflow-auto bg-[var(--bg-elev)] p-4">
         <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs whitespace-pre-wrap">
-          {PROVIDER_LABELS[provider]} request failed: {message.slice(0, 300)}
+          {PROVIDER_LABELS[provider]} request failed:{" "}
+          {message.length > 300 ? `${message.slice(0, 300)}…` : message}
         </div>
       </div>
     </div>

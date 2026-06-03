@@ -21,10 +21,10 @@ export function ProviderToggle({
   disabled,
 }: ProviderToggleProps) {
   return (
-    <div>
-      <span className="block text-xs font-medium text-[var(--ink-3)] mb-1">
+    <fieldset className="border-0 p-0 m-0 min-w-0">
+      <legend className="block text-xs font-medium text-[var(--ink-3)] mb-1">
         VLM provider
-      </span>
+      </legend>
       <div className="flex rounded-md border border-[var(--line-strong)] overflow-hidden">
         {MODES.map((m) => (
           <button
@@ -32,6 +32,7 @@ export function ProviderToggle({
             type="button"
             onClick={() => onChange(m.value)}
             disabled={disabled}
+            aria-pressed={value === m.value}
             className={`flex-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
               value === m.value
                 ? "bg-[var(--surface)] text-[var(--ink)]"
@@ -42,6 +43,6 @@ export function ProviderToggle({
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
