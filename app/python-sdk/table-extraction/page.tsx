@@ -1,10 +1,20 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
 import { confidenceBg, confidenceColor } from "../_components/confidence";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 import { buildGrid, type Cell, type TableResult } from "./buildGrid";
 
 const API_BASE =
@@ -29,17 +39,19 @@ interface TablesResult {
 
 export default function TableExtractionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<TablesResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<TablesResult>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_DOCUMENTS[selectedIndex];
 
-  const handleProcess = async () => {
-    setProcessing(true);
-    setError(null);
-    setResult(null);
-    try {
+  const handleProcess = () =>
+    runAll(mode, async (provider: Provider) => {
       const response = await fetch(selected.path);
       const blob = await response.blob();
       const file = new File([blob], selected.filename);
@@ -47,7 +59,7 @@ export default function TableExtractionPage() {
       formData.append("file", file);
 
       const res = await fetch(
-        `${API_BASE}/api/extraction/tables?provider=claude`,
+        `${API_BASE}/api/extraction/tables?provider=${provider}`,
         {
           method: "POST",
           body: formData,
@@ -60,30 +72,23 @@ export default function TableExtractionPage() {
           .catch(() => null);
         throw new Error(detail ?? `API returned ${res.status}`);
       }
-      setResult((await res.json()) as TablesResult);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Table extraction failed");
-    } finally {
-      setProcessing(false);
-    }
-  };
+      return (await res.json()) as TablesResult;
+    });
 
-  const handleDownload = () => {
-    if (!result) return;
+  const handleDownload = (provider: Provider, result: TablesResult) => {
     const blob = new Blob([JSON.stringify(result, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-tables.json`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-tables-${provider}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
-  const totalCells = result
-    ? result.tables.reduce((n, t) => n + t.cells.length, 0)
-    : 0;
+  const totalCells = (result: TablesResult) =>
+    result.tables.reduce((n, t) => n + t.cells.length, 0);
 
   const renderCellText = useCallback(
     (c: Cell) =>
@@ -100,10 +105,10 @@ export default function TableExtractionPage() {
     [],
   );
 
-  const formatted = useMemo(
-    () => (
+  const renderFormatted = useCallback(
+    (result: TablesResult) => (
       <div className="p-4 space-y-6">
-        {result?.tables.map((table, ti) => {
+        {result.tables.map((table, ti) => {
           const grid = buildGrid(
             table.cells,
             table.rowCount,
@@ -144,23 +149,23 @@ export default function TableExtractionPage() {
         })}
       </div>
     ),
-    [result, renderCellText],
+    [renderCellText],
   );
 
-  const raw = useMemo(
-    () => (
+  const renderRaw = useCallback(
+    (result: TablesResult) => (
       <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {result ? JSON.stringify(result, null, 2) : ""}
+        {JSON.stringify(result, null, 2)}
       </pre>
     ),
-    [result],
+    [],
   );
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Table Extraction"
-        description="Extract structured tables — rows, columns, and spanning cells — from an invoice via VLM-enhanced extraction with Claude."
+        description="Extract structured tables — rows, columns, and spanning cells — from an invoice via VLM-enhanced extraction with Claude or OpenAI."
       />
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
@@ -177,8 +182,7 @@ export default function TableExtractionPage() {
                   value={selectedIndex}
                   onChange={(e) => {
                     setSelectedIndex(Number(e.target.value));
-                    setResult(null);
-                    setError(null);
+                    reset();
                   }}
                   className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
@@ -188,6 +192,11 @@ export default function TableExtractionPage() {
                     </option>
                   ))}
                 </select>
+                <ProviderToggle
+                  value={mode}
+                  onChange={setMode}
+                  disabled={processing}
+                />
                 <button
                   type="button"
                   onClick={handleProcess}
@@ -197,15 +206,12 @@ export default function TableExtractionPage() {
                 >
                   {processing ? "Extracting..." : "Extract Tables"}
                 </button>
-                {error && (
-                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
-                    {error}
-                  </div>
-                )}
               </div>
             </div>
             <div className="flex-1 min-w-0 flex flex-col">
-              <div className={`relative ${result ? "h-[55%]" : "flex-1"}`}>
+              <div
+                className={`relative ${entries.length > 0 ? "h-[55%]" : "flex-1"}`}
+              >
                 {processing && (
                   <div
                     className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60"
@@ -222,17 +228,33 @@ export default function TableExtractionPage() {
                 )}
                 <PdfViewer document={selected.path} />
               </div>
-              {result && (
-                <div className="border-t border-[var(--line)] h-[45%]">
-                  <ExtractionResultPanel
-                    title="Extracted Tables"
-                    stats={`${result.tableCount} tables | ${totalCells} cells`}
-                    primaryLabel="Formatted"
-                    primary={formatted}
-                    secondaryLabel="JSON"
-                    secondary={raw}
-                    onDownload={handleDownload}
-                  />
+              {entries.length > 0 && (
+                <div className="border-t border-[var(--line)] h-[45%] flex flex-col lg:flex-row">
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "ok" ? (
+                        <ExtractionResultPanel
+                          title="Extracted Tables"
+                          stats={`${PROVIDER_LABELS[provider]} · ${formatTiming(outcome.ms)} | ${outcome.data.tableCount} tables | ${totalCells(outcome.data)} cells`}
+                          primaryLabel="Formatted"
+                          primary={renderFormatted(outcome.data)}
+                          secondaryLabel="JSON"
+                          secondary={renderRaw(outcome.data)}
+                          onDownload={() =>
+                            handleDownload(provider, outcome.data)
+                          }
+                        />
+                      ) : (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
