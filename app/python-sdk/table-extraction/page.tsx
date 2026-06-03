@@ -105,60 +105,50 @@ export default function TableExtractionPage() {
     [],
   );
 
-  const renderFormatted = useCallback(
-    (result: TablesResult) => (
-      <div className="p-4 space-y-6">
-        {result.tables.map((table, ti) => {
-          const grid = buildGrid(
-            table.cells,
-            table.rowCount,
-            table.columnCount,
-          );
-          return (
-            // biome-ignore lint/suspicious/noArrayIndexKey: table index is stable positional key
-            <div key={ti} className="space-y-1">
-              <div className="text-xs text-[var(--ink-3)]">
-                Table {ti + 1} — {table.rowCount}×{table.columnCount}
-              </div>
-              <table className="border-collapse text-sm text-[var(--ink-2)]">
-                <tbody>
-                  {grid.map((row, ri) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: row index is stable grid position
-                    <tr key={ri}>
-                      {row.map((c, ci) =>
-                        c === null ? null : (
-                          <td
-                            // biome-ignore lint/suspicious/noArrayIndexKey: column index is stable grid position
-                            key={ci}
-                            rowSpan={c.rowSpan > 1 ? c.rowSpan : undefined}
-                            colSpan={c.colSpan > 1 ? c.colSpan : undefined}
-                            className={`border border-[var(--line)] px-2 py-1 align-top ${confidenceBg(
-                              c.confidence,
-                            )} ${confidenceColor(c.confidence)}`}
-                          >
-                            {renderCellText(c)}
-                          </td>
-                        ),
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+  const renderFormatted = (result: TablesResult) => (
+    <div className="p-4 space-y-6">
+      {result.tables.map((table, ti) => {
+        const grid = buildGrid(table.cells, table.rowCount, table.columnCount);
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: table index is stable positional key
+          <div key={ti} className="space-y-1">
+            <div className="text-xs text-[var(--ink-3)]">
+              Table {ti + 1} — {table.rowCount}×{table.columnCount}
             </div>
-          );
-        })}
-      </div>
-    ),
-    [renderCellText],
+            <table className="border-collapse text-sm text-[var(--ink-2)]">
+              <tbody>
+                {grid.map((row, ri) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: row index is stable grid position
+                  <tr key={ri}>
+                    {row.map((c, ci) =>
+                      c === null ? null : (
+                        <td
+                          // biome-ignore lint/suspicious/noArrayIndexKey: column index is stable grid position
+                          key={ci}
+                          rowSpan={c.rowSpan > 1 ? c.rowSpan : undefined}
+                          colSpan={c.colSpan > 1 ? c.colSpan : undefined}
+                          className={`border border-[var(--line)] px-2 py-1 align-top ${confidenceBg(
+                            c.confidence,
+                          )} ${confidenceColor(c.confidence)}`}
+                        >
+                          {renderCellText(c)}
+                        </td>
+                      ),
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
+    </div>
   );
 
-  const renderRaw = useCallback(
-    (result: TablesResult) => (
-      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {JSON.stringify(result, null, 2)}
-      </pre>
-    ),
-    [],
+  const renderRaw = (result: TablesResult) => (
+    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+      {JSON.stringify(result, null, 2)}
+    </pre>
   );
 
   return (

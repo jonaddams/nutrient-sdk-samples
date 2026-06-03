@@ -41,7 +41,7 @@ export function ExtractionResultPanel({
   const [view, setView] = useState<"primary" | "secondary">("primary");
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-semibold text-[var(--ink-2)]">{title}</h3>

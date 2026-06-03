@@ -130,79 +130,72 @@ export default function FieldExtractionPage() {
     [],
   );
 
-  const renderFormatted = useCallback(
-    (result: FieldsResult) => (
-      <div className="p-4 space-y-5">
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
-            Schema-driven fields
-          </h4>
-          {result.parseError ? (
-            <div className="text-xs text-[var(--code-coral)] space-y-2">
-              <p>The model did not return valid JSON. Raw response:</p>
-              <pre className="whitespace-pre-wrap font-mono text-[var(--ink-3)]">
-                {result.parseError}
-              </pre>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {result.requestedFields.map((name, i) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: field names are user-editable and may duplicate
-                  key={`${name}-${i}`}
-                  className="rounded-lg border border-[var(--line)] px-3 py-2"
-                >
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-4)]">
-                    {name}
-                  </div>
-                  <div className="text-sm">
-                    {renderValue(result.schemaFields[name])}
-                  </div>
+  const renderFormatted = (result: FieldsResult) => (
+    <div className="p-4 space-y-5">
+      <div>
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
+          Schema-driven fields
+        </h4>
+        {result.parseError ? (
+          <div className="text-xs text-[var(--code-coral)] space-y-2">
+            <p>The model did not return valid JSON. Raw response:</p>
+            <pre className="whitespace-pre-wrap font-mono text-[var(--ink-3)]">
+              {result.parseError}
+            </pre>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {result.requestedFields.map((name, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: field names are user-editable and may duplicate
+                key={`${name}-${i}`}
+                className="rounded-lg border border-[var(--line)] px-3 py-2"
+              >
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-4)]">
+                  {name}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
-            Native KEY_VALUE_REGION
-          </h4>
-          {result.nativeRegions.length === 0 ? (
-            <div className="text-xs text-[var(--ink-3)] rounded-lg border border-[var(--line)] px-3 py-2 leading-relaxed">
-              The SDK&apos;s native KEY_VALUE_REGION returned no tagged regions
-              for this document. The schema-driven result above is produced by a
-              custom VLM prompt — which is why this demo pairs the two
-              approaches.
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {result.nativeRegions.map((r, i) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: native regions are positional
-                  key={i}
-                  className="text-sm text-[var(--ink-2)] rounded border border-[var(--line)] px-2 py-1"
-                >
-                  <span className="text-[10px] uppercase text-[var(--ink-4)] mr-2">
-                    {r.role || r.type}
-                  </span>
-                  {r.text}
+                <div className="text-sm">
+                  {renderValue(result.schemaFields[name])}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    ),
-    [renderValue],
+      <div>
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
+          Native KEY_VALUE_REGION
+        </h4>
+        {result.nativeRegions.length === 0 ? (
+          <div className="text-xs text-[var(--ink-3)] rounded-lg border border-[var(--line)] px-3 py-2 leading-relaxed">
+            The SDK&apos;s native KEY_VALUE_REGION returned no tagged regions
+            for this document. The schema-driven result above is produced by a
+            custom VLM prompt — which is why this demo pairs the two approaches.
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {result.nativeRegions.map((r, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: native regions are positional
+                key={i}
+                className="text-sm text-[var(--ink-2)] rounded border border-[var(--line)] px-2 py-1"
+              >
+                <span className="text-[10px] uppercase text-[var(--ink-4)] mr-2">
+                  {r.role || r.type}
+                </span>
+                {r.text}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 
-  const renderRaw = useCallback(
-    (result: FieldsResult) => (
-      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {JSON.stringify(result, null, 2)}
-      </pre>
-    ),
-    [],
+  const renderRaw = (result: FieldsResult) => (
+    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+      {JSON.stringify(result, null, 2)}
+    </pre>
   );
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
@@ -86,31 +86,25 @@ export default function MarkdownExtractionPage() {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
-  const renderFormatted = useCallback(
-    (result: MarkdownResult) => (
-      <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
-        {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
-            rehype-sanitize (after raw) strips scripts and event-handler attributes so a
-            malicious/uploaded document transcribed by the VLM cannot inject active HTML.
-            The default sanitize schema still permits table/thead/tr/td/th. */}
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw, rehypeSanitize]}
-        >
-          {result.markdown}
-        </ReactMarkdown>
-      </div>
-    ),
-    [],
+  const renderFormatted = (result: MarkdownResult) => (
+    <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
+      {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
+          rehype-sanitize (after raw) strips scripts and event-handler attributes so a
+          malicious/uploaded document transcribed by the VLM cannot inject active HTML.
+          The default sanitize schema still permits table/thead/tr/td/th. */}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize]}
+      >
+        {result.markdown}
+      </ReactMarkdown>
+    </div>
   );
 
-  const renderRaw = useCallback(
-    (result: MarkdownResult) => (
-      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {result.markdown}
-      </pre>
-    ),
-    [],
+  const renderRaw = (result: MarkdownResult) => (
+    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+      {result.markdown}
+    </pre>
   );
 
   return (
