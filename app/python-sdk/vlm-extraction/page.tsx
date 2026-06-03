@@ -167,6 +167,7 @@ export default function VlmExtractionPage() {
                 <select
                   value={selectedIndex}
                   onChange={(e) => handleDocumentChange(Number(e.target.value))}
+                  aria-label="Source document"
                   className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
                   {SAMPLE_DOCUMENTS.map((doc, i) => (
@@ -176,7 +177,14 @@ export default function VlmExtractionPage() {
                   ))}
                 </select>
 
-                <ProviderToggle value={mode} onChange={setMode} disabled={processing} />
+                <ProviderToggle
+                  value={mode}
+                  onChange={(m) => {
+                    setMode(m);
+                    setResultExpanded(false);
+                  }}
+                  disabled={processing}
+                />
 
                 <button
                   type="button"
