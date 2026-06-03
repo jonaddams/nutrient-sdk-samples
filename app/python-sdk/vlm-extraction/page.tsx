@@ -316,6 +316,7 @@ export default function VlmExtractionPage() {
                             <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)] space-y-3">
                               {outcome.data.textElements.map((el, idx) => (
                                 <div
+                                  // biome-ignore lint/suspicious/noArrayIndexKey: elements are positional within a single extraction result
                                   key={`${idx}-${el.readingOrder}`}
                                   className="rounded-lg border border-[var(--line)] overflow-hidden"
                                 >
