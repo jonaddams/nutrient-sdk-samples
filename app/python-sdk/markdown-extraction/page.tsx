@@ -1,13 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -30,17 +40,19 @@ interface MarkdownResult {
 
 export default function MarkdownExtractionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<MarkdownResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<MarkdownResult>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_DOCUMENTS[selectedIndex];
 
-  const handleProcess = async () => {
-    setProcessing(true);
-    setError(null);
-    setResult(null);
-    try {
+  const handleProcess = () =>
+    runAll(mode, async (provider: Provider) => {
       const response = await fetch(selected.path);
       const blob = await response.blob();
       const file = new File([blob], selected.filename);
@@ -48,7 +60,7 @@ export default function MarkdownExtractionPage() {
       formData.append("file", file);
 
       const res = await fetch(
-        `${API_BASE}/api/extraction/markdown?provider=claude`,
+        `${API_BASE}/api/extraction/markdown?provider=${provider}`,
         {
           method: "POST",
           body: formData,
@@ -61,63 +73,51 @@ export default function MarkdownExtractionPage() {
           .catch(() => null);
         throw new Error(detail ?? `API returned ${res.status}`);
       }
-      setResult((await res.json()) as MarkdownResult);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Markdown extraction failed",
-      );
-    } finally {
-      setProcessing(false);
-    }
-  };
+      return (await res.json()) as MarkdownResult;
+    });
 
-  const handleDownload = () => {
-    if (!result) return;
+  const handleDownload = (provider: Provider, result: MarkdownResult) => {
     const blob = new Blob([result.markdown], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}.md`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-${provider}.md`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
-  const formatted = useMemo(
-    () => (
+  const renderFormatted = useCallback(
+    (result: MarkdownResult) => (
       <div className="p-4 max-w-none text-[var(--ink-2)] [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--line)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--line)] [&_th]:px-2 [&_th]:py-1">
-        {result && (
-          <>
-            {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
-                rehype-sanitize (after raw) strips scripts and event-handler attributes so a
-                malicious/uploaded document transcribed by the VLM cannot inject active HTML.
-                The default sanitize schema still permits table/thead/tr/td/th. */}
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw, rehypeSanitize]}
-            >
-              {result.markdown}
-            </ReactMarkdown>
-          </>
-        )}
+        {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
+            rehype-sanitize (after raw) strips scripts and event-handler attributes so a
+            malicious/uploaded document transcribed by the VLM cannot inject active HTML.
+            The default sanitize schema still permits table/thead/tr/td/th. */}
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw, rehypeSanitize]}
+        >
+          {result.markdown}
+        </ReactMarkdown>
       </div>
     ),
-    [result],
+    [],
   );
 
-  const raw = useMemo(
-    () => (
+  const renderRaw = useCallback(
+    (result: MarkdownResult) => (
       <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {result?.markdown ?? ""}
+        {result.markdown}
       </pre>
     ),
-    [result],
+    [],
   );
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Document to Markdown"
-        description="Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines, via VLM-enhanced extraction with Claude."
+        description="Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines, via VLM-enhanced extraction with Claude or OpenAI."
       />
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
@@ -134,8 +134,7 @@ export default function MarkdownExtractionPage() {
                   value={selectedIndex}
                   onChange={(e) => {
                     setSelectedIndex(Number(e.target.value));
-                    setResult(null);
-                    setError(null);
+                    reset();
                   }}
                   className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
@@ -145,6 +144,11 @@ export default function MarkdownExtractionPage() {
                     </option>
                   ))}
                 </select>
+                <ProviderToggle
+                  value={mode}
+                  onChange={setMode}
+                  disabled={processing}
+                />
                 <button
                   type="button"
                   onClick={handleProcess}
@@ -154,15 +158,12 @@ export default function MarkdownExtractionPage() {
                 >
                   {processing ? "Converting..." : "Convert to Markdown"}
                 </button>
-                {error && (
-                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
-                    {error}
-                  </div>
-                )}
               </div>
             </div>
             <div className="flex-1 min-w-0 flex flex-col">
-              <div className={`relative ${result ? "h-[55%]" : "flex-1"}`}>
+              <div
+                className={`relative ${entries.length > 0 ? "h-[55%]" : "flex-1"}`}
+              >
                 {processing && (
                   <div
                     role="status"
@@ -179,17 +180,33 @@ export default function MarkdownExtractionPage() {
                 )}
                 <PdfViewer document={selected.path} />
               </div>
-              {result && (
-                <div className="border-t border-[var(--line)] h-[45%]">
-                  <ExtractionResultPanel
-                    title="Markdown Output"
-                    stats={`${result.charCount.toLocaleString()} characters`}
-                    primaryLabel="Rendered"
-                    primary={formatted}
-                    secondaryLabel="Markdown"
-                    secondary={raw}
-                    onDownload={handleDownload}
-                  />
+              {entries.length > 0 && (
+                <div className="border-t border-[var(--line)] h-[45%] flex flex-col lg:flex-row">
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "ok" ? (
+                        <ExtractionResultPanel
+                          title="Markdown Output"
+                          stats={`${PROVIDER_LABELS[provider]} · ${formatTiming(outcome.ms)} | ${outcome.data.charCount.toLocaleString()} characters`}
+                          primaryLabel="Rendered"
+                          primary={renderFormatted(outcome.data)}
+                          secondaryLabel="Markdown"
+                          secondary={renderRaw(outcome.data)}
+                          onDownload={() =>
+                            handleDownload(provider, outcome.data)
+                          }
+                        />
+                      ) : (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
