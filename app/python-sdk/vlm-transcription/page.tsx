@@ -2,7 +2,17 @@
 
 import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -50,21 +60,19 @@ interface DescribeResult {
 export default function VlmTranscriptionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<DescribeResult | null>(null);
-  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<DescribeResult>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_DOCUMENTS[selectedIndex] as (typeof SAMPLE_DOCUMENTS)[number];
 
-  const handleTranscribe = async () => {
-    setProcessing(true);
-    setError(null);
-    setResult(null);
-    setElapsedMs(null);
-    const start = performance.now();
-
-    try {
+  const handleTranscribe = () =>
+    runAll(mode, async (provider: Provider) => {
       const sampleRes = await fetch(selected.path);
       const blob = await sampleRes.blob();
       const file = new File([blob], selected.filename);
@@ -72,7 +80,7 @@ export default function VlmTranscriptionPage() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("prompt", prompt);
-      formData.append("provider", "claude");
+      formData.append("provider", provider);
 
       const apiRes = await fetch(`${API_BASE}/api/extraction/describe`, {
         method: "POST",
@@ -87,22 +95,16 @@ export default function VlmTranscriptionPage() {
         throw new Error(detail ?? `API returned ${apiRes.status}`);
       }
 
-      const data: DescribeResult = await apiRes.json();
-      setResult(data);
-      setElapsedMs(Math.round(performance.now() - start));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Transcription failed");
-    } finally {
-      setProcessing(false);
-    }
-  };
+      return (await apiRes.json()) as DescribeResult;
+    });
 
-  const handleDocumentChange = useCallback((index: number) => {
-    setSelectedIndex(index);
-    setResult(null);
-    setElapsedMs(null);
-    setError(null);
-  }, []);
+  const handleDocumentChange = useCallback(
+    (index: number) => {
+      setSelectedIndex(index);
+      reset();
+    },
+    [reset],
+  );
 
   const handleResetPrompt = useCallback(() => {
     setPrompt(DEFAULT_PROMPT);
@@ -112,7 +114,7 @@ export default function VlmTranscriptionPage() {
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="VLM Transcription"
-        description="Transcribe handwriting via the Nutrient SDK's Vision.describe() routed through Claude. Edit the prompt to customize what the model does — transcription, summarization, structured extraction."
+        description="Transcribe handwriting via the Nutrient SDK's Vision.describe() routed through Claude or OpenAI. Edit the prompt to customize what the model does — transcription, summarization, structured extraction."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
@@ -179,13 +181,13 @@ export default function VlmTranscriptionPage() {
                   </p>
                 </div>
 
+                <ProviderToggle
+                  value={mode}
+                  onChange={setMode}
+                  disabled={processing}
+                />
+
                 <div className="text-[11px] text-[var(--ink-3)] space-y-1">
-                  <div className="flex justify-between">
-                    <span>Provider</span>
-                    <span className="font-medium text-[var(--ink-2)]">
-                      Claude
-                    </span>
-                  </div>
                   <div className="flex justify-between">
                     <span>Endpoint</span>
                     <span className="font-mono text-[var(--ink-2)]">
@@ -205,25 +207,20 @@ export default function VlmTranscriptionPage() {
                 >
                   {processing ? "Transcribing…" : "Transcribe"}
                 </button>
-                {error && (
-                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
-                    {error}
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Right Panel — Viewer + Result */}
             <div className="flex-1 min-w-0 flex flex-col">
               <div
-                className={`relative ${result ? "h-[50%]" : "flex-1"} border-b border-[var(--line)]`}
+                className={`relative ${entries.length > 0 ? "h-[50%]" : "flex-1"} border-b border-[var(--line)]`}
               >
                 {processing && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
                     <div className="text-center space-y-2">
                       <div className="inline-block w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                       <p className="text-sm text-[var(--ink-3)]">
-                        Asking Claude to transcribe…
+                        Asking the VLM to transcribe…
                       </p>
                     </div>
                   </div>
@@ -235,34 +232,46 @@ export default function VlmTranscriptionPage() {
                 />
               </div>
 
-              {result && (
-                <div className="h-[50%] flex flex-col">
-                  <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-sm font-semibold text-[var(--ink-2)]">
-                        Transcription
-                      </h3>
-                      <span className="text-xs text-[var(--ink-3)]">
-                        provider:{" "}
-                        <span className="font-medium text-[var(--ink-2)]">
-                          {result.provider}
-                        </span>
-                        {elapsedMs !== null && (
-                          <>
-                            {" · "}
-                            {(elapsedMs / 1000).toFixed(1)}s
-                          </>
-                        )}
-                        {" · "}
-                        {result.text.length} chars
-                      </span>
+              {entries.length > 0 && (
+                <div className="h-[50%] flex flex-col lg:flex-row">
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 flex flex-col border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "error" ? (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-sm font-semibold text-[var(--ink-2)]">
+                                Transcription
+                              </h3>
+                              <span className="text-xs text-[var(--ink-3)]">
+                                provider:{" "}
+                                <span className="font-medium text-[var(--ink-2)]">
+                                  {PROVIDER_LABELS[provider]}
+                                </span>
+                                {" · "}
+                                {formatTiming(outcome.ms)}
+                                {" · "}
+                                {outcome.data.text.length} chars
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)]">
+                            <pre className="text-sm text-[var(--ink)] whitespace-pre-wrap leading-relaxed font-sans">
+                              {outcome.data.text}
+                            </pre>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </div>
-                  <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)]">
-                    <pre className="text-sm text-[var(--ink)] whitespace-pre-wrap leading-relaxed font-sans">
-                      {result.text}
-                    </pre>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>

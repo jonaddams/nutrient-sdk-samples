@@ -1,8 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -30,13 +40,14 @@ async function describe(
   imgPath: string,
   filename: string,
   level: Level,
+  provider: Provider,
 ): Promise<DescribeResult> {
   const response = await fetch(imgPath);
   const blob = await response.blob();
   const file = new File([blob], filename);
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("provider", "claude");
+  formData.append("provider", provider);
   formData.append("level", level);
 
   const res = await fetch(`${API_BASE}/api/extraction/describe`, {
@@ -56,85 +67,72 @@ async function describe(
 export default function AltTextPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [level, setLevel] = useState<Level>("detailed");
-  const [processing, setProcessing] = useState(false);
-  const [results, setResults] = useState<DescribeResult[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<DescribeResult[]>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_IMAGES[selectedIndex];
 
-  const run = async (mode: "single" | "compare") => {
-    setProcessing(true);
-    setError(null);
-    setResults(null);
-    try {
-      if (mode === "compare") {
-        const [std, det] = await Promise.all([
-          describe(selected.path, selected.filename, "standard"),
-          describe(selected.path, selected.filename, "detailed"),
-        ]);
-        setResults([std, det]);
-      } else {
-        setResults([await describe(selected.path, selected.filename, level)]);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Description failed");
-    } finally {
-      setProcessing(false);
-    }
-  };
+  const run = (kind: "single" | "compare") =>
+    runAll(mode, async (provider: Provider) =>
+      kind === "compare"
+        ? Promise.all([
+            describe(selected.path, selected.filename, "standard", provider),
+            describe(selected.path, selected.filename, "detailed", provider),
+          ])
+        : [await describe(selected.path, selected.filename, level, provider)],
+    );
 
-  const handleDownload = () => {
-    if (!results) return;
+  const handleDownload = (provider: Provider, results: DescribeResult[]) => {
     const blob = new Blob([JSON.stringify(results, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-alt-text.json`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-alt-text-${provider}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
-  const formatted = useMemo(
-    () => (
-      <div className="p-4">
-        <div
-          className={`grid gap-4 ${(results?.length ?? 0) > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}
-        >
-          {results?.map((r) => (
-            <div
-              key={r.level}
-              className="rounded-lg border border-[var(--line)] p-3"
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
-                {r.level} description
-              </div>
-              <p className="text-sm text-[var(--ink-2)] leading-relaxed whitespace-pre-wrap">
-                {r.text}
-              </p>
+  const renderFormatted = (results: DescribeResult[]) => (
+    <div className="p-4">
+      <div
+        className={`grid gap-4 ${results.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}
+      >
+        {results.map((r) => (
+          <div
+            key={r.level}
+            className="rounded-lg border border-[var(--line)] p-3"
+          >
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
+              {r.level} description
             </div>
-          ))}
-        </div>
+            <p className="text-sm text-[var(--ink-2)] leading-relaxed whitespace-pre-wrap">
+              {r.text}
+            </p>
+          </div>
+        ))}
       </div>
-    ),
-    [results],
+    </div>
   );
 
-  const raw = useMemo(
-    () => (
-      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {results ? JSON.stringify(results, null, 2) : ""}
-      </pre>
-    ),
-    [results],
+  const renderRaw = (results: DescribeResult[]) => (
+    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+      {JSON.stringify(results, null, 2)}
+    </pre>
   );
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Image Alt Text"
-        description="Generate WCAG-style accessibility descriptions for images at standard or detailed level, via Vision.describe() with Claude."
+        description="Generate WCAG-style accessibility descriptions for images at standard or detailed level, via Vision.describe() with Claude or OpenAI."
       />
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
@@ -151,8 +149,7 @@ export default function AltTextPage() {
                   value={selectedIndex}
                   onChange={(e) => {
                     setSelectedIndex(Number(e.target.value));
-                    setResults(null);
-                    setError(null);
+                    reset();
                   }}
                   className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
@@ -183,6 +180,7 @@ export default function AltTextPage() {
                     ))}
                   </div>
                 </div>
+                <ProviderToggle value={mode} onChange={setMode} disabled={processing} />
                 <button
                   type="button"
                   onClick={() => run("single")}
@@ -195,21 +193,21 @@ export default function AltTextPage() {
                 <button
                   type="button"
                   onClick={() => run("compare")}
-                  disabled={processing}
+                  disabled={processing || mode === "both"}
+                  title={
+                    mode === "both"
+                      ? "Level comparison runs on a single provider — pick Claude or OpenAI"
+                      : undefined
+                  }
                   className="w-full px-4 py-2 text-sm font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Compare standard vs detailed
                 </button>
-                {error && (
-                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
-                    {error}
-                  </div>
-                )}
               </div>
             </div>
             <div className="flex-1 min-w-0 flex flex-col">
               <div
-                className={`relative ${results ? "h-[50%]" : "flex-1"} flex items-center justify-center bg-[var(--surface)] overflow-auto`}
+                className={`relative ${entries.length > 0 ? "h-[50%]" : "flex-1"} flex items-center justify-center bg-[var(--surface)] overflow-auto`}
               >
                 {processing && (
                   <div
@@ -232,21 +230,37 @@ export default function AltTextPage() {
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
-              {results && (
-                <div className="border-t border-[var(--line)] h-[50%]">
-                  <ExtractionResultPanel
-                    title="Generated Alt Text"
-                    stats={
-                      results.length > 1
-                        ? "standard + detailed"
-                        : results[0].level
-                    }
-                    primaryLabel="Description"
-                    primary={formatted}
-                    secondaryLabel="JSON"
-                    secondary={raw}
-                    onDownload={handleDownload}
-                  />
+              {entries.length > 0 && (
+                <div className="border-t border-[var(--line)] h-[50%] flex flex-col lg:flex-row">
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "ok" ? (
+                        <ExtractionResultPanel
+                          title="Generated Alt Text"
+                          stats={`${PROVIDER_LABELS[provider]} · ${formatTiming(outcome.ms)} | ${
+                            outcome.data.length > 1
+                              ? "standard + detailed"
+                              : outcome.data[0].level
+                          }`}
+                          primaryLabel="Description"
+                          primary={renderFormatted(outcome.data)}
+                          secondaryLabel="JSON"
+                          secondary={renderRaw(outcome.data)}
+                          onDownload={() =>
+                            handleDownload(provider, outcome.data)
+                          }
+                        />
+                      ) : (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

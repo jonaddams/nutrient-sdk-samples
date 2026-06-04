@@ -2,7 +2,17 @@
 
 import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_PYTHON_SDK_API_URL || "http://localhost:8080";
@@ -55,11 +65,16 @@ type ViewMode = "formatted" | "json";
 
 export default function VlmExtractionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<ExtractionResult | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
   const [resultExpanded, setResultExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("formatted");
-  const [error, setError] = useState<string | null>(null);
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<ExtractionResult>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_DOCUMENTS[selectedIndex] as {
     label: string;
@@ -67,13 +82,9 @@ export default function VlmExtractionPage() {
     filename: string;
   };
 
-  const handleProcess = async () => {
-    setProcessing(true);
-    setError(null);
-    setResult(null);
+  const handleProcess = () => {
     setResultExpanded(false);
-
-    try {
+    return runAll(mode, async (provider: Provider) => {
       const response = await fetch(selected.path);
       const blob = await response.blob();
       const file = new File([blob], selected.filename);
@@ -82,7 +93,7 @@ export default function VlmExtractionPage() {
       formData.append("file", file);
 
       const res = await fetch(
-        `${API_BASE}/api/extraction/vlm?provider=claude`,
+        `${API_BASE}/api/extraction/vlm?provider=${provider}`,
         {
           method: "POST",
           body: formData,
@@ -97,31 +108,27 @@ export default function VlmExtractionPage() {
         throw new Error(detail ?? `API returned ${res.status}`);
       }
 
-      const data: ExtractionResult = await res.json();
-      setResult(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "VLM extraction failed");
-    } finally {
-      setProcessing(false);
-    }
+      return (await res.json()) as ExtractionResult;
+    });
   };
 
-  const handleDocumentChange = useCallback((index: number) => {
-    setSelectedIndex(index);
-    setResult(null);
-    setResultExpanded(false);
-    setError(null);
-  }, []);
+  const handleDocumentChange = useCallback(
+    (index: number) => {
+      setSelectedIndex(index);
+      reset();
+      setResultExpanded(false);
+    },
+    [reset],
+  );
 
-  const handleDownload = () => {
-    if (!result) return;
+  const handleDownload = (provider: Provider, result: ExtractionResult) => {
     const blob = new Blob([JSON.stringify(result, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-vlm.json`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-vlm-${provider}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
@@ -142,7 +149,7 @@ export default function VlmExtractionPage() {
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="VLM-Enhanced Extraction"
-        description="Extract structured content from documents that don't have native form fields. Calls VLM-enhanced ICR with Claude live against the deployed backend — no localhost VLM required."
+        description="Extract structured content from documents that don't have native form fields. Calls VLM-enhanced ICR with Claude or OpenAI live against the deployed backend — no localhost VLM required."
       />
 
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
@@ -160,6 +167,7 @@ export default function VlmExtractionPage() {
                 <select
                   value={selectedIndex}
                   onChange={(e) => handleDocumentChange(Number(e.target.value))}
+                  aria-label="Source document"
                   className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)]"
                 >
                   {SAMPLE_DOCUMENTS.map((doc, i) => (
@@ -168,6 +176,15 @@ export default function VlmExtractionPage() {
                     </option>
                   ))}
                 </select>
+
+                <ProviderToggle
+                  value={mode}
+                  onChange={(m) => {
+                    setMode(m);
+                    setResultExpanded(false);
+                  }}
+                  disabled={processing}
+                />
 
                 <button
                   type="button"
@@ -181,12 +198,6 @@ export default function VlmExtractionPage() {
                 >
                   {processing ? "Extracting..." : "Extract Content"}
                 </button>
-
-                {error && (
-                  <div className="p-3 bg-[color-mix(in_srgb,var(--code-coral)_12%,var(--bg-elev))] rounded-md text-[var(--code-coral)] text-xs">
-                    {error}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -194,7 +205,7 @@ export default function VlmExtractionPage() {
             <div className="flex-1 min-w-0 flex flex-col">
               {/* Viewer */}
               <div
-                className={`relative ${result && !resultExpanded ? "h-[55%]" : "flex-1"} ${resultExpanded ? "hidden" : ""}`}
+                className={`relative ${entries.length > 0 && !resultExpanded ? "h-[55%]" : "flex-1"} ${resultExpanded && entries.length > 0 ? "hidden" : ""}`}
               >
                 {processing && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-black/60">
@@ -214,123 +225,150 @@ export default function VlmExtractionPage() {
               </div>
 
               {/* Extracted Content Panel */}
-              {result && (
+              {entries.length > 0 && (
                 <div
-                  className={`border-t border-[var(--line)] flex flex-col ${resultExpanded ? "flex-1" : "h-[45%]"}`}
+                  className={`border-t border-[var(--line)] flex flex-col lg:flex-row ${resultExpanded ? "flex-1" : "h-[45%]"}`}
                 >
-                  <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-sm font-semibold text-[var(--ink-2)]">
-                        Extracted Content
-                      </h3>
-                      <span className="text-xs text-[var(--ink-3)]">
-                        {result.statistics.textElements} text regions
-                        {" | "}
-                        <span
-                          className={confidenceColor(
-                            result.statistics.averageConfidence,
-                          )}
-                        >
-                          {Math.round(
-                            result.statistics.averageConfidence * 100,
-                          )}
-                          % avg confidence
-                        </span>
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="flex rounded-md border border-[var(--line-strong)] overflow-hidden">
-                        <button
-                          type="button"
-                          onClick={() => setViewMode("formatted")}
-                          className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
-                            viewMode === "formatted"
-                              ? "bg-[var(--surface)] text-[var(--ink)]"
-                              : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
-                          }`}
-                        >
-                          Formatted
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setViewMode("json")}
-                          className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
-                            viewMode === "json"
-                              ? "bg-[var(--surface)] text-[var(--ink)]"
-                              : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
-                          }`}
-                        >
-                          JSON
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleDownload}
-                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
-                      >
-                        Download
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setResultExpanded(!resultExpanded)}
-                        className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
-                      >
-                        {resultExpanded ? "Collapse" : "Expand"}
-                      </button>
-                    </div>
-                  </div>
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 flex flex-col border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "error" ? (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--line)] flex-shrink-0">
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-sm font-semibold text-[var(--ink-2)]">
+                                Extracted Content
+                              </h3>
+                              <span className="text-xs text-[var(--ink-3)]">
+                                {PROVIDER_LABELS[provider]} ·{" "}
+                                {formatTiming(outcome.ms)}
+                                {" | "}
+                                {outcome.data.statistics.textElements} text
+                                regions
+                                {" | "}
+                                <span
+                                  className={confidenceColor(
+                                    outcome.data.statistics.averageConfidence,
+                                  )}
+                                >
+                                  {Math.round(
+                                    outcome.data.statistics.averageConfidence *
+                                      100,
+                                  )}
+                                  % avg confidence
+                                </span>
+                              </span>
+                            </div>
+                            <div className="flex gap-2">
+                              <div className="flex rounded-md border border-[var(--line-strong)] overflow-hidden">
+                                <button
+                                  type="button"
+                                  onClick={() => setViewMode("formatted")}
+                                  className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
+                                    viewMode === "formatted"
+                                      ? "bg-[var(--surface)] text-[var(--ink)]"
+                                      : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
+                                  }`}
+                                >
+                                  Formatted
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setViewMode("json")}
+                                  className={`px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
+                                    viewMode === "json"
+                                      ? "bg-[var(--surface)] text-[var(--ink)]"
+                                      : "text-[var(--ink-3)] hover:bg-[var(--surface)]"
+                                  }`}
+                                >
+                                  JSON
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDownload(provider, outcome.data)
+                                }
+                                className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+                              >
+                                Download
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setResultExpanded(!resultExpanded)
+                                }
+                                className="px-2.5 py-1 text-xs font-medium rounded-md border border-[var(--line-strong)] text-[var(--ink-2)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+                              >
+                                {resultExpanded ? "Collapse" : "Expand"}
+                              </button>
+                            </div>
+                          </div>
 
-                  {viewMode === "formatted" ? (
-                    <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)] space-y-3">
-                      {result.textElements.map((el, idx) => (
-                        <div
-                          key={`${idx}-${el.readingOrder}`}
-                          className="rounded-lg border border-[var(--line)] overflow-hidden"
-                        >
-                          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface)] border-b border-[var(--line)]">
-                            <span className="text-[10px] font-mono text-[var(--ink-4)] w-5 text-right">
-                              {el.readingOrder}
-                            </span>
-                            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--ink-3)]">
-                              {el.role || el.type}
-                            </span>
-                            <span
-                              className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded ${confidenceBg(el.confidence)} ${confidenceColor(el.confidence)}`}
-                            >
-                              {Math.round(el.confidence * 100)}%
-                            </span>
-                          </div>
-                          <div className="px-3 py-2">
-                            <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-                              {el.words
-                                ? el.words.map((w, i) => (
-                                    <span key={i}>
-                                      {i > 0 && " "}
-                                      <span
-                                        className={`${
-                                          w.confidence < 0.4
-                                            ? "underline decoration-wavy decoration-red-400 dark:decoration-red-500"
-                                            : w.confidence < 0.7
-                                              ? "underline decoration-dotted decoration-yellow-500 dark:decoration-yellow-400"
-                                              : ""
-                                        }`}
-                                        title={`"${w.text}" — ${Math.round(w.confidence * 100)}% confidence`}
-                                      >
-                                        {w.text}
-                                      </span>
+                          {viewMode === "formatted" ? (
+                            <div className="flex-1 overflow-auto p-4 bg-[var(--bg-elev)] space-y-3">
+                              {outcome.data.textElements.map((el, idx) => (
+                                <div
+                                  // biome-ignore lint/suspicious/noArrayIndexKey: elements are positional within a single extraction result
+                                  key={`${idx}-${el.readingOrder}`}
+                                  className="rounded-lg border border-[var(--line)] overflow-hidden"
+                                >
+                                  <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface)] border-b border-[var(--line)]">
+                                    <span className="text-[10px] font-mono text-[var(--ink-4)] w-5 text-right">
+                                      {el.readingOrder}
                                     </span>
-                                  ))
-                                : el.text}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                                    <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--ink-3)]">
+                                      {el.role || el.type}
+                                    </span>
+                                    <span
+                                      className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded ${confidenceBg(el.confidence)} ${confidenceColor(el.confidence)}`}
+                                    >
+                                      {Math.round(el.confidence * 100)}%
+                                    </span>
+                                  </div>
+                                  <div className="px-3 py-2">
+                                    <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                                      {el.words
+                                        ? el.words.map((w, i) => (
+                                            // biome-ignore lint/suspicious/noArrayIndexKey: words are positional
+                                            <span key={i}>
+                                              {i > 0 && " "}
+                                              <span
+                                                className={`${
+                                                  w.confidence < 0.4
+                                                    ? "underline decoration-wavy decoration-red-400 dark:decoration-red-500"
+                                                    : w.confidence < 0.7
+                                                      ? "underline decoration-dotted decoration-yellow-500 dark:decoration-yellow-400"
+                                                      : ""
+                                                }`}
+                                                title={`"${w.text}" — ${Math.round(w.confidence * 100)}% confidence`}
+                                              >
+                                                {w.text}
+                                              </span>
+                                            </span>
+                                          ))
+                                        : el.text}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <pre className="flex-1 overflow-auto p-4 text-xs text-[var(--ink-3)] bg-[var(--bg-elev)] whitespace-pre-wrap font-mono leading-relaxed">
+                              {JSON.stringify(outcome.data, null, 2)}
+                            </pre>
+                          )}
+                        </>
+                      )}
                     </div>
-                  ) : (
-                    <pre className="flex-1 overflow-auto p-4 text-xs text-[var(--ink-3)] bg-[var(--bg-elev)] whitespace-pre-wrap font-mono leading-relaxed">
-                      {JSON.stringify(result, null, 2)}
-                    </pre>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
