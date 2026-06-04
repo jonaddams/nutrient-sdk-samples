@@ -1,9 +1,19 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { PdfViewer } from "../../java-sdk/_components/PdfViewer";
 import { ExtractionResultPanel } from "../_components/ExtractionResultPanel";
+import { ProviderErrorCard } from "../_components/ProviderErrorCard";
+import { ProviderToggle } from "../_components/ProviderToggle";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  formatTiming,
+  outcomeEntries,
+  PROVIDER_LABELS,
+  type Provider,
+  type ProviderMode,
+} from "../_components/providers";
+import { useProviderRun } from "../_components/useProviderRun";
 import { parseFieldNames } from "./fieldNames";
 
 const API_BASE =
@@ -46,29 +56,33 @@ interface FieldsResult {
 export default function FieldExtractionPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [fieldsInput, setFieldsInput] = useState(SAMPLE_DOCUMENTS[0].fields);
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<FieldsResult | null>(null);
+  const [mode, setMode] = useState<ProviderMode>("claude");
   const [error, setError] = useState<string | null>(null);
+  const {
+    runAll,
+    loading: processing,
+    outcomes,
+    reset,
+  } = useProviderRun<FieldsResult>();
+  const entries = outcomeEntries(outcomes);
 
   const selected = SAMPLE_DOCUMENTS[selectedIndex];
 
   const handleSelect = (i: number) => {
     setSelectedIndex(i);
     setFieldsInput(SAMPLE_DOCUMENTS[i].fields);
-    setResult(null);
+    reset();
     setError(null);
   };
 
-  const handleProcess = async () => {
+  const handleProcess = () => {
     const names = parseFieldNames(fieldsInput);
     if (names.length === 0) {
       setError("Enter at least one field name.");
       return;
     }
-    setProcessing(true);
     setError(null);
-    setResult(null);
-    try {
+    return runAll(mode, async (provider: Provider) => {
       const response = await fetch(selected.path);
       const blob = await response.blob();
       const file = new File([blob], selected.filename);
@@ -77,7 +91,7 @@ export default function FieldExtractionPage() {
       formData.append("fields", names.join(", "));
 
       const res = await fetch(
-        `${API_BASE}/api/extraction/fields?provider=claude`,
+        `${API_BASE}/api/extraction/fields?provider=${provider}`,
         {
           method: "POST",
           body: formData,
@@ -90,23 +104,18 @@ export default function FieldExtractionPage() {
           .catch(() => null);
         throw new Error(detail ?? `API returned ${res.status}`);
       }
-      setResult((await res.json()) as FieldsResult);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Field extraction failed");
-    } finally {
-      setProcessing(false);
-    }
+      return (await res.json()) as FieldsResult;
+    });
   };
 
-  const handleDownload = () => {
-    if (!result) return;
+  const handleDownload = (provider: Provider, result: FieldsResult) => {
     const blob = new Blob([JSON.stringify(result, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-fields.json`;
+    a.download = `${selected.filename.replace(/\.[^.]+$/, "")}-fields-${provider}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
@@ -121,86 +130,79 @@ export default function FieldExtractionPage() {
     [],
   );
 
-  const formatted = useMemo(
-    () => (
-      <div className="p-4 space-y-5">
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
-            Schema-driven fields
-          </h4>
-          {result?.parseError ? (
-            <div className="text-xs text-[var(--code-coral)] space-y-2">
-              <p>The model did not return valid JSON. Raw response:</p>
-              <pre className="whitespace-pre-wrap font-mono text-[var(--ink-3)]">
-                {result.parseError}
-              </pre>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {result?.requestedFields.map((name, i) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: field names are user-editable and may duplicate
-                  key={`${name}-${i}`}
-                  className="rounded-lg border border-[var(--line)] px-3 py-2"
-                >
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-4)]">
-                    {name}
-                  </div>
-                  <div className="text-sm">
-                    {renderValue(result.schemaFields[name])}
-                  </div>
+  const renderFormatted = (result: FieldsResult) => (
+    <div className="p-4 space-y-5">
+      <div>
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
+          Schema-driven fields
+        </h4>
+        {result.parseError ? (
+          <div className="text-xs text-[var(--code-coral)] space-y-2">
+            <p>The model did not return valid JSON. Raw response:</p>
+            <pre className="whitespace-pre-wrap font-mono text-[var(--ink-3)]">
+              {result.parseError}
+            </pre>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {result.requestedFields.map((name, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: field names are user-editable and may duplicate
+                key={`${name}-${i}`}
+                className="rounded-lg border border-[var(--line)] px-3 py-2"
+              >
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-4)]">
+                  {name}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
-            Native KEY_VALUE_REGION
-          </h4>
-          {result && result.nativeRegions.length === 0 ? (
-            <div className="text-xs text-[var(--ink-3)] rounded-lg border border-[var(--line)] px-3 py-2 leading-relaxed">
-              The SDK&apos;s native KEY_VALUE_REGION returned no tagged regions
-              for this document. The schema-driven result above is produced by a
-              custom VLM prompt — which is why this demo pairs the two
-              approaches.
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {result?.nativeRegions.map((r, i) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: native regions are positional
-                  key={i}
-                  className="text-sm text-[var(--ink-2)] rounded border border-[var(--line)] px-2 py-1"
-                >
-                  <span className="text-[10px] uppercase text-[var(--ink-4)] mr-2">
-                    {r.role || r.type}
-                  </span>
-                  {r.text}
+                <div className="text-sm">
+                  {renderValue(result.schemaFields[name])}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    ),
-    [result, renderValue],
+      <div>
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--ink-3)] mb-2">
+          Native KEY_VALUE_REGION
+        </h4>
+        {result.nativeRegions.length === 0 ? (
+          <div className="text-xs text-[var(--ink-3)] rounded-lg border border-[var(--line)] px-3 py-2 leading-relaxed">
+            The SDK&apos;s native KEY_VALUE_REGION returned no tagged regions
+            for this document. The schema-driven result above is produced by a
+            custom VLM prompt — which is why this demo pairs the two approaches.
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {result.nativeRegions.map((r, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: native regions are positional
+                key={i}
+                className="text-sm text-[var(--ink-2)] rounded border border-[var(--line)] px-2 py-1"
+              >
+                <span className="text-[10px] uppercase text-[var(--ink-4)] mr-2">
+                  {r.role || r.type}
+                </span>
+                {r.text}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 
-  const raw = useMemo(
-    () => (
-      <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
-        {result ? JSON.stringify(result, null, 2) : ""}
-      </pre>
-    ),
-    [result],
+  const renderRaw = (result: FieldsResult) => (
+    <pre className="p-4 text-xs text-[var(--ink-3)] whitespace-pre-wrap font-mono leading-relaxed">
+      {JSON.stringify(result, null, 2)}
+    </pre>
   );
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <PythonSampleHeader
         title="Field Extraction"
-        description="Pull labeled fields into clean values — native key-value regions plus schema-driven extraction with a custom prompt, via Claude."
+        description="Pull labeled fields into clean values — native key-value regions plus schema-driven extraction with a custom prompt, via Claude or OpenAI."
       />
       <main className="max-w-7xl mx-auto px-6 pt-6 pb-8">
         <div className="bg-[var(--bg-elev)] rounded-xl shadow-lg border border-[var(--line)] overflow-hidden h-[calc(100vh-12rem)]">
@@ -239,6 +241,11 @@ export default function FieldExtractionPage() {
                     className="w-full px-3 py-2 text-sm rounded-md border border-[var(--line-strong)] bg-[var(--bg-elev)] text-[var(--ink)] font-mono"
                   />
                 </div>
+                <ProviderToggle
+                  value={mode}
+                  onChange={setMode}
+                  disabled={processing}
+                />
                 <button
                   type="button"
                   onClick={handleProcess}
@@ -256,7 +263,9 @@ export default function FieldExtractionPage() {
               </div>
             </div>
             <div className="flex-1 min-w-0 flex flex-col">
-              <div className={`relative ${result ? "h-[55%]" : "flex-1"}`}>
+              <div
+                className={`relative ${entries.length > 0 ? "h-[55%]" : "flex-1"}`}
+              >
                 {processing && (
                   <div
                     role="status"
@@ -273,17 +282,33 @@ export default function FieldExtractionPage() {
                 )}
                 <PdfViewer document={selected.path} />
               </div>
-              {result && (
-                <div className="border-t border-[var(--line)] h-[45%]">
-                  <ExtractionResultPanel
-                    title="Extracted Fields"
-                    stats={`${result.requestedFields.length} requested | ${result.nativeRegions.length} native regions`}
-                    primaryLabel="Formatted"
-                    primary={formatted}
-                    secondaryLabel="JSON"
-                    secondary={raw}
-                    onDownload={handleDownload}
-                  />
+              {entries.length > 0 && (
+                <div className="border-t border-[var(--line)] h-[45%] flex flex-col lg:flex-row">
+                  {entries.map(([provider, outcome]) => (
+                    <div
+                      key={provider}
+                      className="flex-1 min-w-0 min-h-0 border-b lg:border-b-0 lg:border-r last:border-0 border-[var(--line)]"
+                    >
+                      {outcome.status === "ok" ? (
+                        <ExtractionResultPanel
+                          title="Extracted Fields"
+                          stats={`${PROVIDER_LABELS[provider]} · ${formatTiming(outcome.ms)} | ${outcome.data.requestedFields.length} requested | ${outcome.data.nativeRegions.length} native regions`}
+                          primaryLabel="Formatted"
+                          primary={renderFormatted(outcome.data)}
+                          secondaryLabel="JSON"
+                          secondary={renderRaw(outcome.data)}
+                          onDownload={() =>
+                            handleDownload(provider, outcome.data)
+                          }
+                        />
+                      ) : (
+                        <ProviderErrorCard
+                          provider={provider}
+                          message={outcome.message}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

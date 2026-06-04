@@ -1,0 +1,50 @@
+"use client";
+
+import { useCallback, useRef, useState } from "react";
+import {
+  assembleOutcomes,
+  type Outcomes,
+  type Provider,
+  type ProviderMode,
+  providersFor,
+} from "./providers";
+
+/**
+ * Runs a page-supplied request function against one or both providers.
+ * Both mode runs in parallel (total wait = slower provider, not the sum).
+ * A rejected request becomes an error outcome; partial results survive.
+ * Re-entrant calls while a run is in flight are ignored.
+ */
+export function useProviderRun<T>() {
+  const [loading, setLoading] = useState(false);
+  const [outcomes, setOutcomes] = useState<Outcomes<T>>({});
+  const running = useRef(false);
+
+  const runAll = useCallback(
+    async (mode: ProviderMode, fn: (provider: Provider) => Promise<T>) => {
+      if (running.current) return;
+      running.current = true;
+      const providers = providersFor(mode);
+      setLoading(true);
+      setOutcomes({});
+      try {
+        const settled = await Promise.allSettled(
+          providers.map(async (provider) => {
+            const start = performance.now();
+            const data = await fn(provider);
+            return { data, ms: performance.now() - start };
+          }),
+        );
+        setOutcomes(assembleOutcomes(providers, settled));
+      } finally {
+        running.current = false;
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  const reset = useCallback(() => setOutcomes({}), []);
+
+  return { runAll, loading, outcomes, reset };
+}
