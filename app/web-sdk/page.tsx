@@ -1,4 +1,4 @@
-import { SamplesIndex, type Sample } from "@/app/_components/SamplesIndex";
+import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
 
 const samples: Sample[] = [
   {
@@ -225,6 +225,13 @@ const samples: Sample[] = [
     description:
       "Side-by-side PDF comparison with synchronized viewing and interactive change tracking",
     path: "/web-sdk/text-comparison",
+  },
+  {
+    name: "Hybrid Comparison",
+    category: "Document Comparison",
+    description:
+      "Compare a document pair visually (overlay) and textually at once, with auto-highlighted changes and reviewer markup on both views",
+    path: "/web-sdk/hybrid-comparison",
   },
   {
     name: "Text Extraction",
