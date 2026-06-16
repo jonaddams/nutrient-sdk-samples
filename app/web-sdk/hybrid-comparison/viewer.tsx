@@ -145,6 +145,7 @@ export function HybridComparisonViewer() {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: one-time init (guarded by didInit); helpers use refs only
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
@@ -160,14 +161,17 @@ export function HybridComparisonViewer() {
     async function init() {
       try {
         const NV = await waitForSDK();
-        leftInstance.current = await NV!.load({
-          container: leftRef.current!,
+        const leftContainer = leftRef.current;
+        const rightContainer = rightRef.current;
+        if (!leftContainer || !rightContainer) return;
+        leftInstance.current = await NV.load({
+          container: leftContainer,
           document: DOC_A,
           useCDN: true,
           licenseKey,
         });
-        rightInstance.current = await NV!.load({
-          container: rightRef.current!,
+        rightInstance.current = await NV.load({
+          container: rightContainer,
           document: DOC_B,
           useCDN: true,
           licenseKey,
@@ -203,11 +207,11 @@ export function HybridComparisonViewer() {
   }, [licenseKey]);
 
   // Re-run both comparisons when the page or blend mode changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-runs only on page/blend; helpers are ref-based and stable
   useEffect(() => {
     if (loading) return;
     applyVisualOverlay(pageIndex, blendMode);
     runTextComparison(pageIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageIndex, blendMode]);
 
   if (error) {
@@ -236,9 +240,9 @@ export function HybridComparisonViewer() {
             onChange={(e) => setPageIndex(Number(e.target.value))}
             disabled={loading}
           >
-            {Array.from({ length: pageCount }, (_, i) => (
-              <option key={i} value={i}>
-                {i + 1}
+            {Array.from({ length: pageCount }, (_, i) => i).map((p) => (
+              <option key={p} value={p}>
+                {p + 1}
               </option>
             ))}
           </select>
