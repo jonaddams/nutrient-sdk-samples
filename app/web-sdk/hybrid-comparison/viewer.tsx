@@ -105,6 +105,46 @@ export function HybridComparisonViewer() {
     setSelectedId(null);
   }
 
+  // Select a change in the rail and scroll the text pane to it.
+  function handleSelect(c: ChangeEntry) {
+    setSelectedId(c.id);
+    const NV = window.NutrientViewer;
+    const right = rightInstance.current;
+    if (!NV || !right) return;
+    right.setViewState(right.viewState.set("currentPageIndex", c.pageIndex));
+    right.jumpToRect(
+      c.pageIndex,
+      new NV.Geometry.Rect({
+        left: c.rect[0],
+        top: c.rect[1],
+        width: c.rect[2],
+        height: c.rect[3],
+      }),
+    );
+  }
+
+  // Reviewer markup on the visual-overlay pane (works while in comparison mode).
+  async function addOverlayMarkup() {
+    const NV = window.NutrientViewer;
+    const left = leftInstance.current;
+    if (!NV || !left) return;
+    const note = new NV.Annotations.RectangleAnnotation({
+      pageIndex,
+      boundingBox: new NV.Geometry.Rect({
+        left: 60,
+        top: 60,
+        width: 160,
+        height: 90,
+      }),
+      strokeColor: NV.Color.RED,
+      strokeWidth: 3,
+    });
+    const res = await left.create(note);
+    if (Array.isArray(res) && res.length) {
+      setMarkupCount((n) => n + res.length);
+    }
+  }
+
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
@@ -131,8 +171,17 @@ export function HybridComparisonViewer() {
           document: DOC_B,
           useCDN: true,
           licenseKey,
+          toolbarItems: [
+            { type: "pan" },
+            { type: "zoom-out" },
+            { type: "zoom-in" },
+            { type: "highlighter" },
+            { type: "note" },
+            { type: "ink" },
+            { type: "rectangle" },
+          ] as never,
         });
-        setPageCount(await leftInstance.current.totalPageCount);
+        setPageCount(leftInstance.current.totalPageCount);
         await applyVisualOverlay(0, "darken");
         await runTextComparison(0);
         setLoading(false);
@@ -208,6 +257,9 @@ export function HybridComparisonViewer() {
             ))}
           </select>
         </label>
+        <button type="button" onClick={addOverlayMarkup} disabled={loading}>
+          Add note to overlay
+        </button>
       </div>
       <div
         style={{
@@ -239,7 +291,7 @@ export function HybridComparisonViewer() {
           changes={changes}
           selectedId={selectedId}
           markupCount={markupCount}
-          onSelect={(c) => setSelectedId(c.id)}
+          onSelect={handleSelect}
         />
       </div>
     </div>
