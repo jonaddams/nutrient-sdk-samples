@@ -10,13 +10,20 @@ const DOC_A = "/documents/hybrid-comparison-a.pdf";
 const DOC_B = "/documents/hybrid-comparison-b.pdf";
 
 const BLEND_MODES = ["darken", "multiply", "difference"];
+const INSERT_COLOR = "#ffe066";
+
+type ViewMode = "overlay" | "changed";
 
 export function HybridComparisonViewer() {
   const licenseKey = process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY;
-  const leftRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
-  const leftInstance = useRef<Instance | null>(null);
-  const rightInstance = useRef<Instance | null>(null);
+  // Two stacked instances: the SDK's visual comparison overlay (Rev A base),
+  // and a normal viewer of the changed document (Rev B) where highlight
+  // annotations actually render. A toggle controls which is visible; the
+  // changed-doc instance also runs the text diff (no separate helper needed).
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const changedRef = useRef<HTMLDivElement>(null);
+  const overlayInstance = useRef<Instance | null>(null);
+  const changedInstance = useRef<Instance | null>(null);
   const autoAnnotationIds = useRef<string[]>([]);
   const didInit = useRef(false);
 
@@ -28,12 +35,13 @@ export function HybridComparisonViewer() {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageCount, setPageCount] = useState(1);
   const [blendMode, setBlendMode] = useState("darken");
+  const [viewMode, setViewMode] = useState<ViewMode>("overlay");
 
-  // Overlay the two documents on the left instance for one page.
+  // Put the overlay instance into the SDK's native visual comparison mode.
   async function applyVisualOverlay(page: number, blend: string) {
     const NV = window.NutrientViewer;
-    if (!NV || !leftInstance.current) return;
-    await leftInstance.current.setDocumentComparisonMode({
+    if (!NV || !overlayInstance.current) return;
+    await overlayInstance.current.setDocumentComparisonMode({
       documentA: {
         source: NV.DocumentComparisonSourceType.USE_OPEN_DOCUMENT,
         pageIndex: page,
@@ -44,16 +52,18 @@ export function HybridComparisonViewer() {
     });
   }
 
-  // Run text comparison for one page, auto-highlight inserts, populate the rail.
+  // Compute the text diff on the changed-doc instance, highlight each inserted
+  // change there (highlights render on this normal view), and populate the rail.
   async function runTextComparison(page: number) {
     const NV = window.NutrientViewer;
-    const right = rightInstance.current;
-    if (!NV || !right) return;
+    const changed = changedInstance.current;
+    if (!NV || !changed) return;
 
-    // Clear previous auto-highlights for the old page.
     if (autoAnnotationIds.current.length) {
       await Promise.all(
-        autoAnnotationIds.current.map((id) => right.delete(id).catch(() => {})),
+        autoAnnotationIds.current.map((id) =>
+          changed.delete(id).catch(() => {}),
+        ),
       );
       autoAnnotationIds.current = [];
     }
@@ -69,30 +79,32 @@ export function HybridComparisonViewer() {
       filePath: DOC_B,
       pageIndexes: [page],
     });
-    const result = await right.compareDocuments(
+    const result = await changed.compareDocuments(
       { originalDocument, changedDocument },
       op,
     );
 
     const extracted = extractChanges(result, page);
 
+    // Inserts carry coordinates in the changed document, so they highlight
+    // correctly here. Deletes (text only in the original) are listed in the
+    // rail without a highlight.
     const created: string[] = [];
     for (const c of extracted) {
-      // Only inserts have a position in the changed (right) document.
       if (c.type !== "insert") continue;
+      const rect = new NV.Geometry.Rect({
+        left: c.rect[0],
+        top: c.rect[1],
+        width: c.rect[2],
+        height: c.rect[3],
+      });
       const annotation = new NV.Annotations.HighlightAnnotation({
         pageIndex: page,
-        rects: NV.Immutable.List([
-          new NV.Geometry.Rect({
-            left: c.rect[0],
-            top: c.rect[1],
-            width: c.rect[2],
-            height: c.rect[3],
-          }),
-        ]),
-        color: NV.Color.fromHex("#ffe066"),
+        rects: NV.Immutable.List([rect]),
+        boundingBox: rect,
+        color: NV.Color.fromHex(INSERT_COLOR),
       });
-      const res = await right.create(annotation);
+      const res = await changed.create(annotation);
       const id =
         Array.isArray(res) && res[0] ? (res[0] as { id: string }).id : null;
       if (id) {
@@ -105,14 +117,17 @@ export function HybridComparisonViewer() {
     setSelectedId(null);
   }
 
-  // Select a change in the rail and scroll the text pane to it.
+  // Select a change: flip to the changed-doc view and scroll to its highlight.
   function handleSelect(c: ChangeEntry) {
     setSelectedId(c.id);
+    setViewMode("changed");
     const NV = window.NutrientViewer;
-    const right = rightInstance.current;
-    if (!NV || !right) return;
-    right.setViewState(right.viewState.set("currentPageIndex", c.pageIndex));
-    right.jumpToRect(
+    const changed = changedInstance.current;
+    if (!NV || !changed) return;
+    changed.setViewState(
+      changed.viewState.set("currentPageIndex", c.pageIndex),
+    );
+    changed.jumpToRect(
       c.pageIndex,
       new NV.Geometry.Rect({
         left: c.rect[0],
@@ -123,11 +138,12 @@ export function HybridComparisonViewer() {
     );
   }
 
-  // Reviewer markup on the visual-overlay pane (works while in comparison mode).
-  async function addOverlayMarkup() {
+  // Reviewer markup on the changed-doc view (renders there, unlike the overlay).
+  async function addMarkup() {
     const NV = window.NutrientViewer;
-    const left = leftInstance.current;
-    if (!NV || !left) return;
+    const changed = changedInstance.current;
+    if (!NV || !changed) return;
+    setViewMode("changed");
     const note = new NV.Annotations.RectangleAnnotation({
       pageIndex,
       boundingBox: new NV.Geometry.Rect({
@@ -139,7 +155,7 @@ export function HybridComparisonViewer() {
       strokeColor: NV.Color.RED,
       strokeWidth: 3,
     });
-    const res = await left.create(note);
+    const res = await changed.create(note);
     if (Array.isArray(res) && res.length) {
       setMarkupCount((n) => n + res.length);
     }
@@ -161,17 +177,17 @@ export function HybridComparisonViewer() {
     async function init() {
       try {
         const NV = await waitForSDK();
-        const leftContainer = leftRef.current;
-        const rightContainer = rightRef.current;
-        if (!leftContainer || !rightContainer) return;
-        leftInstance.current = await NV.load({
-          container: leftContainer,
+        const overlayContainer = overlayRef.current;
+        const changedContainer = changedRef.current;
+        if (!overlayContainer || !changedContainer) return;
+        overlayInstance.current = await NV.load({
+          container: overlayContainer,
           document: DOC_A,
           useCDN: true,
           licenseKey,
         });
-        rightInstance.current = await NV.load({
-          container: rightContainer,
+        changedInstance.current = await NV.load({
+          container: changedContainer,
           document: DOC_B,
           useCDN: true,
           licenseKey,
@@ -185,7 +201,7 @@ export function HybridComparisonViewer() {
             { type: "rectangle" },
           ] as never,
         });
-        setPageCount(leftInstance.current.totalPageCount);
+        setPageCount(overlayInstance.current.totalPageCount);
         await applyVisualOverlay(0, "darken");
         await runTextComparison(0);
         setLoading(false);
@@ -199,14 +215,14 @@ export function HybridComparisonViewer() {
 
     return () => {
       const NV = window.NutrientViewer;
-      if (NV && leftRef.current) NV.unload(leftRef.current);
-      if (NV && rightRef.current) NV.unload(rightRef.current);
-      leftInstance.current = null;
-      rightInstance.current = null;
+      if (NV && overlayRef.current) NV.unload(overlayRef.current);
+      if (NV && changedRef.current) NV.unload(changedRef.current);
+      overlayInstance.current = null;
+      changedInstance.current = null;
     };
   }, [licenseKey]);
 
-  // Re-run both comparisons when the page or blend mode changes.
+  // Re-run the overlay + text diff when the page or blend mode changes.
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-runs only on page/blend; helpers are ref-based and stable
   useEffect(() => {
     if (loading) return;
@@ -222,6 +238,15 @@ export function HybridComparisonViewer() {
     );
   }
 
+  const segBtn = (active: boolean): React.CSSProperties => ({
+    padding: "4px 12px",
+    fontSize: 13,
+    border: "1px solid #c9c9d6",
+    background: active ? "#6c5ce7" : "#fff",
+    color: active ? "#fff" : "#333",
+    cursor: "pointer",
+  });
+
   return (
     <div style={{ position: "relative" }}>
       {loading && <LoadingSpinner message="Loading comparison…" />}
@@ -231,8 +256,34 @@ export function HybridComparisonViewer() {
           gap: 12,
           alignItems: "center",
           padding: "8px 4px",
+          flexWrap: "wrap",
         }}
       >
+        <div style={{ display: "flex" }}>
+          <button
+            type="button"
+            onClick={() => setViewMode("overlay")}
+            disabled={loading}
+            style={{
+              ...segBtn(viewMode === "overlay"),
+              borderRadius: "4px 0 0 4px",
+            }}
+          >
+            Visual overlay
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("changed")}
+            disabled={loading}
+            style={{
+              ...segBtn(viewMode === "changed"),
+              borderRadius: "0 4px 4px 0",
+              borderLeft: "none",
+            }}
+          >
+            Changed document
+          </button>
+        </div>
         <label style={{ fontSize: 13 }}>
           Page{" "}
           <select
@@ -247,12 +298,14 @@ export function HybridComparisonViewer() {
             ))}
           </select>
         </label>
-        <label style={{ fontSize: 13 }}>
+        <label
+          style={{ fontSize: 13, opacity: viewMode === "overlay" ? 1 : 0.4 }}
+        >
           Blend{" "}
           <select
             value={blendMode}
             onChange={(e) => setBlendMode(e.target.value)}
-            disabled={loading}
+            disabled={loading || viewMode !== "overlay"}
           >
             {BLEND_MODES.map((m) => (
               <option key={m} value={m}>
@@ -261,8 +314,8 @@ export function HybridComparisonViewer() {
             ))}
           </select>
         </label>
-        <button type="button" onClick={addOverlayMarkup} disabled={loading}>
-          Add note to overlay
+        <button type="button" onClick={addMarkup} disabled={loading}>
+          Add reviewer note
         </button>
       </div>
       <div
@@ -273,23 +326,39 @@ export function HybridComparisonViewer() {
           border: "1px solid #e0e0ea",
         }}
       >
-        <div style={{ flex: 1, borderRight: "1px solid #e0e0ea" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            borderRight: "1px solid #e0e0ea",
+          }}
+        >
           <div style={{ fontSize: 12, padding: "4px 8px", color: "#666" }}>
-            Visual overlay
+            {viewMode === "overlay"
+              ? "Visual Document Comparison (overlay)"
+              : "Changed Document — Rev B (highlighted changes)"}
           </div>
-          <div
-            ref={leftRef}
-            style={{ width: "100%", height: "calc(100% - 24px)" }}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, padding: "4px 8px", color: "#666" }}>
-            Text + changes
+          {/* Both instances stay mounted and full-size; visibility toggles which
+              one shows, so neither viewer is ever loaded into a zero-size box. */}
+          <div style={{ position: "relative", flex: 1 }}>
+            <div
+              ref={overlayRef}
+              style={{
+                position: "absolute",
+                inset: 0,
+                visibility: viewMode === "overlay" ? "visible" : "hidden",
+              }}
+            />
+            <div
+              ref={changedRef}
+              style={{
+                position: "absolute",
+                inset: 0,
+                visibility: viewMode === "changed" ? "visible" : "hidden",
+              }}
+            />
           </div>
-          <div
-            ref={rightRef}
-            style={{ width: "100%", height: "calc(100% - 24px)" }}
-          />
         </div>
         <ChangesRail
           changes={changes}
