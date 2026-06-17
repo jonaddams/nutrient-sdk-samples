@@ -234,6 +234,13 @@ const samples: Sample[] = [
     path: "/web-sdk/hybrid-comparison",
   },
   {
+    name: "Hybrid Comparison — Custom Overlay",
+    category: "Document Comparison",
+    description:
+      "Single-view comparison where each text change is a custom-overlay callout pinned to its location, showing the before → after value",
+    path: "/web-sdk/hybrid-comparison-overlay",
+  },
+  {
     name: "Text Extraction",
     category: "Content",
     description:
