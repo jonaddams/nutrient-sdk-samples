@@ -10,21 +10,37 @@ const DOC_A = "/documents/hybrid-comparison-a.pdf";
 const DOC_B = "/documents/hybrid-comparison-b.pdf";
 
 const BLEND_MODES = ["darken", "multiply", "difference"];
-const INSERT_COLOR = "#ffe066";
+const INSERT_COLOR = "#ffe066"; // changed-document highlights (text added)
+const ORIGINAL_COLOR = "#ffb3b3"; // original-document highlights (text changed)
 
-type ViewMode = "overlay" | "changed";
+const ANNOTATION_TOOLBAR = [
+  { type: "pan" },
+  { type: "zoom-out" },
+  { type: "zoom-in" },
+  { type: "highlighter" },
+  { type: "note" },
+  { type: "ink" },
+  { type: "rectangle" },
+];
+
+type ViewMode = "overlay" | "original" | "changed";
 
 export function HybridComparisonViewer() {
   const licenseKey = process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY;
-  // Two stacked instances: the SDK's visual comparison overlay (Rev A base),
-  // and a normal viewer of the changed document (Rev B) where highlight
-  // annotations actually render. A toggle controls which is visible; the
-  // changed-doc instance also runs the text diff (no separate helper needed).
+  // Three stacked instances, one visible at a time (toggled by `visibility`):
+  //  - overlay:  Rev A in the SDK's visual comparison mode (composited overlay)
+  //  - original: Rev A as a normal viewer, highlighting the text that changed
+  //  - changed:  Rev B as a normal viewer, highlighting the text that was added
+  // The overlay can't render annotations, so the highlights live on the two
+  // normal viewers. The changed instance also runs the text diff.
   const overlayRef = useRef<HTMLDivElement>(null);
+  const originalRef = useRef<HTMLDivElement>(null);
   const changedRef = useRef<HTMLDivElement>(null);
   const overlayInstance = useRef<Instance | null>(null);
+  const originalInstance = useRef<Instance | null>(null);
   const changedInstance = useRef<Instance | null>(null);
-  const autoAnnotationIds = useRef<string[]>([]);
+  const originalAnnotationIds = useRef<string[]>([]);
+  const changedAnnotationIds = useRef<string[]>([]);
   const didInit = useRef(false);
 
   const [loading, setLoading] = useState(true);
@@ -52,20 +68,30 @@ export function HybridComparisonViewer() {
     });
   }
 
-  // Compute the text diff on the changed-doc instance, highlight each inserted
-  // change there (highlights render on this normal view), and populate the rail.
+  // Compute the text diff and highlight each change on the matching normal
+  // viewer: inserts on the changed document, the original text that changed on
+  // the original document. Both render because they're normal viewers.
   async function runTextComparison(page: number) {
     const NV = window.NutrientViewer;
+    const original = originalInstance.current;
     const changed = changedInstance.current;
-    if (!NV || !changed) return;
+    if (!NV || !original || !changed) return;
 
-    if (autoAnnotationIds.current.length) {
+    if (originalAnnotationIds.current.length) {
       await Promise.all(
-        autoAnnotationIds.current.map((id) =>
+        originalAnnotationIds.current.map((id) =>
+          original.delete(id).catch(() => {}),
+        ),
+      );
+      originalAnnotationIds.current = [];
+    }
+    if (changedAnnotationIds.current.length) {
+      await Promise.all(
+        changedAnnotationIds.current.map((id) =>
           changed.delete(id).catch(() => {}),
         ),
       );
-      autoAnnotationIds.current = [];
+      changedAnnotationIds.current = [];
     }
 
     const op = new NV.ComparisonOperation(NV.ComparisonOperationType.TEXT, {
@@ -86,48 +112,51 @@ export function HybridComparisonViewer() {
 
     const extracted = extractChanges(result, page);
 
-    // Inserts carry coordinates in the changed document, so they highlight
-    // correctly here. Deletes (text only in the original) are listed in the
-    // rail without a highlight.
-    const created: string[] = [];
+    // Inserts carry coordinates in the changed document; deletes carry
+    // coordinates in the original document. Highlight each on its own viewer.
+    const createdOriginal: string[] = [];
+    const createdChanged: string[] = [];
     for (const c of extracted) {
-      if (c.type !== "insert") continue;
       const rect = new NV.Geometry.Rect({
         left: c.rect[0],
         top: c.rect[1],
         width: c.rect[2],
         height: c.rect[3],
       });
+      const target = c.type === "insert" ? changed : original;
       const annotation = new NV.Annotations.HighlightAnnotation({
         pageIndex: page,
         rects: NV.Immutable.List([rect]),
         boundingBox: rect,
-        color: NV.Color.fromHex(INSERT_COLOR),
+        color: NV.Color.fromHex(
+          c.type === "insert" ? INSERT_COLOR : ORIGINAL_COLOR,
+        ),
       });
-      const res = await changed.create(annotation);
+      const res = await target.create(annotation);
       const id =
         Array.isArray(res) && res[0] ? (res[0] as { id: string }).id : null;
       if (id) {
-        created.push(id);
         c.id = id; // tie the rail entry to its annotation for navigation
+        if (c.type === "insert") createdChanged.push(id);
+        else createdOriginal.push(id);
       }
     }
-    autoAnnotationIds.current = created;
+    originalAnnotationIds.current = createdOriginal;
+    changedAnnotationIds.current = createdChanged;
     setChanges(extracted);
     setSelectedId(null);
   }
 
-  // Select a change: flip to the changed-doc view and scroll to its highlight.
+  // Select a change: flip to the view that holds its highlight and scroll to it.
   function handleSelect(c: ChangeEntry) {
     setSelectedId(c.id);
-    setViewMode("changed");
     const NV = window.NutrientViewer;
-    const changed = changedInstance.current;
-    if (!NV || !changed) return;
-    changed.setViewState(
-      changed.viewState.set("currentPageIndex", c.pageIndex),
-    );
-    changed.jumpToRect(
+    const target =
+      c.type === "insert" ? changedInstance.current : originalInstance.current;
+    setViewMode(c.type === "insert" ? "changed" : "original");
+    if (!NV || !target) return;
+    target.setViewState(target.viewState.set("currentPageIndex", c.pageIndex));
+    target.jumpToRect(
       c.pageIndex,
       new NV.Geometry.Rect({
         left: c.rect[0],
@@ -138,12 +167,16 @@ export function HybridComparisonViewer() {
     );
   }
 
-  // Reviewer markup on the changed-doc view (renders there, unlike the overlay).
+  // Reviewer markup on whichever document view is active (the overlay can't
+  // render annotations, so markup from the overlay tab lands on the changed doc).
   async function addMarkup() {
     const NV = window.NutrientViewer;
-    const changed = changedInstance.current;
-    if (!NV || !changed) return;
-    setViewMode("changed");
+    const target =
+      viewMode === "original"
+        ? originalInstance.current
+        : changedInstance.current;
+    if (!NV || !target) return;
+    if (viewMode === "overlay") setViewMode("changed");
     const note = new NV.Annotations.RectangleAnnotation({
       pageIndex,
       boundingBox: new NV.Geometry.Rect({
@@ -155,7 +188,7 @@ export function HybridComparisonViewer() {
       strokeColor: NV.Color.RED,
       strokeWidth: 3,
     });
-    const res = await changed.create(note);
+    const res = await target.create(note);
     if (Array.isArray(res) && res.length) {
       setMarkupCount((n) => n + res.length);
     }
@@ -178,28 +211,29 @@ export function HybridComparisonViewer() {
       try {
         const NV = await waitForSDK();
         const overlayContainer = overlayRef.current;
+        const originalContainer = originalRef.current;
         const changedContainer = changedRef.current;
-        if (!overlayContainer || !changedContainer) return;
+        if (!overlayContainer || !originalContainer || !changedContainer)
+          return;
         overlayInstance.current = await NV.load({
           container: overlayContainer,
           document: DOC_A,
           useCDN: true,
           licenseKey,
         });
+        originalInstance.current = await NV.load({
+          container: originalContainer,
+          document: DOC_A,
+          useCDN: true,
+          licenseKey,
+          toolbarItems: ANNOTATION_TOOLBAR as never,
+        });
         changedInstance.current = await NV.load({
           container: changedContainer,
           document: DOC_B,
           useCDN: true,
           licenseKey,
-          toolbarItems: [
-            { type: "pan" },
-            { type: "zoom-out" },
-            { type: "zoom-in" },
-            { type: "highlighter" },
-            { type: "note" },
-            { type: "ink" },
-            { type: "rectangle" },
-          ] as never,
+          toolbarItems: ANNOTATION_TOOLBAR as never,
         });
         setPageCount(overlayInstance.current.totalPageCount);
         await applyVisualOverlay(0, "darken");
@@ -216,8 +250,10 @@ export function HybridComparisonViewer() {
     return () => {
       const NV = window.NutrientViewer;
       if (NV && overlayRef.current) NV.unload(overlayRef.current);
+      if (NV && originalRef.current) NV.unload(originalRef.current);
       if (NV && changedRef.current) NV.unload(changedRef.current);
       overlayInstance.current = null;
+      originalInstance.current = null;
       changedInstance.current = null;
     };
   }, [licenseKey]);
@@ -238,14 +274,35 @@ export function HybridComparisonViewer() {
     );
   }
 
-  const segBtn = (active: boolean): React.CSSProperties => ({
-    padding: "4px 12px",
-    fontSize: 13,
-    border: "1px solid #c9c9d6",
-    background: active ? "#6c5ce7" : "#fff",
-    color: active ? "#fff" : "#333",
-    cursor: "pointer",
-  });
+  const TABS: { mode: ViewMode; label: string }[] = [
+    { mode: "overlay", label: "Visual overlay" },
+    { mode: "original", label: "Original document" },
+    { mode: "changed", label: "Changed document" },
+  ];
+
+  const tabStyle = (mode: ViewMode, index: number): React.CSSProperties => {
+    const active = viewMode === mode;
+    return {
+      padding: "4px 12px",
+      fontSize: 13,
+      border: "1px solid #c9c9d6",
+      borderLeft: index === 0 ? "1px solid #c9c9d6" : "none",
+      borderTopLeftRadius: index === 0 ? 4 : 0,
+      borderBottomLeftRadius: index === 0 ? 4 : 0,
+      borderTopRightRadius: index === TABS.length - 1 ? 4 : 0,
+      borderBottomRightRadius: index === TABS.length - 1 ? 4 : 0,
+      background: active ? "#6c5ce7" : "#fff",
+      color: active ? "#fff" : "#333",
+      cursor: "pointer",
+    };
+  };
+
+  const paneLabel =
+    viewMode === "overlay"
+      ? "Visual Document Comparison (overlay)"
+      : viewMode === "original"
+        ? "Original Document — Rev A (changed text highlighted)"
+        : "Changed Document — Rev B (added text highlighted)";
 
   return (
     <div style={{ position: "relative" }}>
@@ -260,29 +317,17 @@ export function HybridComparisonViewer() {
         }}
       >
         <div style={{ display: "flex" }}>
-          <button
-            type="button"
-            onClick={() => setViewMode("overlay")}
-            disabled={loading}
-            style={{
-              ...segBtn(viewMode === "overlay"),
-              borderRadius: "4px 0 0 4px",
-            }}
-          >
-            Visual overlay
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("changed")}
-            disabled={loading}
-            style={{
-              ...segBtn(viewMode === "changed"),
-              borderRadius: "0 4px 4px 0",
-              borderLeft: "none",
-            }}
-          >
-            Changed document
-          </button>
+          {TABS.map((t, i) => (
+            <button
+              key={t.mode}
+              type="button"
+              onClick={() => setViewMode(t.mode)}
+              disabled={loading}
+              style={tabStyle(t.mode, i)}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
         <label style={{ fontSize: 13 }}>
           Page{" "}
@@ -335,12 +380,10 @@ export function HybridComparisonViewer() {
           }}
         >
           <div style={{ fontSize: 12, padding: "4px 8px", color: "#666" }}>
-            {viewMode === "overlay"
-              ? "Visual Document Comparison (overlay)"
-              : "Changed Document — Rev B (highlighted changes)"}
+            {paneLabel}
           </div>
-          {/* Both instances stay mounted and full-size; visibility toggles which
-              one shows, so neither viewer is ever loaded into a zero-size box. */}
+          {/* All instances stay mounted and full-size; visibility toggles which
+              one shows, so none is ever loaded into a zero-size box. */}
           <div style={{ position: "relative", flex: 1 }}>
             <div
               ref={overlayRef}
@@ -348,6 +391,14 @@ export function HybridComparisonViewer() {
                 position: "absolute",
                 inset: 0,
                 visibility: viewMode === "overlay" ? "visible" : "hidden",
+              }}
+            />
+            <div
+              ref={originalRef}
+              style={{
+                position: "absolute",
+                inset: 0,
+                visibility: viewMode === "original" ? "visible" : "hidden",
               }}
             />
             <div
