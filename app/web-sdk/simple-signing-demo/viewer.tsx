@@ -1608,7 +1608,7 @@ export default function SigningDemoViewer() {
               })}
             </div>
             <div className="field-hint">
-              Drag a field onto the document to place it
+              Drag fields onto the document
             </div>
             <div className="or-divider">OR</div>
             <button
