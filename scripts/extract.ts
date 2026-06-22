@@ -98,7 +98,8 @@ export function capText(units: IndexUnit[], cap = DEFAULT_TEXT_CAP): IndexUnit[]
 
 async function extractPdf(buffer: Buffer, entry: CorpusEntry): Promise<IndexUnit[]> {
   const data = new Uint8Array(buffer);
-  const doc = await pdfjs.getDocument({ data, useSystemFonts: true }).promise;
+  const loadingTask = pdfjs.getDocument({ data, useSystemFonts: true });
+  const doc = await loadingTask.promise;
   const units: IndexUnit[] = [];
 
   for (let i = 1; i <= doc.numPages; i++) {
@@ -122,7 +123,7 @@ async function extractPdf(buffer: Buffer, entry: CorpusEntry): Promise<IndexUnit
       text,
     });
   }
-  await doc.destroy();
+  await loadingTask.destroy();
   return units;
 }
 
