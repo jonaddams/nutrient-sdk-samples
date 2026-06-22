@@ -327,7 +327,17 @@ export default function Home() {
               awesome-nutrient
             </a>{" "}
             — a curated list of Nutrient integrations, community projects, and
-            further reading.
+            further reading. Or wire up{" "}
+            <a
+              href="https://www.npmjs.com/package/@nutrient-sdk/viewer-mcp"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--accent)", textDecoration: "underline" }}
+            >
+              @nutrient-sdk/viewer-mcp
+            </a>{" "}
+            — an MCP server that gives AI assistants live access to Web SDK
+            docs, API, examples, and changelog.
           </p>
         </div>
       </div>
