@@ -1,465 +1,163 @@
-# Nutrient SDK Showcase
+# Nutrient SDK Samples
 
-A comprehensive showcase application demonstrating Nutrient Web SDK capabilities, built with Next.js 16, React 19, and TypeScript.
+A solutions-engineering showcase demonstrating Nutrient's document SDKs and APIs
+across browser and server platforms. Each sample is self-contained — copy a
+folder, swap the brand tokens, and ship.
 
-## Features
+Run the app and open [http://localhost:3000](http://localhost:3000); the home
+page is the index of everything below.
 
-### Content Edit API Demo
-- **Text Detection**: Automatically detect all text blocks across PDF documents
-- **Text Selection**: Visual selection and highlighting of text blocks
-- **Find & Replace**: Search and replace text across entire documents
-- **Session Management**: Controlled editing sessions with commit/discard
-- **Real-time Preview**: See changes as annotations before committing
+## What's inside
 
-### Document Generator Demo
-- Interactive wizard for document creation
-- Template-based document generation
-- Multi-step form interface
+The showcase groups demos by product area:
 
-### Text Comparison Demo
-- Side-by-side PDF comparison
-- Text diff visualization
-- Custom comparison UI
+- **Web SDK** — in-browser PDF viewing, annotations, forms, e-signatures,
+  redaction, content editing, search, document assembly, and document/text
+  comparison. The largest collection, covering most viewer and headless
+  workflows.
+- **Python SDK** — server-side form-field detection and fill, digital signing,
+  redaction, format conversion, template generation, and VLM-based extraction
+  (via a separate FastAPI backend).
+- **.NET SDK** — server-side MRC optimization, linearization, and OCR (via a
+  hosted backend).
+- **Java SDK** — server-side conversion, OCR, and digital signing for JVM
+  workloads.
+- **Nutrient DWS API** — signing, conversion, and comparison over REST.
+- **AI Document Processing** — classify and extract structured data from
+  invoices, receipts, and POs.
+- **Document Authoring SDK** — programmatic document generation with templates,
+  variables, and live preview.
+- **Document Engine** — server-side processing (coming soon).
+
+A standalone [**Sign**](https://sign-sage.vercel.app) reference application — a
+full e-signing flow re-themed through the same tokens — is linked from the home
+page.
 
 ## Tech Stack
 
-- **Framework**: Next.js 16.1.1 with App Router and Turbopack
-- **React**: 19.x with modern hooks and concurrent features
-- **TypeScript**: 5.9.3 with strict type checking
-- **PDF SDK**: Nutrient Web SDK 1.10.0
-- **Testing**: Vitest + @testing-library/react
-- **Code Quality**: Biome for linting and formatting
-- **Package Manager**: pnpm
+- **Framework**: Next.js 16 with App Router and Turbopack
+- **UI**: React 19 with TypeScript (strict)
+- **Document SDKs**: Nutrient Web SDK (client-side) plus Python, .NET, Java, and
+  DWS API backends
+- **Testing**: Vitest + Testing Library
+- **Tooling**: Biome (lint + format), pnpm
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ (LTS recommended)
-- pnpm 8+ (or npm/yarn)
-- Nutrient SDK license key
+- Node.js 20+ (LTS recommended)
+- pnpm (or npm/yarn)
+- A Nutrient SDK license key
 
 ### Installation
 
-1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd nutrient-sdk-samples
-```
-
-2. Install dependencies:
-```bash
 pnpm install
 ```
 
-3. Set up environment variables:
-```bash
-# Copy example env file
-cp .env.example .env.local
+Set up environment variables:
 
-# Add your Nutrient license key
-NEXT_PUBLIC_NUTRIENT_LICENSE_KEY=your_license_key_here
+```bash
+cp .env.example .env.local
+# then add your license key:
+# NEXT_PUBLIC_NUTRIENT_LICENSE_KEY=your_license_key_here
 ```
 
-4. Start the development server:
+Start the dev server:
+
 ```bash
 pnpm dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+The Web SDK, AI Document Processing, DWS API, and Document Authoring samples run
+against this front end directly. The Python and .NET samples additionally need
+their backends running — see [Backends](#backends).
 
-## Project Structure
-
-```
-app/
-├── web-sdk/
-│   ├── content-edit-api/     # Content editing demo
-│   │   ├── components/       # UI components
-│   │   ├── viewer.tsx        # Main viewer (731 lines)
-│   │   └── page.tsx          # Route component
-│   ├── document-generator/   # Document generation demo
-│   └── text-comparison/      # Text comparison demo
-├── layout.tsx                # Root layout
-└── page.tsx                  # Home page
-
-lib/
-├── hooks/                    # Custom React hooks
-│   ├── useSyncRef.ts        # Ref synchronization
-│   ├── useTextBlocks.ts     # Text block management
-│   └── useViewerSession.ts  # Session lifecycle
-├── utils/                    # Utility functions
-│   └── typeGuards.ts        # Type safety helpers
-├── context/                  # React contexts
-├── events/                   # Event system
-├── types/                    # TypeScript definitions
-└── constants.ts             # App constants
-
-tests/
-└── setup.ts                 # Test configuration
-
-docs/
-└── ARCHITECTURE.md          # Architecture documentation
-```
-
-## Available Scripts
-
-### Development
-```bash
-pnpm dev          # Start development server with Turbopack
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm lint         # Run Biome linter
-pnpm format       # Format code with Biome
-```
-
-### Testing
-```bash
-pnpm test         # Run all tests
-pnpm test:watch   # Run tests in watch mode
-pnpm test:ui      # Open Vitest UI
-```
-
-### Code Quality
-```bash
-pnpm biome check                    # Check linting and formatting
-pnpm biome check --write            # Fix linting and formatting issues
-pnpm biome format --write           # Format all files
-```
-
-## Architecture
-
-### Component Architecture
-
-The application follows a component-based architecture with clear separation of concerns:
-
-- **Main Viewer**: Orchestrates PDF operations and state management
-- **UI Components**: Reusable, props-based components (FindReplaceDialog, StatsPopup)
-- **Custom Hooks**: Encapsulated logic for sessions, text blocks, and refs
-- **Type Guards**: Safe SDK interop with TypeScript
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.
-
-### Key Design Patterns
-
-1. **Custom Hooks Pattern**: Encapsulate complex logic in reusable hooks
-2. **Controlled Components**: All UI components use controlled props
-3. **Type Safety**: Comprehensive TypeScript typing throughout
-4. **Event System**: Typed event system for component communication
-5. **Context Pattern**: Share SDK instance across components
-
-## Testing
-
-The project includes comprehensive test coverage:
-
-- **75 tests** across 4 test files (+31% from initial baseline)
-- **Unit tests** for hooks and utilities
-- **Component tests** for UI components with CSS module and error scenario testing
-- **Integration tests** for complex workflows
-
-### Running Tests
+## Scripts
 
 ```bash
-# Run all tests
-pnpm test
-
-# Watch mode
-pnpm test:watch
-
-# UI mode
-pnpm test:ui
-
-# Coverage report
-pnpm test:coverage
+pnpm dev            # Start the dev server (Turbopack)
+pnpm build          # Production build
+pnpm start          # Start the production server
+pnpm lint           # Biome lint
+pnpm format         # Biome format
+pnpm test           # Run tests (test:watch, test:ui, test:coverage also available)
+pnpm index          # Build the indexed-search corpus
+pnpm seed-search    # Seed search demo data
 ```
 
-## Content Edit API Usage
+## Backends
 
-### Basic Text Detection
+A few sample groups call separate backend services.
 
-```tsx
-import { useViewerSession } from '@/lib/hooks/useViewerSession';
-import { useTextBlocks } from '@/lib/hooks/useTextBlocks';
+### Python SDK
 
-function MyComponent() {
-  const { beginSession, commitSession } = useViewerSession();
-  const { detectTextBlocks, textBlocks } = useTextBlocks();
+Backend source: https://github.com/jonaddams/python-fast-api
 
-  const handleDetect = async () => {
-    const session = await beginSession();
-    await detectTextBlocks(session, totalPages);
-    // textBlocks now contains all detected text
-  };
-}
-```
-
-### Find and Replace
-
-```tsx
-const { findAndReplace } = useTextBlocks();
-const session = useViewerSession();
-
-const handleReplace = async () => {
-  const { updates, count } = findAndReplace('old text', 'new text');
-  await session.getSession()?.updateTextBlocks(updates);
-  await session.commitSession();
-  console.log(`Replaced ${count} instances`);
-};
-```
-
-## Custom Hooks
-
-### useSyncRef
-
-Keep a ref synchronized with state for use in stable callbacks:
-
-```tsx
-const [count, setCount] = useState(0);
-const countRef = useSyncRef(count);
-
-const handleClick = useCallback(() => {
-  // countRef.current always has latest count
-  console.log(countRef.current);
-}, []); // No need to include count in deps
-```
-
-### useTextBlocks
-
-Manage text blocks state and operations:
-
-```tsx
-const {
-  textBlocks,           // All detected blocks
-  selectedBlocks,       // Selected blocks
-  selectedCount,        // Count of selections
-  isDetecting,          // Loading state
-  detectTextBlocks,     // Detect all text
-  toggleBlockSelection, // Toggle selection
-  findAndReplace       // Find/replace text
-} = useTextBlocks();
-```
-
-### useViewerSession
-
-Manage Nutrient content editing sessions:
-
-```tsx
-const {
-  beginSession,      // Start new session
-  commitSession,     // Save changes
-  discardSession,    // Cancel changes
-  hasActiveSession  // Check if session active
-} = useViewerSession();
-```
-
-## Browser Support
-
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-
-## Performance
-
-- **Lazy Loading**: Components render only when visible
-- **Memoization**: Callbacks and values memoized to prevent re-renders
-- **Efficient Updates**: Batched text block updates
-- **Turbopack**: Fast development builds
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Push your code to GitHub/GitLab/Bitbucket
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy
-
-```bash
-# Or use Vercel CLI
-npx vercel
-```
-
-### Other Platforms
-
-The app can be deployed to any platform supporting Next.js:
-
-```bash
-pnpm build
-pnpm start
-```
-
-## Contributing
-
-### Development Workflow
-
-1. Create a feature branch
-2. Make your changes
-3. Add tests for new functionality
-4. Run tests and linting
-5. Submit a pull request
-
-### Code Style
-
-- Follow TypeScript best practices
-- Add JSDoc comments to public APIs
-- Write tests for new features
-- Use Biome for formatting
-
-## License
-
-[Your License Here]
-
-## Python SDK Samples
-
-Demos calling the Nutrient Python SDK backend. Source for the backend API:
-https://github.com/jonaddams/python-fast-api
-
-### Setup
-
-The Python backend runs locally on `localhost:8080` during development. Clone
-and start it:
+Runs locally on `localhost:8080` during development:
 
 ```bash
 git clone https://github.com/jonaddams/python-fast-api.git
 cd python-fast-api
 python3.12 -m venv .venv
 make install
-cp .env.example .env  # add your NUTRIENT_LICENSE_KEY
-make dev              # uvicorn on :8080 with --reload
+cp .env.example .env   # add your NUTRIENT_LICENSE_KEY
+make dev               # uvicorn on :8080 with --reload
 ```
 
-Then point this app at it in `.env.local`:
+Point this app at it in `.env.local`:
 
 ```
 NEXT_PUBLIC_PYTHON_SDK_API_URL=http://localhost:8080
 ```
 
-Or set it inline for one run:
-
-```bash
-NEXT_PUBLIC_PYTHON_SDK_API_URL=http://localhost:8080 pnpm dev
-```
-
-### Available demos
-
-Visit `/python-sdk` for the index. Pages live under `app/python-sdk/`.
-
-- **Form Field Detection** — Run the Nutrient SDK's ML-based form-field
-  detector on an unfielded IRS Form 940. Includes a confidence-threshold
-  slider so you can see the precision/recall tradeoff directly.
-- **PDF Form Fill** — Detect existing form fields in a sample PDF, fill them
-  with user-entered values, return the filled document.
-- **Digital Signature** — Apply a digital signature using a bundled demo
-  certificate, returning the signed PDF.
-- **VLM Extraction** — Send a PDF to the backend's VLM_ENHANCED_ICR engine
-  (requires a local VLM server such as LM Studio on `localhost:1234`; if
-  unavailable, the backend returns a structured 503).
-- **Office to PDF**, **Markdown to PDF**, **PDF to HTML**, **PDF to Office**
-  — Document format conversions.
-- **PDF Redaction** — Permanently remove sensitive content.
-- **Word Template Generation** — Generate PDFs from Word templates populated
-  with JSON data.
-
 The backend's full endpoint list is at `http://localhost:8080/docs` once
 `make dev` is running.
 
-## .NET SDK Samples
+### .NET SDK
 
-Demos calling the Nutrient .NET SDK backend deployed on Railway. Source for
-the backend API: https://github.com/jonaddams/nutrient-dotnet-api
+Backend source: https://github.com/jonaddams/nutrient-dotnet-api (deployed on
+Railway).
 
-### Setup
-
-Add to your `.env.local`:
+Add to `.env.local`:
 
 ```
 NEXT_PUBLIC_DOTNET_SDK_API_URL=https://nutrient-dotnet-api-production.up.railway.app
 DOTNET_SDK_API_KEY=<the X-API-Key value set in Railway env vars>
 ```
 
-`DOTNET_SDK_API_KEY` is a server-side secret. Browser code never sees it —
-all calls go through `/app/api/dotnet-sdk/*` proxy routes, which add the
-header before forwarding to the .NET API.
+`DOTNET_SDK_API_KEY` is a server-side secret — browser code never sees it. All
+calls go through the `/app/api/dotnet-sdk/*` proxy routes, which add the header
+before forwarding to the .NET API.
 
-### Available demos
+## Deployment
 
-- **Optimize** — MRC compression to dramatically reduce PDF file size on
-  image-heavy documents. Choose from curated sample PDFs in the picker.
-- **Linearize** — Restructure a PDF for fast web view (progressive loading
-  over HTTP). Choose from curated sample PDFs in the picker.
-- **OCR** — Run optical character recognition on a scanned PDF. Choose
-  Searchable PDF mode (adds a selectable text layer) or Extracted Text mode
-  (returns the raw recognized text). Supports English, French, German, and
-  Spanish via a language picker.
-- (Coming soon: convert, redact, pdfa, merge, watermark.)
+Deploys cleanly to Vercel (recommended): push to your Git host, import the
+project, add the environment variables, and deploy. Any Next.js-compatible host
+works via `pnpm build` && `pnpm start`.
+
+## Theming
+
+The full design vocabulary lives in CSS variables on `<html>`. Override
+`data-palette`, `data-theme`, or the tokens directly to rebrand the whole app.
 
 ## Resources
 
-### Documentation
-- [Nutrient SDK Documentation](https://pspdfkit.com/guides/web/)
+- [Nutrient SDK Documentation](https://www.nutrient.io/guides/web/)
+- [`@nutrient-sdk/viewer-mcp`](https://www.npmjs.com/package/@nutrient-sdk/viewer-mcp) — MCP server giving AI assistants live access to Web SDK docs, API, examples, and changelog
 - [Next.js Documentation](https://nextjs.org/docs)
 - [React Documentation](https://react.dev)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 
-### Internal Documentation
-- [Architecture Guide](docs/ARCHITECTURE.md) - Detailed architecture overview
-- [API Reference](docs/API.md) - API documentation (coming soon)
+## Contributing
 
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: PDF doesn't load
-- Verify Nutrient license key is set
-- Check console for SDK errors
-- Ensure PDF file exists and is accessible
-
-**Issue**: Text detection fails
-- Verify an active session exists
-- Check if PDF contains selectable text
-- Review SDK console errors
-
-**Issue**: Tests failing
-- Run `pnpm install` to ensure dependencies are up to date
-- Clear test cache: `pnpm test --clearCache`
-- Check test setup in `tests/setup.ts`
-
-## Support
-
-For issues and questions:
-- File an issue on GitHub
-- Check existing documentation
-- Review SDK documentation
-
-## Changelog
-
-### v1.0.0 - Current
-- ✅ Phase 1: Quick Wins (completed)
-  - Created custom hooks (useSyncRef, useTextBlocks, useViewerSession)
-  - Added type guards for SDK safety
-  - Implemented typed event system
-
-- ✅ Phase 2: Component Refactoring (completed)
-  - Extracted FindReplaceDialog component
-  - Extracted StatsPopup component
-  - Reduced main viewer from 940 to 731 lines
-
-- ✅ Phase 3: Testing Infrastructure (completed)
-  - Set up Vitest with @testing-library/react
-  - Added 57 tests across hooks, utilities, and components
-  - Achieved comprehensive test coverage
-
-- ✅ Phase 4: Documentation (completed)
-  - Added JSDoc comments to all hooks and utilities
-  - Created comprehensive architecture guide
-  - Updated README with full project information
-
-### Upcoming
-- Phase 5: Performance & Polish
-  - Virtual scrolling for large documents
-  - Centralized error handling
-  - CSS modules migration
-  - Enhanced accessibility
+1. Create a feature branch
+2. Make your changes (add tests where it makes sense)
+3. Run `pnpm lint` and `pnpm test`
+4. Open a pull request
 
 ---
 
-Built with ❤️ using Nutrient Web SDK
+Built with Nutrient SDKs.
