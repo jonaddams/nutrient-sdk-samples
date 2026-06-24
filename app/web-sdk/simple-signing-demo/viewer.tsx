@@ -19,10 +19,12 @@
  *    - Uses Nutrient's Document Signing Service (DWS) API
  *    - Provides tamper-evident proof and legal compliance
  *
- * 4. SIGNATURE FLATTENING:
+ * 4. SIGNATURE FLATTENING + CERTIFICATE PAGE:
  *    - Before digital signing, electronic signature images are flattened
  *    - Flattening makes signatures permanent (prevents removal/modification)
  *    - "By Nutrient {ID}" labels are added as TextAnnotations
+ *    - A blank certificate page is appended; the digital signature is rendered
+ *      visibly on it (native appearance: signer, reason, date, watermark)
  *
  * 5. ANNOTATION PERMISSIONS:
  *    - Form fields dynamically update readOnly status based on current user
@@ -1275,13 +1277,16 @@ export default function SigningDemoViewer() {
    *    - Create "By Nutrient {ID}" TextAnnotations above each signature
    *    - Flatten all annotations to make them permanent
    *
-   * 2. REQUEST TOKEN:
+   * 2. APPEND CERTIFICATE PAGE:
+   *    - Add a blank page at the end (sized to the last page) via applyOperations
+   *
+   * 3. REQUEST TOKEN:
    *    - Call DWS API to get JWT authentication token
    *    - Token authorizes the signing operation
    *
-   * 3. SIGN DOCUMENT:
-   *    - Use instance.signDocument() with CAdES signature type
-   *    - Uses PAdES-B-LT level for long-term validation
+   * 4. SIGN DOCUMENT (VISIBLE):
+   *    - Use instance.signDocument() with CAdES + PAdES-B-LT
+   *    - Place a VISIBLE signature on the certificate page via position + appearance
    *    - Digital signature is cryptographic and tamper-evident
    *
    * 4. UPDATE UI:
