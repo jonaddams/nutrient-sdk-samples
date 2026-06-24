@@ -49,6 +49,16 @@ const STORAGE_KEY = "nutrient_signatures_storage";
 const ATTACHMENTS_KEY = "nutrient_attachments_storage";
 
 /**
+ * Metadata shown in the visible digital-signature block on the appended
+ * certificate page. Demo values — safe to retune per prospect.
+ */
+const CERTIFICATE_SIGNATURE_METADATA = {
+  signerName: "Nutrient DWS Demo",
+  signatureReason: "Approved and digitally sealed",
+  signatureLocation: "Nutrient Web SDK — Simple Signing Demo",
+};
+
+/**
  * Helper function to convert File/Blob to data URL
  * Used for storing signature image attachments in localStorage
  */
@@ -1401,6 +1411,30 @@ export default function SigningDemoViewer() {
       console.log("All annotations flattened successfully");
 
       /**
+       * STEP 3.5: APPEND SIGNATURE CERTIFICATE PAGE
+       * Add a blank page at the end (matching the last page's size) to carry the
+       * visible digital signature, leaving the original content untouched.
+       * Kept as a separate applyOperations call from the flatten above.
+       */
+      console.log("--- STEP 3.5: Appending signature certificate page ---");
+      setSignStatus("Adding signature page...");
+      const lastPageIndex = instance.totalPageCount - 1;
+      const lastPageInfo = await instance.pageInfoForIndex(lastPageIndex);
+      if (!lastPageInfo) throw new Error("Could not get last page info");
+      await instance.applyOperations([
+        {
+          type: "addPage",
+          afterPageIndex: lastPageIndex,
+          pageWidth: lastPageInfo.width,
+          pageHeight: lastPageInfo.height,
+          backgroundColor: new NV.Color({ r: 255, g: 255, b: 255 }),
+          rotateBy: 0,
+        },
+      ]);
+      const certPageIndex = instance.totalPageCount - 1;
+      console.log("Certificate page added at index", certPageIndex);
+
+      /**
        * STEP 4: GET AUTHENTICATION TOKEN
        * Request JWT token from DWS API to authorize digital signing
        */
@@ -1450,11 +1484,34 @@ export default function SigningDemoViewer() {
       console.log("--- STEP 5: Applying digital signature ---");
       setSignStatus("Signing document...");
 
+      // Place a VISIBLE signature, centered on the appended certificate page.
+      const certPageInfo = await instance.pageInfoForIndex(certPageIndex);
+      if (!certPageInfo) throw new Error("Could not get certificate page info");
+      const sigBoxWidth = 280;
+      const sigBoxHeight = 120;
       const signingConfig = {
         signingData: {
           signatureType: NV.SignatureType.CAdES,
           padesLevel: NV.PAdESLevel.b_lt,
         },
+        // `position` and `formFieldName` are mutually exclusive — use position only.
+        position: {
+          pageIndex: certPageIndex,
+          boundingBox: new NV.Geometry.Rect({
+            left: (certPageInfo.width - sigBoxWidth) / 2,
+            top: (certPageInfo.height - sigBoxHeight) / 2,
+            width: sigBoxWidth,
+            height: sigBoxHeight,
+          }),
+        },
+        appearance: {
+          mode: NV.SignatureAppearanceMode.signatureAndDescription,
+          showSigner: true,
+          showReason: true,
+          showSignDate: true,
+          showWatermark: true,
+        },
+        signatureMetadata: CERTIFICATE_SIGNATURE_METADATA,
       };
 
       const authConfig = {
@@ -1484,6 +1541,7 @@ export default function SigningDemoViewer() {
       await instance.setViewState(
         currentViewState
           .set("interactionMode", NV.InteractionMode.PAN)
+          .set("currentPageIndex", certPageIndex)
           .set(
             "showSignatureValidationStatus",
             NV.ShowSignatureValidationStatusMode.IF_SIGNED,
@@ -1607,9 +1665,7 @@ export default function SigningDemoViewer() {
                 );
               })}
             </div>
-            <div className="field-hint">
-              Drag fields onto the document
-            </div>
+            <div className="field-hint">Drag fields onto the document</div>
             <div className="or-divider">OR</div>
             <button
               type="button"
