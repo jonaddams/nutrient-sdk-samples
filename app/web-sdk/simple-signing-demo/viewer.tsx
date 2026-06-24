@@ -1289,7 +1289,7 @@ export default function SigningDemoViewer() {
    *    - Place a VISIBLE signature on the certificate page via position + appearance
    *    - Digital signature is cryptographic and tamper-evident
    *
-   * 4. UPDATE UI:
+   * 5. UPDATE UI:
    *    - Show signature validation status banner
    *    - Hide any remaining unsigned field overlays
    *    - Display success message
