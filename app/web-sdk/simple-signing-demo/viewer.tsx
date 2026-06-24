@@ -19,10 +19,12 @@
  *    - Uses Nutrient's Document Signing Service (DWS) API
  *    - Provides tamper-evident proof and legal compliance
  *
- * 4. SIGNATURE FLATTENING:
+ * 4. SIGNATURE FLATTENING + CERTIFICATE PAGE:
  *    - Before digital signing, electronic signature images are flattened
  *    - Flattening makes signatures permanent (prevents removal/modification)
  *    - "By Nutrient {ID}" labels are added as TextAnnotations
+ *    - A blank certificate page is appended; the digital signature is rendered
+ *      visibly on it (native appearance: signer, reason, date, watermark)
  *
  * 5. ANNOTATION PERMISSIONS:
  *    - Form fields dynamically update readOnly status based on current user
@@ -47,6 +49,16 @@ import "./styles.css";
 // LocalStorage keys for signature storage
 const STORAGE_KEY = "nutrient_signatures_storage";
 const ATTACHMENTS_KEY = "nutrient_attachments_storage";
+
+/**
+ * Metadata shown in the visible digital-signature block on the appended
+ * certificate page. Demo values — safe to retune per prospect.
+ */
+const CERTIFICATE_SIGNATURE_METADATA = {
+  signerName: "Nutrient DWS Demo",
+  signatureReason: "Approved and digitally sealed",
+  signatureLocation: "Nutrient Web SDK — Simple Signing Demo",
+};
 
 /**
  * Helper function to convert File/Blob to data URL
@@ -1265,16 +1277,19 @@ export default function SigningDemoViewer() {
    *    - Create "By Nutrient {ID}" TextAnnotations above each signature
    *    - Flatten all annotations to make them permanent
    *
-   * 2. REQUEST TOKEN:
+   * 2. APPEND CERTIFICATE PAGE:
+   *    - Add a blank page at the end (sized to the last page) via applyOperations
+   *
+   * 3. REQUEST TOKEN:
    *    - Call DWS API to get JWT authentication token
    *    - Token authorizes the signing operation
    *
-   * 3. SIGN DOCUMENT:
-   *    - Use instance.signDocument() with CAdES signature type
-   *    - Uses PAdES-B-LT level for long-term validation
+   * 4. SIGN DOCUMENT (VISIBLE):
+   *    - Use instance.signDocument() with CAdES + PAdES-B-LT
+   *    - Place a VISIBLE signature on the certificate page via position + appearance
    *    - Digital signature is cryptographic and tamper-evident
    *
-   * 4. UPDATE UI:
+   * 5. UPDATE UI:
    *    - Show signature validation status banner
    *    - Hide any remaining unsigned field overlays
    *    - Display success message
@@ -1401,6 +1416,30 @@ export default function SigningDemoViewer() {
       console.log("All annotations flattened successfully");
 
       /**
+       * STEP 3.5: APPEND SIGNATURE CERTIFICATE PAGE
+       * Add a blank page at the end (matching the last page's size) to carry the
+       * visible digital signature, leaving the original content untouched.
+       * Kept as a separate applyOperations call from the flatten above.
+       */
+      console.log("--- STEP 3.5: Appending signature certificate page ---");
+      setSignStatus("Adding signature page...");
+      const lastPageIndex = instance.totalPageCount - 1;
+      const lastPageInfo = await instance.pageInfoForIndex(lastPageIndex);
+      if (!lastPageInfo) throw new Error("Could not get last page info");
+      await instance.applyOperations([
+        {
+          type: "addPage",
+          afterPageIndex: lastPageIndex,
+          pageWidth: lastPageInfo.width,
+          pageHeight: lastPageInfo.height,
+          backgroundColor: new NV.Color({ r: 255, g: 255, b: 255 }),
+          rotateBy: 0,
+        },
+      ]);
+      const certPageIndex = instance.totalPageCount - 1;
+      console.log("Certificate page added at index", certPageIndex);
+
+      /**
        * STEP 4: GET AUTHENTICATION TOKEN
        * Request JWT token from DWS API to authorize digital signing
        */
@@ -1450,11 +1489,34 @@ export default function SigningDemoViewer() {
       console.log("--- STEP 5: Applying digital signature ---");
       setSignStatus("Signing document...");
 
+      // Place a VISIBLE signature, centered on the appended certificate page.
+      const certPageInfo = await instance.pageInfoForIndex(certPageIndex);
+      if (!certPageInfo) throw new Error("Could not get certificate page info");
+      const sigBoxWidth = 280;
+      const sigBoxHeight = 120;
       const signingConfig = {
         signingData: {
           signatureType: NV.SignatureType.CAdES,
           padesLevel: NV.PAdESLevel.b_lt,
         },
+        // `position` and `formFieldName` are mutually exclusive — use position only.
+        position: {
+          pageIndex: certPageIndex,
+          boundingBox: new NV.Geometry.Rect({
+            left: (certPageInfo.width - sigBoxWidth) / 2,
+            top: (certPageInfo.height - sigBoxHeight) / 2,
+            width: sigBoxWidth,
+            height: sigBoxHeight,
+          }),
+        },
+        appearance: {
+          mode: NV.SignatureAppearanceMode.signatureAndDescription,
+          showSigner: true,
+          showReason: true,
+          showSignDate: true,
+          showWatermark: true,
+        },
+        signatureMetadata: CERTIFICATE_SIGNATURE_METADATA,
       };
 
       const authConfig = {
@@ -1484,6 +1546,8 @@ export default function SigningDemoViewer() {
       await instance.setViewState(
         currentViewState
           .set("interactionMode", NV.InteractionMode.PAN)
+          // Land on the certificate page so the visible signature is in view.
+          .set("currentPageIndex", certPageIndex)
           .set(
             "showSignatureValidationStatus",
             NV.ShowSignatureValidationStatusMode.IF_SIGNED,
@@ -1607,9 +1671,7 @@ export default function SigningDemoViewer() {
                 );
               })}
             </div>
-            <div className="field-hint">
-              Drag fields onto the document
-            </div>
+            <div className="field-hint">Drag fields onto the document</div>
             <div className="or-divider">OR</div>
             <button
               type="button"

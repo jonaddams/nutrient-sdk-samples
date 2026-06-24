@@ -13,7 +13,7 @@ export default function SimpleSigningDemoPage() {
   return (
     <SampleFrame
       title="Simple Signing Demo"
-      description="Demonstrates digital signing workflow with the Nutrient Web SDK and DWS API."
+      description="Demonstrates a digital signing workflow with the Nutrient Web SDK and DWS API, finishing with a visible signature on an appended certificate page."
     >
       <Viewer />
     </SampleFrame>
