@@ -94,7 +94,7 @@ export default function RootLayout({
         />
 
         <script
-          src={`https://document-authoring.cdn.nutrient.io/releases/document-authoring-${process.env.NEXT_PUBLIC_DOCUMENT_AUTHORING_SDK_VERSION || "1.10.0"}-umd.js`}
+          src={`https://document-authoring.cdn.nutrient.io/releases/document-authoring-${process.env.NEXT_PUBLIC_DOCUMENT_AUTHORING_SDK_VERSION || "1.16.0"}-umd.js`}
         />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js" />
