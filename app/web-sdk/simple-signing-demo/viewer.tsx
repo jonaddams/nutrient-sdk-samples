@@ -1546,6 +1546,7 @@ export default function SigningDemoViewer() {
       await instance.setViewState(
         currentViewState
           .set("interactionMode", NV.InteractionMode.PAN)
+          // Land on the certificate page so the visible signature is in view.
           .set("currentPageIndex", certPageIndex)
           .set(
             "showSignatureValidationStatus",
