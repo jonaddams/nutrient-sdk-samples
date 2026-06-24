@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 
-const VERSION = process.env.NEXT_PUBLIC_WEB_SDK_VERSION || "1.10.0";
+const VERSION = process.env.NEXT_PUBLIC_WEB_SDK_VERSION || "1.16.1";
 const BASE_URL = `https://cdn.cloud.pspdfkit.com/pspdfkit-web@${VERSION}/`;
 const LICENSE_KEY = process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY;
 
