@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif, Fraunces } from "next/font/google";
+import {
+  Fraunces,
+  Geist,
+  Geist_Mono,
+  Instrument_Serif,
+} from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ErrorBoundary } from "@/lib/components/ErrorBoundary";
-import { TopBar } from "./_components/TopBar";
 import { Footer } from "./_components/Footer";
 import { NutrientViewerScript } from "./_components/NutrientViewerScript";
+import { TopBar } from "./_components/TopBar";
 
 const geist = Geist({
   subsets: ["latin"],
