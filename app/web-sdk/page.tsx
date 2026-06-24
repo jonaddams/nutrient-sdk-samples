@@ -209,7 +209,7 @@ const samples: Sample[] = [
     name: "Simple Signing Demo",
     category: "Signatures",
     description:
-      "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and digital signatures via DWS API",
+      "Complete signature workflow with drag-and-drop field placement, electronic signatures, role-based permissions, signature flattening, and a visible digital signature on an appended certificate page via DWS API",
     path: "/web-sdk/simple-signing-demo",
   },
   {
