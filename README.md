@@ -46,7 +46,7 @@ page.
 
 ### Prerequisites
 
-- Node.js 20+ (LTS recommended)
+- Node.js 20.9+ (22 or 24 LTS recommended — required by Next.js 16)
 - pnpm (or npm/yarn)
 - A Nutrient SDK license key
 
@@ -61,10 +61,14 @@ pnpm install
 Set up environment variables:
 
 ```bash
-cp .env.example .env.local
+cp env.sample .env.local
 # then add your license key:
 # NEXT_PUBLIC_NUTRIENT_LICENSE_KEY=your_license_key_here
 ```
+
+`env.sample` is the canonical list of every variable the app reads, grouped by
+sample area and annotated. Only the license key is required for the Web SDK
+samples; the backend variables below are needed only for those sample groups.
 
 Start the dev server:
 
@@ -116,6 +120,21 @@ NEXT_PUBLIC_PYTHON_SDK_API_URL=http://localhost:8080
 
 The backend's full endpoint list is at `http://localhost:8080/docs` once
 `make dev` is running.
+
+### Java SDK
+
+Backend source: https://github.com/jonaddams/java-spring-boot — a Spring Boot
+service wrapping the Nutrient Java SDK. Run it per that repo's README; it serves
+on `localhost:8080` by default.
+
+Point this app at it in `.env.local`:
+
+```
+NEXT_PUBLIC_JAVA_SDK_API_URL=http://localhost:8080
+```
+
+> The Python and Java backends both default to port `8080`. To run them at the
+> same time, start one on a different port and update its URL var to match.
 
 ### .NET SDK
 
