@@ -3,7 +3,7 @@
 // ============================================================================
 
 export const NUTRIENT_SDK = {
-  VERSION: process.env.NEXT_PUBLIC_WEB_SDK_VERSION || "1.10.0",
+  VERSION: process.env.NEXT_PUBLIC_WEB_SDK_VERSION || "1.16.1",
   CDN_BASE: "https://cdn.cloud.pspdfkit.com",
   LICENSE_KEY: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY || "",
 } as const;
