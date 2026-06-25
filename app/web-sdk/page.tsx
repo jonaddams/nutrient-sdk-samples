@@ -304,6 +304,17 @@ const intro = (
         </pre>
       </figure>
     </div>
+    <p>
+      Prefer agent skills? Follow the{" "}
+      <a
+        href="https://www.nutrient.io/guides/web/agent-skill/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Web SDK agent skill guide
+      </a>{" "}
+      to install Nutrient skills directly into your coding agent.
+    </p>
   </div>
 );
 
