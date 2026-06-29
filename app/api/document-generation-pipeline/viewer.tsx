@@ -260,7 +260,7 @@ export default function Viewer() {
         title="Document Generation Pipeline"
         description="Generate a contract from data, auto-place signature fields by content with the DWS API, then sign it in the viewer."
       />
-      <div className="flex flex-1 min-h-0">
+      <div className="shell flex flex-1 min-h-0" style={{ width: "100%" }}>
         <aside
           style={{
             width: 360,
