@@ -58,11 +58,20 @@ export async function POST(request: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (obj: unknown) =>
+      let closed = false;
+      const safeClose = () => {
+        if (!closed) {
+          closed = true;
+          controller.close();
+        }
+      };
+      const send = (obj: unknown) => {
+        if (closed) return;
         controller.enqueue(encoder.encode(`${JSON.stringify(obj)}\n`));
+      };
       const fail = (step: string, detail: string) => {
         send({ step, status: "error", detail });
-        controller.close();
+        safeClose();
       };
 
       try {
@@ -177,14 +186,14 @@ export async function POST(request: NextRequest) {
             page: a.pageIndex,
           })),
         });
-        controller.close();
+        safeClose();
       } catch (error) {
         send({
           step: "error",
           status: "error",
           detail: error instanceof Error ? error.message : String(error),
         });
-        controller.close();
+        safeClose();
       }
     },
   });
