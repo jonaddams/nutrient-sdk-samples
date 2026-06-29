@@ -52,7 +52,11 @@ describe("locateAnchors", () => {
 
   it("ignores non-anchor words", () => {
     const anchors = locateAnchors(content);
-    expect(anchors.find((a) => a.fieldName === "Agreement")).toBeUndefined();
+    expect(
+      anchors.every((a) =>
+        ["signatureClient", "signatureProvider"].includes(a.fieldName),
+      ),
+    ).toBe(true);
   });
 
   it("returns [] when pages or structuredText are missing", () => {
@@ -91,6 +95,18 @@ describe("buildInstantJson", () => {
       id: "field-0",
       name: "signatureClient",
       annotationIds: ["widget-0"],
+    });
+    expect(ij.annotations[1]).toMatchObject({
+      type: "pspdfkit/widget",
+      id: "widget-1",
+      pageIndex: 0,
+      formFieldName: "signatureProvider",
+    });
+    expect(ij.formFields[1]).toMatchObject({
+      type: "pspdfkit/form-field/signature",
+      id: "field-1",
+      name: "signatureProvider",
+      annotationIds: ["widget-1"],
     });
   });
 });
