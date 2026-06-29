@@ -5,7 +5,7 @@ import {
   type JsonContent,
   locateAnchors,
 } from "../../pipeline";
-import { type MergeValues, mergeTemplate, SIGNERS } from "../../template";
+import { type MergeValues, mergeTemplate, SIGNERS } from "../../contract-template";
 
 export const runtime = "nodejs";
 

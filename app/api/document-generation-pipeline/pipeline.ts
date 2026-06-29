@@ -1,4 +1,4 @@
-import { SIGNERS } from "./template";
+import { SIGNERS } from "./contract-template";
 
 export interface Bbox {
   left: number;

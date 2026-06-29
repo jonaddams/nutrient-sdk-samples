@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/app/_components/PageHeader";
-import { DEFAULT_VALUES, type MergeValues } from "./template";
+import { DEFAULT_VALUES, type MergeValues } from "./contract-template";
 
 interface StepEvent {
   step: string;

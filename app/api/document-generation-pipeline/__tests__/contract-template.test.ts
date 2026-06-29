@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_VALUES, mergeTemplate, SIGNERS } from "../template";
+import { DEFAULT_VALUES, mergeTemplate, SIGNERS } from "../contract-template";
 
 describe("mergeTemplate", () => {
   it("interpolates merge values into the HTML", () => {
