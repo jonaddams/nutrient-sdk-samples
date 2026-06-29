@@ -50,6 +50,7 @@ export default function Viewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
   const instanceRef = useRef<any>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   function setStep(key: string, status: StepStatus, detail?: string) {
     setSteps((prev) => ({ ...prev, [key]: { status, detail } }));
@@ -67,14 +68,28 @@ export default function Viewer() {
     setStep(STEP_DEFS[0].key, "running");
 
     try {
+      const controller = new AbortController();
+      abortRef.current = controller;
       const res = await fetch(
         "/api/document-generation-pipeline/api/generate",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
+          signal: controller.signal,
         },
       );
+      if (!res.ok) {
+        const text = await res.text();
+        let message = `Request failed (${res.status})`;
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed?.error) message = parsed.error;
+        } catch {
+          // body was not JSON; keep the status-based message
+        }
+        throw new Error(message);
+      }
       if (!res.body) throw new Error("No response stream");
 
       const reader = res.body.getReader();
@@ -94,6 +109,7 @@ export default function Viewer() {
         }
       }
     } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setRunning(false);
@@ -160,6 +176,9 @@ export default function Viewer() {
       instanceRef.current = null;
     };
   }, [docBuffer]);
+
+  // Abort any in-flight fetch/stream when the component unmounts.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const field = (key: keyof MergeValues, label: string) => (
     <label style={{ display: "block", marginBottom: 12 }}>
