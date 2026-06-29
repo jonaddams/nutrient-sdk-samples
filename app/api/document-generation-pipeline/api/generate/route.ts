@@ -1,11 +1,15 @@
 // app/api/document-generation-pipeline/api/generate/route.ts
 import type { NextRequest } from "next/server";
 import {
+  FORM_FIELDS,
+  type MergeValues,
+  mergeTemplate,
+} from "../../contract-template";
+import {
   buildInstantJson,
   type JsonContent,
   locateAnchors,
 } from "../../pipeline";
-import { type MergeValues, mergeTemplate, SIGNERS } from "../../contract-template";
 
 export const runtime = "nodejs";
 
@@ -133,16 +137,27 @@ export async function POST(request: NextRequest) {
         send({
           step: "locate",
           status: "done",
-          detail: `${anchors.length} signature anchors located`,
+          detail: `${anchors.length} form-field anchors located`,
         });
 
         // Step 4: scrub markers (white redaction) + add signature fields, one call.
-        const instantJson = buildInstantJson(anchors);
-        const redactions = SIGNERS.map((signer) => ({
+        // Pre-fill the "date signed" text fields with today's date.
+        const dateSigned = new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const instantJson = buildInstantJson(anchors, {
+          textValue: dateSigned,
+        });
+        const redactions = FORM_FIELDS.map((spec) => ({
           type: "createRedactions",
           strategy: "text",
-          strategyOptions: { text: signer.token, caseSensitive: false },
-          content: { backgroundColor: "#FFFFFF", overlayText: "" },
+          strategyOptions: { text: spec.token, caseSensitive: false },
+          // fillColor is the color the area is filled with AFTER applying the
+          // redaction; white makes the scrubbed marker invisible. (backgroundColor
+          // is the pre-apply marker color and does NOT affect the applied fill.)
+          content: { fillColor: "#FFFFFF" },
         }));
         const finalRes = await dwsBuild(
           {
@@ -173,7 +188,7 @@ export async function POST(request: NextRequest) {
         send({
           step: "fields",
           status: "done",
-          detail: `${anchors.length} signature fields added`,
+          detail: `${anchors.length} form fields added`,
         });
 
         // Final line: the document + anchor summary.

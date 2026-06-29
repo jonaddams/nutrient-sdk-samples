@@ -3,7 +3,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/app/_components/PageHeader";
-import { DEFAULT_VALUES, type MergeValues } from "./contract-template";
+import {
+  DEFAULT_VALUES,
+  type MergeValues,
+  mergeTemplate,
+} from "./contract-template";
 
 interface StepEvent {
   step: string;
@@ -18,8 +22,8 @@ type StepStatus = "pending" | "running" | "done" | "error";
 const STEP_DEFS: { key: string; label: string }[] = [
   { key: "html", label: "Build HTML from form data" },
   { key: "pdf", label: "Generate PDF (HTML → PDF)" },
-  { key: "locate", label: "Locate signature anchors" },
-  { key: "fields", label: "Scrub markers & add signature fields" },
+  { key: "locate", label: "Locate field anchors" },
+  { key: "fields", label: "Scrub markers & add form fields" },
 ];
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
@@ -27,6 +31,26 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes.buffer;
+}
+
+// Today's date as a local YYYY-MM-DD string for the <input type="date"> default.
+function todayISO(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// Turn an ISO date (YYYY-MM-DD) into a human-readable string for the contract
+// body, e.g. "June 29, 2026". Falls back to the raw value if not ISO.
+function formatDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return iso;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 const inputStyle: React.CSSProperties = {
@@ -39,13 +63,17 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function Viewer() {
-  const [values, setValues] = useState<MergeValues>(DEFAULT_VALUES);
+  const [values, setValues] = useState<MergeValues>(() => ({
+    ...DEFAULT_VALUES,
+    effectiveDate: todayISO(),
+  }));
   const [steps, setSteps] = useState<
     Record<string, { status: StepStatus; detail?: string }>
   >({});
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [docBuffer, setDocBuffer] = useState<ArrayBuffer | null>(null);
+  const [htmlPreview, setHtmlPreview] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   // biome-ignore lint/suspicious/noExplicitAny: NutrientViewer instance type is not available
@@ -56,6 +84,22 @@ export default function Viewer() {
     setSteps((prev) => ({ ...prev, [key]: { status, detail } }));
   }
 
+  // Merge values with the effective date formatted for the contract body.
+  // Used for both the client-side preview and the server pipeline, so the
+  // previewed HTML matches exactly what gets converted.
+  function mergedValues(): MergeValues {
+    return { ...values, effectiveDate: formatDate(values.effectiveDate) };
+  }
+
+  // Step 1: build and show the merged HTML. No PDF is produced yet.
+  function preview() {
+    setError(null);
+    setDocBuffer(null);
+    setSteps({});
+    setHtmlPreview(mergeTemplate(mergedValues()));
+  }
+
+  // Step 2: run the DWS pipeline and swap the preview for the signable PDF.
   async function generate() {
     setRunning(true);
     setError(null);
@@ -75,7 +119,7 @@ export default function Viewer() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
+          body: JSON.stringify(mergedValues()),
           signal: controller.signal,
         },
       );
@@ -180,7 +224,7 @@ export default function Viewer() {
   // Abort any in-flight fetch/stream when the component unmounts.
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  const field = (key: keyof MergeValues, label: string) => (
+  const field = (key: keyof MergeValues, label: string, type = "text") => (
     <label style={{ display: "block", marginBottom: 12 }}>
       <span
         style={{
@@ -193,13 +237,22 @@ export default function Viewer() {
         {label}
       </span>
       <input
+        type={type}
         style={inputStyle}
         value={values[key]}
         disabled={running}
-        onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))}
+        onChange={(e) => {
+          setValues((v) => ({ ...v, [key]: e.target.value }));
+          // Editing invalidates a shown preview/document — return to "Preview".
+          setHtmlPreview(null);
+          setDocBuffer(null);
+        }}
       />
     </label>
   );
+
+  // After a preview is shown (and before the PDF arrives), the button converts.
+  const awaitingGenerate = htmlPreview !== null && !docBuffer;
 
   return (
     <div className="flex flex-col h-full">
@@ -222,11 +275,11 @@ export default function Viewer() {
           {field("clientName", "Client name")}
           {field("providerName", "Provider name")}
           {field("feePerMonth", "Fee per month ($)")}
-          {field("effectiveDate", "Effective date")}
+          {field("effectiveDate", "Effective date", "date")}
 
           <button
             type="button"
-            onClick={generate}
+            onClick={awaitingGenerate ? generate : preview}
             disabled={running}
             style={{
               marginTop: 8,
@@ -237,12 +290,17 @@ export default function Viewer() {
               color: "var(--on-accent, #fff)",
               fontWeight: 600,
               opacity: running ? 0.6 : 1,
+              cursor: running ? "default" : "pointer",
             }}
           >
-            {running ? "Generating…" : "Generate signable PDF"}
+            {running
+              ? "Generating…"
+              : awaitingGenerate
+                ? "Generate signable PDF"
+                : "Preview"}
           </button>
 
-          <ol style={{ marginTop: 24, listStyle: "none", padding: 0 }}>
+          <ul style={{ marginTop: 24, listStyle: "none", padding: 0 }}>
             {STEP_DEFS.map((def, i) => {
               const s = steps[def.key]?.status ?? "pending";
               const mark =
@@ -282,7 +340,7 @@ export default function Viewer() {
                 </li>
               );
             })}
-          </ol>
+          </ul>
 
           {error && (
             <p
@@ -303,6 +361,52 @@ export default function Viewer() {
               ref={containerRef}
               style={{ position: "absolute", inset: 0 }}
             />
+          ) : htmlPreview ? (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              {/* Constrain the preview to a document-like 768px column, centered. */}
+              <div
+                style={{
+                  width: "100%",
+                  maxWidth: 768,
+                  flex: 1,
+                  minHeight: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "8px 16px",
+                    borderBottom: "1px solid var(--line)",
+                    fontSize: 13,
+                    color: "var(--ink-3)",
+                  }}
+                >
+                  {running
+                    ? "Converting to a signable PDF…"
+                    : "HTML preview — click Generate to create the signable PDF"}
+                </div>
+                <iframe
+                  title="Generated HTML preview"
+                  srcDoc={htmlPreview}
+                  sandbox=""
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                    border: "none",
+                    background: "#fff",
+                  }}
+                />
+              </div>
+            </div>
           ) : (
             <div
               className="flex items-center justify-center h-full"

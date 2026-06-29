@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_VALUES, mergeTemplate, SIGNERS } from "../contract-template";
+import {
+  DEFAULT_VALUES,
+  FORM_FIELDS,
+  mergeTemplate,
+} from "../contract-template";
 
 describe("mergeTemplate", () => {
   it("interpolates merge values into the HTML", () => {
@@ -15,10 +19,10 @@ describe("mergeTemplate", () => {
     expect(html).toContain("March 3, 2026");
   });
 
-  it("contains every signer anchor token exactly once", () => {
+  it("contains every form-field anchor token exactly once", () => {
     const html = mergeTemplate(DEFAULT_VALUES);
-    for (const signer of SIGNERS) {
-      const matches = html.split(signer.token).length - 1;
+    for (const spec of FORM_FIELDS) {
+      const matches = html.split(spec.token).length - 1;
       expect(matches).toBe(1);
     }
   });
@@ -32,10 +36,12 @@ describe("mergeTemplate", () => {
     expect(html).toContain("&lt;script&gt;x&lt;/script&gt;");
   });
 
-  it("ships two signers with underscore-free uppercase tokens", () => {
-    expect(SIGNERS).toHaveLength(2);
-    for (const s of SIGNERS) {
-      expect(s.token).toMatch(/^[A-Z0-9]+$/);
+  it("ships date + signature fields with underscore-free uppercase tokens", () => {
+    expect(FORM_FIELDS).toHaveLength(4);
+    for (const f of FORM_FIELDS) {
+      expect(f.token).toMatch(/^[A-Z0-9]+$/);
     }
+    expect(FORM_FIELDS.filter((f) => f.type === "signature")).toHaveLength(2);
+    expect(FORM_FIELDS.filter((f) => f.type === "text")).toHaveLength(2);
   });
 });
