@@ -1,6 +1,13 @@
-import { SamplesIndex, type Sample } from "@/app/_components/SamplesIndex";
+import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
 
 const samples: Sample[] = [
+  {
+    name: "Document Generation Pipeline",
+    category: "Generation",
+    description:
+      "Generate a contract from form data, auto-place signature fields by content with the DWS API (HTML→PDF, locate, redact, add fields), then sign it in the viewer.",
+    path: "/api/document-generation-pipeline",
+  },
   {
     name: "Web SDK Digital Signature (DWS)",
     category: "Signatures",
@@ -40,7 +47,13 @@ const samples: Sample[] = [
   },
 ];
 
-const categories = ["All", "Signatures", "Comparison", "Conversion"];
+const categories = [
+  "All",
+  "Generation",
+  "Signatures",
+  "Comparison",
+  "Conversion",
+];
 
 export default function APIPage() {
   return (
