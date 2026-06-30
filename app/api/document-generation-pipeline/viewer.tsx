@@ -62,6 +62,12 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
 };
 
+const codeStyle: React.CSSProperties = {
+  fontFamily: "var(--font-mono, ui-monospace, monospace)",
+  fontSize: "0.85em",
+  color: "var(--ink)",
+};
+
 export default function Viewer() {
   const [values, setValues] = useState<MergeValues>(() => ({
     ...DEFAULT_VALUES,
@@ -260,7 +266,7 @@ export default function Viewer() {
         title="Document Generation Pipeline"
         description="Generate a contract from data, auto-place signature fields by content with the DWS API, then sign it in the viewer."
       />
-      <div className="flex flex-1 min-h-0">
+      <div className="shell flex flex-1 min-h-0" style={{ width: "100%" }}>
         <aside
           style={{
             width: 360,
@@ -353,6 +359,104 @@ export default function Viewer() {
               {error}
             </p>
           )}
+
+          <details
+            style={{
+              marginTop: 24,
+              borderTop: "1px solid var(--line)",
+              paddingTop: 14,
+            }}
+          >
+            <summary
+              style={{
+                cursor: "pointer",
+                fontSize: 14,
+                fontWeight: 600,
+                color: "var(--ink)",
+              }}
+            >
+              How this works
+            </summary>
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: 13,
+                lineHeight: 1.65,
+                color: "var(--ink-2)",
+              }}
+            >
+              <p style={{ margin: "0 0 10px" }}>
+                The whole pipeline runs on the stateless Nutrient DWS Processor
+                API (<code style={codeStyle}>POST /build</code>) — nothing is
+                stored server-side, and each step is a single HTTP call.
+              </p>
+              <ol
+                style={{
+                  margin: "0 0 14px",
+                  paddingLeft: 18,
+                  display: "grid",
+                  gap: 6,
+                }}
+              >
+                <li>
+                  <strong>Merge HTML</strong> — fill the contract template with
+                  the form values.
+                </li>
+                <li>
+                  <strong>HTML → PDF</strong> —{" "}
+                  <code style={codeStyle}>/build</code> with{" "}
+                  <code style={codeStyle}>{"parts: [{ html }]"}</code>.
+                </li>
+                <li>
+                  <strong>Locate anchors</strong> — DWS has no search endpoint,
+                  so we ask <code style={codeStyle}>/build</code> for{" "}
+                  <code style={codeStyle}>json-content</code> with{" "}
+                  <code style={codeStyle}>structuredText</code>: it returns
+                  every word with a bounding box, and we match our uppercase
+                  tokens (<code style={codeStyle}>SIGNATURECLIENT</code>,{" "}
+                  <code style={codeStyle}>DATECLIENT</code>, …).
+                </li>
+                <li>
+                  <strong>Scrub &amp; place</strong> — one{" "}
+                  <code style={codeStyle}>/build</code> call:{" "}
+                  <code style={codeStyle}>createRedactions</code> (white fill)
+                  erases the marker text, then{" "}
+                  <code style={codeStyle}>applyInstantJson</code> drops a
+                  signature field and a pre-filled date field at each captured
+                  rect.
+                </li>
+              </ol>
+              <p
+                style={{
+                  margin: "0 0 6px",
+                  fontWeight: 600,
+                  color: "var(--ink)",
+                }}
+              >
+                Doing this with Document Engine instead
+              </p>
+              <p style={{ margin: 0 }}>
+                <a
+                  href="https://www.nutrient.io/guides/document-engine/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Document Engine
+                </a>{" "}
+                is the self-hosted engine — documents never leave your
+                infrastructure, and it is stateful: you create a document once
+                and operate on it by ID. The key difference for this pipeline is
+                that Document Engine has a built-in{" "}
+                <strong>text search API that returns match rectangles</strong>,
+                so step 3 becomes a direct search call instead of extracting
+                every word and filtering. Steps 2 and 4 carry over unchanged —
+                the same Instant JSON adds the fields and its redaction support
+                scrubs the markers — only now nothing is sent to a hosted
+                service. (It also backs persistent storage and Instant real-time
+                collaboration.)
+              </p>
+            </div>
+          </details>
         </aside>
 
         <main style={{ flex: 1, minWidth: 0, position: "relative" }}>
