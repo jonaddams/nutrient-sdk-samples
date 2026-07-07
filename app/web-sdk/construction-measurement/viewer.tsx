@@ -185,8 +185,11 @@ export default function ConstructionMeasurementViewer() {
                     pageIndex,
                   },
                 ]);
-                // Stay in measure mode so the user can place more.
-                setMode({ phase: "awaiting-a" });
+                // Disarm the tool after completing a measurement so the pins
+                // become draggable immediately (in measure mode, a press on a
+                // pin drops a new pin instead of dragging it). Click "Measure
+                // distance" again to place another.
+                setMode({ phase: "idle" });
               } finally {
                 creatingRef.current = false;
               }
@@ -374,8 +377,12 @@ export default function ConstructionMeasurementViewer() {
           >
             Click{" "}
             <strong style={{ color: "var(--ink-2)" }}>Measure distance</strong>,
-            then click two points on the plan. A measurement line with a live
-            distance label is drawn between the pins.
+            then click two points on the plan to drop a pin at each. The tool
+            then turns off so you can{" "}
+            <strong style={{ color: "var(--ink-2)" }}>drag either pin</strong>{" "}
+            to adjust — the line and distance update live. Click{" "}
+            <strong style={{ color: "var(--ink-2)" }}>Measure distance</strong>{" "}
+            again to add another.
           </p>
 
           <ul className="space-y-2" style={{ paddingLeft: 0, margin: 0 }}>
