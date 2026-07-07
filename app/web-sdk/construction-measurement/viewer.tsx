@@ -34,6 +34,7 @@ export default function ConstructionMeasurementViewer() {
   const measurementsRef = useRef<Measurement[]>([]);
   const creatingRef = useRef(false);
   const reconcilingRef = useRef(false);
+  const cascadingDeleteRef = useRef(false);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -197,6 +198,63 @@ export default function ConstructionMeasurementViewer() {
             }
           }
         });
+
+        instance.addEventListener(
+          // biome-ignore lint/suspicious/noExplicitAny: delete event typing is minimal
+          "annotations.delete" as any,
+          // biome-ignore lint/suspicious/noExplicitAny: delete event typing is minimal
+          async (event: any) => {
+            if (cascadingDeleteRef.current) return;
+
+            // Deleted annotations arrive in varied shapes; handle all.
+            let deleted: unknown[] = [];
+            if (Array.isArray(event?.annotations)) deleted = event.annotations;
+            else if (event?.annotations?.toArray)
+              deleted = event.annotations.toArray();
+            else if (Array.isArray(event)) deleted = event;
+            else if (event?.toArray) deleted = event.toArray();
+
+            const deletedIds = new Set<string>();
+            for (const ann of deleted) {
+              // biome-ignore lint/suspicious/noExplicitAny: annotation shape varies
+              const a = ann as any;
+              if (a?.id != null) deletedIds.add(String(a.id));
+              else if (typeof a === "string") deletedIds.add(a);
+            }
+            if (deletedIds.size === 0) return;
+
+            const affected = measurementsRef.current.filter(
+              (m) =>
+                deletedIds.has(m.pinAId) ||
+                deletedIds.has(m.pinBId) ||
+                deletedIds.has(m.lineId),
+            );
+            if (affected.length === 0) return;
+
+            const siblingIds: string[] = [];
+            for (const m of affected) {
+              for (const id of [m.pinAId, m.pinBId, m.lineId]) {
+                if (!deletedIds.has(id)) siblingIds.push(id);
+              }
+            }
+
+            if (siblingIds.length > 0) {
+              cascadingDeleteRef.current = true;
+              try {
+                await instance.delete(siblingIds);
+              } finally {
+                setTimeout(() => {
+                  cascadingDeleteRef.current = false;
+                }, 0);
+              }
+            }
+
+            const affectedIds = new Set(affected.map((m) => m.pairId));
+            setMeasurements((prev) =>
+              prev.filter((m) => !affectedIds.has(m.pairId)),
+            );
+          },
+        );
       })
       .catch((error: Error) => {
         console.error("Error loading viewer:", error);
@@ -270,6 +328,67 @@ export default function ConstructionMeasurementViewer() {
             then click two points on the plan. A measurement line with a live
             distance label is drawn between the pins.
           </p>
+
+          <ul className="space-y-2" style={{ paddingLeft: 0, margin: 0 }}>
+            {measurements.map((m, i) => (
+              <li
+                key={m.pairId}
+                className="flex items-center justify-between gap-3 p-2"
+                style={{
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-2)",
+                  background: "var(--bg-elev)",
+                  listStyle: "none",
+                }}
+              >
+                <span className="text-sm" style={{ color: "var(--ink-2)" }}>
+                  Measurement {i + 1}
+                </span>
+                <button
+                  type="button"
+                  className="text-sm cursor-pointer"
+                  style={{ color: "var(--ink-4)" }}
+                  aria-label={`Delete measurement ${i + 1}`}
+                  onClick={async () => {
+                    const instance = instanceRef.current;
+                    if (!instance) return;
+                    // Delete one annotation; the cascade handler removes the rest.
+                    await instance.delete(m.lineId);
+                  }}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {measurements.length > 0 && (
+            <button
+              type="button"
+              className="panel-button"
+              onClick={async () => {
+                const instance = instanceRef.current;
+                if (!instance) return;
+                const ids = measurements.flatMap((m) => [
+                  m.pinAId,
+                  m.pinBId,
+                  m.lineId,
+                ]);
+                if (ids.length === 0) return;
+                cascadingDeleteRef.current = true;
+                try {
+                  await instance.delete(ids);
+                } finally {
+                  setTimeout(() => {
+                    cascadingDeleteRef.current = false;
+                  }, 0);
+                }
+                setMeasurements([]);
+              }}
+            >
+              Clear all
+            </button>
+          )}
         </div>
       </div>
       <div style={{ flex: 1, position: "relative" }}>
