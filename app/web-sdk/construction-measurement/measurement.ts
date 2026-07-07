@@ -22,11 +22,23 @@ export const PIN_SIZE = 14;
 // 2-decimal feet, e.g. "24.50 ft". See measurementPrecision in the SDK types.
 export const MEASUREMENT_PRECISION = "twoDp";
 
-// Fixed scale for floor-plan-layers.pdf: SCALE_FROM_VALUE page-inches map to
-// SCALE_TO_VALUE feet in the real world. Calibrated in Task 6 against a known
-// dimension on the plan; placeholder 1:1 until then.
+// Calibrated 2026-07-07 against floor-plan-layers.pdf (page 0 is US Letter,
+// 612x792 pt, and the plan is labeled "not to scale — for demonstration only").
+// Semantics: the SDK converts the on-page line length from PDF points to
+// `unitFrom` (inches, /72), then scales by toValue/fromValue into `unitTo` (feet).
+// At the 1:1 placeholder, the Living Room<->Kitchen span (~216 pt ≈ 3 page-inches)
+// read 3.00 ft; at 1 in = 5 ft it reads ~15 ft (a believable room center-to-center
+// distance), and the full ~612 pt page width reads ~42 ft (plausible office-suite
+// width). 1 in = 5 ft is a clean architectural scale.
 export const SCALE_FROM_VALUE = 1;
-export const SCALE_TO_VALUE = 1;
+export const SCALE_TO_VALUE = 5;
+
+// One example measurement drawn on load so the sample isn't empty. Page-space
+// points on page 0 of floor-plan-layers.pdf (Living Room <-> Kitchen), ~15 ft.
+export const SEED_MEASUREMENT: { a: Point; b: Point } | null = {
+  a: { x: 220, y: 265 },
+  b: { x: 436, y: 265 },
+};
 
 export function pinBoundingBox(center: Point): BoundingBox {
   const half = PIN_SIZE / 2;

@@ -10,6 +10,7 @@ import {
   type Point,
   pinCenter,
   pointDrifted,
+  SEED_MEASUREMENT,
 } from "./measurement";
 
 const DOCUMENT = "/documents/floor-plan-layers.pdf";
@@ -60,8 +61,56 @@ export default function ConstructionMeasurementViewer() {
           ["pager", "zoom-out", "zoom-in", "zoom-mode"].includes(item.type),
       ),
     })
-      .then((instance: Instance) => {
+      .then(async (instance: Instance) => {
         instanceRef.current = instance;
+
+        // Seed one example measurement so the demo isn't empty on load. Runs
+        // before listener registration below so this create doesn't trigger
+        // the relink/reconcile handler.
+        if (SEED_MEASUREMENT) {
+          const pairId = crypto.randomUUID();
+          const pageIndex = 0;
+          // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
+          const created: any = await instance.create([
+            buildPin(NV, {
+              pairId,
+              slot: "a",
+              pageIndex,
+              center: SEED_MEASUREMENT.a,
+            }),
+            buildPin(NV, {
+              pairId,
+              slot: "b",
+              pageIndex,
+              center: SEED_MEASUREMENT.b,
+            }),
+            buildMeasurementLine(NV, {
+              pairId,
+              pageIndex,
+              a: SEED_MEASUREMENT.a,
+              b: SEED_MEASUREMENT.b,
+            }),
+          ]);
+          // biome-ignore lint/suspicious/noExplicitAny: inferred
+          const pins = created.filter((x: any) => x.customData?.role === "pin");
+          // biome-ignore lint/suspicious/noExplicitAny: inferred
+          const line = created.find((x: any) => x.customData?.role === "line");
+          // biome-ignore lint/suspicious/noExplicitAny: inferred
+          const pinA = pins.find((x: any) => x.customData?.slot === "a");
+          // biome-ignore lint/suspicious/noExplicitAny: inferred
+          const pinB = pins.find((x: any) => x.customData?.slot === "b");
+          if (pinA?.id && pinB?.id && line?.id) {
+            setMeasurements([
+              {
+                pairId,
+                pinAId: pinA.id as string,
+                pinBId: pinB.id as string,
+                lineId: line.id as string,
+                pageIndex,
+              },
+            ]);
+          }
+        }
 
         // page.press delivers a point already in page space + we read the
         // current page index from the view state.
@@ -389,6 +438,27 @@ export default function ConstructionMeasurementViewer() {
               Clear all
             </button>
           )}
+
+          <div
+            className="text-xs leading-relaxed pt-3 mt-1"
+            style={{
+              color: "var(--ink-4)",
+              borderTop: "1px solid var(--line)",
+            }}
+          >
+            <div
+              className="font-semibold mb-1"
+              style={{ color: "var(--ink-3)" }}
+            >
+              How this works
+            </div>
+            Each pin is an <code>EllipseAnnotation</code>. The measurement is a{" "}
+            <code>LineAnnotation</code> with a fixed{" "}
+            <code>measurementScale</code>, and the SDK computes and renders the
+            distance label. Dragging a pin fires <code>annotations.change</code>
+            , and we recompute the line&apos;s endpoints from the pins&apos;
+            centers.
+          </div>
         </div>
       </div>
       <div style={{ flex: 1, position: "relative" }}>

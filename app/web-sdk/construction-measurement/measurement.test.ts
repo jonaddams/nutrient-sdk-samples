@@ -5,6 +5,8 @@ import {
   pinBoundingBox,
   pinCenter,
   pointDrifted,
+  SCALE_FROM_VALUE,
+  SCALE_TO_VALUE,
 } from "./measurement";
 
 describe("pinBoundingBox / pinCenter", () => {
@@ -47,5 +49,15 @@ describe("pointDrifted", () => {
     expect(pointDrifted({ x: 1, y: 1 }, { x: 1, y: 1 })).toBe(false);
     expect(pointDrifted({ x: 1, y: 1 }, { x: 1.2, y: 1 })).toBe(false);
     expect(pointDrifted({ x: 1, y: 1 }, { x: 3, y: 1 })).toBe(true);
+  });
+});
+
+describe("fixed scale", () => {
+  it("is calibrated away from the 1:1 placeholder and positive", () => {
+    expect(SCALE_FROM_VALUE).toBeGreaterThan(0);
+    expect(SCALE_TO_VALUE).toBeGreaterThan(0);
+    // Placeholder was 1:1; a real floor-plan scale maps a small page distance
+    // to a larger real distance.
+    expect(SCALE_TO_VALUE / SCALE_FROM_VALUE).toBeGreaterThan(1);
   });
 });
