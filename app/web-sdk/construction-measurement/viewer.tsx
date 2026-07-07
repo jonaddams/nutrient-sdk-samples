@@ -5,8 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   buildMeasurementLine,
   buildPin,
+  lineBoundingBox,
   type Measurement,
   type Point,
+  pinCenter,
+  pointDrifted,
 } from "./measurement";
 
 const DOCUMENT = "/documents/floor-plan-layers.pdf";
@@ -30,6 +33,7 @@ export default function ConstructionMeasurementViewer() {
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const measurementsRef = useRef<Measurement[]>([]);
   const creatingRef = useRef(false);
+  const reconcilingRef = useRef(false);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -137,6 +141,60 @@ export default function ConstructionMeasurementViewer() {
                 creatingRef.current = false;
               }
             })();
+          }
+        });
+
+        // biome-ignore lint/suspicious/noExplicitAny: annotations.change typing is minimal
+        instance.addEventListener("annotations.change" as any, async () => {
+          if (reconcilingRef.current) return;
+          const NV = window.NutrientViewer;
+          if (!NV) return;
+
+          // biome-ignore lint/suspicious/noExplicitAny: annotation update type
+          const updates: any[] = [];
+
+          for (const m of measurementsRef.current) {
+            const anns = (await instance.getAnnotations(m.pageIndex)).toArray();
+            // biome-ignore lint/suspicious/noExplicitAny: annotation type
+            const pinA: any = anns.find((a: any) => a.id === m.pinAId);
+            // biome-ignore lint/suspicious/noExplicitAny: annotation type
+            const pinB: any = anns.find((a: any) => a.id === m.pinBId);
+            // biome-ignore lint/suspicious/noExplicitAny: annotation type
+            const line: any = anns.find((a: any) => a.id === m.lineId);
+            if (!pinA || !pinB || !line) continue; // dangling; skip
+
+            const a = pinCenter(pinA.boundingBox);
+            const b = pinCenter(pinB.boundingBox);
+            const startDrift = pointDrifted(
+              { x: line.startPoint.x, y: line.startPoint.y },
+              a,
+            );
+            const endDrift = pointDrifted(
+              { x: line.endPoint.x, y: line.endPoint.y },
+              b,
+            );
+            if (!startDrift && !endDrift) continue;
+
+            updates.push(
+              line
+                .set("startPoint", new NV.Geometry.Point(a))
+                .set("endPoint", new NV.Geometry.Point(b))
+                .set(
+                  "boundingBox",
+                  new NV.Geometry.Rect(lineBoundingBox(a, b)),
+                ),
+            );
+          }
+
+          if (updates.length > 0) {
+            reconcilingRef.current = true;
+            try {
+              await instance.update(updates);
+            } finally {
+              setTimeout(() => {
+                reconcilingRef.current = false;
+              }, 0);
+            }
           }
         });
       })
