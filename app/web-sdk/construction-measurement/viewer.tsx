@@ -29,6 +29,7 @@ export default function ConstructionMeasurementViewer() {
   const modeRef = useRef<Mode>({ phase: "idle" });
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const measurementsRef = useRef<Measurement[]>([]);
+  const creatingRef = useRef(false);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -65,25 +66,35 @@ export default function ConstructionMeasurementViewer() {
           if (!point) return;
           const current = modeRef.current;
           if (current.phase === "idle") return;
+          // Guard against overlapping creates: a second page.press firing
+          // while a create is still in flight (e.g. a rapid double-click)
+          // would otherwise re-enter the same branch and issue a duplicate
+          // instance.create(), racing or double-pairing pins/lines.
+          if (creatingRef.current) return;
           const pageIndex = instance.viewState.currentPageIndex;
           const p: Point = { x: point.x, y: point.y };
 
           if (current.phase === "awaiting-a") {
             const pairId = crypto.randomUUID();
+            creatingRef.current = true;
             (async () => {
-              // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
-              const created: any = await instance.create(
-                buildPin(NV, { pairId, slot: "a", pageIndex, center: p }),
-              );
-              const pinA = created[0];
-              if (!pinA?.id) return;
-              setMode({
-                phase: "awaiting-b",
-                pairId,
-                pinAId: pinA.id as string,
-                a: p,
-                pageIndex,
-              });
+              try {
+                // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
+                const created: any = await instance.create(
+                  buildPin(NV, { pairId, slot: "a", pageIndex, center: p }),
+                );
+                const pinA = created[0];
+                if (!pinA?.id) return;
+                setMode({
+                  phase: "awaiting-b",
+                  pairId,
+                  pinAId: pinA.id as string,
+                  a: p,
+                  pageIndex,
+                });
+              } finally {
+                creatingRef.current = false;
+              }
             })();
             return;
           }
@@ -93,33 +104,38 @@ export default function ConstructionMeasurementViewer() {
             pageIndex === current.pageIndex
           ) {
             const { pairId, pinAId, a } = current;
+            creatingRef.current = true;
             (async () => {
-              // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
-              const created: any = await instance.create([
-                buildPin(NV, { pairId, slot: "b", pageIndex, center: p }),
-                buildMeasurementLine(NV, { pairId, pageIndex, a, b: p }),
-              ]);
-              const pinB = created.find(
-                // biome-ignore lint/suspicious/noExplicitAny: inferred
-                (x: any) => x.customData?.role === "pin",
-              );
-              const line = created.find(
-                // biome-ignore lint/suspicious/noExplicitAny: inferred
-                (x: any) => x.customData?.role === "line",
-              );
-              if (!pinB?.id || !line?.id) return;
-              setMeasurements((prev) => [
-                ...prev,
-                {
-                  pairId,
-                  pinAId,
-                  pinBId: pinB.id as string,
-                  lineId: line.id as string,
-                  pageIndex,
-                },
-              ]);
-              // Stay in measure mode so the user can place more.
-              setMode({ phase: "awaiting-a" });
+              try {
+                // biome-ignore lint/suspicious/noExplicitAny: create() returns a union
+                const created: any = await instance.create([
+                  buildPin(NV, { pairId, slot: "b", pageIndex, center: p }),
+                  buildMeasurementLine(NV, { pairId, pageIndex, a, b: p }),
+                ]);
+                const pinB = created.find(
+                  // biome-ignore lint/suspicious/noExplicitAny: inferred
+                  (x: any) => x.customData?.role === "pin",
+                );
+                const line = created.find(
+                  // biome-ignore lint/suspicious/noExplicitAny: inferred
+                  (x: any) => x.customData?.role === "line",
+                );
+                if (!pinB?.id || !line?.id) return;
+                setMeasurements((prev) => [
+                  ...prev,
+                  {
+                    pairId,
+                    pinAId,
+                    pinBId: pinB.id as string,
+                    lineId: line.id as string,
+                    pageIndex,
+                  },
+                ]);
+                // Stay in measure mode so the user can place more.
+                setMode({ phase: "awaiting-a" });
+              } finally {
+                creatingRef.current = false;
+              }
             })();
           }
         });
