@@ -59,3 +59,54 @@ export function lineBoundingBox(a: Point, b: Point): BoundingBox {
 export function pointDrifted(a: Point, b: Point, threshold = 0.5): boolean {
   return Math.abs(a.x - b.x) > threshold || Math.abs(a.y - b.y) > threshold;
 }
+
+/* SDK annotation builders. `NV` is window.NutrientViewer, passed in to avoid
+   importing the runtime bundle. Return values are SDK annotation instances. */
+
+// Shared color for pins and the measurement line (blue-600).
+export const PIN_COLOR = { r: 37, g: 99, b: 235 };
+
+export function buildPin(
+  // biome-ignore lint/suspicious/noExplicitAny: SDK namespace
+  NV: any,
+  args: { pairId: string; slot: "a" | "b"; pageIndex: number; center: Point },
+) {
+  const { pairId, slot, pageIndex, center } = args;
+  return new NV.Annotations.EllipseAnnotation({
+    pageIndex,
+    boundingBox: new NV.Geometry.Rect(pinBoundingBox(center)),
+    strokeColor: new NV.Color(PIN_COLOR),
+    fillColor: new NV.Color(PIN_COLOR),
+    strokeWidth: 1,
+    customData: { role: "pin", pairId, slot },
+  });
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: SDK namespace
+export function buildMeasurementScale(NV: any) {
+  return new NV.MeasurementScale({
+    unitFrom: NV.MeasurementScaleUnitFrom.INCHES,
+    unitTo: NV.MeasurementScaleUnitTo.FEET,
+    fromValue: SCALE_FROM_VALUE,
+    toValue: SCALE_TO_VALUE,
+  });
+}
+
+export function buildMeasurementLine(
+  // biome-ignore lint/suspicious/noExplicitAny: SDK namespace
+  NV: any,
+  args: { pairId: string; pageIndex: number; a: Point; b: Point },
+) {
+  const { pairId, pageIndex, a, b } = args;
+  return new NV.Annotations.LineAnnotation({
+    pageIndex,
+    startPoint: new NV.Geometry.Point(a),
+    endPoint: new NV.Geometry.Point(b),
+    boundingBox: new NV.Geometry.Rect(lineBoundingBox(a, b)),
+    strokeColor: new NV.Color(PIN_COLOR),
+    strokeWidth: 2,
+    measurementScale: buildMeasurementScale(NV),
+    measurementPrecision: MEASUREMENT_PRECISION,
+    customData: { role: "line", pairId },
+  });
+}
