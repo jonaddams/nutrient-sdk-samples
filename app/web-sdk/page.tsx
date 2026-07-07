@@ -58,6 +58,13 @@ const samples: Sample[] = [
     path: "/web-sdk/counting-annotations",
   },
   {
+    name: "Construction Measurement",
+    category: "Annotations",
+    description:
+      "Measure distances on a construction floor plan by dropping two pins. The measurement line and its live distance label update as you drag either pin.",
+    path: "/web-sdk/construction-measurement",
+  },
+  {
     name: "Cross-Page Text Comparison",
     category: "Document Comparison",
     description:
