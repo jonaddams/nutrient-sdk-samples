@@ -107,6 +107,22 @@ export default function OneStepLinkViewer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isArmed]);
 
+  // Esc closes the modal, mirroring the overlay's click-to-dismiss action.
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsModalOpen(false);
+        setText("");
+        setUrl("");
+        setColorHex(SWATCHES[0]);
+        setErrors({});
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isModalOpen]);
+
   return (
     <div className="osl-wrapper">
       <div className={`osl-viewer-shell${isArmed ? " osl-arming" : ""}`}>
@@ -124,7 +140,7 @@ export default function OneStepLinkViewer() {
 
       {isModalOpen && (
         // biome-ignore lint/a11y/noStaticElementInteractions: Modal overlay requires click handler for dismissal
-        // biome-ignore lint/a11y/useKeyWithClickEvents: Esc handling is wired separately via the window keydown listener
+        // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click cancels the dialog; keyboard equivalent is the Escape handler bound on window above.
         <div className="osl-modal-overlay" onClick={handleCancel}>
           {/* biome-ignore lint/a11y/useKeyWithClickEvents: onClick here only stops propagation to the overlay's dismiss handler */}
           <div
