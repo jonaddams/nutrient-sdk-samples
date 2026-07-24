@@ -1,7 +1,7 @@
 "use client";
 
 import type { Instance } from "@nutrient-sdk/viewer";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { normalizeUrl } from "./link";
 import "./styles.css";
 
@@ -64,12 +64,19 @@ export default function OneStepLinkViewer() {
     };
   }, []);
 
-  function resetForm() {
+  const resetForm = useCallback(() => {
     setText("");
     setUrl("");
     setColorHex(SWATCHES[0]);
     setErrors({});
-  }
+  }, []);
+
+  // Single source of truth for "close the modal and clear its fields" —
+  // used by the backdrop click, the Cancel button, and the Esc handler below.
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    resetForm();
+  }, [resetForm]);
 
   function handleSubmit() {
     const nextErrors: { text?: string; url?: string } = {};
@@ -90,8 +97,7 @@ export default function OneStepLinkViewer() {
   }
 
   function handleCancel() {
-    setIsModalOpen(false);
-    resetForm();
+    closeModal();
   }
 
   // Esc disarms a pending placement.
@@ -111,17 +117,11 @@ export default function OneStepLinkViewer() {
   useEffect(() => {
     if (!isModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsModalOpen(false);
-        setText("");
-        setUrl("");
-        setColorHex(SWATCHES[0]);
-        setErrors({});
-      }
+      if (e.key === "Escape") closeModal();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isModalOpen]);
+  }, [isModalOpen, closeModal]);
 
   return (
     <div className="osl-wrapper">
