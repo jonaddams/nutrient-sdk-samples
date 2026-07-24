@@ -2,7 +2,12 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { normalizeUrl } from "./link";
+import {
+  type BoundingBox,
+  buildLinkAnnotations,
+  DEFAULT_FONT_SIZE,
+  normalizeUrl,
+} from "./link";
 import "./styles.css";
 
 const DOCUMENT = "/documents/contract-template.pdf";
@@ -14,6 +19,14 @@ const SWATCHES = ["#2563eb", "#dc2626", "#16a34a", "#7c3aed", "#111827"];
 
 type PendingLink = { text: string; colorHex: string; url: string };
 
+type CreatedLink = {
+  id: string;
+  text: string;
+  url: string;
+  pageIndex: number;
+  box: BoundingBox;
+};
+
 export default function OneStepLinkViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
@@ -24,6 +37,7 @@ export default function OneStepLinkViewer() {
   const [url, setUrl] = useState("");
   const [colorHex, setColorHex] = useState(SWATCHES[0]);
   const [errors, setErrors] = useState<{ text?: string; url?: string }>({});
+  const [links, setLinks] = useState<CreatedLink[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -56,6 +70,53 @@ export default function OneStepLinkViewer() {
       ],
     }).then((instance: Instance) => {
       instanceRef.current = instance;
+
+      instance.addEventListener("page.press" as any, (event: any) => {
+        const pending = pendingRef.current;
+        if (!pending) return; // inert unless a link is being placed
+        const point = event.point;
+        if (!point) return;
+
+        const pageIndex = instance.viewState.currentPageIndex;
+        const p = { x: point.x, y: point.y };
+        const [textAnnotation, linkAnnotation] = buildLinkAnnotations(
+          NutrientViewer,
+          {
+            pageIndex,
+            point: p,
+            text: pending.text,
+            colorHex: pending.colorHex,
+            url: pending.url,
+            fontSize: DEFAULT_FONT_SIZE,
+          },
+        );
+
+        instance
+          .create([textAnnotation, linkAnnotation])
+          .then((created: any[]) => {
+            const textCreated = created.find(
+              (a) => a instanceof NutrientViewer.Annotations.TextAnnotation,
+            );
+            setLinks((prev) => [
+              ...prev,
+              {
+                id: (textCreated?.id ?? crypto.randomUUID()) as string,
+                text: pending.text,
+                url: pending.url,
+                pageIndex,
+                box: {
+                  left: p.x,
+                  top: p.y,
+                  width: textAnnotation.boundingBox.width,
+                  height: textAnnotation.boundingBox.height,
+                },
+              },
+            ]);
+          });
+
+        pendingRef.current = null;
+        setIsArmed(false);
+      });
     });
 
     return () => {
