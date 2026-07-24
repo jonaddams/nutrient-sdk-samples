@@ -117,6 +117,18 @@ export default function OneStepLinkViewer() {
         pendingRef.current = null;
         setIsArmed(false);
       });
+
+      instance.addEventListener("annotations.delete" as any, (event: any) => {
+        const deletedIds = new Set<string>();
+        if (event?.annotations) {
+          for (const ann of event.annotations) {
+            if (ann?.id) deletedIds.add(ann.id);
+          }
+        }
+        if (deletedIds.size > 0) {
+          setLinks((prev) => prev.filter((link) => !deletedIds.has(link.id)));
+        }
+      });
     });
 
     return () => {
@@ -194,6 +206,8 @@ export default function OneStepLinkViewer() {
     }
     for (const id of ids) await instance.delete(id);
     setLinks([]);
+    pendingRef.current = null;
+    setIsArmed(false);
   }
 
   // Esc disarms a pending placement.
