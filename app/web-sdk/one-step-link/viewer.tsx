@@ -161,6 +161,41 @@ export default function OneStepLinkViewer() {
     closeModal();
   }
 
+  function handleLinkClick(link: CreatedLink) {
+    const instance = instanceRef.current;
+    const NV = window.NutrientViewer;
+    if (!instance || !NV) return;
+    instance.jumpToRect(
+      link.pageIndex,
+      new NV.Geometry.Rect({
+        left: link.box.left - 50,
+        top: link.box.top - 50,
+        width: link.box.width + 100,
+        height: link.box.height + 100,
+      }),
+    );
+  }
+
+  async function handleReset() {
+    const instance = instanceRef.current;
+    const NV = window.NutrientViewer;
+    if (!instance || !NV) return;
+    const ids: string[] = [];
+    for (let i = 0; i < instance.totalPageCount; i++) {
+      const anns = await instance.getAnnotations(i);
+      for (const ann of anns.toArray()) {
+        if (
+          ann instanceof NV.Annotations.TextAnnotation ||
+          ann instanceof NV.Annotations.LinkAnnotation
+        ) {
+          ids.push(ann.id as string);
+        }
+      }
+    }
+    for (const id of ids) await instance.delete(id);
+    setLinks([]);
+  }
+
   // Esc disarms a pending placement.
   useEffect(() => {
     if (!isArmed) return;
@@ -275,6 +310,44 @@ export default function OneStepLinkViewer() {
           </div>
         </div>
       )}
+
+      <div className="osl-sidebar">
+        <div>
+          <div className="osl-label">Created Links</div>
+        </div>
+        {links.length === 0 ? (
+          <div className="osl-empty">
+            Click <strong>Add Link</strong>, fill in the details, then click the
+            page to drop a link.
+          </div>
+        ) : (
+          <ul className="osl-list">
+            {links.map((link) => (
+              <li key={link.id}>
+                <button
+                  type="button"
+                  className="osl-item"
+                  onClick={() => handleLinkClick(link)}
+                >
+                  <span className="osl-item-text">{link.text}</span>
+                  <span className="osl-item-url">{link.url}</span>
+                  <span className="osl-item-page">
+                    Page {link.pageIndex + 1}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="button"
+          className="osl-reset-btn"
+          onClick={handleReset}
+          disabled={links.length === 0}
+        >
+          Reset All
+        </button>
+      </div>
     </div>
   );
 }
