@@ -199,6 +199,13 @@ const samples: Sample[] = [
     path: "/web-sdk/numbered-callouts",
   },
   {
+    name: "One-Step Link",
+    category: "Annotations",
+    description:
+      "Add a visible, clickable link in a single guided action — one button prompts for text, color, and URL, then one click creates the text label and link annotation together",
+    path: "/web-sdk/one-step-link",
+  },
+  {
     name: "Patient Intake Forms",
     category: "Forms",
     description:
