@@ -101,6 +101,13 @@ const samples: Sample[] = [
     path: "/python-sdk/field-extraction",
   },
   {
+    name: "Structured Extraction",
+    category: "Extraction",
+    description:
+      "Extract a JSON schema's fields with the SDK's native structured extraction — every value carries a clickable citation on the page",
+    path: "/python-sdk/extraction-studio",
+  },
+  {
     name: "Image Alt Text",
     category: "Extraction",
     description:
