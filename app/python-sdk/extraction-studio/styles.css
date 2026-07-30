@@ -1,0 +1,891 @@
+/* Extraction studio — component styles.
+ *
+ * WHY A STYLESHEET AND NOT TAILWIND UTILITIES
+ * This sample is a multi-pane app, not a single-purpose demo: a 3-column shell,
+ * a document strip, and a dense results table whose row height was tuned
+ * deliberately (see .field-table). Expressing that in utilities would obscure
+ * it. This is a knowing exception to PROJECT.md's "Tailwind first" convention.
+ *
+ * WHY EVERY RULE IS SCOPED UNDER .studio-shell
+ * A plain .css file imported by a page is GLOBAL in Next, and 13 of the class
+ * names here already exist in app/globals.css — .btn (19 rules), .chip (8),
+ * .field (6), .segmented (6), .callout (5), .tag (3), .panel-section (2),
+ * plus .muted, .mono, .viewer, .field-row, .eyebrow and .hint. Unscoped, this
+ * file would restyle every other sample in the repo.
+ *
+ * .studio-shell is the studio's root element, so prefixing gives every rule
+ * specificity (0,2,0) against the host's (0,1,0): ours wins inside the studio
+ * and changes nothing outside it. Do not remove the prefix, and do not render
+ * studio markup outside .studio-shell — it would silently lose its styling.
+ *
+ * All 26 custom properties referenced here are already defined in
+ * app/globals.css; none are added. Verified at port time.
+ */
+
+.studio-shell .topnav a.active {
+  color: var(--ink);
+}
+
+.studio-shell .panel-section {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding: 8px 0 0;
+}
+
+.studio-shell .panel-section:first-child {
+  padding-top: 0;
+}
+
+.studio-shell .panel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.studio-shell .panel-row-h {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studio-shell .segmented {
+  display: flex;
+  padding: 2px;
+  border-radius: var(--r-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  gap: 2px;
+}
+
+.studio-shell .segmented button {
+  appearance: none;
+  flex: 1;
+  border: 0;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: calc(var(--r-2) - 2px);
+  cursor: pointer;
+  transition: all 0.12s var(--ease);
+  min-height: 26px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.studio-shell .segmented button:hover {
+  color: var(--ink);
+}
+
+.studio-shell .segmented button[aria-pressed="true"],
+.studio-shell .segmented button.active {
+  background: var(--bg-elev);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.studio-shell .segmented button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.studio-shell .switch {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.studio-shell .switch[data-on="1"] {
+  background: var(--accent);
+}
+
+.studio-shell .switch i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-elev);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+
+.studio-shell .switch[data-on="1"] i {
+  transform: translateX(14px);
+}
+
+.studio-shell .panel-button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  padding: 8px 12px;
+  border-radius: var(--r-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.12s var(--ease);
+}
+
+.studio-shell .panel-button:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.studio-shell .panel-button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.studio-shell .panel-button.primary:hover {
+  opacity: 0.9;
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.studio-shell .panel-button:disabled,
+.studio-shell .panel-button.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.studio-shell .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.studio-shell .muted {
+  color: var(--ink-3);
+}
+
+.studio-shell .mono {
+  font-family: var(--font-mono);
+}
+
+.studio-shell .filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: var(--space-5) 0 var(--space-4);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-5);
+}
+
+.studio-shell .chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.12s var(--ease);
+  white-space: nowrap;
+}
+
+.studio-shell .chip:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.studio-shell .chip[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.studio-shell .chip .count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-left: 6px;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-shell .chip[aria-pressed="true"] .count {
+  opacity: 0.65;
+}
+
+.studio-shell .filter-bar.sidebar {
+  display: block;
+  padding: var(--space-5) var(--space-4) 0;
+  border: 0;
+  margin: 0;
+}
+
+.studio-shell .filter-bar.sidebar .chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid transparent;
+  padding: 8px var(--space-2);
+  border-radius: var(--r-2);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  gap: var(--space-2);
+  text-align: left;
+  transition:
+    background 0.12s var(--ease),
+    color 0.12s var(--ease);
+}
+
+.studio-shell .filter-bar.sidebar .chip:not(:disabled):hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.studio-shell .filter-bar.sidebar .chip[aria-pressed="true"] {
+  background: var(--accent-tint);
+  color: var(--ink);
+  font-weight: 600;
+  border: 1px solid var(--accent);
+}
+
+.studio-shell .filter-bar.sidebar .chip .tag {
+  flex-shrink: 0;
+}
+
+.studio-shell .filter-bar.sidebar > div + div {
+  margin-top: var(--space-4);
+}
+
+.studio-shell .filter-bar.dropdown {
+  border: 0;
+  padding: var(--space-4) 0;
+  gap: var(--space-3);
+}
+
+.studio-shell .filter-bar.dropdown select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--line);
+  background: var(--bg-elev)
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23737373' d='M0 0h10L5 6z'/></svg>")
+    no-repeat right 12px center;
+  color: var(--ink);
+  padding: 8px 32px 8px 12px;
+  border-radius: var(--r-2);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.studio-shell .tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+}
+
+.studio-shell .tag.wip {
+  color: var(--accent-2);
+  border-color: var(--accent);
+}
+
+.studio-shell .tag.solid {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.studio-shell .btn {
+  appearance: none;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: var(--r-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.12s var(--ease);
+  text-decoration: none;
+}
+
+.studio-shell .btn:hover {
+  opacity: 0.85;
+}
+
+.studio-shell .btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.studio-shell .btn.ghost:hover {
+  border-color: var(--ink);
+  opacity: 1;
+  background: var(--surface);
+}
+
+.studio-shell .btn.sm {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+}
+
+.studio-shell .btn.icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--r-pill);
+  justify-content: center;
+}
+
+.studio-shell .viewer {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 12px,
+      color-mix(in srgb, var(--line) 50%, transparent) 12px 13px
+    ),
+    var(--surface);
+  min-height: 560px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  position: relative;
+}
+
+.studio-shell .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.studio-shell .field label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+}
+
+.studio-shell .field input[type="text"],
+.studio-shell .field input[type="number"],
+.studio-shell .field textarea,
+.studio-shell .field select {
+  appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 10px;
+  border-radius: var(--r-2);
+  font: inherit;
+  font-size: var(--text-sm);
+  outline: none;
+}
+
+.studio-shell .field input:focus,
+.studio-shell .field textarea:focus,
+.studio-shell .field select:focus {
+  border-color: var(--ink);
+  background: var(--bg-elev);
+}
+
+.studio-shell .field .hint {
+  font-size: var(--text-xs);
+  color: var(--ink-4);
+}
+
+.studio-shell .field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.studio-shell .callout {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.studio-shell .callout .callout-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.studio-shell .callout p {
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.studio-shell .callout a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.studio-shell .callout a:hover {
+  opacity: 0.8;
+}
+
+.studio-shell button.callout {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+
+.studio-shell .callout.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.studio-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) clamp(340px, 30vw, 440px);
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.studio-shell .studio-viewer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding-top: var(--space-5);
+}
+
+.studio-shell .studio-panel {
+  margin: var(--space-5) var(--space-5) var(--space-5) 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+
+.studio-shell .studio-panel-head {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.studio-shell .feature-title {
+  margin-bottom: var(--space-3);
+}
+
+.studio-shell .feature-title strong {
+  display: block;
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+
+.studio-shell .feature-title p {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.studio-shell .studio-panel-body {
+  padding: var(--space-4);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+@media (max-width: 1024px) {
+  .studio-shell {
+    display: block;
+  }
+  .studio-shell .studio-viewer {
+    height: 70vh;
+    padding: 0 var(--space-4);
+  }
+  .studio-shell .studio-panel {
+    margin: var(--space-4);
+  }
+}
+
+.studio-shell .studio-panel .samples-grid {
+  grid-template-columns: 1fr;
+}
+
+.studio-shell .studio-sec {
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--line);
+}
+
+.studio-shell .studio-sec:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.studio-shell .studio-sec-title {
+  margin-bottom: var(--space-3);
+}
+
+.studio-shell .studio-sec > .field + .field,
+.studio-shell .studio-sec > .field + .toggle-row,
+.studio-shell .studio-sec > .toggle-row + .toggle-row {
+  margin-top: var(--space-4);
+}
+
+.studio-shell .studio-panel .field label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.studio-shell .toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.studio-shell .toggle-row-text {
+  min-width: 0;
+}
+
+.studio-shell .toggle-row-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.studio-shell .toggle-row-text .hint {
+  display: block;
+  margin: 2px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--ink-4);
+}
+
+.studio-shell .toggle-row .switch {
+  flex-shrink: 0;
+}
+
+.studio-shell .studio-panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.studio-shell .studio-sec-head {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+.studio-shell .schema-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px 56px 28px;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.studio-shell .schema-cols.eyebrow {
+  margin-bottom: var(--space-2);
+  font-size: 10px;
+  /* Inset the header to match .schema-prop's padding + border, so each
+	   header sits over the control it labels. Without this the header's 1fr
+	   resolves 26px wider than the row's and every column is offset. */
+  padding: 0 calc(var(--space-3) + 1px);
+}
+
+.studio-shell .schema-prop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--surface);
+}
+
+.studio-shell .schema-prop input[type="text"],
+.studio-shell .schema-prop select,
+.studio-shell .studio-panel .field textarea.mono {
+  appearance: none;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 10px;
+  border-radius: var(--r-2);
+  font: inherit;
+  font-size: var(--text-sm);
+  outline: none;
+  min-width: 0;
+}
+
+.studio-shell .schema-prop input[type="text"]:focus,
+.studio-shell .schema-prop select:focus {
+  border-color: var(--ink);
+}
+
+.studio-shell .studio-panel .field textarea.mono {
+  font-family: var(--font-mono);
+}
+
+.studio-shell .results-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-3);
+}
+
+.studio-shell .results-meta .toggle-row {
+  flex: 1;
+}
+
+.studio-shell .results-actions-btns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.studio-shell .doc-strip {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) 0 0;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.studio-shell .doc-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding: 8px var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--r-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.12s var(--ease);
+}
+
+.studio-shell .doc-chip:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.studio-shell .doc-chip[aria-pressed="true"] {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.studio-shell .doc-chip-name {
+  white-space: nowrap;
+}
+
+.studio-shell .field-table {
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+
+.studio-shell .field-table-head,
+.studio-shell .field-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 0.85fr) minmax(0, 1.6fr) 26px 52px;
+  gap: var(--space-2);
+  align-items: baseline;
+  width: 100%;
+  padding: 7px var(--space-3);
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
+}
+
+.studio-shell .field-table-head {
+  border-top: 0;
+  font-size: 10px;
+  color: var(--ink-4);
+  background: var(--surface);
+}
+
+.studio-shell .field-table-head span:nth-child(3),
+.studio-shell .field-table-head span:nth-child(4) {
+  text-align: right;
+}
+
+.studio-shell .field-row:hover {
+  background: var(--surface);
+}
+
+.studio-shell .field-row[aria-pressed="true"] {
+  background: var(--accent-tint);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.studio-shell .field-row-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+.studio-shell .field-row[aria-pressed="true"] .field-row-name {
+  color: var(--ink-2);
+}
+
+.studio-shell .field-row-value {
+  min-width: 0;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.5;
+  /* Wrap long values instead of clipping them. */
+  overflow-wrap: anywhere;
+}
+
+.studio-shell .field-row-page,
+.studio-shell .field-row-parse {
+  white-space: nowrap;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-4);
+}
+
+.studio-shell .field-row-parse {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.studio-shell .match-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* Fixed hues, not palette tokens: these encode grounding strength, so they
+	   must keep their meaning across every theme and palette. */
+  background: var(--ink-4);
+}
+
+.studio-shell .match-dot.good {
+  background: #4a9d6a;
+}
+
+.studio-shell .match-dot.partial {
+  background: #c9a227;
+}
+
+.studio-shell .match-dot.bad {
+  background: #c8553c;
+}
+
+.studio-shell .rail-item {
+  position: relative;
+  display: block;
+}
+
+.studio-shell .chip-label {
+  min-width: 0;
+}
+
+.studio-shell .rail-tip {
+  position: absolute;
+  left: calc(100% + var(--space-5));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  width: 264px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-2);
+  background: var(--bg-elev);
+  color: var(--ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 22%);
+  /* visibility, not display, so the transition runs and screen readers can
+	   still reach the text via aria-describedby. */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.12s var(--ease),
+    visibility 0.12s var(--ease);
+}
+
+.studio-shell .rail-item:hover .rail-tip,
+.studio-shell .rail-item:focus-within .rail-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 1024px) {
+  .studio-shell .rail-tip {
+    left: 0;
+    top: calc(100% + 4px);
+    transform: none;
+    width: min(264px, 100%);
+  }
+}
