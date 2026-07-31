@@ -62,11 +62,21 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       optional: false,
     },
   ],
-  // Spans both statement types deliberately: the income statement fills revenue
-  // and net income, the balance sheet fills assets and liabilities, and each
-  // returns null for the other pair. That is honest rather than broken, and it
-  // demonstrates optional-field handling. periodEnding is the one field both
-  // documents carry, so it stays required.
+  // Spans both statement types deliberately, so some fields are null on any one
+  // document. That is honest rather than broken, and it demonstrates
+  // optional-field handling. periodEnding is the one field both documents carry,
+  // so it stays required.
+  //
+  // Measured against gpt-5.4 (2026-07-31), not assumed:
+  //   income statement -> periodEnding, totalRevenue, netIncome
+  //                       (totalAssets/totalLiabilities null — absent from the doc)
+  //   balance sheet    -> periodEnding, totalAssets, totalLiabilities, AND netIncome
+  //                       (totalRevenue null)
+  //
+  // netIncome fills on BOTH. The balance sheet states it in prose — "Net income of
+  // 612,000 for the period ties to the accompanying income statement" — so
+  // extracting it is correct, not a leak. Only totalRevenue is exclusive to the
+  // income statement.
   finance: [
     {
       key: "periodEnding",

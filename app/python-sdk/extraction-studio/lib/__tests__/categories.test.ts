@@ -89,9 +89,10 @@ describe("presets", () => {
   });
 
   test("finance marks the statement-specific fields optional", () => {
-    // An income statement fills revenue/netIncome and a balance sheet fills
-    // assets/liabilities; each legitimately returns null for the other pair, so
-    // those four must not be required. periodEnding is on both documents.
+    // No single Finance document fills all four, so none may be required.
+    // Measured 2026-07-31: the income statement nulls totalAssets and
+    // totalLiabilities; the balance sheet nulls only totalRevenue, because it
+    // states net income in prose. periodEnding is on both documents.
     const rows = presetFor("finance");
     const optional = (k: string) => rows.find((r) => r.key === k)?.optional;
     expect(optional("totalRevenue")).toBe(true);
