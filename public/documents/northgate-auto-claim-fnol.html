@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Northgate Mutual — First Notice of Loss</title>
+    <style>
+      @page { size: letter; margin: 0.75in; }
+      /* Ligatures off: the renderer otherwise emits U+FB01 (fi) etc. into the
+         text layer, so "Whitfield" extracts as "Whit\uFB01eld" and breaks any
+         exact-string comparison against the page. */
+      body { font-family: Helvetica, Arial, sans-serif; color: #111; font-size: 10.5pt;
+             font-variant-ligatures: none; }
+      h1 { font-size: 16pt; margin: 0 0 2px; letter-spacing: .01em; }
+      .sub { font-size: 10pt; color: #444; margin: 0 0 18px; }
+      h2 { font-size: 11pt; margin: 20px 0 6px; padding-bottom: 3px;
+           border-bottom: 1.5px solid #111; text-transform: uppercase;
+           letter-spacing: .04em; }
+      table { width: 100%; border-collapse: collapse; }
+      td { padding: 4px 6px; border-bottom: 1px solid #ddd; }
+      td.n { text-align: right; white-space: nowrap; }
+      tr.total td { border-top: 1.5px solid #111; border-bottom: none; font-weight: 700; }
+      .meta { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+      .meta td { border: 1px solid #999; padding: 5px 7px; }
+      .meta td.k { background: #f2f2f2; font-weight: 700; width: 24%; }
+      .note { margin-top: 22px; font-size: 9pt; color: #555; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <h1>Northgate Mutual Insurance Company</h1>
+    <p class="sub">Automobile First Notice of Loss &middot; Form FNOL-AUTO-04</p>
+
+    <table class="meta">
+      <tr>
+        <td class="k">Claim Number</td><td>CLM-2026-004417</td>
+        <td class="k">Date of Loss</td><td>March 14, 2026</td>
+      </tr>
+      <tr>
+        <td class="k">Policy Number</td><td>MAP-7781204-03</td>
+        <td class="k">Date Reported</td><td>March 16, 2026</td>
+      </tr>
+      <tr>
+        <td class="k">Insured Name</td><td>Daniel R. Whitfield</td>
+        <td class="k">Claim Status</td><td>Open &mdash; Under Review</td>
+      </tr>
+      <tr>
+        <td class="k">Loss Location</td>
+        <td colspan="3">
+          Junction of Halsted Street and West 47th, Chicago, IL 60609
+        </td>
+      </tr>
+      <tr>
+        <td class="k">Adjuster</td><td>Priya Raman, Field Unit 12</td>
+        <td class="k">Estimated Damage</td><td>8,450.00 USD</td>
+      </tr>
+    </table>
+
+    <h2>Description of Loss</h2>
+    <table>
+      <tr>
+        <td>
+          Insured vehicle was struck on the rear passenger quarter while
+          stationary at a signal-controlled junction. Third-party vehicle failed
+          to stop. No injuries reported by either party at the scene. Police
+          attended and issued incident reference CPD-2026-88214.
+        </td>
+      </tr>
+    </table>
+
+    <h2>Damage Assessment</h2>
+    <table>
+      <tr><td>Rear quarter panel &mdash; replace and refinish</td><td class="n">3,180.00</td></tr>
+      <tr><td>Rear bumper assembly &mdash; replace</td><td class="n">1,940.00</td></tr>
+      <tr><td>Tail lamp cluster, right</td><td class="n">610.00</td></tr>
+      <tr><td>Wheel alignment and suspension check</td><td class="n">420.00</td></tr>
+      <tr><td>Paint, materials and labour</td><td class="n">2,300.00</td></tr>
+      <tr class="total"><td>Total estimated damage</td><td class="n">8,450.00</td></tr>
+    </table>
+
+    <p class="note">
+      Prepared for demonstration purposes. Northgate Mutual Insurance Company is
+      a fictional entity; the named individuals, policy and claim references are
+      invented and describe no real person or event.
+    </p>
+  </body>
+</html>

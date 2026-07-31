@@ -691,6 +691,45 @@
   gap: var(--space-2);
 }
 
+/* Document categories, above the sample strip. The strip is the document axis
+   and the rail is the feature axis, so a document control belongs here rather
+   than in the rail. Scoped like everything else in this file. */
+.studio-shell .category-tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-3) 0 0;
+  overflow-x: auto;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+}
+.studio-shell .category-tab {
+  flex-shrink: 0;
+  padding: 6px var(--space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s var(--ease);
+}
+.studio-shell .category-tab:hover {
+  color: var(--ink);
+}
+.studio-shell .category-tab[aria-pressed="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+.studio-shell .doc-strip-empty {
+  margin: 0;
+  padding: 8px 0;
+  font-size: var(--text-sm);
+}
+
 .studio-shell .doc-strip {
   display: flex;
   gap: var(--space-2);

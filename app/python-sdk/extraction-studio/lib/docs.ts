@@ -10,6 +10,9 @@ export type DocSummary = {
    *  snippet name something recognisable. */
   filename: string;
   hasTextLayer: boolean;
+  /** Drives both the strip filter and which schema preset loads. A string, not
+   *  CategoryId, so an entry with an unrecognised category still renders. */
+  category: string;
 };
 
 /**
@@ -39,6 +42,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/invoices/Invoice AC-2025-1047.pdf",
     filename: "invoice-ac20251047.pdf",
     hasTextLayer: true,
+    category: "invoices",
   },
   {
     docId: "lumen-invoice",
@@ -46,6 +50,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/lumen-invoice.pdf",
     filename: "lumen-invoice.pdf",
     hasTextLayer: false,
+    category: "invoices",
   },
   {
     docId: "scanned-invoice",
@@ -53,6 +58,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/scanned-invoice.pdf",
     filename: "scanned-invoice.pdf",
     hasTextLayer: false,
+    category: "invoices",
   },
   {
     docId: "happy-tooth-invoice-excel",
@@ -60,6 +66,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/happy-tooth-invoice-excel.pdf",
     filename: "happy-tooth-invoice-excel.pdf",
     hasTextLayer: true,
+    category: "invoices",
   },
   {
     docId: "westbridge-engineering-submittal-form",
@@ -67,6 +74,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/westbridge-engineering-submittal-form.pdf",
     filename: "westbridge-engineering-submittal-form.pdf",
     hasTextLayer: false,
+    category: "construction",
   },
   {
     docId: "bill-of-lading",
@@ -74,6 +82,7 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/bill-of-lading.pdf",
     filename: "bill-of-lading.pdf",
     hasTextLayer: false,
+    category: "logistics",
   },
   {
     docId: "emergency-dept-billing-worksheet",
@@ -81,6 +90,31 @@ export const DOCUMENTS: DocSummary[] = [
     path: "/documents/emergency-dept-billing-worksheet.pdf",
     filename: "emergency-dept-billing-worksheet.pdf",
     hasTextLayer: true,
+    category: "healthcare",
+  },
+  {
+    docId: "meridian-income-statement",
+    label: "Meridian income statement",
+    path: "/documents/meridian-income-statement.pdf",
+    filename: "meridian-income-statement.pdf",
+    hasTextLayer: true,
+    category: "finance",
+  },
+  {
+    docId: "meridian-balance-sheet",
+    label: "Meridian balance sheet",
+    path: "/documents/meridian-balance-sheet.pdf",
+    filename: "meridian-balance-sheet.pdf",
+    hasTextLayer: true,
+    category: "finance",
+  },
+  {
+    docId: "northgate-auto-claim-fnol",
+    label: "Northgate auto claim (FNOL)",
+    path: "/documents/northgate-auto-claim-fnol.pdf",
+    filename: "northgate-auto-claim-fnol.pdf",
+    hasTextLayer: true,
+    category: "claims",
   },
 ];
 

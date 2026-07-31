@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Meridian Components Inc. — Income Statement</title>
+    <style>
+      @page { size: letter; margin: 0.75in; }
+      /* Ligatures off: the renderer otherwise emits U+FB01 (fi) etc. into the
+         text layer, so "Whitfield" extracts as "Whit\uFB01eld" and breaks any
+         exact-string comparison against the page. */
+      body { font-family: Helvetica, Arial, sans-serif; color: #111; font-size: 10.5pt;
+             font-variant-ligatures: none; }
+      h1 { font-size: 16pt; margin: 0 0 2px; letter-spacing: .01em; }
+      .sub { font-size: 10pt; color: #444; margin: 0 0 18px; }
+      h2 { font-size: 11pt; margin: 20px 0 6px; padding-bottom: 3px;
+           border-bottom: 1.5px solid #111; text-transform: uppercase;
+           letter-spacing: .04em; }
+      table { width: 100%; border-collapse: collapse; }
+      td { padding: 4px 6px; border-bottom: 1px solid #ddd; }
+      td.n { text-align: right; white-space: nowrap; }
+      tr.total td { border-top: 1.5px solid #111; border-bottom: none; font-weight: 700; }
+      .note { margin-top: 22px; font-size: 9pt; color: #555; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <h1>Meridian Components Inc.</h1>
+    <p class="sub">
+      Statement of Operations &middot; Period Ending December 31, 2025 &middot;
+      Reporting Currency: USD
+    </p>
+    <h2>Income Statement</h2>
+    <table>
+      <tr><td>Total revenue</td><td class="n">4,820,000</td></tr>
+      <tr><td>Cost of sales</td><td class="n">(2,915,000)</td></tr>
+      <tr class="total"><td>Gross profit</td><td class="n">1,905,000</td></tr>
+      <tr><td>Selling, general &amp; administrative</td><td class="n">(742,000)</td></tr>
+      <tr><td>Research &amp; development</td><td class="n">(265,000)</td></tr>
+      <tr><td>Depreciation &amp; amortisation</td><td class="n">(95,000)</td></tr>
+      <tr class="total"><td>Operating income</td><td class="n">803,000</td></tr>
+      <tr><td>Interest expense</td><td class="n">(41,000)</td></tr>
+      <tr class="total"><td>Income before income taxes</td><td class="n">762,000</td></tr>
+      <tr><td>Provision for income taxes</td><td class="n">(150,000)</td></tr>
+      <tr class="total"><td>Net income</td><td class="n">612,000</td></tr>
+    </table>
+    <p class="note">
+      Prepared for demonstration purposes. Meridian Components Inc. is a
+      fictional entity and these figures describe no real company. Amounts are
+      stated in whole US dollars.
+    </p>
+  </body>
+</html>
