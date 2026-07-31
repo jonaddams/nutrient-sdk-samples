@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
+import { CategoryTabs } from "./_components/CategoryTabs";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
@@ -16,12 +17,14 @@ import type {
   StructuredRequest,
 } from "./lib/api";
 import { extractStructured } from "./lib/api";
+import { presetFor } from "./lib/categories";
 import { indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
   const [doc, setDoc] = useState(DOCUMENTS[0].docId);
+  const [category, setCategory] = useState(DOCUMENTS[0].category);
   const [tab, setTab] = useState("config");
   const [result, setResult] = useState<Envelope | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -35,6 +38,16 @@ export default function ExtractionStudio() {
   // loading state and no fallback list.
   const current = findDoc(doc) ?? DOCUMENTS[0];
 
+  const visibleDocs = useMemo(
+    () => DOCUMENTS.filter((d) => d.category === category),
+    [category],
+  );
+
+  // MUST be memoised on [category]. StructuredConfig's preset effect keys on
+  // this value's identity and presetFor returns a fresh array every call, so an
+  // inline call here would re-fire that effect every render and loop forever.
+  const schemaPreset = useMemo(() => presetFor(category), [category]);
+
   // A new document invalidates everything derived from the previous one.
   const selectDoc = (docId: string) => {
     setDoc(docId);
@@ -42,6 +55,16 @@ export default function ExtractionStudio() {
     setActiveIndex(null);
     setError(null);
     setTab("config");
+  };
+
+  // Auto-selecting the category's first document keeps the viewer from showing
+  // a document from a different category than the active tab. Routing through
+  // selectDoc also clears result/activeIndex/error, so citations from the
+  // previous document cannot survive a category change.
+  const selectCategory = (next: string) => {
+    setCategory(next);
+    const first = DOCUMENTS.find((d) => d.category === next);
+    if (first) selectDoc(first.docId);
   };
 
   const fields = (result?.data?.fields as FieldResult[] | undefined) ?? [];
@@ -106,7 +129,17 @@ export default function ExtractionStudio() {
               setTab("results");
             }}
           />
-          <DocStrip docs={DOCUMENTS} value={doc} onSelect={selectDoc} />
+          <CategoryTabs
+            docs={DOCUMENTS}
+            value={category}
+            onSelect={selectCategory}
+          />
+          <DocStrip
+            docs={visibleDocs}
+            value={doc}
+            category={category}
+            onSelect={selectDoc}
+          />
         </section>
 
         <aside className="studio-panel">
@@ -159,6 +192,7 @@ export default function ExtractionStudio() {
                 filename={current.filename}
                 onRun={handleRun}
                 runSignal={runSignal}
+                schemaPreset={schemaPreset}
               />
             </div>
             {tab === "results" &&

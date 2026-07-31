@@ -7,43 +7,42 @@ import { PanelSection } from "./PanelSection";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
-const DEFAULT_PROPS: SchemaProp[] = [
-  newSchemaProp({
-    key: "invoiceNumber",
-    type: "string",
-    description: "The invoice number/reference",
-  }),
-  newSchemaProp({
-    key: "issueDate",
-    type: "string",
-    description: "The issue date, as printed",
-  }),
-  newSchemaProp({
-    key: "totalAmount",
-    type: "number",
-    description: "The final total due, digits only",
-  }),
-];
-
 export function StructuredConfig({
   docPath,
   filename,
   onRun,
   runSignal,
+  schemaPreset,
 }: {
   docPath: string;
   filename: string;
   onRun: (req: StructuredRequest) => void;
   runSignal: number;
+  /** MUST be referentially stable per category — see the effect below. */
+  schemaPreset: SchemaProp[];
 }) {
   const [mode, setMode] = useState("builder");
-  const [props, setProps] = useState<SchemaProp[]>(DEFAULT_PROPS);
+  const [props, setProps] = useState<SchemaProp[]>(schemaPreset);
   const [instructions, setInstructions] = useState("");
   const [provider, setProvider] = useState("openai");
   const [citations, setCitations] = useState(true);
   const [strict, setStrict] = useState(false);
   const [multimodal, setMultimodal] = useState(false);
-  const [json, setJson] = useState(buildSchema(DEFAULT_PROPS));
+  const [json, setJson] = useState(() => buildSchema(schemaPreset));
+
+  // Switching category replaces the schema wholesale, discarding hand-edits.
+  // That is deliberate: a demo-er changing category wants that category's
+  // schema, not their last experiment.
+  //
+  // Keyed on schemaPreset's IDENTITY, so the caller must memoise it per
+  // category. presetFor returns a fresh array every call, so calling it inline
+  // during render would fire this effect every render and loop forever. On
+  // mount it is a no-op: both setters receive values equal to current state, so
+  // React bails out.
+  useEffect(() => {
+    setProps(schemaPreset);
+    setJson(buildSchema(schemaPreset));
+  }, [schemaPreset]);
 
   const update = (i: number, patch: Partial<SchemaProp>) =>
     setProps((p) =>

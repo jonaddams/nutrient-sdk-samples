@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Meridian Components Inc. — Balance Sheet</title>
+    <style>
+      @page { size: letter; margin: 0.75in; }
+      /* Ligatures off: the renderer otherwise emits U+FB01 (fi) etc. into the
+         text layer, so "Whitfield" extracts as "Whit\uFB01eld" and breaks any
+         exact-string comparison against the page. */
+      body { font-family: Helvetica, Arial, sans-serif; color: #111; font-size: 10.5pt;
+             font-variant-ligatures: none; }
+      h1 { font-size: 16pt; margin: 0 0 2px; letter-spacing: .01em; }
+      .sub { font-size: 10pt; color: #444; margin: 0 0 18px; }
+      h2 { font-size: 11pt; margin: 20px 0 6px; padding-bottom: 3px;
+           border-bottom: 1.5px solid #111; text-transform: uppercase;
+           letter-spacing: .04em; }
+      table { width: 100%; border-collapse: collapse; }
+      td { padding: 4px 6px; border-bottom: 1px solid #ddd; }
+      td.n { text-align: right; white-space: nowrap; }
+      tr.total td { border-top: 1.5px solid #111; border-bottom: none; font-weight: 700; }
+      .note { margin-top: 22px; font-size: 9pt; color: #555; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <h1>Meridian Components Inc.</h1>
+    <p class="sub">
+      Statement of Financial Position &middot; Period Ending December 31, 2025
+      &middot; Reporting Currency: USD
+    </p>
+
+    <h2>Assets</h2>
+    <table>
+      <tr><td>Cash and cash equivalents</td><td class="n">486,000</td></tr>
+      <tr><td>Accounts receivable, net</td><td class="n">1,240,000</td></tr>
+      <tr><td>Inventory</td><td class="n">890,000</td></tr>
+      <tr class="total"><td>Total current assets</td><td class="n">2,616,000</td></tr>
+      <tr><td>Property, plant &amp; equipment, net</td><td class="n">1,884,000</td></tr>
+      <tr class="total"><td>Total assets</td><td class="n">4,500,000</td></tr>
+    </table>
+
+    <h2>Liabilities</h2>
+    <table>
+      <tr><td>Accounts payable</td><td class="n">615,000</td></tr>
+      <tr><td>Accrued expenses</td><td class="n">232,000</td></tr>
+      <tr><td>Current portion of long-term debt</td><td class="n">150,000</td></tr>
+      <tr class="total"><td>Total current liabilities</td><td class="n">997,000</td></tr>
+      <tr><td>Long-term debt</td><td class="n">1,203,000</td></tr>
+      <tr class="total"><td>Total liabilities</td><td class="n">2,200,000</td></tr>
+    </table>
+
+    <h2>Shareholders' Equity</h2>
+    <table>
+      <tr><td>Common stock</td><td class="n">500,000</td></tr>
+      <tr><td>Retained earnings</td><td class="n">1,800,000</td></tr>
+      <tr class="total"><td>Total shareholders' equity</td><td class="n">2,300,000</td></tr>
+      <tr class="total">
+        <td>Total liabilities and shareholders' equity</td>
+        <td class="n">4,500,000</td>
+      </tr>
+    </table>
+
+    <p class="note">
+      Prepared for demonstration purposes. Meridian Components Inc. is a
+      fictional entity and these figures describe no real company. Net income of
+      612,000 for the period ties to the accompanying income statement, and
+      total assets equal total liabilities plus equity.
+    </p>
+  </body>
+</html>
