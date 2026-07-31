@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
+import { presetFor } from "../../lib/categories";
 import { StructuredConfig } from "../StructuredConfig";
+
+const invoices = presetFor("invoices");
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -14,6 +17,7 @@ test("mounting with a given runSignal does not call onRun", () => {
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={3}
+      schemaPreset={invoices}
     />,
   );
   expect(onRun).not.toHaveBeenCalled();
@@ -27,6 +31,7 @@ test("incrementing runSignal calls onRun exactly once with the current config", 
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={3}
+      schemaPreset={invoices}
     />,
   );
   rerender(
@@ -35,6 +40,7 @@ test("incrementing runSignal calls onRun exactly once with the current config", 
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={4}
+      schemaPreset={invoices}
     />,
   );
   expect(onRun).toHaveBeenCalledTimes(1);
@@ -63,6 +69,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={0}
+      schemaPreset={invoices}
     />,
   );
   rerender(
@@ -71,6 +78,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={1}
+      schemaPreset={invoices}
     />,
   );
   rerender(
@@ -79,6 +87,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       filename="doc-1.pdf"
       onRun={onRun}
       runSignal={2}
+      schemaPreset={invoices}
     />,
   );
   expect(onRun).toHaveBeenCalledTimes(2);
@@ -111,6 +120,7 @@ test("removing a middle row leaves the remaining rows' values intact and correct
       filename="doc-1.pdf"
       onRun={() => {}}
       runSignal={0}
+      schemaPreset={invoices}
     />,
   );
 
@@ -156,6 +166,7 @@ test("two freshly added blank rows have pairwise-distinct accessible names acros
       filename="doc-1.pdf"
       onRun={() => {}}
       runSignal={0}
+      schemaPreset={invoices}
     />,
   );
 
@@ -184,4 +195,113 @@ test("two freshly added blank rows have pairwise-distinct accessible names acros
   for (const el of row4) {
     expect(row5).not.toContain(el);
   }
+});
+
+test("renders the rows it is given rather than a hardcoded default", () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/bol.pdf"
+      filename="bol.pdf"
+      onRun={() => {}}
+      runSignal={0}
+      schemaPreset={presetFor("logistics")}
+    />,
+  );
+  expect(screen.getByRole("textbox", { name: "Property key 1" })).toHaveValue(
+    "billOfLadingNumber",
+  );
+  expect(
+    screen.queryByRole("textbox", { name: "Description for invoiceNumber" }),
+  ).toBeNull();
+});
+
+test("a new preset replaces the rows, discarding hand-edits", () => {
+  // Deliberate: a demo-er switching category wants that category's schema, not
+  // their last experiment.
+  const claims = presetFor("claims");
+  const { rerender } = render(
+    <StructuredConfig
+      docPath="/documents/a.pdf"
+      filename="a.pdf"
+      onRun={() => {}}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Description for invoiceNumber" }),
+    { target: { value: "a hand edit" } },
+  );
+  rerender(
+    <StructuredConfig
+      docPath="/documents/a.pdf"
+      filename="a.pdf"
+      onRun={() => {}}
+      runSignal={0}
+      schemaPreset={claims}
+    />,
+  );
+  expect(screen.getByRole("textbox", { name: "Property key 1" })).toHaveValue(
+    "claimNumber",
+  );
+  expect(
+    screen.queryByRole("textbox", { name: "Description for invoiceNumber" }),
+  ).toBeNull();
+});
+
+test("the run request carries the current preset's fields", () => {
+  const onRun = vi.fn();
+  const healthcare = presetFor("healthcare");
+  const { rerender } = render(
+    <StructuredConfig
+      docPath="/documents/a.pdf"
+      filename="a.pdf"
+      onRun={onRun}
+      runSignal={0}
+      schemaPreset={healthcare}
+    />,
+  );
+  rerender(
+    <StructuredConfig
+      docPath="/documents/a.pdf"
+      filename="a.pdf"
+      onRun={onRun}
+      runSignal={1}
+      schemaPreset={healthcare}
+    />,
+  );
+  const properties = JSON.parse(onRun.mock.calls[0][0].schema).schema
+    .properties;
+  expect(properties).toHaveProperty("patientName");
+  expect(properties).not.toHaveProperty("invoiceNumber");
+});
+
+test("re-rendering with the same preset does not reset edited rows", () => {
+  // Guards the render-loop trap: a stable preset must settle, not re-fire. If
+  // the effect's deps gain anything that changes per render, this fails.
+  const { rerender } = render(
+    <StructuredConfig
+      docPath="/documents/a.pdf"
+      filename="a.pdf"
+      onRun={() => {}}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Description for invoiceNumber" }),
+    { target: { value: "survives" } },
+  );
+  rerender(
+    <StructuredConfig
+      docPath="/documents/b.pdf"
+      filename="b.pdf"
+      onRun={() => {}}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  expect(
+    screen.getByRole("textbox", { name: "Description for invoiceNumber" }),
+  ).toHaveValue("survives");
 });
