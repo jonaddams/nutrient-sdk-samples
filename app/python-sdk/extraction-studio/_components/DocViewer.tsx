@@ -29,6 +29,7 @@ export function DocViewer({
   citations,
   activeIndex,
   showCitations,
+  citationHex,
   onCitationPress,
 }: {
   /** Public URL of the PDF, served by Next from public/. */
@@ -36,6 +37,7 @@ export function DocViewer({
   citations: IndexedCitation[];
   activeIndex: number | null;
   showCitations: boolean;
+  citationHex: string;
   onCitationPress: (fieldIndex: number) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,7 @@ export function DocViewer({
     citations,
     activeIndex,
     showCitations,
+    citationHex,
   });
 
   // ── Load the document. Deps are ONLY docPath: keying this on `citations` too

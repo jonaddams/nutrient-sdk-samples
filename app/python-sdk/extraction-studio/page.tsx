@@ -18,7 +18,7 @@ import type {
 } from "./lib/api";
 import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
-import { indexCitations } from "./lib/citations";
+import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
 
 export default function ExtractionStudio() {
@@ -32,6 +32,9 @@ export default function ExtractionStudio() {
   const [error, setError] = useState<string | null>(null);
   const [runSignal, setRunSignal] = useState(0);
   const [showCitations, setShowCitations] = useState(true);
+  // Session state on purpose, not persisted: every demo then opens in the
+  // same known-good colour rather than whatever the last viewer picked.
+  const [citationHex, setCitationHex] = useState(DEFAULT_CITATION_HEX);
 
   // The document list is a code manifest, not a fetch — the backend is
   // stateless and Next serves these from public/. Nothing to load, so no
@@ -157,6 +160,7 @@ export default function ExtractionStudio() {
             citations={citations}
             activeIndex={activeIndex}
             showCitations={showCitations}
+            citationHex={citationHex}
             onCitationPress={(i) => {
               setActiveIndex(i);
               setTab("results");
@@ -226,6 +230,8 @@ export default function ExtractionStudio() {
                   activeIndex={activeIndex}
                   onSelectField={setActiveIndex}
                   showCitations={showCitations}
+                  citationHex={citationHex}
+                  onCitationHexChange={setCitationHex}
                   onShowCitationsChange={setShowCitations}
                 />
               ) : (

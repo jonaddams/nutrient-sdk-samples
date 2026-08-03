@@ -811,6 +811,76 @@
   padding: 8px var(--space-3);
 }
 
+/* ── Citation colour picker ───────────────────────────────────────────────── */
+.studio-shell .citation-color {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0 0;
+}
+
+.studio-shell .citation-swatches {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.studio-shell .citation-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-1);
+  cursor: pointer;
+  transition: box-shadow 0.12s var(--ease);
+}
+
+/* Ring rather than a border swap: a border would resize the swatch and shift
+   the row. Offset so it reads against the swatch's own colour. */
+.studio-shell .citation-swatch[aria-pressed="true"] {
+  box-shadow:
+    0 0 0 2px var(--bg-elev),
+    0 0 0 4px var(--ink);
+}
+
+.studio-shell .citation-swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The native swatch keeps the OS picker and eyedropper; only its chrome is
+   normalised so it sits level with the presets. */
+.studio-shell .citation-color-native {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-1);
+  background: none;
+  cursor: pointer;
+}
+.studio-shell .citation-color-native::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.studio-shell .citation-color-native::-webkit-color-swatch {
+  border: none;
+  border-radius: calc(var(--r-1) - 1px);
+}
+
+/* 11ch, not 8ch: "#ffc107" is 7 characters but `ch` is the width of "0" and the
+   field also carries horizontal padding and a border, so 8ch clipped the last
+   digit — the value read "#ffc1…". Sized to the content it must always show. */
+.studio-shell .citation-hex {
+  width: 11ch;
+  padding: 4px var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--bg-elev);
+  color: var(--ink);
+  font-size: var(--text-xs);
+}
+
 /* ── Rail responsive overrides ─────────────────────────────────────────────
    Stacked layout (<=1024px): .studio-shell becomes display:block, so the rail
    spans full width and the 208px constraint that forced a narrow single column
