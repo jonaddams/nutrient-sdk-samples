@@ -694,19 +694,38 @@
 /* Document categories, above the sample strip. The strip is the document axis
    and the rail is the feature axis, so a document control belongs here rather
    than in the rail. Scoped like everything else in this file. */
+/* Rail column: FeatureRail + CategoryTabs stacked. It is the grid item now, so
+   it owns the scroll — the features list plus six categories can exceed a short
+   viewport, and min-height:0 is what lets overflow-y actually resolve. */
+.studio-shell .studio-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Vertical, because the rail column is 240px (208px usable) and the six tabs
+   need 506px laid out horizontally. Same tab language rotated 90°: the 2px
+   accent moves from border-bottom to border-left. Do NOT restore overflow-x —
+   a scrolling strip hides categories, which is the discoverability problem this
+   layout exists to fix. */
 .studio-shell .category-tabs {
   display: flex;
-  gap: var(--space-1);
-  padding: var(--space-3) 0 0;
-  overflow-x: auto;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  margin-top: var(--space-4);
   flex-shrink: 0;
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+.studio-shell .category-tabs .eyebrow {
+  padding-bottom: var(--space-2);
 }
 .studio-shell .category-tab {
   flex-shrink: 0;
   padding: 6px var(--space-3);
   border: none;
-  border-bottom: 2px solid transparent;
+  border-left: 2px solid transparent;
   border-radius: 0;
   background: none;
   color: var(--ink-2);
@@ -714,6 +733,7 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
+  text-align: left;
   transition: all 0.12s var(--ease);
 }
 .studio-shell .category-tab:hover {
@@ -721,8 +741,41 @@
 }
 .studio-shell .category-tab[aria-pressed="true"] {
   color: var(--ink);
-  border-bottom-color: var(--accent);
+  border-left-color: var(--accent);
   font-weight: 600;
+}
+
+/* Stacked layout: the rail spans full width, so the 240px constraint that
+   forced the vertical list no longer applies. Six full-width rows cost ~270px
+   of height above the viewer and pushed the tabs below the fold, so revert to
+   the horizontal row and put the accent back on border-bottom.
+
+   MUST live after the base .category-tab rules above: both selectors are
+   (0,2,0), so source order decides. Placed in the earlier @media block at the
+   top of this file, these lose to the base rules and silently do nothing. */
+@media (max-width: 1024px) {
+  .studio-shell .studio-rail {
+    overflow-y: visible;
+  }
+  .studio-shell .category-tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+  .studio-shell .category-tabs .eyebrow {
+    flex-basis: 100%;
+    padding-bottom: var(--space-1);
+  }
+  .studio-shell .category-tab {
+    border-left: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+  }
+  .studio-shell .category-tab[aria-pressed="true"] {
+    border-left-color: transparent;
+    border-bottom-color: var(--accent);
+  }
 }
 .studio-shell .doc-strip-empty {
   margin: 0;

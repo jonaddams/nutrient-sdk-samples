@@ -33,7 +33,12 @@ export function CategoryTabs({
     // aria-pressed rather than role="tab": this switches a filter, it does not
     // reveal a panel, and it matches the Segmented/DocStrip pattern already used
     // throughout this sample.
+    //
+    // Lives in the rail column, below FeatureRail. The eyebrow matches the rail's
+    // own group headers ("Structured", "Recognition", …) — these tabs previously
+    // sat unlabelled under the viewer, where users were missing them.
     <nav className="category-tabs" aria-label="Document categories">
+      <div className="eyebrow">Document type</div>
       {shown.map((category) => (
         <button
           key={category}

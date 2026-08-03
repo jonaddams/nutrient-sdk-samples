@@ -112,11 +112,21 @@ export default function ExtractionStudio() {
         description="Pull a JSON schema's fields out of a document with the SDK's native structured extraction — every value carries a citation you can click to find it on the page."
       />
       <div className="studio-shell">
-        <FeatureRail
-          features={FEATURES}
-          value={feature}
-          onSelect={setFeature}
-        />
+        {/* Rail column holds both navs. CategoryTabs is a SIBLING of FeatureRail,
+            not a child: it keeps its own `nav[aria-label="Document categories"]`
+            landmark rather than being buried inside "Features". */}
+        <div className="studio-rail">
+          <FeatureRail
+            features={FEATURES}
+            value={feature}
+            onSelect={setFeature}
+          />
+          <CategoryTabs
+            docs={DOCUMENTS}
+            value={category}
+            onSelect={selectCategory}
+          />
+        </div>
 
         <section className="studio-viewer">
           <DocViewer
@@ -128,11 +138,6 @@ export default function ExtractionStudio() {
               setActiveIndex(i);
               setTab("results");
             }}
-          />
-          <CategoryTabs
-            docs={DOCUMENTS}
-            value={category}
-            onSelect={selectCategory}
           />
           <DocStrip
             docs={visibleDocs}
