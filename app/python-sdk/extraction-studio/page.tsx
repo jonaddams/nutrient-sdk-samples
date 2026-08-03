@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
-import { CategoryTabs } from "./_components/CategoryTabs";
+import { CategorySelect } from "./_components/CategorySelect";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
@@ -100,11 +100,24 @@ export default function ExtractionStudio() {
   };
 
   return (
-    // h-screen, not min-h-screen: .studio-shell is `flex: 1; min-height: 0`, so
-    // it needs a parent of DEFINITE height to fill. With min-height the viewer
-    // and results panes cannot resolve their own scroll containers.
+    // A DEFINITE height, not min-height: .studio-shell is `flex: 1;
+    // min-height: 0`, so it needs a parent of definite height to fill.
+    // With min-height the viewer and results panes cannot resolve their own
+    // scroll containers.
+    //
+    // Height is 100dvh MINUS the host's sticky `header.topbar`, because this
+    // element starts below it — plain `h-screen` (100vh) overflowed the viewport
+    // by exactly the topbar's height, which pushed the bottom of the rail and
+    // the results panel off-screen where `overflow-hidden` made them
+    // unreachable.
+    //
+    // The topbar has no fixed height: it comes from `.topbar-inner`'s padding in
+    // app/globals.css, which is 16px below 768px and 18px at/above it — 67px and
+    // 71px including the 1px bottom border. Tailwind's `md` is that same 768px,
+    // so these two values track the host's own breakpoint. If `.topbar-inner`
+    // padding changes, change these.
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="h-[calc(100dvh-67px)] md:h-[calc(100dvh-71px)] flex flex-col overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
       <PythonSampleHeader
@@ -112,11 +125,31 @@ export default function ExtractionStudio() {
         description="Pull a JSON schema's fields out of a document with the SDK's native structured extraction — every value carries a citation you can click to find it on the page."
       />
       <div className="studio-shell">
-        <FeatureRail
-          features={FEATURES}
-          value={feature}
-          onSelect={setFeature}
-        />
+        {/* Rail column: features, then the category control, then the documents
+            for that category. Document selection lives here rather than under
+            the viewer because there it sat below the fold — the page is
+            h-screen/overflow-hidden, so anything past the viewport is not
+            merely unscrolled but unreachable. Each stays its own landmark
+            (`nav[aria-label="Sample documents"]`) rather than being folded into
+            "Features". */}
+        <div className="studio-rail">
+          <FeatureRail
+            features={FEATURES}
+            value={feature}
+            onSelect={setFeature}
+          />
+          <CategorySelect
+            docs={DOCUMENTS}
+            value={category}
+            onSelect={selectCategory}
+          />
+          <DocStrip
+            docs={visibleDocs}
+            value={doc}
+            category={category}
+            onSelect={selectDoc}
+          />
+        </div>
 
         <section className="studio-viewer">
           <DocViewer
@@ -128,17 +161,6 @@ export default function ExtractionStudio() {
               setActiveIndex(i);
               setTab("results");
             }}
-          />
-          <CategoryTabs
-            docs={DOCUMENTS}
-            value={category}
-            onSelect={selectCategory}
-          />
-          <DocStrip
-            docs={visibleDocs}
-            value={doc}
-            category={category}
-            onSelect={selectDoc}
           />
         </section>
 

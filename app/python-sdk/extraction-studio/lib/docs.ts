@@ -35,10 +35,19 @@ export type DocSummary = {
  * latter pair differs only in the PDF trailer /ID). Listing either would show
  * the same document twice under two names.
  */
+/*
+ * Invoice labels deliberately omit the word "invoice" — the category control
+ * directly above the list already says "Invoices", so repeating it in all four
+ * labels wasted the 208px rail column on a word the user just chose. Other
+ * categories keep their document nouns because they are not redundant
+ * ("Meridian income statement" under Finance, "Straight bill of lading" under
+ * Logistics). Claims still reads "Northgate auto claim (FNOL)" — same
+ * redundancy, left alone pending a call on the wording.
+ */
 export const DOCUMENTS: DocSummary[] = [
   {
     docId: "invoice-ac20251047",
-    label: "Atlas Construction invoice",
+    label: "Atlas Construction",
     path: "/invoices/Invoice AC-2025-1047.pdf",
     filename: "invoice-ac20251047.pdf",
     hasTextLayer: true,
@@ -46,7 +55,7 @@ export const DOCUMENTS: DocSummary[] = [
   },
   {
     docId: "lumen-invoice",
-    label: "Lumen invoice",
+    label: "Lumen",
     path: "/documents/lumen-invoice.pdf",
     filename: "lumen-invoice.pdf",
     hasTextLayer: false,
@@ -54,7 +63,7 @@ export const DOCUMENTS: DocSummary[] = [
   },
   {
     docId: "scanned-invoice",
-    label: "Scanned invoice",
+    label: "Scanned",
     path: "/documents/scanned-invoice.pdf",
     filename: "scanned-invoice.pdf",
     hasTextLayer: false,
@@ -62,7 +71,7 @@ export const DOCUMENTS: DocSummary[] = [
   },
   {
     docId: "happy-tooth-invoice-excel",
-    label: "Happy Tooth invoice (from Excel)",
+    label: "Happy Tooth (from Excel)",
     path: "/documents/happy-tooth-invoice-excel.pdf",
     filename: "happy-tooth-invoice-excel.pdf",
     hasTextLayer: true,
