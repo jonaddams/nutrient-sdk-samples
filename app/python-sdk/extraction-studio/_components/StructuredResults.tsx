@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
+import { CitationColor } from "./CitationColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
@@ -31,6 +32,8 @@ export function StructuredResults({
   onSelectField,
   showCitations,
   onShowCitationsChange,
+  citationHex,
+  onCitationHexChange,
 }: {
   data: StructuredData;
   code?: string;
@@ -39,6 +42,8 @@ export function StructuredResults({
   onSelectField: (i: number) => void;
   showCitations: boolean;
   onShowCitationsChange: (v: boolean) => void;
+  citationHex: string;
+  onCitationHexChange: (hex: string) => void;
 }) {
   const [view, setView] = useState("fields");
 
@@ -83,6 +88,12 @@ export function StructuredResults({
           label="Show citations"
         />
       </div>
+
+      {/* Colour lives next to the visibility toggle: same concern, and it is
+          only meaningful once there are citations on the page. */}
+      {showCitations && (
+        <CitationColor value={citationHex} onChange={onCitationHexChange} />
+      )}
 
       <div className="panel-row-h panel-row results-actions">
         <Segmented
