@@ -40,7 +40,11 @@ test("renders a chip per document and marks the active one", () => {
   ).toHaveAttribute("aria-pressed", "false");
 });
 
-test("labels documents by whether they have a text layer", () => {
+test("does not render a text/scanned badge", () => {
+  // The badge was dropped when this list moved into the 208px rail column: it
+  // competed with labels that already wrap. Asserted rather than just deleted,
+  // so re-adding a badge is a deliberate act with a failing test behind it —
+  // `hasTextLayer` is still in the manifest and easy to render by reflex.
   render(
     <DocStrip
       docs={docs}
@@ -49,8 +53,8 @@ test("labels documents by whether they have a text layer", () => {
       onSelect={() => {}}
     />,
   );
-  expect(screen.getByText("text")).toBeInTheDocument();
-  expect(screen.getByText("scanned")).toBeInTheDocument();
+  expect(screen.queryByText("text")).toBeNull();
+  expect(screen.queryByText("scanned")).toBeNull();
 });
 
 test("shows the readable label rather than the docId", () => {
