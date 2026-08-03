@@ -45,6 +45,8 @@ test("renders field cards and reports selection", () => {
       activeIndex={null}
       onSelectField={onSelect}
       showCitations={true}
+      citationHex="#ffc107"
+      onCitationHexChange={() => {}}
       onShowCitationsChange={() => {}}
     />,
   );
@@ -77,6 +79,8 @@ test("shows timing, the citations switch and a Download button", () => {
       activeIndex={null}
       onSelectField={() => {}}
       showCitations={true}
+      citationHex="#ffc107"
+      onCitationHexChange={() => {}}
       onShowCitationsChange={onShowCitationsChange}
     />,
   );
@@ -127,6 +131,8 @@ test("Download builds a JSON blob for Fields/Raw JSON view and a .py blob for Co
       activeIndex={null}
       onSelectField={() => {}}
       showCitations={true}
+      citationHex="#ffc107"
+      onCitationHexChange={() => {}}
       onShowCitationsChange={() => {}}
     />,
   );
@@ -190,6 +196,8 @@ test("scrolls the active field card into view", () => {
       activeIndex={1}
       onSelectField={() => {}}
       showCitations={true}
+      citationHex="#ffc107"
+      onCitationHexChange={() => {}}
       onShowCitationsChange={() => {}}
     />,
   );
