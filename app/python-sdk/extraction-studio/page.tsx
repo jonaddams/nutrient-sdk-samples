@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
-import { CategoryTabs } from "./_components/CategoryTabs";
+import { CategorySelect } from "./_components/CategorySelect";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
@@ -112,19 +112,29 @@ export default function ExtractionStudio() {
         description="Pull a JSON schema's fields out of a document with the SDK's native structured extraction — every value carries a citation you can click to find it on the page."
       />
       <div className="studio-shell">
-        {/* Rail column holds both navs. CategoryTabs is a SIBLING of FeatureRail,
-            not a child: it keeps its own `nav[aria-label="Document categories"]`
-            landmark rather than being buried inside "Features". */}
+        {/* Rail column: features, then the category control, then the documents
+            for that category. Document selection lives here rather than under
+            the viewer because there it sat below the fold — the page is
+            h-screen/overflow-hidden, so anything past the viewport is not
+            merely unscrolled but unreachable. Each stays its own landmark
+            (`nav[aria-label="Sample documents"]`) rather than being folded into
+            "Features". */}
         <div className="studio-rail">
           <FeatureRail
             features={FEATURES}
             value={feature}
             onSelect={setFeature}
           />
-          <CategoryTabs
+          <CategorySelect
             docs={DOCUMENTS}
             value={category}
             onSelect={selectCategory}
+          />
+          <DocStrip
+            docs={visibleDocs}
+            value={doc}
+            category={category}
+            onSelect={selectDoc}
           />
         </div>
 
@@ -138,12 +148,6 @@ export default function ExtractionStudio() {
               setActiveIndex(i);
               setTab("results");
             }}
-          />
-          <DocStrip
-            docs={visibleDocs}
-            value={doc}
-            category={category}
-            onSelect={selectDoc}
           />
         </section>
 
