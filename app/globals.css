@@ -1020,8 +1020,14 @@
 }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
+/* margin-top is --space-5 (24px), not --space-9 (112px): the footer already has
+   48px of its own top padding inside the border, so --space-9 put 160px between
+   page content and the footer text. Most visible on full-height pages like
+   /python-sdk/extraction-studio, where the app shell ends at the viewport edge
+   and the margin read as a large empty band. The margin is deliberately smaller
+   than the padding it sits above — the padding is doing the visual work. */
 .footer {
-  margin-top: var(--space-9);
+  margin-top: var(--space-5);
   border-top: 1px solid var(--line);
   padding: var(--space-7) 0 var(--space-6);
 }
