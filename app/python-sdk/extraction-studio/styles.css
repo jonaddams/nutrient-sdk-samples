@@ -695,14 +695,29 @@
 }
 
 /* Rail column: features, then the category select, then that category's
-   documents. It is the grid item, so it owns the scroll — min-height:0 is what
-   lets overflow-y actually resolve. Scrolling here is a safety net for very
-   short viewports, not the intended experience: the point of this layout is
-   that document selection is visible WITHOUT scrolling, since the page is
-   h-screen/overflow-hidden and anything past the fold is unreachable. */
+   documents.
+ *
+ * The document controls are PINNED and the feature list absorbs the overflow —
+ * not the other way round. All three together need ~800px and the column has
+ * ~753px at a 1070px window, so something has to give; if the rail scrolled as
+ * one block the document list would be what disappeared, which is the exact
+ * problem this layout was built to fix. Instead the feature nav scrolls inside
+ * itself (7 of its 8 entries are disabled "soon" placeholders, so it is the
+ * cheapest thing to lose), and document selection stays on screen at any window
+ * height.
+ *
+ * overflow:hidden here, not auto: the rail itself must never scroll, or the
+ * pinning is pointless. min-height:0 on the scrolling child is what lets its
+ * overflow resolve inside a flex column. */
 .studio-shell .studio-rail {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.studio-shell .studio-rail .filter-bar.sidebar {
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
@@ -811,7 +826,18 @@
    nothing, and only a computed-style check caught it. If you add rail styles
    below this block, move this block down too. */
 @media (max-width: 1024px) {
+  /* `overflow: visible`, not `overflow-y: visible`: the base rule sets both
+     axes to hidden, and `visible` on one axis computes to `auto` while the other
+     stays hidden — which reintroduces a scrollbar instead of removing one. */
   .studio-shell .studio-rail {
+    overflow: visible;
+  }
+  /* Nothing is height-constrained when stacked, so the feature list must grow
+     rather than scroll inside itself. Left as-is it kept the desktop pinning
+     behaviour and hid two roadmap entries behind an inner scrollbar. */
+  .studio-shell .studio-rail .filter-bar.sidebar {
+    flex: none;
+    min-height: auto;
     overflow-y: visible;
   }
   .studio-shell .category-select {

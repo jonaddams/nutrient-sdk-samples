@@ -100,11 +100,24 @@ export default function ExtractionStudio() {
   };
 
   return (
-    // h-screen, not min-h-screen: .studio-shell is `flex: 1; min-height: 0`, so
-    // it needs a parent of DEFINITE height to fill. With min-height the viewer
-    // and results panes cannot resolve their own scroll containers.
+    // A DEFINITE height, not min-height: .studio-shell is `flex: 1;
+    // min-height: 0`, so it needs a parent of definite height to fill.
+    // With min-height the viewer and results panes cannot resolve their own
+    // scroll containers.
+    //
+    // Height is 100dvh MINUS the host's sticky `header.topbar`, because this
+    // element starts below it — plain `h-screen` (100vh) overflowed the viewport
+    // by exactly the topbar's height, which pushed the bottom of the rail and
+    // the results panel off-screen where `overflow-hidden` made them
+    // unreachable.
+    //
+    // The topbar has no fixed height: it comes from `.topbar-inner`'s padding in
+    // app/globals.css, which is 16px below 768px and 18px at/above it — 67px and
+    // 71px including the 1px bottom border. Tailwind's `md` is that same 768px,
+    // so these two values track the host's own breakpoint. If `.topbar-inner`
+    // padding changes, change these.
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="h-[calc(100dvh-67px)] md:h-[calc(100dvh-71px)] flex flex-col overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
       <PythonSampleHeader
