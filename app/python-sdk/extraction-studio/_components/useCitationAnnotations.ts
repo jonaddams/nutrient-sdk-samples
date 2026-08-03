@@ -1,11 +1,12 @@
 import type { Instance, RectangleAnnotation } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef } from "react";
 import {
-  CITATION_STYLES,
+  appearance,
   type CitationStyle,
   diffStyles,
   fracToRect,
   type IndexedCitation,
+  type PaintedStyle,
   styleFor,
 } from "../lib/citations";
 import { getNutrientViewer } from "../lib/nutrient";
@@ -41,7 +42,8 @@ async function applyEmphasis(
   citations: IndexedCitation[],
   activeIndex: number | null,
   fieldToAnnotation: Map<number, RectangleAnnotation>,
-  styles: Map<number, CitationStyle>,
+  styles: Map<number, PaintedStyle>,
+  hex: string,
 ) {
   const NutrientViewer = getNutrientViewer();
   if (!NutrientViewer) {
@@ -91,9 +93,9 @@ async function applyEmphasis(
   // is permanently defeated for the rest of the session once any citation
   // fails to build. Harmless (a discarded `.map`/`.filter` over a small list),
   // but worth knowing so it isn't mistaken for a leak or a bug on rediscovery.
-  const next = new Map<number, CitationStyle>();
+  const next = new Map<number, PaintedStyle>();
   for (const { fieldIndex } of citations) {
-    next.set(fieldIndex, styleFor(fieldIndex, activeIndex));
+    next.set(fieldIndex, { style: styleFor(fieldIndex, activeIndex), hex });
   }
   const changed = diffStyles(styles, next);
   if (!changed.length) return;
@@ -106,7 +108,9 @@ async function applyEmphasis(
       .map((fieldIndex) => {
         const annotation = fieldToAnnotation.get(fieldIndex);
         if (!annotation) return null;
-        const style = CITATION_STYLES[next.get(fieldIndex) as CitationStyle];
+        const painted = next.get(fieldIndex);
+        if (!painted) return null;
+        const style = appearance(painted.style, painted.hex);
         const restyled = annotation
           .set("strokeColor", new NutrientViewer.Color(style.stroke))
           .set("strokeWidth", style.strokeWidth)
@@ -123,7 +127,8 @@ async function applyEmphasis(
     await instance.update(updated.map((u) => u.restyled));
     for (const { fieldIndex, restyled } of updated) {
       fieldToAnnotation.set(fieldIndex, restyled);
-      styles.set(fieldIndex, next.get(fieldIndex) as CitationStyle);
+      const painted = next.get(fieldIndex);
+      if (painted) styles.set(fieldIndex, painted);
     }
   } catch (e) {
     console.error("citation emphasis failed:", e);
@@ -136,15 +141,26 @@ export function useCitationAnnotations(opts: {
   citations: IndexedCitation[];
   activeIndex: number | null;
   showCitations: boolean;
+  /** Hex fill color for the highlights. Part of PaintedStyle, so changing it
+   *  registers in `diffStyles` and restyles every annotation — see the note on
+   *  PaintedStyle in lib/citations.ts. */
+  citationHex: string;
 }) {
-  const { instanceRef, ready, citations, activeIndex, showCitations } = opts;
+  const {
+    instanceRef,
+    ready,
+    citations,
+    activeIndex,
+    showCitations,
+    citationHex,
+  } = opts;
 
   // annotation id → field index (for the press direction), field index →
   // the annotation object itself (so restyling never needs a lookup by id),
   // and the style each one currently carries.
   const idToField = useRef(new Map<string, number>());
   const fieldToAnnotation = useRef(new Map<number, RectangleAnnotation>());
-  const styles = useRef(new Map<number, CitationStyle>());
+  const styles = useRef(new Map<number, PaintedStyle>());
 
   // Every annotation mutation — rebuilds and restyles alike — runs through this
   // one chain, so an awaited update and the write-back that follows it always
@@ -273,7 +289,10 @@ export function useCitationAnnotations(opts: {
               throw new Error(`no page info for page ${citation.page}`);
             const { width, height } = info;
             const rect = fracToRect(citation, width, height);
-            const style = CITATION_STYLES[styleFor(fieldIndex, selected)];
+            const style = appearance(
+              styleFor(fieldIndex, selected),
+              citationHex,
+            );
             built.push(
               new NutrientViewer.Annotations.RectangleAnnotation({
                 pageIndex: citation.page,
@@ -338,7 +357,10 @@ export function useCitationAnnotations(opts: {
           const { fieldIndex } = buildable[i];
           idToField.current.set(annotation.id, fieldIndex);
           fieldToAnnotation.current.set(fieldIndex, annotation);
-          styles.current.set(fieldIndex, styleFor(fieldIndex, selected));
+          styles.current.set(fieldIndex, {
+            style: styleFor(fieldIndex, selected),
+            hex: citationHex,
+          });
         });
 
         // The selection can move while `create` is in flight, leaving the
@@ -358,6 +380,7 @@ export function useCitationAnnotations(opts: {
             activeIndexRef.current,
             fieldToAnnotation.current,
             styles.current,
+            citationHex,
           );
         }
       } catch (e) {
@@ -371,7 +394,7 @@ export function useCitationAnnotations(opts: {
     return () => {
       cancelled = true;
     };
-  }, [citations, showCitations, ready, enqueue]);
+  }, [citations, showCitations, ready, enqueue, citationHex]);
 
   // ── Apply selection: restyle only what changed, then scroll it into view.
   // No teardown: the chain already guarantees this run's write-back completes
@@ -388,9 +411,13 @@ export function useCitationAnnotations(opts: {
         activeIndex,
         fieldToAnnotation.current,
         styles.current,
+        citationHex,
       ),
     );
-  }, [activeIndex, citations, ready, enqueue]);
+    // citationHex belongs here: it is what makes a color change repaint. The
+    // style KEYS are unchanged when only the color moves, so without this dep
+    // the effect never re-runs and the new color never reaches the canvas.
+  }, [activeIndex, citations, ready, enqueue, citationHex]);
 
   /**
    * Maps a pressed annotation's id back to the field index it cites, for the
