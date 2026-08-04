@@ -62,7 +62,47 @@ this yet?" is answered by what `/structured` can do — not by category labels.
 Two gaps fall out of that: **Table Extraction has no successor in the rail**, and
 **Document to Markdown → Text export is an assumption**, not a verified equivalence.
 
-### 3. Decide the Local (LM Studio) caveat
+### 3. AWS Bedrock — likely the answer to the local-model problem
+
+**Jon has Bedrock access with vision models suitable for this (2026-08-04).** That
+potentially removes the whole reason the local path exists as a demo option, and with it
+the parked "cache local model results" design in `nutrient-data-extraction-demo`'s
+`DEVELOPMENT-NOTES.md` — a hosted provider is just another live provider, so there is
+nothing to cache.
+
+Checked before writing this down, so nobody starts from the wrong assumption:
+
+- **`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` are already in
+  `python-fast-api`'s `.env`.** Credentials are not the blocker.
+- **The SDK has NO native Bedrock provider.** `VlmProvider` is exactly
+  `CLAUDE, CUSTOM, GOOGLE, OPEN_AI, UNKNOWN`. There is no `BEDROCK`, and no
+  `BedrockApiSettings` alongside `ClaudeApiSettings`/`CustomVlmApiSettings`.
+
+So Bedrock has to arrive through the **CUSTOM / `local`** path, which expects an
+OpenAI-compatible endpoint. Two obstacles, both worth checking before committing to it:
+
+1. **Bedrock's native API is not OpenAI-compatible** (Converse / InvokeModel, not
+   `/v1/chat/completions`). Either use an OpenAI-compatible surface if one is available
+   for the account and region, or put a translating proxy in front.
+2. **Bedrock authenticates with SigV4 request signing, not a bearer token.** The `local`
+   branch of `apply_provider()` sets only `ai.endpoint` and no credentials at all, so a
+   plain endpoint override cannot authenticate. This needs a loopback shim that terminates
+   SigV4 and exposes an OpenAI-compatible surface.
+
+**There is precedent for exactly that shim in `python-fast-api`:**
+`docs/sdk-feedback/benchmark-tables/gemini_auth_shim.py`, written when the CUSTOM path
+was not sending an `Authorization` header at all (**SDK-039**, since fixed in 1.0.8).
+Start there rather than from scratch.
+
+**Verify with a header/request capture, not a 200.** SDK-039's entry records that the
+missing-auth bug slipped through original validation *precisely because* no-auth local
+servers hid it — and the `local` path is the one Bedrock would ride on.
+
+Unrelated but adjacent: Nutrient's **AI Assistant** product lists Bedrock as a supported
+backend. That is a different product (the Docker `ai-assistant` service), not the Python
+SDK's Vision API, so its support says nothing about this path.
+
+### 4. Decide the Local (LM Studio) caveat
 
 A 7B makes the flagship Invoices document look broken: `qwen2.5-vl-7b-instruct` scores
 1/3 with `totalAmount: 0.0`, where OpenAI and Claude both return all three including the
@@ -72,14 +112,14 @@ document containing neither word.
 Options: a UI caveat next to the option, recommending a larger model, or accepting it.
 Unresolved since 2026-08-03.
 
-### 4. Whitespace pass
+### 5. Whitespace pass
 
 Jon, 2026-08-03: "there's more whitespace we can remove." The footer margin already went
 112px → 24px (`--space-9` → `--space-5`) and was verified across every sample. The two
 biggest remaining knobs in `app/globals.css`: `--space-9` is still used by
 `padding: var(--space-9) 0 var(--space-8)`, and `--section-gap` is 80px.
 
-### 5. Smaller items
+### 6. Smaller items
 
 - **Claims label redundancy.** "Northgate auto claim (FNOL)" under a **Claims** header.
   Invoice labels already dropped their redundant "invoice"; this one was left pending a
@@ -94,7 +134,7 @@ biggest remaining knobs in `app/globals.css`: `--space-9` is still used by
   for not tinting the picker, which was the original ambiguity. A small colour dot in the
   corner of the dropper button would give both.
 
-### 6. Known issue, not ours — SDK-045
+### 7. Known issue, not ours — SDK-045
 
 Healthcare's `admissionDate` returns empty at grounding score 0.40 with no citation,
 although the document plainly prints `Date of Admission: 12/04/2016`. Reproducible across
