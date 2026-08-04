@@ -275,3 +275,22 @@ deliberate source-ordering described above. Neither is something you broke.
 Backend: `cd ~/SE/code/python-fast-api && .venv/bin/uvicorn app.main:app --port 8080`
 (**not** 8000 — `.env.local` points at 8080; the backend has no `/` route, so health-check
 `/docs`). Frontend: `pnpm exec next dev --turbopack`.
+
+### Two traps in the backend's own test suite
+
+Both found 2026-08-04 running `pytest tests/ --ignore=tests/sdk` after #31 merged.
+
+**`test_vlm_endpoint_returns_503_when_local_vlm_unavailable` fails when LM Studio is
+running.** It asserts an *absence*: the default VLM engine connects to `localhost:1234`,
+and the test expects a clean 503 when nothing is there. With LM Studio up the call
+succeeds, so the 503 never comes and the suite goes red. Nothing is broken — the
+precondition is simply violated, and the test's own comment says so. **Stop the local VLM
+server before trusting a full backend run**, or expect this one failure and ignore it.
+Worth fixing properly at some point: an environment-dependent assertion that flips on
+whether an unrelated app happens to be open is a bad citizen in a default suite.
+
+**That run is not free and not fast.** 68 tests took **7 minutes** and several endpoints
+make real provider calls. `--ignore=tests/sdk` skips the SDK defect-hunting suite but not
+the live extraction endpoints. Budget for it, and prefer targeted runs
+(`pytest tests/test_structured.py -k "not live and not endpoint and not extract"`, which
+is pure and finishes in well under a second).
