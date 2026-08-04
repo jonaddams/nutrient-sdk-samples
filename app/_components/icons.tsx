@@ -130,3 +130,14 @@ export function UnlockIcon(props: IconProps) {
     </svg>
   );
 }
+
+/** Eyedropper. Marks a control as "choose a colour" rather than "apply this
+ *  colour" — a bare colour swatch next to preset swatches is indistinguishable
+ *  from another preset. */
+export function DropperIcon(props: IconProps) {
+  return (
+    <svg aria-hidden="true" {...baseProps} {...props}>
+      <path d="M15.5 4.5a2.1 2.1 0 0 1 3 3l-1.6 1.6 1 1-2.2 2.2-1-1-6.4 6.4a3 3 0 0 1-1.5.8l-2.6.6.6-2.6a3 3 0 0 1 .8-1.5l6.4-6.4-1-1L13.9 5l1 1z" />
+    </svg>
+  );
+}
