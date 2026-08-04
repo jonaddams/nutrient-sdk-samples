@@ -32,5 +32,21 @@ export function buildSchema(props: SchemaProp[]): string {
     properties[p.key] = { type: p.type, description: p.description };
     if (!p.optional) required.push(p.key);
   }
-  return JSON.stringify({ schema: { type: "object", properties, required } });
+  // additionalProperties: false is REQUIRED by Anthropic — without it their API
+  // rejects the request outright:
+  //   400 invalid_request_error — "output_config.format.schema: For 'object'
+  //   type, 'additionalProperties' must be explicitly set to false"
+  // Emitted unconditionally rather than per-provider: verified 2026-08-04 that
+  // OpenAI and Anthropic both return identical values and citation counts with
+  // it present, so a provider-conditional schema would be extra branching for
+  // no behavioural difference. It is also the honest schema — the extraction
+  // really should not invent keys outside the ones asked for.
+  return JSON.stringify({
+    schema: {
+      type: "object",
+      properties,
+      required,
+      additionalProperties: false,
+    },
+  });
 }

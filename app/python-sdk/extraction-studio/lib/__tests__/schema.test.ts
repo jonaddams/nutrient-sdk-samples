@@ -55,3 +55,19 @@ test("newSchemaProp defaults to an empty string row and accepts overrides", () =
     type: "number",
   });
 });
+
+test("emits additionalProperties: false", () => {
+  // Anthropic rejects object schemas without it — 400 invalid_request_error,
+  // "additionalProperties must be explicitly set to false". Unconditional
+  // because OpenAI accepts it too (verified 2026-08-04), so this must not be
+  // quietly dropped when someone tidies the schema builder.
+  const s = JSON.parse(
+    buildSchema([newSchemaProp({ key: "a", type: "string" })]),
+  );
+  expect(s.schema.additionalProperties).toBe(false);
+});
+
+test("keeps additionalProperties: false even with no properties", () => {
+  const s = JSON.parse(buildSchema([]));
+  expect(s.schema.additionalProperties).toBe(false);
+});
