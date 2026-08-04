@@ -64,11 +64,30 @@ Two gaps fall out of that: **Table Extraction has no successor in the rail**, an
 
 ### 3. AWS Bedrock — likely the answer to the local-model problem
 
-**Jon has Bedrock access with vision models suitable for this (2026-08-04).** That
-potentially removes the whole reason the local path exists as a demo option, and with it
-the parked "cache local model results" design in `nutrient-data-extraction-demo`'s
-`DEVELOPMENT-NOTES.md` — a hosted provider is just another live provider, so there is
-nothing to cache.
+**Jon has Bedrock access with vision models suitable for this (2026-08-04).** The intent is
+that Bedrock **takes the place of the Local (LM Studio) option** — same "smaller / open
+model" story in the provider dropdown, without the laptop dependency. Two candidates,
+**Qwen and Google Gemma**, both already exercised via LM Studio.
+
+That also retires the parked "cache local model results" design in
+`nutrient-data-extraction-demo`'s `DEVELOPMENT-NOTES.md`: the whole point of caching was
+that a local model could not be relied on live. A hosted one can, so there is nothing to
+cache and no read-only-configuration problem to solve.
+
+**Why this matters more than it sounds.** The local option is the single most fragile
+thing in the demo, and it failed for environmental reasons repeatedly in one session:
+LM Studio not running; loaded on a *different machine* than assumed; and unreachable even
+then because macOS gates local-network access per app, so the LAN address timed out from
+tooling while working fine from Terminal. None of that is the model's fault, and none of
+it is defensible in front of a prospect. A hosted endpoint removes the whole class.
+
+**Caveat on the existing local benchmark.** The recorded local results are
+`qwen2.5-vl-7b-instruct` — 1/3 on Invoices with `totalAmount: 0.0`, and fabricated
+`totalAssets`/`totalLiabilities`. **`qwen3-vl-8b` was never actually measured** (that run
+was blocked by the LAN issue above), and Jon rates it well above 2.5. So do not carry the
+7B numbers over to a Bedrock-hosted Qwen 3 or Gemma — they are the wrong models. Re-run
+the seven-category gate once Bedrock is wired; the OpenAI and Claude results in this repo's
+PR bodies are the comparison points.
 
 Checked before writing this down, so nobody starts from the wrong assumption:
 
@@ -102,7 +121,7 @@ Unrelated but adjacent: Nutrient's **AI Assistant** product lists Bedrock as a s
 backend. That is a different product (the Docker `ai-assistant` service), not the Python
 SDK's Vision API, so its support says nothing about this path.
 
-### 4. Decide the Local (LM Studio) caveat
+### 4. Decide the Local (LM Studio) caveat — or delete the option
 
 A 7B makes the flagship Invoices document look broken: `qwen2.5-vl-7b-instruct` scores
 1/3 with `totalAmount: 0.0`, where OpenAI and Claude both return all three including the
@@ -110,7 +129,14 @@ retainage-adjusted `345015`. It also fabricated `totalAssets`/`totalLiabilities`
 document containing neither word.
 
 Options: a UI caveat next to the option, recommending a larger model, or accepting it.
-Unresolved since 2026-08-03.
+Unresolved since 2026-08-03 — **and likely moot**, since the plan (item 3) is for Bedrock
+to replace this option outright. Do not spend effort caveating something due for removal;
+settle Bedrock first.
+
+If the local option does go, `apply_provider()`'s `local` branch and the
+`LM_STUDIO_API_URL` / `LM_STUDIO_MODEL` env vars go with it — but check first whether
+Bedrock ends up riding that same CUSTOM path, in which case it is renamed rather than
+deleted.
 
 ### 5. Whitespace pass
 
