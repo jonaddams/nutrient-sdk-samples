@@ -849,23 +849,60 @@
   outline-offset: 2px;
 }
 
-/* The native swatch keeps the OS picker and eyedropper; only its chrome is
-   normalised so it sits level with the presets. */
-.studio-shell .citation-color-native {
+/* Dropper button wrapping the native colour input. Deliberately NOT tinted with
+   the current colour: a fifth coloured square beside four preset squares reads
+   as another preset rather than a control. The icon says "choose a colour"; the
+   hex field beside it says which one. */
+.studio-shell .citation-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 22px;
   height: 22px;
-  padding: 0;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-1);
-  background: none;
+  background: var(--surface);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    color 0.12s var(--ease),
+    border-color 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
+}
+
+.studio-shell .citation-picker:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Same ring the presets use, so a custom colour is visibly "the active one"
+   even though this control does not display the colour itself. */
+.studio-shell .citation-picker[data-custom="true"] {
+  color: var(--ink);
+  box-shadow:
+    0 0 0 2px var(--bg-elev),
+    0 0 0 4px var(--ink);
+}
+
+/* The real input, covering the button and invisible. Keeping it a live
+   <input type="color"> is what preserves the OS picker and system eyedropper —
+   do not swap it for a click handler. */
+.studio-shell .citation-color-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
   cursor: pointer;
 }
-.studio-shell .citation-color-native::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-.studio-shell .citation-color-native::-webkit-color-swatch {
-  border: none;
-  border-radius: calc(var(--r-1) - 1px);
+
+.studio-shell .citation-picker:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* 11ch, not 8ch: "#ffc107" is 7 characters but `ch` is the width of "0" and the

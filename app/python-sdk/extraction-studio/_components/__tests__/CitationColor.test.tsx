@@ -16,6 +16,38 @@ test("renders a swatch per preset plus the native picker", () => {
   ).toBeInTheDocument();
 });
 
+test("the picker is a real colour input, not a stand-in button", () => {
+  // The dropper icon is chrome over a live <input type="color">. Replacing it
+  // with a click handler would lose the OS picker and system eyedropper.
+  render(<CitationColor value={AMBER} onChange={() => {}} />);
+  const input = screen.getByLabelText("Pick a custom citation color");
+  expect(input.tagName).toBe("INPUT");
+  expect(input).toHaveAttribute("type", "color");
+});
+
+test("the picker shows an icon rather than a fifth colour swatch", () => {
+  // A coloured square beside four preset squares reads as another preset. The
+  // regression this guards is someone re-tinting it with the current value.
+  const { container } = render(
+    <CitationColor value={AMBER} onChange={() => {}} />,
+  );
+  const picker = container.querySelector(".citation-picker");
+  expect(picker).not.toBeNull();
+  expect(picker?.querySelector("svg")).not.toBeNull();
+  // decorative: the input carries the accessible name, so the icon must not
+  expect(picker?.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+});
+
+test("marks the picker as custom only when no preset matches", () => {
+  const { container, rerender } = render(
+    <CitationColor value={AMBER} onChange={() => {}} />,
+  );
+  const picker = () => container.querySelector(".citation-picker");
+  expect(picker()).not.toHaveAttribute("data-custom");
+  rerender(<CitationColor value="#123456" onChange={() => {}} />);
+  expect(picker()).toHaveAttribute("data-custom", "true");
+});
+
 test("marks the swatch matching the current value", () => {
   render(<CitationColor value={CYAN} onChange={() => {}} />);
   expect(screen.getByRole("button", { name: "Cyan" })).toHaveAttribute(
