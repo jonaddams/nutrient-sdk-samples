@@ -199,6 +199,7 @@ export function StructuredConfig({
             onChange={(e) => setProvider(e.target.value)}
           >
             <option value="openai">OpenAI</option>
+            <option value="anthropic">Claude</option>
             <option value="local">Local (LM Studio)</option>
           </select>
         </Field>
