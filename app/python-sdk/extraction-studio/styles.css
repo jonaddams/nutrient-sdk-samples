@@ -812,11 +812,16 @@
 }
 
 /* ── Citation colour picker ───────────────────────────────────────────────── */
+/* Bottom padding matters as much as the top: this block sits directly above
+   .results-actions, and with `0` on the bottom the swatch row butted straight
+   into it. --space-4 rather than --space-3 because there is no separator rule
+   here doing part of the work, unlike .results-meta above, which pairs its
+   --space-3 with a border-bottom. */
 .studio-shell .citation-color {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3) 0 0;
+  padding: var(--space-3) 0 var(--space-4);
 }
 
 .studio-shell .citation-swatches {
