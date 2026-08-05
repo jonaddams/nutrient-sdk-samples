@@ -153,4 +153,17 @@ describe("extractStructured", () => {
       /could not load \/documents\/lumen-invoice\.pdf/,
     );
   });
+
+  test("omits model from the query string when unset", async () => {
+    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+    await extractStructured(REQ);
+    expect(calls[1].url).not.toContain("model=");
+  });
+
+  test("forwards model when set", async () => {
+    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+    await extractStructured({ ...REQ, model: "amazon.nova-pro-v1:0" });
+    // Encoded because the id contains a colon.
+    expect(calls[1].url).toContain("model=amazon.nova-pro-v1%3A0");
+  });
 });
