@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { StructuredRequest } from "../lib/api";
+import { fetchProviders, type ProviderInfo } from "../lib/providers";
 import { buildSchema, newSchemaProp, type SchemaProp } from "../lib/schema";
 import { Field } from "./Field";
 import { PanelSection } from "./PanelSection";
@@ -25,6 +26,9 @@ export function StructuredConfig({
   const [props, setProps] = useState<SchemaProp[]>(schemaPreset);
   const [instructions, setInstructions] = useState("");
   const [provider, setProvider] = useState("openai");
+  const [model, setModel] = useState<string | undefined>(undefined);
+  const [providers, setProviders] = useState<ProviderInfo[] | null>(null);
+  const [providersFailed, setProvidersFailed] = useState(false);
   const [citations, setCitations] = useState(true);
   const [strict, setStrict] = useState(false);
   const [multimodal, setMultimodal] = useState(false);
@@ -44,6 +48,31 @@ export function StructuredConfig({
     setJson(buildSchema(schemaPreset));
   }, [schemaPreset]);
 
+  // The backend decides which providers are offerable, because only it knows
+  // which credentials exist. This is what keeps "Local (LM Studio)" off the
+  // hosted deployment, where the Railway backend cannot reach a laptop.
+  useEffect(() => {
+    let cancelled = false;
+    fetchProviders()
+      .then((list) => {
+        if (cancelled) return;
+        setProviders(list);
+        // Keep the current selection if the backend still offers it; otherwise
+        // fall back to the first thing it does offer.
+        setProvider((current) =>
+          list.some((p) => p.id === current)
+            ? current
+            : (list[0]?.id ?? current),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setProvidersFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const update = (i: number, patch: Partial<SchemaProp>) =>
     setProps((p) =>
       p.map((row, idx) => (idx === i ? { ...row, ...patch } : row)),
@@ -62,6 +91,7 @@ export function StructuredConfig({
       schema: mode === "builder" ? buildSchema(props) : json,
       instructions,
       provider,
+      model,
       includeSourceLocations: citations,
       strict,
       includePageImages: multimodal,
@@ -75,11 +105,24 @@ export function StructuredConfig({
     json,
     instructions,
     provider,
+    model,
     citations,
     strict,
     multimodal,
     onRun,
   ]);
+
+  // Resetting is required, not cosmetic: carrying a Bedrock model id over to
+  // OpenAI would be rejected by the backend allowlist with a 400.
+  const changeProvider = (next: string) => {
+    setProvider(next);
+    setModel(undefined);
+  };
+
+  const selected = providers?.find((p) => p.id === provider);
+  // Only providers offering a real choice get a picker; the others take no model
+  // parameter at all, and the backend rejects one with a 400.
+  const showModels = (selected?.models.length ?? 0) > 1;
 
   return (
     <div>
@@ -191,18 +234,46 @@ export function StructuredConfig({
         <Field
           label="Provider"
           htmlFor="cfg-provider"
-          help="Which model backend runs the extraction."
+          help={
+            providersFailed
+              ? "Could not reach the backend, so the provider list is unavailable."
+              : "Which model backend runs the extraction."
+          }
         >
           <select
             id="cfg-provider"
+            aria-label="Provider"
             value={provider}
-            onChange={(e) => setProvider(e.target.value)}
+            disabled={providersFailed || providers === null}
+            onChange={(e) => changeProvider(e.target.value)}
           >
-            <option value="openai">OpenAI</option>
-            <option value="anthropic">Claude</option>
-            <option value="local">Local (LM Studio)</option>
+            {(providers ?? []).map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
           </select>
         </Field>
+        {showModels && selected ? (
+          <Field
+            label="Model"
+            htmlFor="cfg-model"
+            help="Runs in your own AWS account via Bedrock's OpenAI-compatible API."
+          >
+            <select
+              id="cfg-model"
+              aria-label="Model"
+              value={model ?? selected.defaultModel}
+              onChange={(e) => setModel(e.target.value)}
+            >
+              {selected.models.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
       </PanelSection>
 
       <PanelSection title="Advanced options">

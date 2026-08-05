@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { presetFor } from "../../lib/categories";
 import { StructuredConfig } from "../StructuredConfig";
 
@@ -7,6 +7,148 @@ const invoices = presetFor("invoices");
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+const PROVIDERS = [
+  { id: "openai", label: "OpenAI", models: [], defaultModel: "gpt-5.4" },
+  {
+    id: "bedrock",
+    label: "AWS Bedrock",
+    models: [
+      { id: "amazon.nova-pro-v1:0", label: "Nova Pro" },
+      { id: "qwen.qwen3-vl-235b-a22b", label: "Qwen3-VL 235B" },
+    ],
+    defaultModel: "qwen.qwen3-vl-235b-a22b",
+  },
+];
+
+function stubProviders(providers: unknown = PROVIDERS, ok = true) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({
+      ok,
+      status: ok ? 200 : 503,
+      json: async () => ({ providers }),
+    })) as unknown as typeof fetch,
+  );
+}
+
+beforeEach(() => {
+  stubProviders();
+});
+
+test("populates the provider select from the backend", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("option", { name: "AWS Bedrock" })).toBeDefined(),
+  );
+});
+
+test("shows no model select for a single-model provider", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  // OpenAI is selected by default and publishes no models.
+  expect(screen.queryByLabelText("Model")).toBeNull();
+});
+
+test("shows a model select once a multi-model provider is chosen", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  fireEvent.change(screen.getByLabelText("Provider"), {
+    target: { value: "bedrock" },
+  });
+  expect(screen.getByLabelText("Model")).toBeDefined();
+  expect(screen.getByRole("option", { name: "Nova Pro" })).toBeDefined();
+});
+
+test("sends the selected model with the run request", async () => {
+  const onRun = vi.fn();
+  const props = {
+    docPath: "/documents/doc-1.pdf",
+    filename: "doc-1.pdf",
+    onRun,
+    schemaPreset: invoices,
+  };
+  const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  fireEvent.change(screen.getByLabelText("Provider"), {
+    target: { value: "bedrock" },
+  });
+  fireEvent.change(screen.getByLabelText("Model"), {
+    target: { value: "amazon.nova-pro-v1:0" },
+  });
+  rerender(<StructuredConfig {...props} runSignal={1} />);
+  expect(onRun).toHaveBeenCalledWith(
+    expect.objectContaining({
+      provider: "bedrock",
+      model: "amazon.nova-pro-v1:0",
+    }),
+  );
+});
+
+test("switching provider drops the previous provider's model", async () => {
+  // Otherwise a Bedrock model id would ride along to OpenAI and earn a 400.
+  const onRun = vi.fn();
+  const props = {
+    docPath: "/documents/doc-1.pdf",
+    filename: "doc-1.pdf",
+    onRun,
+    schemaPreset: invoices,
+  };
+  const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  const providerSelect = screen.getByLabelText("Provider");
+  fireEvent.change(providerSelect, { target: { value: "bedrock" } });
+  fireEvent.change(screen.getByLabelText("Model"), {
+    target: { value: "amazon.nova-pro-v1:0" },
+  });
+  fireEvent.change(providerSelect, { target: { value: "openai" } });
+  rerender(<StructuredConfig {...props} runSignal={1} />);
+  expect(onRun).toHaveBeenCalledWith(
+    expect.objectContaining({ provider: "openai", model: undefined }),
+  );
+});
+
+test("disables the provider select when the fetch fails", async () => {
+  stubProviders(null, false);
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() =>
+    expect(
+      (screen.getByLabelText("Provider") as HTMLSelectElement).disabled,
+    ).toBe(true),
+  );
 });
 
 test("mounting with a given runSignal does not call onRun", () => {
