@@ -20,7 +20,14 @@ export async function fetchProviders(): Promise<ProviderInfo[]> {
   if (!resp.ok) {
     throw new Error(`could not load providers: ${resp.status}`);
   }
-  const body = (await resp.json()) as { providers?: ProviderInfo[] };
+  let body: { providers?: ProviderInfo[] };
+  try {
+    body = (await resp.json()) as { providers?: ProviderInfo[] };
+  } catch {
+    // Invalid JSON is indistinguishable from a malformed response shape from the
+    // caller's perspective — both mean the backend is broken.
+    throw new Error("malformed providers response");
+  }
   if (!Array.isArray(body?.providers)) {
     // Distinguished from an empty list on purpose: an empty list means "nothing
     // configured", which is a legitimate answer, while this means the backend

@@ -51,9 +51,26 @@ test("throws on a non-ok response", async () => {
   await expect(fetchProviders()).rejects.toThrow("503");
 });
 
+test("an empty provider list resolves rather than throwing", async () => {
+  // Empty is a legitimate answer — a deployment with no credentials configured.
+  // Only a body *without* a providers array means the backend is broken, so this
+  // must not be conflated with the malformed case below.
+  stubFetch({ ok: true, json: async () => ({ providers: [] }) });
+  await expect(fetchProviders()).resolves.toEqual([]);
+});
+
 test("throws when the body has no providers array", async () => {
   // A backend that answers with something unexpected must not surface as an
   // empty dropdown, which would read as "no providers configured".
   stubFetch({ ok: true, json: async () => ({ nope: true }) });
+  await expect(fetchProviders()).rejects.toThrow(/malformed/i);
+});
+
+test("throws when the body is invalid JSON", async () => {
+  // Invalid JSON is indistinguishable from a malformed response shape from the
+  // caller's perspective — both mean the backend is broken.
+  stubFetch({ ok: true, json: async () => {
+    throw new SyntaxError("Unexpected token");
+  } });
   await expect(fetchProviders()).rejects.toThrow(/malformed/i);
 });
