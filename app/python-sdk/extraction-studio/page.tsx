@@ -31,6 +31,13 @@ export default function ExtractionStudio() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [runSignal, setRunSignal] = useState(0);
+  // False until StructuredConfig's providers fetch resolves successfully, and
+  // forced back to false if that fetch fails. Gates Run: clicking before this
+  // is true would send the hardcoded initial `provider: "openai"` from
+  // StructuredConfig, which is wrong on any deployment where OpenAI isn't the
+  // one configured — and Bedrock is currently the only provider with its own
+  // not-configured guard.
+  const [providersReady, setProvidersReady] = useState(false);
   const [showCitations, setShowCitations] = useState(true);
   // Session state on purpose, not persisted: every demo then opens in the
   // same known-good colour rather than whatever the last viewer picked.
@@ -188,7 +195,7 @@ export default function ExtractionStudio() {
               <button
                 type="button"
                 className="panel-button primary"
-                disabled={busy}
+                disabled={busy || !providersReady}
                 onClick={() => setRunSignal((n) => n + 1)}
               >
                 {busy ? "Running…" : "Run extraction"}
@@ -219,6 +226,7 @@ export default function ExtractionStudio() {
                 onRun={handleRun}
                 runSignal={runSignal}
                 schemaPreset={schemaPreset}
+                onProvidersReady={setProvidersReady}
               />
             </div>
             {tab === "results" &&

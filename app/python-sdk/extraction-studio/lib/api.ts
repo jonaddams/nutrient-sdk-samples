@@ -42,6 +42,9 @@ export type StructuredRequest = {
   schema: string;
   instructions?: string;
   provider?: string;
+  /** Optional model id. Only providers that publish a model list accept this;
+   *  the backend returns 400 for anything outside its allowlist. */
+  model?: string;
   includeConfidence?: boolean;
   includeSourceLocations?: boolean;
   includePageImages?: boolean;
@@ -81,6 +84,14 @@ export async function extractStructured(
     includePageImages: String(req.includePageImages ?? false),
     strict: String(req.strict ?? false),
   });
+
+  // Appended conditionally: sending an empty model would be rejected by the
+  // allowlist, and providers with a single model accept no model param at all.
+  // Forward the TRIMMED value — the guard checks `.trim()` but must also send
+  // it, or a padded id (e.g. a stray trailing space) passes this check and
+  // still earns a 400 from the backend allowlist.
+  const trimmedModel = req.model?.trim();
+  if (trimmedModel) params.set("model", trimmedModel);
 
   // No content-type header — the browser must set the multipart boundary.
   const resp = await fetch(`${API_BASE}/api/extraction/structured?${params}`, {
