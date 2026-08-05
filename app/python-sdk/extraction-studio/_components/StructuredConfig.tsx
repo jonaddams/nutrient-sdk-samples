@@ -294,7 +294,16 @@ export function StructuredConfig({
           <Field
             label="Model"
             htmlFor="cfg-model"
-            help="Runs in your own AWS account via Bedrock's OpenAI-compatible API. Confidence scores are not returned for these models; citations still work."
+            help={
+              <>
+                Runs in your own AWS account via Bedrock's OpenAI-compatible
+                API.{" "}
+                <strong className="hint-em">
+                  Confidence scores are not returned for these models; citations
+                  still work.
+                </strong>
+              </>
+            }
           >
             <select
               id="cfg-model"
