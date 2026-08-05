@@ -13,10 +13,10 @@ const PAYLOAD = {
       id: "bedrock",
       label: "AWS Bedrock",
       models: [
-        { id: "amazon.nova-pro-v1:0", label: "Nova Pro" },
-        { id: "qwen.qwen3-vl-235b-a22b", label: "Qwen3-VL 235B" },
+        { id: "google.gemma-3-27b-it", label: "Gemma 3 27B" },
+        { id: "qwen.qwen3-vl-235b-a22b-instruct", label: "Qwen3-VL 235B" },
       ],
-      defaultModel: "qwen.qwen3-vl-235b-a22b",
+      defaultModel: "qwen.qwen3-vl-235b-a22b-instruct",
     },
   ],
 };
@@ -45,7 +45,7 @@ test("returns the provider list", async () => {
   stubFetch({ ok: true, json: async () => PAYLOAD });
   const providers = await fetchProviders();
   expect(providers.map((p) => p.id)).toEqual(["openai", "bedrock"]);
-  expect(providers[1].models[0].label).toBe("Nova Pro");
+  expect(providers[1].models[0].label).toBe("Gemma 3 27B");
 });
 
 test("throws on a non-ok response", async () => {

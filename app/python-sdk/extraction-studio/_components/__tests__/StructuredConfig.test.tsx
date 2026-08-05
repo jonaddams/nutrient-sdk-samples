@@ -15,10 +15,10 @@ const PROVIDERS = [
     id: "bedrock",
     label: "AWS Bedrock",
     models: [
-      { id: "amazon.nova-pro-v1:0", label: "Nova Pro" },
-      { id: "qwen.qwen3-vl-235b-a22b", label: "Qwen3-VL 235B" },
+      { id: "google.gemma-3-27b-it", label: "Gemma 3 27B" },
+      { id: "qwen.qwen3-vl-235b-a22b-instruct", label: "Qwen3-VL 235B" },
     ],
-    defaultModel: "qwen.qwen3-vl-235b-a22b",
+    defaultModel: "qwen.qwen3-vl-235b-a22b-instruct",
   },
 ];
 
@@ -82,7 +82,7 @@ test("shows a model select once a multi-model provider is chosen", async () => {
     target: { value: "bedrock" },
   });
   expect(screen.getByLabelText("Model")).toBeDefined();
-  expect(screen.getByRole("option", { name: "Nova Pro" })).toBeDefined();
+  expect(screen.getByRole("option", { name: "Gemma 3 27B" })).toBeDefined();
 });
 
 test("sends the selected model with the run request", async () => {
@@ -99,13 +99,13 @@ test("sends the selected model with the run request", async () => {
     target: { value: "bedrock" },
   });
   fireEvent.change(screen.getByLabelText("Model"), {
-    target: { value: "amazon.nova-pro-v1:0" },
+    target: { value: "google.gemma-3-27b-it" },
   });
   rerender(<StructuredConfig {...props} runSignal={1} />);
   expect(onRun).toHaveBeenCalledWith(
     expect.objectContaining({
       provider: "bedrock",
-      model: "amazon.nova-pro-v1:0",
+      model: "google.gemma-3-27b-it",
     }),
   );
 });
@@ -124,7 +124,7 @@ test("switching provider drops the previous provider's model", async () => {
   const providerSelect = screen.getByLabelText("Provider");
   fireEvent.change(providerSelect, { target: { value: "bedrock" } });
   fireEvent.change(screen.getByLabelText("Model"), {
-    target: { value: "amazon.nova-pro-v1:0" },
+    target: { value: "google.gemma-3-27b-it" },
   });
   fireEvent.change(providerSelect, { target: { value: "openai" } });
   rerender(<StructuredConfig {...props} runSignal={1} />);

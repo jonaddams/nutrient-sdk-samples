@@ -110,8 +110,8 @@ What the request capture established against SDK 1.0.9:
   (optionally with an OpenAI-compatible endpoint)."`
   **Corollary: the `azure` branch in `apply_provider()` is dead code that cannot work.**
 - **Request shape branches on the model id, not the provider.** An unrecognised id such as
-  `qwen.qwen3-vl-235b-a22b` gets `response_format: json_schema` plus `logprobs: true` and
-  `top_logprobs: 5`; `gpt-5.4` instead gets `tools` + `tool_choice` and no logprobs.
+  `qwen.qwen3-vl-235b-a22b-instruct` gets `response_format: json_schema` plus `logprobs: true`
+  and `top_logprobs: 5`; `gpt-5.4` instead gets `tools` + `tool_choice` and no logprobs.
 
 So the whole integration is roughly: `ai.provider = "openai"`, endpoint pointed at Bedrock,
 `ai.api_key` = a Bedrock API key, model from a server-side allowlist.
@@ -131,17 +131,41 @@ else: Bedrock invoke permission, per-model access granted in the console (not im
 `InvokeModel`), and a **long-term** Bedrock API key — a short-term token expires in ≤12
 hours and would break the Railway-hosted demo daily.
 
-**The one unresolved risk is `logprobs`.** Every Bedrock request will carry `logprobs: true`
-and `top_logprobs: 5`, because Bedrock model ids are unrecognised. If Bedrock rejects them,
-extraction fails outright. If it accepts them but returns nothing, grounding confidence comes
-back null and the citation overlay degrades — the nastier case, because it half-works. Not
-testable until access exists. If it happens, that is a decision (ship with confidence off, or
-do not ship Bedrock), not something to paper over.
+**Live-verified 2026-08-05 against the real endpoint**
+(`https://bedrock-mantle.us-east-1.api.aws/v1`, once `textract-benchmark`'s creds were
+swapped for a real Bedrock API key). The integration works end-to-end: auth, endpoint
+composition, schema, and citations all function.
 
-Chosen models, ids **provisional until confirmed against the live catalogue**:
-`qwen.qwen3-vl-235b-a22b` and Amazon Nova Pro. Do **not** carry the old local benchmark
-numbers over as comparison — those were `qwen2.5-vl-7b-instruct`, a different class of model.
-The OpenAI and Claude results in this repo's PR bodies are the valid comparison points.
+Two of the three provisional ids above were wrong:
+
+- Qwen needed a suffix. The real id is `qwen.qwen3-vl-235b-a22b-instruct`.
+- **`amazon.nova-pro-v1:0` does not exist on this endpoint.** `GET /v1/models` returns 55
+  models and none of them are `amazon.nova-*` — there is no Nova on Bedrock's
+  OpenAI-compatible surface at all. Its replacement is `google.gemma-3-27b-it`.
+- `GET /v1/models` also lists models that `/v1/chat/completions` rejects
+  (`google.gemma-4-31b` and `anthropic.claude-sonnet-5` both appear in the catalogue and both
+  are rejected on the chat-completions route). Catalogue membership does not imply
+  usability — only an end-to-end success does.
+
+The `logprobs` risk resolved to the nastier of the two predicted outcomes:
+**Bedrock accepts `logprobs: true`/`top_logprobs: 5` but returns nothing usable from them.**
+`confidenceComponents.groundingScore` comes back `None` for both shipping Bedrock models,
+even though the raw endpoint response does carry `logprobs`. Citations and the overlay still
+work; only the confidence number is missing. `gpt-5.4` returns `0.95` on the same document, so
+this is Bedrock-specific, not a document problem. Decision: ship anyway, with the UI's Model
+help text stating scores are unavailable rather than silently showing nothing (see
+`_components/StructuredConfig.tsx`).
+
+One more finding, orthogonal to ids: both shipping models need an explicit instruction to get
+the flagship invoice's money field right. Unprompted, both return the "Revised Contract"
+figure (1,910,500) instead of "Amount Due" (345,015) — a 5.5x error. Adding the instruction
+`"For totalAmount use the final Amount Due payable now, after any retainage deduction — not
+the contract value."` fixes both, returning `345015.0` in ~6.5s.
+
+**Ships:** `qwen.qwen3-vl-235b-a22b-instruct` (`Qwen3-VL 235B`, default) and
+`google.gemma-3-27b-it` (`Gemma 3 27B`). Do **not** carry the old local benchmark numbers over
+as comparison — those were `qwen2.5-vl-7b-instruct`, a different class of model. The OpenAI
+and Claude results in this repo's PR bodies are the valid comparison points.
 
 Unrelated but adjacent: Nutrient's **AI Assistant** product lists Bedrock as a supported
 backend. That is a different product (the Docker `ai-assistant` service), not the Python

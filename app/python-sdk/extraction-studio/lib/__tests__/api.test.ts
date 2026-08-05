@@ -165,6 +165,11 @@ describe("extractStructured", () => {
     }
   });
 
+  // "amazon.nova-pro-v1:0" below is a deliberately synthetic id, not a live
+  // model — it exists here only because it contains a colon, which is what
+  // exercises URLSearchParams' percent-encoding. Neither currently-allowlisted
+  // Bedrock model (qwen.qwen3-vl-235b-a22b-instruct, google.gemma-3-27b-it)
+  // contains a colon, so a real id would not cover this path at all.
   test("forwards model when set", async () => {
     const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
     await extractStructured({ ...REQ, model: "amazon.nova-pro-v1:0" });
@@ -175,7 +180,8 @@ describe("extractStructured", () => {
   test("trims a padded model id before forwarding it", async () => {
     // The guard is `.trim()` on the check, but the untrimmed request.model was
     // being forwarded — a padded id passed the guard and still earned a 400
-    // from the backend allowlist.
+    // from the backend allowlist. Uses the same synthetic colon-bearing id as
+    // the test above, for the same reason.
     const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
     await extractStructured({ ...REQ, model: "  amazon.nova-pro-v1:0  " });
     const url = new URL(calls[1].url, "http://x");
