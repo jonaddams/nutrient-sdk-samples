@@ -329,7 +329,7 @@ export function StructuredConfig({
           checked={multimodal}
           onChange={setMultimodal}
           label="Multimodal"
-          description="Send page images to the model alongside the parsed text."
+          description="Requests page images alongside the parsed text. Verified 2026-08-05: the SDK does not currently send them on this endpoint."
         />
       </PanelSection>
     </div>
