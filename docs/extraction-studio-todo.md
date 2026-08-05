@@ -1,6 +1,8 @@
 # Extraction studio — open work and hard-won facts
 
-Written 2026-08-04, after the studio's consolidation into this repo (#43–#48).
+Written 2026-08-04, after the studio's consolidation into this repo (#43–#48). Revised
+2026-08-05: TODO items 3 and 4 rewritten after spiking Bedrock — the SigV4 shim that section
+prescribed is not needed, and the credentials it called a non-blocker are the only blocker.
 
 The studio came from the standalone `nutrient-data-extraction-demo`, now retired. **This
 file is the part that matters for working in the studio from here** — everything actively
@@ -77,81 +79,93 @@ this yet?" is answered by what `/structured` can do — not by category labels.
 Two gaps fall out of that: **Table Extraction has no successor in the rail**, and
 **Document to Markdown → Text export is an assumption**, not a verified equivalence.
 
-### 3. AWS Bedrock — likely the answer to the local-model problem
+### 3. AWS Bedrock — viable, and much simpler than previously believed
 
-**Jon has Bedrock access with vision models suitable for this (2026-08-04).** The intent is
-that Bedrock **takes the place of the Local (LM Studio) option** — same "smaller / open
-model" story in the provider dropdown, without the laptop dependency. Two candidates,
-**Qwen and Google Gemma**, both already exercised via LM Studio.
+**Spike-verified 2026-08-05. This section replaces an earlier version that prescribed a
+SigV4 translating shim. That plan was wrong and is not needed.** Full design in
+`docs/superpowers/specs/2026-08-05-bedrock-provider-design.md` (local only — `docs/superpowers/`
+is gitignored).
 
-That also retires the parked "cache local model results" design in
-`nutrient-data-extraction-demo`'s `DEVELOPMENT-NOTES.md`: the whole point of caching was
-that a local model could not be relied on live. A hosted one can, so there is nothing to
-cache and no read-only-configuration problem to solve.
+Bedrock now exposes an **OpenAI-compatible surface that authenticates with a plain bearer
+token**, which removes every obstacle the old plan was built around:
 
-**Why this matters more than it sounds.** The local option is the single most fragile
-thing in the demo, and it failed for environmental reasons repeatedly in one session:
-LM Studio not running; loaded on a *different machine* than assumed; and unreachable even
-then because macOS gates local-network access per app, so the LAN address timed out from
-tooling while working fine from Terminal. None of that is the model's fault, and none of
-it is defensible in front of a prospect. A hosted endpoint removes the whole class.
+| Endpoint | Base URL | Auth |
+|---|---|---|
+| `bedrock-mantle` (AWS-recommended) | `https://bedrock-mantle.{region}.api.aws/v1` | Bedrock API key or AWS creds |
+| `bedrock-runtime` | `https://bedrock-runtime.{region}.amazonaws.com/v1` | SigV4 or Bedrock API key |
 
-**Caveat on the existing local benchmark.** The recorded local results are
-`qwen2.5-vl-7b-instruct` — 1/3 on Invoices with `totalAmount: 0.0`, and fabricated
-`totalAssets`/`totalLiabilities`. **`qwen3-vl-8b` was never actually measured** (that run
-was blocked by the LAN issue above), and Jon rates it well above 2.5. So do not carry the
-7B numbers over to a Bedrock-hosted Qwen 3 or Gemma — they are the wrong models. Re-run
-the seven-category gate once Bedrock is wired; the OpenAI and Claude results in this repo's
-PR bodies are the comparison points.
+So there is **no shim to write**, and `gemini_auth_shim.py` is not the starting point.
+`VlmProvider` having no `BEDROCK` member turns out not to matter either — see below.
 
-Checked before writing this down, so nobody starts from the wrong assumption:
+What the request capture established against SDK 1.0.9:
 
-- **`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` are already in
-  `python-fast-api`'s `.env`.** Credentials are not the blocker.
-- **The SDK has NO native Bedrock provider.** `VlmProvider` is exactly
-  `CLAUDE, CUSTOM, GOOGLE, OPEN_AI, UNKNOWN`. There is no `BEDROCK`, and no
-  `BedrockApiSettings` alongside `ClaudeApiSettings`/`CustomVlmApiSettings`.
+- **`ai.endpoint` + `ai.api_key` produce `Authorization: Bearer <api_key>`.** SDK-039 really
+  is fixed. With no key the SDK sends the literal `Bearer no-key`.
+- **Endpoint composition is a naive append**, so the configured endpoint must end in `/v1`
+  to yield `POST /v1/chat/completions`.
+- **The provider string does not affect wiring on the flat path.** `local`, `openai`,
+  `bedrock` and `custom` produced byte-identical requests. Only `azure` is special-cased,
+  and it is *rejected* with a message that names the pattern to use:
+  `"Azure OpenAI is not a supported provider for Maestro AI processing. Use 'openai'
+  (optionally with an OpenAI-compatible endpoint)."`
+  **Corollary: the `azure` branch in `apply_provider()` is dead code that cannot work.**
+- **Request shape branches on the model id, not the provider.** An unrecognised id such as
+  `qwen.qwen3-vl-235b-a22b` gets `response_format: json_schema` plus `logprobs: true` and
+  `top_logprobs: 5`; `gpt-5.4` instead gets `tools` + `tool_choice` and no logprobs.
 
-So Bedrock has to arrive through the **CUSTOM / `local`** path, which expects an
-OpenAI-compatible endpoint. Two obstacles, both worth checking before committing to it:
+So the whole integration is roughly: `ai.provider = "openai"`, endpoint pointed at Bedrock,
+`ai.api_key` = a Bedrock API key, model from a server-side allowlist.
 
-1. **Bedrock's native API is not OpenAI-compatible** (Converse / InvokeModel, not
-   `/v1/chat/completions`). Either use an OpenAI-compatible surface if one is available
-   for the account and region, or put a translating proxy in front.
-2. **Bedrock authenticates with SigV4 request signing, not a bearer token.** The `local`
-   branch of `apply_provider()` sets only `ai.endpoint` and no credentials at all, so a
-   plain endpoint override cannot authenticate. This needs a loopback shim that terminates
-   SigV4 and exposes an OpenAI-compatible surface.
+**Credentials ARE the blocker — the previous version of this section said they were not.**
+The keys in `python-fast-api/.env` belong to IAM user `textract-benchmark`
+(account `157765378366`) and carry **no Bedrock permissions at all**:
 
-**There is precedent for exactly that shim in `python-fast-api`:**
-`docs/sdk-feedback/benchmark-tables/gemini_auth_shim.py`, written when the CUSTOM path
-was not sending an `Authorization` header at all (**SDK-039**, since fixed in 1.0.8).
-Start there rather than from scratch.
+```
+AccessDeniedException: … not authorized to perform: bedrock:ListFoundationModels
+AccessDeniedException: … not authorized to perform: bedrock:InvokeModel on
+    inference-profile/us.anthropic.claude-sonnet-4-6
+```
 
-**Verify with a header/request capture, not a 200.** SDK-039's entry records that the
-missing-auth bug slipped through original validation *precisely because* no-auth local
-servers hid it — and the `local` path is the one Bedrock would ride on.
+Those are Textract credentials that happen to live in the same file. Needed before anything
+else: Bedrock invoke permission, per-model access granted in the console (not implied by
+`InvokeModel`), and a **long-term** Bedrock API key — a short-term token expires in ≤12
+hours and would break the Railway-hosted demo daily.
+
+**The one unresolved risk is `logprobs`.** Every Bedrock request will carry `logprobs: true`
+and `top_logprobs: 5`, because Bedrock model ids are unrecognised. If Bedrock rejects them,
+extraction fails outright. If it accepts them but returns nothing, grounding confidence comes
+back null and the citation overlay degrades — the nastier case, because it half-works. Not
+testable until access exists. If it happens, that is a decision (ship with confidence off, or
+do not ship Bedrock), not something to paper over.
+
+Chosen models, ids **provisional until confirmed against the live catalogue**:
+`qwen.qwen3-vl-235b-a22b` and Amazon Nova Pro. Do **not** carry the old local benchmark
+numbers over as comparison — those were `qwen2.5-vl-7b-instruct`, a different class of model.
+The OpenAI and Claude results in this repo's PR bodies are the valid comparison points.
 
 Unrelated but adjacent: Nutrient's **AI Assistant** product lists Bedrock as a supported
 backend. That is a different product (the Docker `ai-assistant` service), not the Python
 SDK's Vision API, so its support says nothing about this path.
 
-### 4. Decide the Local (LM Studio) caveat — or delete the option
+### 4. The Local (LM Studio) caveat — resolved
 
-A 7B makes the flagship Invoices document look broken: `qwen2.5-vl-7b-instruct` scores
-1/3 with `totalAmount: 0.0`, where OpenAI and Claude both return all three including the
-retainage-adjusted `345015`. It also fabricated `totalAssets`/`totalLiabilities` on a
-document containing neither word.
+**Decided 2026-08-05: Local stays, and is hidden wherever it cannot work.** This supersedes
+the earlier plan to delete it, and the older question of how to caveat a weak 7B result.
 
-Options: a UI caveat next to the option, recommending a larger model, or accepting it.
-Unresolved since 2026-08-03 — **and likely moot**, since the plan (item 3) is for Bedrock
-to replace this option outright. Do not spend effort caveating something due for removal;
-settle Bedrock first.
+The reasoning changed once the hosting picture was clear. The studio's actual subject is
+*bring your own provider* — on-prem **or** cloud — so Local still carries the on-prem half of
+that story when the backend runs on a laptop. What it cannot do is work on the deployed demo:
+the Railway-hosted backend has no route to LM Studio on Jon's machine, so on the hosted
+studio it is a dead option that errors when clicked.
 
-If the local option does go, `apply_provider()`'s `local` branch and the
-`LM_STUDIO_API_URL` / `LM_STUDIO_MODEL` env vars go with it — but check first whether
-Bedrock ends up riding that same CUSTOM path, in which case it is renamed rather than
-deleted.
+The fix is a `GET /api/extraction/providers` endpoint that lists only providers whose
+credential env var is present, with the dropdown built from it. `LM_STUDIO_API_URL` is set in
+the laptop `.env` and never in Railway, so Local appears locally and disappears when hosted —
+no network probing, no latency, nothing to time out misleadingly. The same mechanism hides any
+provider whose key is missing, which is why it is worth building rather than special-casing
+Local.
+
+Therefore `apply_provider()`'s `local` branch and the `LM_STUDIO_*` env vars all stay.
 
 ### 5. Whitespace pass
 
@@ -256,9 +270,39 @@ problem the layout exists to fix.
 `scrollHeight > clientHeight` is *not* evidence of clipped content in the feature nav.
 Check button boxes instead. This produced a false regression report.
 
+### The schema needs an outer envelope, and the error for omitting it is a red herring
+
+**`InvalidArgumentException` error code 3016 `[Source: Vision]` means `request.schema` is
+missing its outer `{"schema": {…}}` wrapper.** `buildSchema()` in `lib/schema.ts` emits that
+wrapper; a bare JSON Schema — the shape you would write by hand or copy from the JSON Schema
+docs — is rejected.
+
+Two things make this expensive to rediscover. The rejection happens **before any HTTP request
+is made**, so it looks exactly like a provider-configuration error; and the message names
+neither the schema nor the envelope. On 2026-08-05 it consumed four debugging runs and
+produced a false conclusion that `/structured` had regressed on every provider — the endpoint
+was healthy the whole time. `/describe` and `/tables` continuing to work is the tell that it is
+not the license, the env, or Vision generally: those use the Claude settings path, so only the
+flat path was implicated.
+
+### `include_page_images` is a no-op on `extract_structured`
+
+Verified 2026-08-05 by capturing the outbound request: **no image ever reaches the wire.** Not
+with the flag on, not on `scanned-invoice.pdf`. Requests were byte-identical with the flag both
+ways (8,600 bytes for the scanned invoice), and message content parts were
+`['str(system)', 'text', 'text']` in every run. The SDK sends a text "IR-lite" layout
+representation instead.
+
+Consequence for demos: **a vision model's vision is never exercised on this endpoint**, so do
+not describe the models as doing vision. Multimodal models still work — just not for that
+reason. Probably a genuine SDK defect, in the same family as SDK-037's no-op
+`KEY_VALUE_REGION`, and worth filing.
+
 ### Providers
 
 - `/structured` accepts `openai`, `azure`, `anthropic` (alias `claude`) and `local`.
+  **`azure` cannot work** — the SDK rejects it outright (see TODO item 3), so that branch of
+  `apply_provider()` is dead code.
 - **The schema must set `additionalProperties: false`** or Anthropic returns
   `400 invalid_request_error`. `buildSchema()` emits it; anything hand-rolling a schema
   must too. Verified harmless for OpenAI, which is why it is unconditional.
