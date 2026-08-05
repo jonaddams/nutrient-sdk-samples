@@ -29,7 +29,7 @@ export const FEATURES: Feature[] = [
     blurb:
       "Pull schema-defined fields from the document, grounded with citations.",
     description:
-      "Pulls out the specific fields you ask for — invoice number, date, total — as clean data, and shows you where on the page each value came from. An AI model does the reading: OpenAI, Azure, or a model running on your own machine so documents never leave it.",
+      "Pulls out the specific fields you ask for — invoice number, date, total — as clean data, and shows you where on the page each value came from. An AI model does the reading: OpenAI, Claude, AWS Bedrock, or a model running on your own machine so documents never leave it.",
   },
   {
     id: "icr",

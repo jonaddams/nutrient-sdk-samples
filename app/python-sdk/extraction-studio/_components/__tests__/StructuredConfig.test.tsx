@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { presetFor } from "../../lib/categories";
 import { StructuredConfig } from "../StructuredConfig";
 
@@ -7,6 +7,186 @@ const invoices = presetFor("invoices");
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+const PROVIDERS = [
+  { id: "openai", label: "OpenAI", models: [], defaultModel: "gpt-5.4" },
+  {
+    id: "bedrock",
+    label: "AWS Bedrock",
+    models: [
+      { id: "google.gemma-3-27b-it", label: "Gemma 3 27B" },
+      { id: "qwen.qwen3-vl-235b-a22b-instruct", label: "Qwen3-VL 235B" },
+    ],
+    defaultModel: "qwen.qwen3-vl-235b-a22b-instruct",
+  },
+];
+
+function stubProviders(providers: unknown = PROVIDERS, ok = true) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({
+      ok,
+      status: ok ? 200 : 503,
+      json: async () => ({ providers }),
+    })) as unknown as typeof fetch,
+  );
+}
+
+beforeEach(() => {
+  stubProviders();
+});
+
+test("populates the provider select from the backend", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("option", { name: "AWS Bedrock" })).toBeDefined(),
+  );
+});
+
+test("shows no model select for a single-model provider", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  // OpenAI is selected by default and publishes no models.
+  expect(screen.queryByLabelText("Model")).toBeNull();
+});
+
+test("shows a model select once a multi-model provider is chosen", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  fireEvent.change(screen.getByLabelText("Provider"), {
+    target: { value: "bedrock" },
+  });
+  expect(screen.getByLabelText("Model")).toBeDefined();
+  expect(screen.getByRole("option", { name: "Gemma 3 27B" })).toBeDefined();
+});
+
+test("sends the selected model with the run request", async () => {
+  const onRun = vi.fn();
+  const props = {
+    docPath: "/documents/doc-1.pdf",
+    filename: "doc-1.pdf",
+    onRun,
+    schemaPreset: invoices,
+  };
+  const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  fireEvent.change(screen.getByLabelText("Provider"), {
+    target: { value: "bedrock" },
+  });
+  fireEvent.change(screen.getByLabelText("Model"), {
+    target: { value: "google.gemma-3-27b-it" },
+  });
+  rerender(<StructuredConfig {...props} runSignal={1} />);
+  expect(onRun).toHaveBeenCalledWith(
+    expect.objectContaining({
+      provider: "bedrock",
+      model: "google.gemma-3-27b-it",
+    }),
+  );
+});
+
+test("switching provider drops the previous provider's model", async () => {
+  // Otherwise a Bedrock model id would ride along to OpenAI and earn a 400.
+  const onRun = vi.fn();
+  const props = {
+    docPath: "/documents/doc-1.pdf",
+    filename: "doc-1.pdf",
+    onRun,
+    schemaPreset: invoices,
+  };
+  const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  const providerSelect = screen.getByLabelText("Provider");
+  fireEvent.change(providerSelect, { target: { value: "bedrock" } });
+  fireEvent.change(screen.getByLabelText("Model"), {
+    target: { value: "google.gemma-3-27b-it" },
+  });
+  fireEvent.change(providerSelect, { target: { value: "openai" } });
+  rerender(<StructuredConfig {...props} runSignal={1} />);
+  expect(onRun).toHaveBeenCalledWith(
+    expect.objectContaining({ provider: "openai", model: undefined }),
+  );
+});
+
+test("disables the provider select when the fetch fails", async () => {
+  stubProviders(null, false);
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() =>
+    expect(
+      (screen.getByLabelText("Provider") as HTMLSelectElement).disabled,
+    ).toBe(true),
+  );
+});
+
+// The parent gates its Run control on this callback. These tests are the
+// mechanism-level proof that "Run must be unavailable before providers
+// resolve and after a failed fetch" holds — page.tsx wires
+// `disabled={busy || !providersReady}` straight to this signal.
+test("reports readiness only after the providers fetch resolves, never before", async () => {
+  const onProvidersReady = vi.fn();
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+      onProvidersReady={onProvidersReady}
+    />,
+  );
+  // Not called with true synchronously on mount — the fetch is still pending.
+  expect(onProvidersReady).not.toHaveBeenCalledWith(true);
+  await waitFor(() => expect(onProvidersReady).toHaveBeenCalledWith(true));
+});
+
+test("reports not-ready, and never ready, after a failed providers fetch", async () => {
+  stubProviders(null, false);
+  const onProvidersReady = vi.fn();
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+      onProvidersReady={onProvidersReady}
+    />,
+  );
+  await waitFor(() => expect(onProvidersReady).toHaveBeenCalledWith(false));
+  expect(onProvidersReady).not.toHaveBeenCalledWith(true);
 });
 
 test("mounting with a given runSignal does not call onRun", () => {
