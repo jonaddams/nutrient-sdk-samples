@@ -59,11 +59,18 @@ export function StructuredConfig({
         setProviders(list);
         // Keep the current selection if the backend still offers it; otherwise
         // fall back to the first thing it does offer.
-        setProvider((current) =>
-          list.some((p) => p.id === current)
-            ? current
-            : (list[0]?.id ?? current),
-        );
+        setProvider((current) => {
+          if (list.some((p) => p.id === current)) return current;
+          // Falling back to a different provider must drop the model too, for
+          // the same reason changeProvider does: a model id is only valid for
+          // the provider that published it, and the backend allowlist answers
+          // a mismatch with a 400. This branch is unreachable while the
+          // effect runs once at mount (the Model select can't have set a
+          // model before this same fetch resolves), but it is the second path
+          // that mutates `provider` and must not be the one that forgets.
+          setModel(undefined);
+          return list[0]?.id ?? current;
+        });
       })
       .catch(() => {
         if (!cancelled) setProvidersFailed(true);
