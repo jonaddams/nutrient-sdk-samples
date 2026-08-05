@@ -21,7 +21,9 @@ const PAYLOAD = {
   ],
 };
 
-function stubFetch(response: Partial<Response> & { json?: () => Promise<unknown> }) {
+function stubFetch(
+  response: Partial<Response> & { json?: () => Promise<unknown> },
+) {
   const calls: string[] = [];
   vi.stubGlobal(
     "fetch",
@@ -69,8 +71,11 @@ test("throws when the body has no providers array", async () => {
 test("throws when the body is invalid JSON", async () => {
   // Invalid JSON is indistinguishable from a malformed response shape from the
   // caller's perspective — both mean the backend is broken.
-  stubFetch({ ok: true, json: async () => {
-    throw new SyntaxError("Unexpected token");
-  } });
+  stubFetch({
+    ok: true,
+    json: async () => {
+      throw new SyntaxError("Unexpected token");
+    },
+  });
   await expect(fetchProviders()).rejects.toThrow(/malformed/i);
 });
