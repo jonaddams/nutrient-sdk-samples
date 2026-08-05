@@ -1124,6 +1124,16 @@
   visibility: visible;
 }
 
+/* The confidence caveat is the one thing in this panel a prospect could be
+   misled by, so it must not inherit .hint's faintest-tone --ink-4. Lifted to
+   --ink-2 rather than a new colour, so it tracks every palette and both
+   themes. A direct rule on the element beats .hint's inherited colour
+   regardless of specificity. */
+.studio-shell .hint-em {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
 @media (max-width: 1024px) {
   .studio-shell .rail-tip {
     left: 0;

@@ -153,4 +153,38 @@ describe("extractStructured", () => {
       /could not load \/documents\/lumen-invoice\.pdf/,
     );
   });
+
+  test("omits model when unset, empty, or whitespace", async () => {
+    // Present-but-blank is the case that matters: a bare `model=` or a whitespace
+    // id reaches the backend allowlist and earns a 400. `undefined` alone would
+    // pass even with the guard deleted, so it proves nothing on its own.
+    for (const model of [undefined, "", "   "]) {
+      const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+      await extractStructured({ ...REQ, model });
+      expect(calls[1].url).not.toContain("model=");
+    }
+  });
+
+  // "amazon.nova-pro-v1:0" below is a deliberately synthetic id, not a live
+  // model — it exists here only because it contains a colon, which is what
+  // exercises URLSearchParams' percent-encoding. Neither currently-allowlisted
+  // Bedrock model (qwen.qwen3-vl-235b-a22b-instruct, google.gemma-3-27b-it)
+  // contains a colon, so a real id would not cover this path at all.
+  test("forwards model when set", async () => {
+    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+    await extractStructured({ ...REQ, model: "amazon.nova-pro-v1:0" });
+    // Encoded because the id contains a colon.
+    expect(calls[1].url).toContain("model=amazon.nova-pro-v1%3A0");
+  });
+
+  test("trims a padded model id before forwarding it", async () => {
+    // The guard is `.trim()` on the check, but the untrimmed request.model was
+    // being forwarded — a padded id passed the guard and still earned a 400
+    // from the backend allowlist. Uses the same synthetic colon-bearing id as
+    // the test above, for the same reason.
+    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+    await extractStructured({ ...REQ, model: "  amazon.nova-pro-v1:0  " });
+    const url = new URL(calls[1].url, "http://x");
+    expect(url.searchParams.get("model")).toBe("amazon.nova-pro-v1:0");
+  });
 });
