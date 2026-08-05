@@ -300,7 +300,7 @@ reason. Probably a genuine SDK defect, in the same family as SDK-037's no-op
 
 ### Providers
 
-- `/structured` accepts `openai`, `azure`, `anthropic` (alias `claude`) and `local`.
+- `/structured` accepts `openai`, `azure`, `anthropic` (alias `claude`), `bedrock` and `local`.
   **`azure` cannot work** — the SDK rejects it outright (see TODO item 3), so that branch of
   `apply_provider()` is dead code.
 - **The schema must set `additionalProperties: false`** or Anthropic returns

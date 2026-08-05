@@ -14,6 +14,7 @@ export function StructuredConfig({
   onRun,
   runSignal,
   schemaPreset,
+  onProvidersReady,
 }: {
   docPath: string;
   filename: string;
@@ -21,6 +22,13 @@ export function StructuredConfig({
   runSignal: number;
   /** MUST be referentially stable per category — see the effect below. */
   schemaPreset: SchemaProp[];
+  /** Called whenever provider-load readiness changes: `false` while the
+   *  providers fetch is in flight or after it has failed, `true` once a
+   *  provider list has been received. The parent uses this to gate its Run
+   *  control — a click before this ever fires would send the hardcoded
+   *  initial `provider: "openai"` below, which is wrong on any deployment
+   *  where OpenAI isn't the one configured. */
+  onProvidersReady?: (ready: boolean) => void;
 }) {
   const [mode, setMode] = useState("builder");
   const [props, setProps] = useState<SchemaProp[]>(schemaPreset);
@@ -51,6 +59,12 @@ export function StructuredConfig({
   // The backend decides which providers are offerable, because only it knows
   // which credentials exist. This is what keeps "Local (LM Studio)" off the
   // hosted deployment, where the Railway backend cannot reach a laptop.
+  //
+  // Deliberately mount-only: `provider` is read below for its value AT THE
+  // TIME THE FETCH RESOLVES, not as a reactive dependency — adding it (or
+  // onProvidersReady) here would refetch providers every time the selection
+  // changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional mount-only fetch; `provider` and `onProvidersReady` are read fresh inside the callback, see comment above.
   useEffect(() => {
     let cancelled = false;
     fetchProviders()
@@ -58,22 +72,37 @@ export function StructuredConfig({
         if (cancelled) return;
         setProviders(list);
         // Keep the current selection if the backend still offers it; otherwise
-        // fall back to the first thing it does offer.
-        setProvider((current) => {
-          if (list.some((p) => p.id === current)) return current;
-          // Falling back to a different provider must drop the model too, for
-          // the same reason changeProvider does: a model id is only valid for
-          // the provider that published it, and the backend allowlist answers
-          // a mismatch with a 400. This branch is unreachable while the
-          // effect runs once at mount (the Model select can't have set a
-          // model before this same fetch resolves), but it is the second path
-          // that mutates `provider` and must not be the one that forgets.
-          setModel(undefined);
-          return list[0]?.id ?? current;
-        });
+        // fall back to the first thing it does offer. `provider` is read
+        // straight from the enclosing closure rather than through
+        // setProvider's updater form — safe because the Provider select stays
+        // disabled until `providers` is set, so `provider` cannot change
+        // between this effect being scheduled and this callback running. The
+        // updater form was unnecessary for that reason, and calling
+        // setModel(undefined) from inside it invited React (StrictMode) to
+        // invoke that updater twice; harmless only because it's idempotent.
+        const nextProvider = list.some((p) => p.id === provider)
+          ? provider
+          : (list[0]?.id ?? provider);
+        setProvider(nextProvider);
+        // No path may change `provider` without also clearing `model` in the
+        // same breath: a model id is only valid for the provider that
+        // published it, and the backend allowlist answers a mismatch with a
+        // 400. This branch (falling back away from the current provider) is
+        // unreachable today — the Model select can't have set a model before
+        // this same mount-time fetch resolves — but it is the second place
+        // (alongside changeProvider) that can change `provider`, and must not
+        // be the one that forgets to clear `model` alongside it.
+        if (nextProvider !== provider) setModel(undefined);
+        onProvidersReady?.(true);
       })
       .catch(() => {
-        if (!cancelled) setProvidersFailed(true);
+        if (!cancelled) {
+          setProvidersFailed(true);
+          // Explicit rather than relying on the parent's initial state: Run
+          // must stay gated after a failed fetch, not just before the first
+          // one resolves.
+          onProvidersReady?.(false);
+        }
       });
     return () => {
       cancelled = true;

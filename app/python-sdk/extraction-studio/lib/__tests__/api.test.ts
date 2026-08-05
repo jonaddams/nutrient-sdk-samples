@@ -171,4 +171,14 @@ describe("extractStructured", () => {
     // Encoded because the id contains a colon.
     expect(calls[1].url).toContain("model=amazon.nova-pro-v1%3A0");
   });
+
+  test("trims a padded model id before forwarding it", async () => {
+    // The guard is `.trim()` on the check, but the untrimmed request.model was
+    // being forwarded — a padded id passed the guard and still earned a 400
+    // from the backend allowlist.
+    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+    await extractStructured({ ...REQ, model: "  amazon.nova-pro-v1:0  " });
+    const url = new URL(calls[1].url, "http://x");
+    expect(url.searchParams.get("model")).toBe("amazon.nova-pro-v1:0");
+  });
 });
