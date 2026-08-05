@@ -114,8 +114,11 @@ hours.
 
 Note for anyone reading the history: `#49` was **squash-merged**, so the twelve commits behind
 it — including the fix rounds that produced the model-id corrections — do not appear in `main`.
-The decision trail is in `.superpowers/sdd/2026-08-05-bedrock-provider/progress.md` and the PR
-body, not in `git log`.
+**The durable record is the two PR bodies** (`#32` and `#49`), which carry the request-capture
+findings and the benchmark table, following the same convention as the gitignored
+`DEFECTS.md`. A fuller decision trail exists locally at
+`.superpowers/sdd/2026-08-05-bedrock-provider/progress.md`, but that path is gitignored — do not
+rely on it surviving a clean checkout.
 
 **This section replaces an earlier version that prescribed a SigV4 translating shim. That plan
 was wrong and is not needed.** Full design in
