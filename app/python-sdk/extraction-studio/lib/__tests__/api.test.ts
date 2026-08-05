@@ -154,10 +154,15 @@ describe("extractStructured", () => {
     );
   });
 
-  test("omits model from the query string when unset", async () => {
-    const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
-    await extractStructured(REQ);
-    expect(calls[1].url).not.toContain("model=");
+  test("omits model when unset, empty, or whitespace", async () => {
+    // Present-but-blank is the case that matters: a bare `model=` or a whitespace
+    // id reaches the backend allowlist and earns a 400. `undefined` alone would
+    // pass even with the guard deleted, so it proves nothing on its own.
+    for (const model of [undefined, "", "   "]) {
+      const calls = stubFetches({ ok: true, json: async () => ENVELOPE });
+      await extractStructured({ ...REQ, model });
+      expect(calls[1].url).not.toContain("model=");
+    }
   });
 
   test("forwards model when set", async () => {
