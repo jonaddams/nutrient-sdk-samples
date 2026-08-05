@@ -1,8 +1,13 @@
 # Extraction studio — open work and hard-won facts
 
-Written 2026-08-04, after the studio's consolidation into this repo (#43–#48). Revised
-2026-08-05: TODO items 3 and 4 rewritten after spiking Bedrock — the SigV4 shim that section
-prescribed is not needed, and the credentials it called a non-blocker are the only blocker.
+Written 2026-08-04, after the studio's consolidation into this repo (#43–#48).
+
+Revised 2026-08-05, when the Bedrock provider was built, live-verified, and merged as
+`python-fast-api#32` + this repo's `#49`. Item 3 was rewritten twice that day: first because the
+SigV4 shim it prescribed turned out to be unnecessary and the credentials it called a
+non-blocker were the only blocker, then again once real Bedrock proved both provisional model
+ids wrong. Item 4 is resolved. Items 8 and 9 are new, and **"Next session — start here" below
+is the priority order agreed with Jon** — read that before picking anything up.
 
 The studio came from the standalone `nutrient-data-extraction-demo`, now retired. **This
 file is the part that matters for working in the studio from here** — everything actively
@@ -46,6 +51,27 @@ reading `localStorage` during render, which would be a hydration mismatch.
 
 ## TODO
 
+### Next session — start here
+
+Reviewed with Jon 2026-08-05, after Bedrock shipped. Ordered by whether a prospect would
+actually see it, which is not the same as ordered by effort.
+
+1. **SDK-045 write-up (item 7).** The only remaining item that fails *visibly* in a demo —
+   pick the Healthcare category and a required field comes back empty. Not a code fix: the
+   work is getting the evidence somewhere durable, since it currently lives only in a
+   gitignored `DEFECTS.md` plus PR #44.
+2. **Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)** —
+   both small, contained, and visible. The loading state is new as of the Bedrock work.
+3. **Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**
+4. **Whitespace pass (item 5)** — Jon's own ask, still outstanding.
+5. **Scan signalling and the Claims label (item 6)** — need a wording call from Jon before
+   anything can be built.
+6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
+   the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
+
+The seven disabled `SOON` rail entries are the standing direction, not a loose end — see
+"Decided, do not re-litigate".
+
 ### 1. Field Extraction is removable now — no new work needed
 
 `/python-sdk/field-extraction` is the one sample the studio genuinely supersedes. Both do
@@ -79,12 +105,32 @@ this yet?" is answered by what `/structured` can do — not by category labels.
 Two gaps fall out of that: **Table Extraction has no successor in the rail**, and
 **Document to Markdown → Text export is an assumption**, not a verified equivalence.
 
-### 3. AWS Bedrock — viable, and much simpler than previously believed
+### 3. AWS Bedrock — SHIPPED and MERGED
 
-**Spike-verified 2026-08-05. This section replaces an earlier version that prescribed a
-SigV4 translating shim. That plan was wrong and is not needed.** Full design in
+**Built, live-verified and merged 2026-08-05: `python-fast-api#32` (backend, merge commit
+`5d18fff`) and this repo's `#49` (studio UI, squash-merged as `1e5dc04`).** Nothing below is
+open work; it is kept because every claim in it was measured, and re-deriving any of it costs
+hours.
+
+Note for anyone reading the history: `#49` was **squash-merged**, so the twelve commits behind
+it — including the fix rounds that produced the model-id corrections — do not appear in `main`.
+The decision trail is in `.superpowers/sdd/2026-08-05-bedrock-provider/progress.md` and the PR
+body, not in `git log`.
+
+**This section replaces an earlier version that prescribed a SigV4 translating shim. That plan
+was wrong and is not needed.** Full design in
 `docs/superpowers/specs/2026-08-05-bedrock-provider-design.md` (local only — `docs/superpowers/`
-is gitignored).
+is gitignored). Full decision trail in `.superpowers/sdd/2026-08-05-bedrock-provider/`.
+
+**The one thing to remember when demoing it:** on the flagship `AC-2025-1047` invoice both
+shipping models return the "Revised Contract" figure `1,910,500` instead of Amount Due
+`345,015` — a 5.5× error on the money field that looks plausible enough to miss. This
+instruction fixes both, and using it doubles as a demonstration of the Instructions field:
+
+> For totalAmount use the final Amount Due payable now, after any retainage deduction — not
+> the contract value.
+
+OpenAI gets it unaided, so that contrast is real if both providers are shown side by side.
 
 Bedrock now exposes an **OpenAI-compatible surface that authenticates with a plain bearer
 token**, which removes every obstacle the old plan was built around:
@@ -227,6 +273,57 @@ document while an ungrounded-but-present value is *dropped* here. Full entry in
 
 The preset is correct, so `admissionDate` is left **required** rather than softened to
 optional just to make the gate pass.
+
+**Confirmed 2026-08-05 that Bedrock does not rescue this** — the behaviour already reproduced
+across two independent providers, so a third changes nothing. Treat it as a fixed property of
+the SDK until filed and fixed upstream.
+
+### 8. Code residuals left by the Bedrock PRs
+
+All three were surfaced by review, judged non-blocking, and deliberately not fixed rather than
+overlooked. None is visible in a demo.
+
+- **`available_providers()` reads `BEDROCK_API_KEY` unstripped** while the validation path
+  `.strip()`s it. So a whitespace-only key lists Bedrock in the dropdown and then 400s on Run —
+  an asymmetry introduced by fixing only one side.
+- **`_validate_default_models()` uses `assert`**, which `python -O` / `PYTHONOPTIMIZE` strips,
+  silently removing the guard that stops `BEDROCK_STRUCTURED_MODEL` naming an unlisted model.
+  Not live — nothing in the Makefile passes `-O` — but `raise RuntimeError` would be sturdier.
+- **The generated snippet references an undefined `SCHEMA`** placeholder, so "runnable as
+  printed" holds only modulo that. Pre-existing, not from the Bedrock work, but the snippet
+  became more prominent now that it carries an endpoint and a key.
+
+Also parked, in descending order of plausibility: `fetchProviders()` validates only that the
+top-level `providers` value is an array, so a provider entry missing `models` would reach the
+component and crash `.models.map` (the backend always sends it, and both sides ship together);
+the two 400 `except` clauses in the router could be one tuple clause; the `aria-label`s on the
+provider and model selects duplicate `Field`'s `htmlFor` association, and the test suite now
+selects on them.
+
+### 9. Multimodal toggle, the loading state, and two unfiled SDK defects
+
+**The Multimodal toggle now honestly describes a control that does nothing.** Its text was
+corrected on 2026-08-05 to say the SDK does not currently send page images, because a request
+capture proved it — see the `include_page_images` entry below in the facts section. That leaves
+a live control whose only effect is to set a flag the SDK ignores. Decide whether it earns its
+place in a prospect-facing panel, or whether it should go until the SDK sends images. It is
+wired end to end, so removing it is UI-only; `DocStrip.test.tsx`-style assertions do not pin it,
+but a `StructuredConfig` test does reference the toggle.
+
+**Two SDK no-ops are still unfiled**, both measured here and both in the same family as
+SDK-037's no-op `VisionFeatures.KEY_VALUE_REGION`:
+
+- `include_page_images` sends no images on `extract_structured` (byte-identical requests with
+  the flag both ways, including on a scanned PDF).
+- `groundingScore` comes back null for Bedrock model ids even though the endpoint returns
+  `logprobs`. OpenAI returns 0.95 on the same document.
+
+**The provider dropdown has no distinct loading state.** New as of the Bedrock work: gating Run
+on the providers fetch means that while `providers === null` the select is empty and disabled
+with the ordinary help text, so the first thing a prospect sees is a brief flash of an empty
+box. Failure is distinguishable (the help text changes); loading is not. The fix is small, and
+the gating that created it is worth keeping — it prevents an early click reaching a provider
+with no credentials and returning an opaque 500.
 
 ---
 
