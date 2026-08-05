@@ -2,10 +2,25 @@
 
 Written 2026-08-04, after the studio's consolidation into this repo (#43–#48).
 
-The studio came from the standalone `nutrient-data-extraction-demo`, which is being
-retired. That repo's `docs/DEVELOPMENT-NOTES.md` still holds the fuller history — the
-consolidation record, the SDK defect registry pointers, and the local-model benchmark
-data. **This file is the part that matters for working in the studio from here.**
+The studio came from the standalone `nutrient-data-extraction-demo`, now retired. **This
+file is the part that matters for working in the studio from here** — everything actively
+needed has been carried over.
+
+What stays only in that repo, as archive rather than working reference:
+
+- `docs/superpowers/specs/2026-07-28-consolidation-design.md` — why the split into two repos
+- `docs/superpowers/plans/2026-07-28-document-categories.md` — **Task 3 is the evidence
+  record**: what each sample PDF actually carries, field by field. Superseded as a plan,
+  still the source for why the category presets are what they are.
+- The document byte-equivalence findings: `construction.pdf` ≡
+  `westbridge-engineering-submittal-form.pdf`, and `accident-report.pdf` ≡
+  `emergency-dept-billing-worksheet.pdf` (differing only in the PDF trailer `/ID`). That is
+  why Claims and Finance needed generated documents, and why nine samples became seven.
+- The 2026-07-30 working-tree wipe incident — all 103 tracked files deleted, cause never
+  identified, recovered from git.
+
+The sample documents themselves are already here in `public/documents/` and
+`public/invoices/`, so nothing the studio loads depends on that repo.
 
 ---
 
@@ -275,6 +290,34 @@ deliberate source-ordering described above. Neither is something you broke.
 Backend: `cd ~/SE/code/python-fast-api && .venv/bin/uvicorn app.main:app --port 8080`
 (**not** 8000 — `.env.local` points at 8080; the backend has no `/` route, so health-check
 `/docs`). Frontend: `pnpm exec next dev --turbopack`.
+
+### Environment traps that are not obvious and will recur
+
+Carried over from the retired demo repo, because all three cost real time and none of them
+look like what they are.
+
+**A LAN address can be unreachable from tooling while working fine from Terminal.**
+macOS gates local-network access **per app**. If the editor or agent host lacks the grant,
+loopback and the public internet work while *every* LAN address silently times out —
+including the machine's own routable IP. `route -n get` is a local syscall and answers
+normally, which makes it look like routing. It is not. The discriminator:
+internet ✓ / loopback ✓ / LAN ✗, and the same `curl` succeeding from Terminal.app. Fix by
+granting the host app Local Network in System Settings → Privacy & Security (usually needs
+an app restart), or relay through loopback from a Terminal that already has the grant.
+This is why the remote LM Studio run never happened, and it is a live constraint on the
+Bedrock work in item 3.
+
+**`pnpm` can be absent from non-interactive shells.** `~/.zshrc` exports `$PNPM_HOME/bin`,
+but zsh only sources `.zshrc` for *interactive* shells, so scripts and agent shells can
+inherit a stale entry and fail with `command not found` while your terminal is fine.
+Prefix `export PATH="$HOME/Library/pnpm/bin:$PATH"`, or move the block to `~/.zshenv`.
+
+**HMR does not reliably connect here, so a clean-looking check can be a stale bundle.**
+Hard-reload before browser checks, and when a CSS or config change appears to do nothing,
+**fetch the served chunk and grep it** before debugging the source. That caught two real
+problems: a `globals.css` edit the dev server never recompiled (chunk hash unchanged), and
+the inverse — a correct change that looked broken. Trusting the rendered page over the
+served asset wastes hours in both directions.
 
 ### Two traps in the backend's own test suite
 
