@@ -83,8 +83,22 @@ actually see it, which is not the same as ordered by effort.
 7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
    the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
-The seven disabled `SOON` rail entries are the standing direction, not a loose end — see
-"Decided, do not re-litigate".
+**Adaptive OCR is LIVE as of 2026-08-06** — the second feature in the rail after Structured
+extraction. Six `SOON` entries remain, and they are the standing direction rather than a loose
+end (see "Decided, do not re-litigate").
+
+Two things that work settled while building it:
+
+- **Multilingual OCR is now known to be buildable.** Multi-language works, with `+` as the
+  separator — `eng+deu+fra` scored higher than any single language. Its rail entry is a
+  decision, no longer an unknown.
+- **Adaptive OCR needs no new documents**, which is why it was built before Local ICR. The
+  manifest's four zero-text-layer scans are its corpus, and #56 already marks them `SCAN`.
+
+Full design at `docs/specs/2026-08-06-adaptive-ocr-design.md`; plan at
+`docs/plans/2026-08-06-adaptive-ocr.md`. Three options ship (languages, table detection,
+output format) because only three of seven candidates measurably change the output — the
+other four are verified no-ops and deliberately have no controls.
 
 ### 1. Field Extraction — UNLISTED 2026-08-06
 
