@@ -54,6 +54,11 @@
   --space-8: 72px;
   --space-9: 112px;
   --row-pad: 20px;
+  /* UNCONSUMED as of 2026-08-06: declared here and in both density blocks, but
+     nothing reads var(--section-gap). Left in place because the density system is
+     a documented feature and this is its natural hook — but do not reach for it
+     expecting to change spacing, because it will do nothing until something
+     consumes it. (The whitespace TODO named it as a knob; it is not one yet.) */
   --section-gap: 80px;
   --content-max: 1200px;
   --reading-max: 680px;
@@ -1026,8 +1031,11 @@
    /python-sdk/extraction-studio, where the app shell ends at the viewport edge
    and the margin read as a large empty band. The margin is deliberately smaller
    than the padding it sits above — the padding is doing the visual work. */
+/* No margin-top. It used to carry var(--space-5) (24px), which stacked on top of
+   this rule's own 48px padding-top AND the page section's padding-bottom — three
+   sources of the same gap, 145px in total on a sample page. The border needs to sit
+   against the content boundary, so the separation belongs to the padding. */
 .footer {
-  margin-top: var(--space-5);
   border-top: 1px solid var(--line);
   padding: var(--space-7) 0 var(--space-6);
 }
@@ -1049,8 +1057,11 @@
 .footer-meta a:hover { color: var(--ink); }
 
 /* ── Landing-specific ───────────────────────────────────────────────────── */
+/* 72/48, down from 112/72 (2026-08-06). The 112px top left a visibly empty band
+   under the sticky topbar and pushed the headline most of the way down the fold;
+   184px of a 548px hero was padding. Still generous — this is the front door. */
 .hero {
-  padding: var(--space-9) 0 var(--space-8);
+  padding: var(--space-8) 0 var(--space-7);
   border-bottom: 1px solid var(--line);
 }
 .hero .display { max-width: 14ch; }

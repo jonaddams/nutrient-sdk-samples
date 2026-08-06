@@ -63,7 +63,7 @@ export default function HtmlComparisonPage() {
           className="shell"
           style={{
             paddingTop: "var(--space-6)",
-            paddingBottom: "var(--space-8)",
+            paddingBottom: "var(--space-7)",
           }}
         >
           <div className="mb-4 flex justify-end">
@@ -98,7 +98,7 @@ export default function HtmlComparisonPage() {
         className="shell"
         style={{
           paddingTop: "var(--space-6)",
-          paddingBottom: "var(--space-8)",
+          paddingBottom: "var(--space-7)",
         }}
       >
         {/* Features */}
