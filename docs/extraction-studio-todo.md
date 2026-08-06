@@ -60,9 +60,10 @@ actually see it, which is not the same as ordered by effort.
    be different from what item 7 claimed. See `docs/sdk-defects/`. It also turned up
    **SDK-046**, which affects the shipped `/python-sdk/document-to-markdown` sample.
    Filing the two tickets is now **item 10** below, deferred deliberately.
-2. **Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)** —
-   both small, contained, and visible. The loading state is new as of the Bedrock work.
+2. ~~**Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)**.~~
+   **DONE 2026-08-06** (#52). Details under items 6 and 9.
 3. **Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**
+   ← **next up, and it needs a call from Jon** before anything can be built.
 4. **Whitespace pass (item 5)** — Jon's own ask, still outstanding.
 5. **Scan signalling and the Claims label (item 6)** — need a wording call from Jon before
    anything can be built.
