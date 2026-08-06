@@ -1,28 +1,5 @@
-import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
-
-const samples: Sample[] = [
-  {
-    name: "Linearize",
-    category: "File Optimization",
-    description:
-      "Optimize PDFs for fast web view, allowing the first page to render before the entire file downloads.",
-    path: "/dotnet-sdk/linearize",
-  },
-  {
-    name: "OCR",
-    category: "Text Extraction",
-    description:
-      "Recognize text in scanned PDFs and images. Output a searchable PDF or extract the recognized text as plain text.",
-    path: "/dotnet-sdk/ocr",
-  },
-  {
-    name: "Optimize",
-    category: "File Optimization",
-    description:
-      "Reduce PDF file size with MRC compression. Especially effective on scanned and image-heavy documents.",
-    path: "/dotnet-sdk/optimize",
-  },
-];
+import { SamplesIndex } from "@/app/_components/SamplesIndex";
+import { samples } from "./samples";
 
 const categories = ["All", "File Optimization", "Text Extraction"];
 

@@ -1,12 +1,34 @@
 import Link from "next/link";
+import type { Sample } from "@/app/_components/SamplesIndex";
+import { samples as aiDocumentProcessing } from "./ai-document-processing/samples";
+import { samples as api } from "./api/samples";
+import { samples as documentAuthoringSdk } from "./document-authoring-sdk/samples";
+import { samples as dotnetSdk } from "./dotnet-sdk/samples";
+import { samples as javaSdk } from "./java-sdk/samples";
+import { samples as pythonSdk } from "./python-sdk/samples";
+import { samples as webSdk } from "./web-sdk/samples";
 
 interface SdkEntry {
   id: string;
   num: string;
   title: string;
   desc: string;
-  foot: string;
+  /** The SDK's sample registry, or omitted for a coming-soon entry. The card
+   *  footer and the headline total are both DERIVED from this — see `foot()`.
+   *
+   *  This used to be `foot: string`, a prose count ("33 samples"), with the
+   *  headline total produced by regex-parsing the leading digits back out of it.
+   *  Nothing derived from the arrays, so nothing failed when the two disagreed —
+   *  and by 2026-08-06 they claimed 57 samples against 76 actual. */
+  samples?: Sample[];
   comingSoon?: boolean;
+}
+
+/** Card footer text. Coming-soon entries have no registry to count. */
+function foot(entry: SdkEntry): string {
+  if (!entry.samples) return "Coming soon";
+  const n = entry.samples.length;
+  return `${n} ${n === 1 ? "sample" : "samples"}`;
 }
 
 const SDKS: SdkEntry[] = [
@@ -15,14 +37,13 @@ const SDKS: SdkEntry[] = [
     num: "01",
     title: "Web SDK",
     desc: "In-browser PDF viewing, annotations, forms, signatures, redaction, and comparison.",
-    foot: "39 samples",
+    samples: webSdk,
   },
   {
     id: "document-engine",
     num: "02",
     title: "Document Engine",
     desc: "Server-side document processing API for hosted or self-hosted deployments.",
-    foot: "Coming soon",
     comingSoon: true,
   },
   {
@@ -30,50 +51,49 @@ const SDKS: SdkEntry[] = [
     num: "03",
     title: "AI Document Processing",
     desc: "Classify and extract structured data from invoices, receipts, and POs.",
-    foot: "1 sample",
+    samples: aiDocumentProcessing,
   },
   {
     id: "java-sdk",
     num: "04",
     title: "Java SDK",
     desc: "Server-side conversion, OCR, and digital signing for JVM applications.",
-    foot: "5 samples",
+    samples: javaSdk,
   },
   {
     id: "python-sdk",
     num: "05",
     title: "Python SDK",
     desc: "Document conversion, redaction, form fill, and template generation.",
-    foot: "17 samples",
+    samples: pythonSdk,
   },
   {
     id: "dotnet-sdk",
     num: "06",
     title: ".NET SDK",
     desc: "File optimization, linearization, and OCR for .NET workloads.",
-    foot: "3 samples",
+    samples: dotnetSdk,
   },
   {
     id: "api",
     num: "07",
     title: "Nutrient DWS API",
     desc: "Document Web Services — signing, conversion, and comparison via REST.",
-    foot: "6 samples",
+    samples: api,
   },
   {
     id: "document-authoring-sdk",
     num: "08",
     title: "Document Authoring SDK",
     desc: "Programmatic document generation with templates, variables, and live preview.",
-    foot: "4 samples",
+    samples: documentAuthoringSdk,
   },
 ];
 
 export default function Home() {
-  const total = SDKS.reduce((n, s) => {
-    const m = s.foot.match(/^(\d+)/);
-    return n + (m ? Number(m[1]) : 0);
-  }, 0);
+  // Summed from the registries themselves, so this figure cannot drift from the
+  // listings. It previously regex-parsed digits out of each card's prose footer.
+  const total = SDKS.reduce((n, s) => n + (s.samples?.length ?? 0), 0);
 
   return (
     <section className="shell">
@@ -223,7 +243,7 @@ export default function Home() {
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
               <div className="foot">
-                <span>{s.foot}</span>
+                <span>{foot(s)}</span>
               </div>
             </div>
           ) : (
@@ -236,7 +256,7 @@ export default function Home() {
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
               <div className="foot">
-                <span>{s.foot}</span>
+                <span>{foot(s)}</span>
                 <span className="arrow">→</span>
               </div>
             </Link>

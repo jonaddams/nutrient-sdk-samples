@@ -1,39 +1,5 @@
-import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
-
-const samples: Sample[] = [
-  {
-    name: "Office to PDF",
-    category: "Conversion",
-    description: "Convert Word, Excel, and PowerPoint documents to PDF format",
-    path: "/java-sdk/office-to-pdf",
-  },
-  {
-    name: "Markdown to PDF",
-    category: "Conversion",
-    description: "Convert Markdown documents to PDF format",
-    path: "/java-sdk/md-to-pdf",
-  },
-  // HTML-to-PDF hidden — SDK's native HTML renderer crashes on Linux (NullReferenceException in ExportAsPdfStringNative)
-  {
-    name: "PDF to HTML",
-    category: "Conversion",
-    description: "Convert PDF documents to HTML for web display",
-    path: "/java-sdk/pdf-to-html",
-  },
-  {
-    name: "PDF to Office",
-    category: "Conversion",
-    description: "Convert PDF documents to Word and Excel formats",
-    path: "/java-sdk/pdf-to-office",
-  },
-  {
-    name: "Digital Signature",
-    category: "Signatures",
-    description: "Apply digital signatures to PDF documents with certificates",
-    path: "/java-sdk/digital-signature",
-  },
-  // OCR and ICR extraction samples hidden until VlmEnhancedIcr ships in a future SDK release
-];
+import { SamplesIndex } from "@/app/_components/SamplesIndex";
+import { samples } from "./samples";
 
 const categories = ["All", "Conversion", "Signatures"];
 

@@ -1,0 +1,140 @@
+import type { Sample } from "@/app/_components/SamplesIndex";
+
+/**
+ * The python sdk sample registry.
+ *
+ * Split out of page.tsx on 2026-08-06 so app/page.tsx can DERIVE its headline
+ * counts from this array instead of a hand-written string. The landing page used
+ * to store each count inside prose (`foot: "33 samples"`) and regex the total
+ * back out of it, so nothing failed when they drifted — they had reached 57
+ * claimed against 76 actual.
+ *
+ * Pure data, and the only import is a TYPE, so importing this costs nothing at
+ * runtime and pulls no page code into whatever imports it.
+ */
+export const samples: Sample[] = [
+  {
+    name: "Office to PDF",
+    category: "Conversion",
+    description: "Convert Word, Excel, and PowerPoint documents to PDF format",
+    path: "/python-sdk/office-to-pdf",
+  },
+  {
+    name: "Markdown to PDF",
+    category: "Conversion",
+    description: "Convert Markdown documents to PDF format",
+    path: "/python-sdk/md-to-pdf",
+  },
+  {
+    name: "PDF to HTML",
+    category: "Conversion",
+    description: "Convert PDF documents to HTML for web display",
+    path: "/python-sdk/pdf-to-html",
+  },
+  {
+    name: "PDF to Office",
+    category: "Conversion",
+    description: "Convert PDF documents to Word and Excel formats",
+    path: "/python-sdk/pdf-to-office",
+  },
+  {
+    name: "Digital Signature",
+    category: "Signatures",
+    description: "Apply digital signatures to PDF documents with certificates",
+    path: "/python-sdk/digital-signature",
+  },
+  {
+    name: "PDF Redaction",
+    category: "Editor",
+    description: "Permanently remove sensitive content from PDF documents",
+    path: "/python-sdk/redaction",
+  },
+  {
+    name: "Form Field Detection",
+    category: "Forms",
+    description:
+      "Detect form fields in an unfielded PDF with the Nutrient SDK's ML detector",
+    path: "/python-sdk/form-detection",
+  },
+  {
+    name: "PDF Form Fill",
+    category: "Forms",
+    description:
+      "Programmatically fill PDF form fields with data and generate a filled PDF",
+    path: "/python-sdk/form-fill",
+  },
+  {
+    name: "VLM Transcription",
+    category: "Extraction",
+    description:
+      "Transcribe handwriting via Vision.describe() with a custom prompt — works on cursive where ICR doesn't",
+    path: "/python-sdk/vlm-transcription",
+  },
+  {
+    name: "OCR Extraction",
+    category: "Extraction",
+    description:
+      "Extract printed text from images with Adaptive OCR — high-throughput, optimized for purely printed content",
+    path: "/python-sdk/ocr-extraction",
+  },
+  {
+    name: "ICR Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured document data from images using the Nutrient SDK's ICR engine — printed pages and hand-printed forms",
+    path: "/python-sdk/icr-extraction",
+  },
+  {
+    name: "VLM Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured content from documents without native form fields (e.g. invoices) via VLM-enhanced ICR with Claude",
+    path: "/python-sdk/vlm-extraction",
+  },
+  {
+    name: "Table Extraction",
+    category: "Extraction",
+    description:
+      "Extract structured tables (rows, columns, spanning cells) from an invoice via VLM-enhanced extraction with Claude",
+    path: "/python-sdk/table-extraction",
+  },
+  {
+    name: "Document to Markdown",
+    category: "Extraction",
+    description:
+      "Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines",
+    path: "/python-sdk/markdown-extraction",
+  },
+  // Field Extraction UNLISTED 2026-08-06 (Jon's call: unlist, do not delete).
+  // The extraction studio supersedes it — both do schema-driven field
+  // extraction, but this one hand-writes a VLM prompt and post-parses the JSON
+  // reply, while /structured calls the SDK's native extract_structured() and
+  // gets grounded citations back. It is also built on
+  // VisionFeatures.KEY_VALUE_REGION, which is a no-op (SDK-037 / NAPY-15),
+  // worked around with describe().
+  //
+  // app/python-sdk/field-extraction/ is deliberately KEPT: the route still
+  // works, and a demo of the pre-SDK-native approach has archival value while
+  // SDK-037 is open. Re-listing is uncommenting this block.
+  {
+    name: "Structured Extraction",
+    category: "Extraction",
+    description:
+      "Extract a JSON schema's fields with the SDK's native structured extraction — every value carries a clickable citation on the page",
+    path: "/python-sdk/extraction-studio",
+  },
+  {
+    name: "Image Alt Text",
+    category: "Extraction",
+    description:
+      "Generate WCAG-style accessibility descriptions for images at standard or detailed level",
+    path: "/python-sdk/alt-text",
+  },
+  {
+    name: "Word Template Generation",
+    category: "Templates",
+    description:
+      "Generate PDF documents from Word templates populated with JSON data",
+    path: "/python-sdk/word-template",
+  },
+];

@@ -116,11 +116,22 @@ quietly understating the collection:
 | Document Authoring | 3 | **4** |
 | **total** | **57** | **76** |
 
-All corrected (total now reads **75**, after this unlisting). But it will rot again: the
-counts live in a different file from the arrays they describe, and nothing fails when they
-disagree. **The durable fix is to derive them** — export each page's `samples` array, or move
-the registry somewhere shared, and compute both the per-SDK count and the total. Not done
-here because it is a refactor across eight pages and well outside this item's scope.
+All corrected (total read **75** after this unlisting) — and then **derived, 2026-08-06**, so
+that class of drift is now impossible:
+
+- Each SDK's array moved to its own `app/<sdk>/samples.ts`, exporting `samples`. The only
+  import is the `Sample` **type**, which is erased at compile time, so the module pulls no
+  page code into anything that imports it.
+- `app/page.tsx` imports all seven and computes both the per-card footer (`foot()`, which also
+  handles "1 sample" and the coming-soon entry) and the headline total. `SdkEntry.foot: string`
+  became `SdkEntry.samples?: Sample[]`. Being a server component, the arrays are consumed
+  during render and nothing extra reaches the client.
+- `app/__tests__/sample-registries.test.ts` pins what types cannot: no empty registry, every
+  path rooted at its own SDK, no duplicate path or name within an SDK, no path claimed by two
+  SDKs, and Field Extraction staying unlisted.
+
+**There is no longer a number to maintain.** A new sample is one array entry and every count
+follows.
 
 ### 2. Which rail feature replaces which sample
 
