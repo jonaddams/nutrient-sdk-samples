@@ -39,7 +39,6 @@ export function StructuredConfig({
   const [providersFailed, setProvidersFailed] = useState(false);
   const [citations, setCitations] = useState(true);
   const [strict, setStrict] = useState(false);
-  const [multimodal, setMultimodal] = useState(false);
   const [json, setJson] = useState(() => buildSchema(schemaPreset));
 
   // Switching category replaces the schema wholesale, discarding hand-edits.
@@ -130,7 +129,10 @@ export function StructuredConfig({
       model,
       includeSourceLocations: citations,
       strict,
-      includePageImages: multimodal,
+      // Sent explicitly as false rather than omitted, so the generated snippet
+      // and the wire request keep saying what they always said while the
+      // Multimodal control is absent — see the note where it used to render.
+      includePageImages: false,
     });
   }, [
     runSignal,
@@ -144,7 +146,6 @@ export function StructuredConfig({
     model,
     citations,
     strict,
-    multimodal,
     onRun,
   ]);
 
@@ -355,12 +356,17 @@ export function StructuredConfig({
           label="Strict schema"
           description="Enforce the JSON schema at the model provider (provider-enforced structured output)."
         />
-        <Toggle
-          checked={multimodal}
-          onChange={setMultimodal}
-          label="Multimodal"
-          description="Requests page images alongside the parsed text. Verified 2026-08-05: the SDK does not currently send them on this endpoint."
-        />
+        {/* The Multimodal toggle was REMOVED here on 2026-08-06, deliberately.
+            It set `include_page_images`, which the SDK ignores on
+            extract_structured() — re-verified that day by capturing the
+            outbound request with the flag both ways on a scanned PDF and a text
+            PDF: no image part, no image_url, no base64, either way. So it was a
+            control a prospect could flip that provably changed nothing, and its
+            own help text had to admit as much in a sales demo.
+
+            The request plumbing is intact (`includePageImages` in lib/api.ts),
+            so restoring this is a Toggle plus one piece of state once the SDK
+            honours the flag. See docs/sdk-defects/sdk-047-*.md. */}
       </PanelSection>
     </div>
   );

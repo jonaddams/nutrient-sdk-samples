@@ -59,17 +59,18 @@ actually see it, which is not the same as ordered by effort.
 1. ~~**SDK-045 write-up (item 7).**~~ **DONE 2026-08-06** — and the mechanism turned out to
    be different from what item 7 claimed. See `docs/sdk-defects/`. It also turned up
    **SDK-046**, which affects the shipped `/python-sdk/document-to-markdown` sample.
-   Filing the two tickets is now **item 10** below, deferred deliberately.
+   Filing all four tickets is now **item 10** below, deferred deliberately.
 2. ~~**Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)**.~~
    **DONE 2026-08-06** (#52). Details under items 6 and 9.
-3. **Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**
-   ← **next up, and it needs a call from Jon** before anything can be built.
-4. **Whitespace pass (item 5)** — Jon's own ask, still outstanding.
+3. ~~**Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**~~
+   **DONE 2026-08-06.** Toggle removed (Jon's call); both no-ops written up as SDK-047/048.
+   Only the *filing* remains, which is item 10.
+4. **Whitespace pass (item 5)** — Jon's own ask, still outstanding. ← **next up.**
 5. **Scan signalling and the Claims label (item 6)** — need a wording call from Jon before
    anything can be built.
 6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
    the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
-7. **File SDK-045 and SDK-046 upstream (item 10)** — blocked on a Jira permission, not on
+7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
    the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
 The seven disabled `SOON` rail entries are the standing direction, not a loose end — see
@@ -339,21 +340,32 @@ selects on them.
 
 ### 9. Multimodal toggle, the loading state, and two unfiled SDK defects
 
-**The Multimodal toggle now honestly describes a control that does nothing.** Its text was
-corrected on 2026-08-05 to say the SDK does not currently send page images, because a request
-capture proved it — see the `include_page_images` entry below in the facts section. That leaves
-a live control whose only effect is to set a flag the SDK ignores. Decide whether it earns its
-place in a prospect-facing panel, or whether it should go until the SDK sends images. It is
-wired end to end, so removing it is UI-only; `DocStrip.test.tsx`-style assertions do not pin it,
-but a `StructuredConfig` test does reference the toggle.
+~~**The Multimodal toggle honestly describes a control that does nothing.**~~
+**REMOVED 2026-08-06**, decided with Jon. A control a prospect can flip that provably changes
+nothing is worse than its absence, and its help text had to admit the SDK ignores the flag —
+an odd thing to put in front of a prospect.
 
-**Two SDK no-ops are still unfiled**, both measured here and both in the same family as
-SDK-037's no-op `VisionFeatures.KEY_VALUE_REGION`:
+**Do not re-add it without checking `include_page_images` is honoured.** The request plumbing
+(`includePageImages` in `lib/api.ts`, sent explicitly as `false`) is intact, so restoring it is
+a `Toggle` plus one piece of state. `StructuredConfig.test.tsx` now asserts the toggle is
+**absent**, in the same spirit as `DocStrip.test.tsx`'s badge test, so re-adding it is a
+decision that also updates a test rather than a reflex. Written up as
+[SDK-047](sdk-defects/sdk-047-include-page-images-noop.md).
 
-- `include_page_images` sends no images on `extract_structured` (byte-identical requests with
-  the flag both ways, including on a scanned PDF).
-- `groundingScore` comes back null for Bedrock model ids even though the endpoint returns
-  `logprobs`. OpenAI returns 0.95 on the same document.
+~~**Two SDK no-ops are still unfiled.**~~ **Both written up 2026-08-06** — filing is item 10.
+Both were re-measured that day rather than carried over from notes, and the second turned out
+to be sharper than the note said:
+
+- **[SDK-047](sdk-defects/sdk-047-include-page-images-noop.md)** — `include_page_images` sends
+  no image. Byte-identical requests (same SHA-256) with the flag both ways, on a text PDF and a
+  scanned one.
+- **[SDK-048](sdk-defects/sdk-048-bedrock-null-grounding.md)** — **the whole
+  `confidenceComponents` object is `null`** for Bedrock ids, not just its score, while
+  `match: "id_match"` and the bbox are present. Two experiments narrow it to a gating bug
+  rather than missing data: `gpt-4.1` takes the *same* request branch as the Bedrock ids and
+  gets the *richest* block of all, and Bedrock's own response carries 47 well-formed logprobs
+  entries. Because it is `null` rather than a dict, naive access raises — `parse_structured()`
+  only survives it via `(meta.get("confidenceComponents") or {})`.
 
 ~~**The provider dropdown has no distinct loading state.**~~ **DONE 2026-08-06.** While the
 fetch is in flight the select now carries `aria-busy`, a `Loading providers…` placeholder
@@ -369,7 +381,7 @@ of which there is none while loading. There is a test pinning this specifically.
 The Run gating that created the flash stays: it prevents an early click reaching a provider
 with no credentials and returning an opaque 500.
 
-### 10. File SDK-045 and SDK-046 upstream — blocked on a Jira permission
+### 10. File SDK-045 through SDK-048 upstream — blocked on a Jira permission
 
 **Deferred by Jon 2026-08-06.** Nothing about the write-ups is outstanding; this is purely
 the filing step.
@@ -377,8 +389,10 @@ the filing step.
 Both ticket bodies are finished and ready to paste, in NAPY house style (metadata table,
 self-contained repro, observed output, root-cause hypothesis, suggested fix, related):
 
-- `docs/sdk-defects/napy-ticket-sdk-045.md`
-- `docs/sdk-defects/napy-ticket-sdk-046.md`
+- `docs/sdk-defects/napy-ticket-sdk-045.md` — text destroyed under a rotated stamp
+- `docs/sdk-defects/napy-ticket-sdk-046.md` — markdown/HTML word loss at column boundaries
+- `docs/sdk-defects/napy-ticket-sdk-047.md` — `include_page_images` no-op
+- `docs/sdk-defects/napy-ticket-sdk-048.md` — `confidenceComponents` null on Bedrock ids
 
 File each as **NAPY / Bug / priority High**, labels `python-sdk` `sdk-defect-hunting`
 `vision` — matching NAPY-15/16/17. Then write the returned issue key into the header of
