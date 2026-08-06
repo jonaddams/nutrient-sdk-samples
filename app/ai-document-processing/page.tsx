@@ -1,14 +1,5 @@
-import { SamplesIndex, type Sample } from "@/app/_components/SamplesIndex";
-
-const samples: Sample[] = [
-  {
-    name: "Invoice Management",
-    category: "Extraction",
-    description:
-      "Automatically classify and extract data from invoices, receipts, and purchase orders with built-in validation",
-    path: "/ai-document-processing/invoices",
-  },
-];
+import { SamplesIndex } from "@/app/_components/SamplesIndex";
+import { samples } from "./samples";
 
 export default function AIDocumentProcessingHome() {
   return (
