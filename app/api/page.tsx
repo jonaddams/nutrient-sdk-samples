@@ -1,51 +1,5 @@
-import { type Sample, SamplesIndex } from "@/app/_components/SamplesIndex";
-
-const samples: Sample[] = [
-  {
-    name: "Document Generation Pipeline",
-    category: "Generation",
-    description:
-      "Generate a contract from form data, auto-place signature fields by content with the DWS API (HTML→PDF, locate, redact, add fields), then sign it in the viewer.",
-    path: "/api/document-generation-pipeline",
-  },
-  {
-    name: "Web SDK Digital Signature (DWS)",
-    category: "Signatures",
-    description:
-      "Sign documents directly in the Nutrient Web SDK viewer using DWS API for secure, in-browser digital signatures",
-    path: "/api/sign-document-web-sdk-dws",
-  },
-  {
-    name: "DWS Document Signing",
-    category: "Signatures",
-    description:
-      "Upload and sign PDF documents server-side using DWS Processor API with visible or invisible signatures",
-    path: "/api/sign-document-dws",
-  },
-  {
-    name: "Markdown Comparison",
-    category: "Comparison",
-    description:
-      "Compare documents using Nutrient DWS API to convert PDFs to Markdown, preserving semantic structure for accurate cross-page comparison",
-    path: "/api/markdown-comparison",
-    wip: true,
-  },
-  {
-    name: "HTML Comparison",
-    category: "Comparison",
-    description:
-      "Compare documents using Nutrient DWS API to convert PDFs to HTML, preserving semantic structure for accurate cross-page comparison",
-    path: "/api/html-comparison",
-    wip: true,
-  },
-  {
-    name: "Text File Viewer",
-    category: "Conversion",
-    description:
-      "View .txt, .csv, and .xml files in the Nutrient viewer by converting them to styled HTML and then to PDF via DWS API",
-    path: "/api/text-viewer",
-  },
-];
+import { SamplesIndex } from "@/app/_components/SamplesIndex";
+import { samples } from "./samples";
 
 const categories = [
   "All",
