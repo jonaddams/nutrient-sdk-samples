@@ -43,7 +43,7 @@ export function SampleFrame({
         className="shell"
         style={{
           paddingTop: "var(--space-6)",
-          paddingBottom: "var(--space-8)",
+          paddingBottom: "var(--space-7)",
           ...(wide ? { maxWidth: 1800 } : null),
         }}
       >

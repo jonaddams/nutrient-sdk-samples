@@ -231,7 +231,7 @@ export default function OcrPage() {
         className="shell"
         style={{
           paddingTop: "var(--space-6)",
-          paddingBottom: "var(--space-8)",
+          paddingBottom: "var(--space-7)",
           maxWidth: 1800,
         }}
       >

@@ -69,7 +69,7 @@ export default function CrossPageTextComparisonPage() {
         className="shell"
         style={{
           paddingTop: "var(--space-6)",
-          paddingBottom: "var(--space-8)",
+          paddingBottom: "var(--space-7)",
         }}
       >
         {/* Features */}
