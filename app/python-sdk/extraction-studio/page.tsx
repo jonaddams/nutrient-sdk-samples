@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
@@ -48,6 +48,16 @@ export default function ExtractionStudio() {
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
   const [showRegions, setShowRegions] = useState(true);
 
+  // Read inside a request's continuation to detect a feature/document switch
+  // that happened while the request was in flight — a plain closure over
+  // `feature`/`doc` would only ever see the values from the moment the
+  // request started. Neither ref causes a re-render; both are written on
+  // every render, mirroring `pressRef` in DocViewer.tsx.
+  const featureRef = useRef(feature);
+  featureRef.current = feature;
+  const docRef = useRef(doc);
+  docRef.current = doc;
+
   // The document list is a code manifest, not a fetch — the backend is
   // stateless and Next serves these from public/. Nothing to load, so no
   // loading state and no fallback list.
@@ -63,10 +73,13 @@ export default function ExtractionStudio() {
   // inline call here would re-fire that effect every render and loop forever.
   const schemaPreset = useMemo(() => presetFor(category), [category]);
 
-  // A new document invalidates everything derived from the previous one.
+  // A new document invalidates everything derived from the previous one —
+  // structured AND OCR results alike, or the previous document's boxes get
+  // drawn over the new one's page at the previous document's coordinates.
   const selectDoc = (docId: string) => {
     setDoc(docId);
     setResult(null);
+    setOcrResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -74,8 +87,8 @@ export default function ExtractionStudio() {
 
   // Auto-selecting the category's first document keeps the viewer from showing
   // a document from a different category than the active tab. Routing through
-  // selectDoc also clears result/activeIndex/error, so citations from the
-  // previous document cannot survive a category change.
+  // selectDoc also clears result/ocrResult/activeIndex/error, so citations
+  // from the previous document cannot survive a category change.
   const selectCategory = (next: string) => {
     setCategory(next);
     const first = DOCUMENTS.find((d) => d.category === next);
@@ -128,21 +141,41 @@ export default function ExtractionStudio() {
   const currentFeature = FEATURES.find((f) => f.id === feature);
 
   const handleRun = async (req: StructuredRequest) => {
+    // Captured at request start, compared against the refs (which track the
+    // LATEST feature/doc) once the request resolves. Neither the rail nor
+    // the doc strip is disabled while busy, so the user can switch either
+    // mid-request — and a response that lands after that switch must not
+    // repopulate state the switch already cleared.
+    const requestFeature = feature;
+    const requestDocId = doc;
     setBusy(true);
     setError(null);
     setActiveIndex(null);
     try {
       const envelope = await extractStructured(req);
-      setResult(envelope);
-      setTab("results");
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setResult(envelope);
+        setTab("results");
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Extraction failed");
-      // Leaving the previous result rendered under the error callout shows
-      // stale data as current — and after a document switch those citations
-      // belong to a different document entirely.
-      setResult(null);
-      setActiveIndex(null);
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setError(e instanceof Error ? e.message : "Extraction failed");
+        // Leaving the previous result rendered under the error callout shows
+        // stale data as current — and after a document switch those citations
+        // belong to a different document entirely.
+        setResult(null);
+        setActiveIndex(null);
+      }
     } finally {
+      // Unconditional: Run is disabled while busy, so at most one request is
+      // ever in flight, and it just settled — nothing else is waiting on
+      // this flag.
       setBusy(false);
     }
   };
@@ -273,14 +306,30 @@ export default function ExtractionStudio() {
                   filename={current.filename}
                   runSignal={runSignal}
                   onRun={async (req) => {
+                    // Same stale-response guard as handleRun above: a
+                    // feature/document switch mid-request must not
+                    // repopulate what that switch already cleared.
+                    const requestFeature = feature;
+                    const requestDocId = doc;
                     setBusy(true);
                     setError(null);
                     setOcrResult(null);
                     try {
-                      setOcrResult(await extractOcr(req));
-                      setTab("results");
+                      const ocr = await extractOcr(req);
+                      if (
+                        featureRef.current === requestFeature &&
+                        docRef.current === requestDocId
+                      ) {
+                        setOcrResult(ocr);
+                        setTab("results");
+                      }
                     } catch (e) {
-                      setError(e instanceof Error ? e.message : "OCR failed");
+                      if (
+                        featureRef.current === requestFeature &&
+                        docRef.current === requestDocId
+                      ) {
+                        setError(e instanceof Error ? e.message : "OCR failed");
+                      }
                     } finally {
                       setBusy(false);
                     }

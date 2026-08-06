@@ -11,6 +11,7 @@ import {
   type IndexedCitation,
   indexCitations,
   type PaintedStyle,
+  resolveHex,
   rgbToHex,
   styleFor,
 } from "../citations";
@@ -65,22 +66,20 @@ describe("indexCitations", () => {
   });
 });
 
-describe("per-citation hex fallback", () => {
-  // The actual `ownHex ?? hex` fallback lives inline in
-  // useCitationAnnotations.ts (applyEmphasis / the sync effect), where it
-  // decides which colour each citation's annotation gets painted with. That
-  // hook drives a real Nutrient viewer Instance, so exercising it directly
-  // would mean mocking the SDK's annotation/create/update surface — out of
-  // proportion for what is a one-line fallback. Task 5 only ever exercised
-  // diffStyles's ability to DETECT a colour change; nothing asserted that a
-  // citation's own hex actually wins the fallback that feeds it. This
-  // reproduces that exact expression — `citation.hex ?? componentHex` — against
-  // IndexedCitation values and confirms it through appearance(), the one place
-  // a resolved hex turns into paint.
+describe("resolveHex", () => {
+  // `resolveHex` IS the fallback useCitationAnnotations.ts calls at all three
+  // sites (the emphasis restyle, and both bookkeeping writes in the sync
+  // effect's citation-build loop) — not a copy of its expression. An earlier
+  // version of this test defined its own `c.hex ?? componentHex` and asserted
+  // against that, which would keep passing even if the real precedence in the
+  // hook were flipped to `hex ?? ownHex`. Testing the actual export closes
+  // that gap; the hook itself still isn't under test here — doing that would
+  // mean mocking the Nutrient viewer Instance the hook drives (annotation
+  // create/update), out of proportion for what is a one-line fallback — but
+  // every call site now routes through this one function, so this test can't
+  // drift from the real behaviour the way the hand-copied version could.
   const componentHex = DEFAULT_CITATION_HEX; // e.g. the citation-colour picker
   const ownHex = "#ef4444"; // e.g. OCR's low-confidence red
-
-  const resolvedHex = (c: IndexedCitation) => c.hex ?? componentHex;
 
   test("a citation's own hex beats the component-level colour", () => {
     const withOwnHex: IndexedCitation = {
@@ -88,19 +87,19 @@ describe("per-citation hex fallback", () => {
       citation: cite(0),
       hex: ownHex,
     };
-    expect(resolvedHex(withOwnHex)).toBe(ownHex);
-    expect(resolvedHex(withOwnHex)).not.toBe(componentHex);
-    expect(appearance("base", resolvedHex(withOwnHex)).fill).toEqual(
-      hexToRgb(ownHex),
-    );
+    expect(resolveHex(withOwnHex, componentHex)).toBe(ownHex);
+    expect(resolveHex(withOwnHex, componentHex)).not.toBe(componentHex);
+    expect(
+      appearance("base", resolveHex(withOwnHex, componentHex)).fill,
+    ).toEqual(hexToRgb(ownHex));
   });
 
   test("a citation with no own hex falls back to the component-level colour", () => {
     const withoutOwnHex: IndexedCitation = { fieldIndex: 1, citation: cite(1) };
-    expect(resolvedHex(withoutOwnHex)).toBe(componentHex);
-    expect(appearance("base", resolvedHex(withoutOwnHex)).fill).toEqual(
-      hexToRgb(componentHex),
-    );
+    expect(resolveHex(withoutOwnHex, componentHex)).toBe(componentHex);
+    expect(
+      appearance("base", resolveHex(withoutOwnHex, componentHex)).fill,
+    ).toEqual(hexToRgb(componentHex));
   });
 });
 

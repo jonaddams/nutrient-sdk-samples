@@ -119,6 +119,21 @@ export type IndexedCitation = {
   hex?: string;
 };
 
+// A citation's own hex wins over the component-level fallback. OCR gives
+// every region its own confidence colour; structured extraction sets none
+// and falls back to the picker's value. Extracted so `useCitationAnnotations`
+// has exactly one place to call for this instead of three separate
+// `ownHex ?? hex` expressions — inlining it three times is how a later edit
+// flips precedence at one call site and not the others without anyone
+// noticing, and how a test of a hand-copied expression can pass while the
+// real code has drifted from it.
+export function resolveHex(
+  citation: IndexedCitation,
+  fallback: string,
+): string {
+  return citation.hex ?? fallback;
+}
+
 // Carries each citation's OWN field index. Compacting to a bare array and
 // indexing into it later silently misaligns as soon as one field has no
 // citation — the bug fixed in 77fa9c1.

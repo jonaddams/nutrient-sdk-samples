@@ -1038,6 +1038,42 @@
   box-shadow: inset 2px 0 0 var(--accent);
 }
 
+/* .ocr-elements is a plain <table>/<tr>/<td>, unlike .field-table's grid-based
+   .field-table-head/.field-row divs above — so it picks up .field-table's
+   border/background on the <table> itself but none of that rule's padding,
+   since that rule targets divs, not <td>. Left unstyled, reading order, type
+   and text ran together with no gap at all: "10paragraphNo 00162". Padding
+   and the border-top mirror .field-row's own values so the two tables read
+   as one system. */
+.studio-shell .ocr-elements td {
+  padding: 7px var(--space-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-sm);
+  vertical-align: baseline;
+}
+
+.studio-shell .ocr-elements tr:first-child td {
+  border-top: 0;
+}
+
+/* Confidence is the one numeric column — right-aligned and non-wrapping, same
+   as .field-row-page/.field-row-parse above, so the dot and percentage stay
+   together on one line instead of the dot wrapping onto its own in a narrow
+   panel. `text-align`, not `display: flex`: this cell is a real <td>, and
+   flex's outer display drops the table-cell box type, breaking the table's
+   column sizing — the dot and text are two inline siblings, so alignment
+   alone is enough. */
+.studio-shell .ocr-elements td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.studio-shell .ocr-elements td:last-child .match-dot {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
 /* ── Rail responsive overrides ─────────────────────────────────────────────
    Stacked layout (<=1024px): .studio-shell becomes display:block, so the rail
    spans full width and the 208px constraint that forced a narrow single column

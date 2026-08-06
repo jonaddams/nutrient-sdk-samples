@@ -148,3 +148,25 @@ test("switching feature clears the previous feature's results", async () => {
   );
   expect(screen.queryByText("Invoice")).toBeNull();
 });
+
+// Critical, reproduced by hand: OCR "Vandelay Industries", switch the
+// document to "Lumen", reopen Results — Vandelay's elements (and their
+// citations, drawn at Vandelay's coordinates) were still on screen because
+// selectDoc cleared `result` but not `ocrResult`. selectDoc also flips the
+// tab back to "config", which hides the results panel and masks the bug
+// until Results is reopened — so this test reopens it rather than trusting
+// the click-through alone.
+test("switching documents clears OCR results", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+  // selectDoc sends the tab back to "config" — reopen Results rather than
+  // taking the config view's silence as proof the results actually cleared.
+  fireEvent.click(screen.getByRole("button", { name: "Results" }));
+  expect(screen.queryByText("Invoice")).toBeNull();
+});

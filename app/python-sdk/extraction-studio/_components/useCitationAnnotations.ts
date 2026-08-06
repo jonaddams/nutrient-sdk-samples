@@ -7,6 +7,7 @@ import {
   fracToRect,
   type IndexedCitation,
   type PaintedStyle,
+  resolveHex,
   styleFor,
 } from "../lib/citations";
 import { getNutrientViewer } from "../lib/nutrient";
@@ -94,12 +95,10 @@ async function applyEmphasis(
   // fails to build. Harmless (a discarded `.map`/`.filter` over a small list),
   // but worth knowing so it isn't mistaken for a leak or a bug on rediscovery.
   const next = new Map<number, PaintedStyle>();
-  for (const { fieldIndex, hex: ownHex } of citations) {
-    next.set(fieldIndex, {
-      style: styleFor(fieldIndex, activeIndex),
-      // A citation's own hex wins. OCR gives every region a confidence colour;
-      // structured extraction sets none and falls back to the picker's value.
-      hex: ownHex ?? hex,
+  for (const entry of citations) {
+    next.set(entry.fieldIndex, {
+      style: styleFor(entry.fieldIndex, activeIndex),
+      hex: resolveHex(entry, hex),
     });
   }
   const changed = diffStyles(styles, next);
@@ -284,7 +283,7 @@ export function useCitationAnnotations(opts: {
         const skipped: number[] = [];
         for (const entry of citations) {
           try {
-            const { fieldIndex, citation, hex: ownHex } = entry;
+            const { fieldIndex, citation } = entry;
             const info = instance.pageInfoForIndex(citation.page);
             // See the matching guard in applyEmphasis: `pageInfoForIndex` can
             // return null for an out-of-range page. Throwing here is caught
@@ -299,7 +298,7 @@ export function useCitationAnnotations(opts: {
             // and then repainted by the emphasis effect.
             const style = appearance(
               styleFor(fieldIndex, selected),
-              ownHex ?? citationHex,
+              resolveHex(entry, citationHex),
             );
             built.push(
               new NutrientViewer.Annotations.RectangleAnnotation({
@@ -362,14 +361,15 @@ export function useCitationAnnotations(opts: {
           // `created` is positional against `built`, not the original
           // `citations` — a skipped citation would otherwise shift every
           // later index and map the wrong annotation id to the wrong field.
-          const { fieldIndex, hex: ownHex } = buildable[i];
+          const entry = buildable[i];
+          const { fieldIndex } = entry;
           idToField.current.set(annotation.id, fieldIndex);
           fieldToAnnotation.current.set(fieldIndex, annotation);
           styles.current.set(fieldIndex, {
             style: styleFor(fieldIndex, selected),
             // Must match the hex actually used to build the annotation above,
             // or the very next diff would see a mismatch and repaint it.
-            hex: ownHex ?? citationHex,
+            hex: resolveHex(entry, citationHex),
           });
         });
 
