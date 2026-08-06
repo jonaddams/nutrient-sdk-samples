@@ -298,6 +298,48 @@ test("mounting with a given runSignal does not call onRun", () => {
   expect(onRun).not.toHaveBeenCalled();
 });
 
+// Asserts an ABSENCE, deliberately — same reasoning as DocStrip's
+// badge-is-absent test. The Multimodal toggle was removed on 2026-08-06 because
+// `include_page_images` is a no-op on extract_structured() (re-verified that day
+// by capturing the request with the flag both ways: no image reaches the wire).
+// Re-adding it should be a considered decision that also updates this test, not
+// a reflex. See docs/sdk-defects/sdk-047-*.md.
+test("offers no Multimodal toggle, because the SDK ignores the flag", () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  expect(screen.queryByLabelText("Multimodal")).toBeNull();
+  expect(screen.queryByText("Multimodal")).toBeNull();
+  // The toggles that DO something are still there. ("Show citations" is
+  // StructuredResults' toggle, not this panel's — this one is "Include
+  // citations".)
+  expect(screen.getByLabelText("Include citations")).toBeInTheDocument();
+  expect(screen.getByLabelText("Strict schema")).toBeInTheDocument();
+});
+
+test("still sends includePageImages: false, so the wire request is unchanged", () => {
+  // The request plumbing stays intact so restoring the control is a Toggle plus
+  // one piece of state. This pins that removing the UI did not change the wire.
+  const onRun = vi.fn();
+  const props = {
+    docPath: "/documents/doc-1.pdf",
+    filename: "doc-1.pdf",
+    onRun,
+    schemaPreset: invoices,
+  };
+  const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
+  rerender(<StructuredConfig {...props} runSignal={1} />);
+  expect(onRun).toHaveBeenCalledWith(
+    expect.objectContaining({ includePageImages: false }),
+  );
+});
+
 test("incrementing runSignal calls onRun exactly once with the current config", () => {
   const onRun = vi.fn();
   const { rerender } = render(
