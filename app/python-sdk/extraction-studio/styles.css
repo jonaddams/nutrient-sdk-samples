@@ -806,6 +806,30 @@
   line-height: 1.3;
 }
 
+/* Scan marker. A CHILD of .doc-chip-name, never a sibling: as a sibling it was a
+   flex item and took width from labels that already wrap in the 208px column,
+   which is why the original badge was dropped in #43. Inside the name it is part
+   of the same text flow, so it wraps with the label and costs no fixed width.
+
+   `white-space: nowrap` on the marker only — the label around it still wraps
+   freely; this just stops "scan" itself breaking across lines. */
+.studio-shell .doc-chip-scan {
+  margin-left: 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+/* Legible against the tinted background of the selected chip, which also bumps
+   the label to 600 — without this the marker inherits that weight and stops
+   reading as metadata. */
+.studio-shell .doc-chip[aria-pressed="true"] .doc-chip-scan {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
 /* The empty state sits in the rail now, so it needs the column's padding. */
 .studio-shell .doc-strip .doc-strip-empty {
   padding: 8px var(--space-3);
