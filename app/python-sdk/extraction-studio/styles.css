@@ -1009,6 +1009,25 @@
   outline-offset: 2px;
 }
 
+/* Extracted text and JSON. Scrolls inside itself so a long document cannot make
+   the panel — or the page — scroll horizontally. */
+.studio-shell .ocr-text {
+  max-height: 420px;
+  overflow: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--bg-elev);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.studio-shell .ocr-elements tr {
+  cursor: pointer;
+}
+
 /* ── Rail responsive overrides ─────────────────────────────────────────────
    Stacked layout (<=1024px): .studio-shell becomes display:block, so the rail
    spans full width and the 208px constraint that forced a narrow single column
