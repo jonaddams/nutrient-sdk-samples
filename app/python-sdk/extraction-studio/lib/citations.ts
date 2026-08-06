@@ -110,7 +110,14 @@ export function styleFor(
   return fieldIndex === activeIndex ? "active" : "dimmed";
 }
 
-export type IndexedCitation = { fieldIndex: number; citation: Citation };
+export type IndexedCitation = {
+  fieldIndex: number;
+  citation: Citation;
+  /** Overrides the component-level citationHex for THIS box only. Used by OCR to
+   *  tint each region by its confidence. Absent for structured extraction, where
+   *  one user-chosen colour applies to every citation. */
+  hex?: string;
+};
 
 // Carries each citation's OWN field index. Compacting to a bare array and
 // indexing into it later silently misaligns as soon as one field has no
