@@ -27,15 +27,48 @@ test("the picker is a real colour input, not a stand-in button", () => {
 
 test("the picker shows an icon rather than a fifth colour swatch", () => {
   // A coloured square beside four preset squares reads as another preset. The
-  // regression this guards is someone re-tinting it with the current value.
+  // regression this guards is someone tinting the BUTTON with the current
+  // value — the corner dot below is the sanctioned way to show the colour.
   const { container } = render(
     <CitationColor value={AMBER} onChange={() => {}} />,
   );
-  const picker = container.querySelector(".citation-picker");
+  const picker = container.querySelector<HTMLElement>(".citation-picker");
   expect(picker).not.toBeNull();
   expect(picker?.querySelector("svg")).not.toBeNull();
   // decorative: the input carries the accessible name, so the icon must not
   expect(picker?.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  // the button itself stays untinted
+  expect(picker?.style.background).toBe("");
+});
+
+test("a corner dot displays the current colour, including a custom one", () => {
+  // Why this exists: a hand-picked colour used to appear nowhere but the hex
+  // field, because the picker button refuses to tint itself. The dot is the
+  // compromise — it shows the value without turning the control into a swatch.
+  const { container, rerender } = render(
+    <CitationColor value={AMBER} onChange={() => {}} />,
+  );
+  const dot = () => container.querySelector<HTMLElement>(".citation-dot");
+  expect(dot()).not.toBeNull();
+  expect(dot()).toHaveStyle({ background: AMBER });
+  // decorative — the hex field already names the value for screen readers
+  expect(dot()).toHaveAttribute("aria-hidden", "true");
+
+  // The case the item was raised for: a colour matching no preset.
+  rerender(<CitationColor value="#123456" onChange={() => {}} />);
+  expect(dot()).toHaveStyle({ background: "#123456" });
+});
+
+test("the dot lives inside the picker, so it cannot steal the click", () => {
+  // The invisible <input type="color"> covers the button and must keep
+  // receiving the click. The dot is a child of the same label (and
+  // pointer-events: none in CSS), not a sibling laid over it.
+  const { container } = render(
+    <CitationColor value={CYAN} onChange={() => {}} />,
+  );
+  const picker = container.querySelector(".citation-picker");
+  expect(picker?.querySelector(".citation-dot")).not.toBeNull();
+  expect(picker?.querySelector('input[type="color"]')).not.toBeNull();
 });
 
 test("marks the picker as custom only when no preset matches", () => {
