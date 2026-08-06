@@ -155,9 +155,14 @@ and PDF→HTML conversion as well — both licensed features in their own right.
 The synthetic pair does *not* reproduce the markdown/HTML half (both keep the date), so
 those pipelines are not identical to the Vision one. The real worksheet's markdown output
 also drops words unrelated to the stamp — `EMERGENCY` from the title,
-`Archive Dept | System Registry:` from the following line, `NAME:` after `PATIENT` —
-which looks like a **separate and broader** text-loss problem in PDF→Markdown rather than
-this defect. Worth its own investigation; deliberately not folded into this one.
+`Archive Dept | System Registry:` from the following line, `NAME:` after `PATIENT`.
+
+That turned out to be a **separate and much broader defect**, now written up as
+**[SDK-046](sdk-046-markdown-column-word-loss.md)**: markdown/HTML conversion drops words
+at inferred table column boundaries, on 16 of this repo's 39 sample documents, up to 40%
+of a document's tokens. It is not this defect — the Vision IR carries the worksheet's
+prose paragraph complete while markdown drops seven words from it — and the two are
+filed separately.
 
 ## Reproducing
 
