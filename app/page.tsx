@@ -15,7 +15,7 @@ const SDKS: SdkEntry[] = [
     num: "01",
     title: "Web SDK",
     desc: "In-browser PDF viewing, annotations, forms, signatures, redaction, and comparison.",
-    foot: "33 samples",
+    foot: "39 samples",
   },
   {
     id: "document-engine",
@@ -44,7 +44,7 @@ const SDKS: SdkEntry[] = [
     num: "05",
     title: "Python SDK",
     desc: "Document conversion, redaction, form fill, and template generation.",
-    foot: "7 samples",
+    foot: "17 samples",
   },
   {
     id: "dotnet-sdk",
@@ -58,14 +58,14 @@ const SDKS: SdkEntry[] = [
     num: "07",
     title: "Nutrient DWS API",
     desc: "Document Web Services — signing, conversion, and comparison via REST.",
-    foot: "5 samples",
+    foot: "6 samples",
   },
   {
     id: "document-authoring-sdk",
     num: "08",
     title: "Document Authoring SDK",
     desc: "Programmatic document generation with templates, variables, and live preview.",
-    foot: "3 samples",
+    foot: "4 samples",
   },
 ];
 
