@@ -155,6 +155,11 @@ export function StructuredConfig({
     setModel(undefined);
   };
 
+  // Distinct from `providersFailed`: the fetch is still in flight. Both disable
+  // the select, but they say different things, and conflating them is what made
+  // loading look like breakage.
+  const providersLoading = providers === null && !providersFailed;
+
   const selected = providers?.find((p) => p.id === provider);
   // Only providers offering a real choice get a picker; the others take no model
   // parameter at all, and the backend rejects one with a 400.
@@ -273,16 +278,32 @@ export function StructuredConfig({
           help={
             providersFailed
               ? "Could not reach the backend, so the provider list is unavailable."
-              : "Which model backend runs the extraction."
+              : providersLoading
+                ? "Checking which providers this backend can serve…"
+                : "Which model backend runs the extraction."
           }
         >
+          {/* Three states, all distinguishable. Before this, loading and ready
+              shared the same help text and the select was simply empty and
+              disabled, so the first thing a prospect saw was a flash of an empty
+              box that looked like a broken control. Failure was already
+              distinguishable; loading was not.
+
+              The placeholder option carries `provider`'s current value so the
+              controlled <select> keeps a matching option throughout — an option
+              with any other value would make React fall back to rendering the
+              first one, and there is none. */}
           <select
             id="cfg-provider"
             aria-label="Provider"
             value={provider}
-            disabled={providersFailed || providers === null}
+            disabled={providersFailed || providersLoading}
+            aria-busy={providersLoading || undefined}
             onChange={(e) => changeProvider(e.target.value)}
           >
+            {providersLoading ? (
+              <option value={provider}>Loading providers…</option>
+            ) : null}
             {(providers ?? []).map((p) => (
               <option key={p.id} value={p.id}>
                 {p.label}

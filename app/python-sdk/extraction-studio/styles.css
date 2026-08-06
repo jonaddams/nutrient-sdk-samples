@@ -890,6 +890,28 @@
     0 0 0 4px var(--ink);
 }
 
+/* Shows WHICH colour the picker currently holds. Before this, a custom colour
+   appeared nowhere but the hex field, because the button above refuses to tint
+   itself. A 7px dot in the bottom-right corner is small enough not to reinstate
+   the "fifth preset" reading, and sits where the dropper glyph has no ink.
+
+   Two rings, not one: the inner --surface border punches a gap out of the
+   button so the dot never blends into it, and the outer --line-strong shadow
+   keeps a pale value (white, or the light yellow preset) from disappearing.
+   pointer-events: none so the whole button stays one click target — the
+   invisible input below must keep receiving it. */
+.studio-shell .citation-dot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  pointer-events: none;
+}
+
 /* The real input, covering the button and invisible. Keeping it a live
    <input type="color"> is what preserves the OS picker and system eyedropper —
    do not swap it for a click handler. */
