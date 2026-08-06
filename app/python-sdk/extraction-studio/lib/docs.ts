@@ -41,8 +41,19 @@ export type DocSummary = {
  * labels wasted the 208px rail column on a word the user just chose. Other
  * categories keep their document nouns because they are not redundant
  * ("Meridian income statement" under Finance, "Straight bill of lading" under
- * Logistics). Claims still reads "Northgate auto claim (FNOL)" — same
- * redundancy, left alone pending a call on the wording.
+ * Logistics).
+ *
+ * Claims followed suit on 2026-08-06 (Jon's call): "Northgate auto claim (FNOL)"
+ * became "Northgate auto (FNOL)". Only the redundant "claim" went — "auto" still
+ * distinguishes it from a property claim, and FNOL is real claims jargon that a
+ * prospect in that vertical reads as a signal rather than noise.
+ *
+ * Every label is now an IDENTITY, never a property. "Scanned" used to break that
+ * rule: it named this document by the one attribute it shares with three others
+ * (Lumen, Westbridge and the bill of lading are all scans too), so it read as a
+ * category while its neighbours read as names. It is now "Vandelay Industries",
+ * after the only proper noun the page carries. Scan-ness is signalled separately
+ * in DocStrip, driven off `hasTextLayer`.
  */
 export const DOCUMENTS: DocSummary[] = [
   {
@@ -63,7 +74,7 @@ export const DOCUMENTS: DocSummary[] = [
   },
   {
     docId: "scanned-invoice",
-    label: "Scanned",
+    label: "Vandelay Industries",
     path: "/documents/scanned-invoice.pdf",
     filename: "scanned-invoice.pdf",
     hasTextLayer: false,
@@ -119,7 +130,7 @@ export const DOCUMENTS: DocSummary[] = [
   },
   {
     docId: "northgate-auto-claim-fnol",
-    label: "Northgate auto claim (FNOL)",
+    label: "Northgate auto (FNOL)",
     path: "/documents/northgate-auto-claim-fnol.pdf",
     filename: "northgate-auto-claim-fnol.pdf",
     hasTextLayer: true,
