@@ -22,7 +22,7 @@ import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
 import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
-import { extractOcr, type OcrResult } from "./lib/ocr";
+import { extractOcr, type OcrRequest, type OcrResult } from "./lib/ocr";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -139,6 +139,39 @@ export default function ExtractionStudio() {
   const viewerShow = feature === "structured" ? showCitations : showRegions;
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
+
+  // Mirrors handleRun below: same busy/error/ref-guard/finally shape, because
+  // the two used to be hand-maintained copies (one here, one inline in the
+  // OcrConfig `onRun` prop) — the inline copy cleared everything EXCEPT
+  // activeIndex, which is exactly how a stale selection survived an OCR
+  // re-run and dimmed every box via styleFor(fieldIndex, activeIndex).
+  const handleOcrRun = async (req: OcrRequest) => {
+    const requestFeature = feature;
+    const requestDocId = doc;
+    setBusy(true);
+    setError(null);
+    setActiveIndex(null);
+    setOcrResult(null);
+    try {
+      const ocr = await extractOcr(req);
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setOcrResult(ocr);
+        setTab("results");
+      }
+    } catch (e) {
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setError(e instanceof Error ? e.message : "OCR failed");
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const handleRun = async (req: StructuredRequest) => {
     // Captured at request start, compared against the refs (which track the
@@ -305,35 +338,7 @@ export default function ExtractionStudio() {
                   docPath={current.path}
                   filename={current.filename}
                   runSignal={runSignal}
-                  onRun={async (req) => {
-                    // Same stale-response guard as handleRun above: a
-                    // feature/document switch mid-request must not
-                    // repopulate what that switch already cleared.
-                    const requestFeature = feature;
-                    const requestDocId = doc;
-                    setBusy(true);
-                    setError(null);
-                    setOcrResult(null);
-                    try {
-                      const ocr = await extractOcr(req);
-                      if (
-                        featureRef.current === requestFeature &&
-                        docRef.current === requestDocId
-                      ) {
-                        setOcrResult(ocr);
-                        setTab("results");
-                      }
-                    } catch (e) {
-                      if (
-                        featureRef.current === requestFeature &&
-                        docRef.current === requestDocId
-                      ) {
-                        setError(e instanceof Error ? e.message : "OCR failed");
-                      }
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
+                  onRun={handleOcrRun}
                 />
               )}
             </div>

@@ -106,16 +106,71 @@ test("names an empty result instead of showing a blank table", () => {
   expect(screen.getByText(/no text found/i)).toBeInTheDocument();
 });
 
-test("shows the markdown view when that format was requested", () => {
-  render(
-    <OcrResults
-      {...props}
-      result={{
-        ...RESULT,
-        markdown: "# Invoice",
-        config: { ...RESULT.config, outputFormat: "markdown" },
-      }}
-    />,
-  );
+// The REAL shape the backend returns for output_format=markdown — a uniform
+// envelope with the same keys as the JSON path, empty on this side, not the
+// JSON-shaped RESULT fixture spread with a markdown string bolted on. That
+// fabrication is exactly how the crash this guards survived eight reviews:
+// the fixture asserted a payload (non-empty textElements alongside markdown)
+// the backend never actually produces. See app/services/extraction.py's
+// extract_text_ocr and tests/test_extraction.py's
+// test_ocr_endpoint_markdown_key_set_matches_json on the backend.
+const MARKDOWN_RESULT: OcrResult = {
+  engine: "OCR",
+  filename: "scan.pdf",
+  statistics: {
+    totalElements: 0,
+    textElements: 0,
+    averageConfidence: 0,
+    lowConfidenceElements: 0,
+  },
+  fullText: "",
+  textElements: [],
+  pages: [],
+  markdown: "# Invoice",
+  config: { languages: "eng", outputFormat: "markdown", tableDetection: true },
+  timingMs: 620,
+};
+
+test("shows the markdown view when that format was requested, without throwing", () => {
+  render(<OcrResults {...props} result={MARKDOWN_RESULT} />);
   expect(screen.getByText("# Invoice")).toBeInTheDocument();
+});
+
+test("the view toggle reflects the actual pane in markdown mode, both ways", () => {
+  render(<OcrResults {...props} result={MARKDOWN_RESULT} />);
+
+  const markdownButton = screen.getByRole("button", { name: "Markdown" });
+  const jsonButton = screen.getByRole("button", { name: "JSON" });
+  expect(markdownButton).toHaveAttribute("aria-pressed", "true");
+  expect(jsonButton).toHaveAttribute("aria-pressed", "false");
+
+  // Clicking JSON must flip which button reads pressed, not just swap the
+  // pane while leaving Markdown stuck at aria-pressed="true" — the bug was
+  // `value={isMarkdown ? "markdown" : view}`, which ignored `view` entirely
+  // whenever isMarkdown was true.
+  fireEvent.click(jsonButton);
+  expect(screen.getByText(/"markdown": "# Invoice"/)).toBeInTheDocument();
+  expect(jsonButton).toHaveAttribute("aria-pressed", "true");
+  expect(markdownButton).toHaveAttribute("aria-pressed", "false");
+
+  fireEvent.click(markdownButton);
+  expect(screen.getByText("# Invoice")).toBeInTheDocument();
+  expect(markdownButton).toHaveAttribute("aria-pressed", "true");
+  expect(jsonButton).toHaveAttribute("aria-pressed", "false");
+});
+
+test("degrades to an empty table instead of throwing if a future backend response omits fields the type declares required", () => {
+  // `as unknown as OcrResult` on purpose: TypeScript would (rightly) reject
+  // this at the call site, but the whole point of the defensive `?? []` /
+  // `?? 0` reads in OcrResults is to survive a payload the type says cannot
+  // happen. Simulating exactly that shape is the only way to test it.
+  const malformed = {
+    ...RESULT,
+    statistics: undefined,
+    textElements: undefined,
+  } as unknown as OcrResult;
+  expect(() =>
+    render(<OcrResults {...props} result={malformed} />),
+  ).not.toThrow();
+  expect(screen.getByText(/no text found/i)).toBeInTheDocument();
 });

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { OcrResult } from "../lib/ocr";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -17,12 +17,18 @@ export function confidenceTone(n: number): "good" | "partial" | "bad" {
 
 /** Fill colour for a region box, so the overlay shows WHERE OCR was unsure.
  *  This is why OcrResults has no colour picker: a user-chosen colour would
- *  fight the confidence tint. */
+ *  fight the confidence tint.
+ *
+ *  Values MUST match `.match-dot.good/.partial/.bad` in styles.css — that is
+ *  the source of truth for these three tones. They used to diverge (this
+ *  function had its own brighter #22c55e/#eab308/#ef4444), so the dot next to
+ *  an element and the box drawn for that same element were visibly different
+ *  greens. */
 export function confidenceHex(n: number): string {
   const tone = confidenceTone(n);
-  if (tone === "good") return "#22c55e";
-  if (tone === "partial") return "#eab308";
-  return "#ef4444";
+  if (tone === "good") return "#4a9d6a";
+  if (tone === "partial") return "#c9a227";
+  return "#c8553c";
 }
 
 export function OcrResults({
@@ -38,19 +44,33 @@ export function OcrResults({
   showRegions: boolean;
   onShowRegionsChange: (value: boolean) => void;
 }) {
-  const [view, setView] = useState("elements");
   const isMarkdown = result.config.outputFormat === "markdown";
-  const empty = result.textElements.length === 0 && !result.markdown;
+  // Seeded from the CURRENT result so a fresh mount already shows the right
+  // pane, then kept in sync below whenever a run flips markdown-ness — this
+  // is a real component instance reused across runs (page.tsx renders it
+  // with no `key`), not remounted per result.
+  const [view, setView] = useState(isMarkdown ? "markdown" : "elements");
+  useEffect(() => {
+    setView(isMarkdown ? "markdown" : "elements");
+  }, [isMarkdown]);
+  // Defensive, not just decorative: a future backend change that narrows this
+  // shape again should degrade (an empty table) rather than blank the whole
+  // panel the way the markdown branch's missing textElements once did.
+  const textElements = result.textElements ?? [];
+  const empty = textElements.length === 0 && !result.markdown;
 
   return (
     <div>
       <div className="results-meta">
-        <span className="mono muted">{(result.timingMs / 1000).toFixed(1)}s</span>
         <span className="mono muted">
-          {result.statistics.textElements} elements
+          {(result.timingMs / 1000).toFixed(1)}s
         </span>
         <span className="mono muted">
-          {Math.round(result.statistics.averageConfidence * 100)}% avg confidence
+          {result.statistics?.textElements ?? 0} elements
+        </span>
+        <span className="mono muted">
+          {Math.round((result.statistics?.averageConfidence ?? 0) * 100)}% avg
+          confidence
         </span>
         <Toggle
           checked={showRegions}
@@ -85,20 +105,29 @@ export function OcrResults({
                     { label: "JSON", value: "raw" },
                   ]
             }
-            value={isMarkdown ? "markdown" : view}
+            // Genuinely `view`, not `isMarkdown ? "markdown" : view` — that
+            // forced value made the segmented control lie about which pane
+            // was showing: clicking JSON switched the pane but the Markdown
+            // button stayed aria-pressed="true", because `value` ignored
+            // `view` whenever isMarkdown was true. `view` is kept in sync
+            // with `isMarkdown` by the effect above, so it is always one of
+            // the options currently on offer.
+            value={view}
             onChange={setView}
           />
 
           {isMarkdown && view !== "raw" ? (
             <pre className="ocr-text mono">{result.markdown}</pre>
           ) : view === "raw" ? (
-            <pre className="ocr-text mono">{JSON.stringify(result, null, 2)}</pre>
+            <pre className="ocr-text mono">
+              {JSON.stringify(result, null, 2)}
+            </pre>
           ) : view === "text" ? (
-            <pre className="ocr-text mono">{result.fullText}</pre>
+            <pre className="ocr-text mono">{result.fullText ?? ""}</pre>
           ) : (
             <table className="field-table ocr-elements">
               <tbody>
-                {result.textElements.map((el, index) => (
+                {textElements.map((el, index) => (
                   <tr
                     key={`${el.readingOrder}-${el.text.slice(0, 12)}`}
                     data-selected={index === activeIndex}

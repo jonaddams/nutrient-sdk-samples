@@ -170,3 +170,33 @@ test("switching documents clears OCR results", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Results" }));
   expect(screen.queryByText("Invoice")).toBeNull();
 });
+
+// Reproduces the exact demo move from the review: select a row to box it,
+// change a config option, Run again. handleRun (structured) has always
+// cleared activeIndex on a new run; the inline OCR onRun did not, so a stale
+// selection survived a re-run and dimmed every box via
+// styleFor(fieldIndex, activeIndex) — worse, if the new run returned fewer
+// elements than before, it marked none. This asserts the row is no longer
+// selected after a second run even though it was never clicked again.
+test("re-running OCR clears the previous selection instead of leaving it stale", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByText("Invoice"));
+  expect(screen.getByText("Invoice").closest("tr")).toHaveAttribute(
+    "data-selected",
+    "true",
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByText("Invoice").closest("tr")).toHaveAttribute(
+      "data-selected",
+      "false",
+    ),
+  );
+});
