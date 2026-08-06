@@ -969,6 +969,46 @@
   font-size: var(--text-xs);
 }
 
+/* Language chips. A wrapped row rather than a select: twenty short codes read
+   better as a grid, and aria-pressed gives each one an honest toggle state. */
+.studio-shell .lang-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.studio-shell .lang-chip {
+  padding: 3px var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--surface);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    color 0.12s var(--ease),
+    border-color 0.12s var(--ease),
+    background 0.12s var(--ease);
+}
+
+.studio-shell .lang-chip:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.studio-shell .lang-chip[aria-pressed="true"] {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.studio-shell .lang-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ── Rail responsive overrides ─────────────────────────────────────────────
    Stacked layout (<=1024px): .studio-shell becomes display:block, so the rail
    spans full width and the 208px constraint that forced a narrow single column
