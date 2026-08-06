@@ -207,16 +207,16 @@ test("a per-citation colour change registers as a diff", () => {
   // diffStyles reports no change and the boxes never repaint — which is exactly
   // how the colour picker once looked dead.
   const before = new Map<number, PaintedStyle>([
-    [0, { style: "idle", hex: "#22c55e" }],
+    [0, { style: "base", hex: "#22c55e" }],
   ]);
   const after = new Map<number, PaintedStyle>([
-    [0, { style: "idle", hex: "#ef4444" }],
+    [0, { style: "base", hex: "#ef4444" }],
   ]);
   expect(diffStyles(before, after).length).toBe(1);
 });
 
 test("an unchanged per-citation colour is not a diff", () => {
   const same = (): Map<number, PaintedStyle> =>
-    new Map([[0, { style: "idle", hex: "#22c55e" }]]);
+    new Map([[0, { style: "base", hex: "#22c55e" }]]);
   expect(diffStyles(same(), same()).length).toBe(0);
 });
