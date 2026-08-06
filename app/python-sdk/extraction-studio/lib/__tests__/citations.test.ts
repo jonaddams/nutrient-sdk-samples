@@ -8,6 +8,7 @@ import {
   diffStyles,
   fracToRect,
   hexToRgb,
+  type IndexedCitation,
   indexCitations,
   type PaintedStyle,
   rgbToHex,
@@ -61,6 +62,45 @@ describe("indexCitations", () => {
 
   test("returns an empty list when no field has a citation", () => {
     expect(indexCitations([{ citation: null }])).toEqual([]);
+  });
+});
+
+describe("per-citation hex fallback", () => {
+  // The actual `ownHex ?? hex` fallback lives inline in
+  // useCitationAnnotations.ts (applyEmphasis / the sync effect), where it
+  // decides which colour each citation's annotation gets painted with. That
+  // hook drives a real Nutrient viewer Instance, so exercising it directly
+  // would mean mocking the SDK's annotation/create/update surface — out of
+  // proportion for what is a one-line fallback. Task 5 only ever exercised
+  // diffStyles's ability to DETECT a colour change; nothing asserted that a
+  // citation's own hex actually wins the fallback that feeds it. This
+  // reproduces that exact expression — `citation.hex ?? componentHex` — against
+  // IndexedCitation values and confirms it through appearance(), the one place
+  // a resolved hex turns into paint.
+  const componentHex = DEFAULT_CITATION_HEX; // e.g. the citation-colour picker
+  const ownHex = "#ef4444"; // e.g. OCR's low-confidence red
+
+  const resolvedHex = (c: IndexedCitation) => c.hex ?? componentHex;
+
+  test("a citation's own hex beats the component-level colour", () => {
+    const withOwnHex: IndexedCitation = {
+      fieldIndex: 0,
+      citation: cite(0),
+      hex: ownHex,
+    };
+    expect(resolvedHex(withOwnHex)).toBe(ownHex);
+    expect(resolvedHex(withOwnHex)).not.toBe(componentHex);
+    expect(appearance("base", resolvedHex(withOwnHex)).fill).toEqual(
+      hexToRgb(ownHex),
+    );
+  });
+
+  test("a citation with no own hex falls back to the component-level colour", () => {
+    const withoutOwnHex: IndexedCitation = { fieldIndex: 1, citation: cite(1) };
+    expect(resolvedHex(withoutOwnHex)).toBe(componentHex);
+    expect(appearance("base", resolvedHex(withoutOwnHex)).fill).toEqual(
+      hexToRgb(componentHex),
+    );
   });
 });
 

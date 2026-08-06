@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
@@ -7,6 +7,8 @@ import { CategorySelect } from "./_components/CategorySelect";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
+import { OcrConfig } from "./_components/OcrConfig";
+import { confidenceHex, OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
 import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
@@ -20,6 +22,7 @@ import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
 import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
+import { extractOcr, type OcrResult } from "./lib/ocr";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -42,6 +45,8 @@ export default function ExtractionStudio() {
   // Session state on purpose, not persisted: every demo then opens in the
   // same known-good colour rather than whatever the last viewer picked.
   const [citationHex, setCitationHex] = useState(DEFAULT_CITATION_HEX);
+  const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
+  const [showRegions, setShowRegions] = useState(true);
 
   // The document list is a code manifest, not a fetch — the backend is
   // stateless and Next serves these from public/. Nothing to load, so no
@@ -86,6 +91,39 @@ export default function ExtractionStudio() {
   // `result` only changes when an extraction actually returns.
   // biome-ignore lint/correctness/useExhaustiveDependencies: `fields` is a fresh array every render, so keying on it would thrash the annotation layer; `result` is the real input.
   const citations = useMemo(() => indexCitations(fields), [result]);
+
+  // Switching feature must not leave the previous feature's results on screen.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `feature` is the trigger, not a value read inside the effect — every setter here is stable. The point is to re-run this clear whenever `feature` changes, which biome can't see from the body alone.
+  useEffect(() => {
+    setResult(null);
+    setOcrResult(null);
+    setError(null);
+    setActiveIndex(null);
+  }, [feature]);
+
+  // OCR elements already arrive as fractional citations from the backend, so the
+  // existing overlay draws them with no new drawing code. Each carries its own
+  // hex, which is why IndexedCitation has an optional per-citation colour.
+  // IndexedCitation is { fieldIndex, citation } — a wrapper. Spreading the
+  // citation's own fields in would produce the wrong shape and paint nothing.
+  const ocrCitations = useMemo(
+    () =>
+      (ocrResult?.textElements ?? []).flatMap((el, index) =>
+        el.citation
+          ? [
+              {
+                fieldIndex: index,
+                citation: el.citation,
+                hex: confidenceHex(el.confidence),
+              },
+            ]
+          : [],
+      ),
+    [ocrResult],
+  );
+
+  const viewerCitations = feature === "structured" ? citations : ocrCitations;
+  const viewerShow = feature === "structured" ? showCitations : showRegions;
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
 
@@ -164,9 +202,9 @@ export default function ExtractionStudio() {
         <section className="studio-viewer">
           <DocViewer
             docPath={current.path}
-            citations={citations}
+            citations={viewerCitations}
             activeIndex={activeIndex}
-            showCitations={showCitations}
+            showCitations={viewerShow}
             citationHex={citationHex}
             onCitationPress={(i) => {
               setActiveIndex(i);
@@ -195,7 +233,7 @@ export default function ExtractionStudio() {
               <button
                 type="button"
                 className="panel-button primary"
-                disabled={busy || !providersReady}
+                disabled={busy || (feature === "structured" && !providersReady)}
                 onClick={() => setRunSignal((n) => n + 1)}
               >
                 {busy ? "Running…" : "Run extraction"}
@@ -220,27 +258,62 @@ export default function ExtractionStudio() {
                 on the Results tab reset the schema to defaults on every round
                 trip and left `Run extraction` inert. */}
             <div hidden={tab !== "config"}>
-              <StructuredConfig
-                docPath={current.path}
-                filename={current.filename}
-                onRun={handleRun}
-                runSignal={runSignal}
-                schemaPreset={schemaPreset}
-                onProvidersReady={setProvidersReady}
-              />
+              {feature === "structured" ? (
+                <StructuredConfig
+                  docPath={current.path}
+                  filename={current.filename}
+                  onRun={handleRun}
+                  runSignal={runSignal}
+                  schemaPreset={schemaPreset}
+                  onProvidersReady={setProvidersReady}
+                />
+              ) : (
+                <OcrConfig
+                  docPath={current.path}
+                  filename={current.filename}
+                  runSignal={runSignal}
+                  onRun={async (req) => {
+                    setBusy(true);
+                    setError(null);
+                    setOcrResult(null);
+                    try {
+                      setOcrResult(await extractOcr(req));
+                      setTab("results");
+                    } catch (e) {
+                      setError(e instanceof Error ? e.message : "OCR failed");
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                />
+              )}
             </div>
             {tab === "results" &&
-              (result ? (
-                <StructuredResults
-                  data={result.data as StructuredData}
-                  code={result.code}
-                  timingMs={result.timingMs}
+              (feature === "structured" ? (
+                result ? (
+                  <StructuredResults
+                    data={result.data as StructuredData}
+                    code={result.code}
+                    timingMs={result.timingMs}
+                    activeIndex={activeIndex}
+                    onSelectField={setActiveIndex}
+                    showCitations={showCitations}
+                    citationHex={citationHex}
+                    onCitationHexChange={setCitationHex}
+                    onShowCitationsChange={setShowCitations}
+                  />
+                ) : (
+                  <div className="panel-section">
+                    <p className="muted">Run an extraction to see results.</p>
+                  </div>
+                )
+              ) : ocrResult ? (
+                <OcrResults
+                  result={ocrResult}
                   activeIndex={activeIndex}
-                  onSelectField={setActiveIndex}
-                  showCitations={showCitations}
-                  citationHex={citationHex}
-                  onCitationHexChange={setCitationHex}
-                  onShowCitationsChange={setShowCitations}
+                  onSelectElement={setActiveIndex}
+                  showRegions={showRegions}
+                  onShowRegionsChange={setShowRegions}
                 />
               ) : (
                 <div className="panel-section">

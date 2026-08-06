@@ -51,7 +51,8 @@ export const FEATURES: Feature[] = [
     id: "adaptive_ocr",
     group: "OCR",
     label: "Adaptive OCR",
-    enabled: false,
+    enabled: true,
+    blurb: "Reads a scan into structured content, entirely on this machine.",
     description:
       "Turns a scan into structured content — paragraphs, tables and pictures, each with its position on the page. The general-purpose choice when you want the document's layout, not just its words.",
   },
