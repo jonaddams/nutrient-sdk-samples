@@ -917,14 +917,14 @@ test("a per-citation colour change registers as a diff", () => {
   // Invariant 4: anything affecting appearance must be inside PaintedStyle, or
   // diffStyles reports no change and the boxes never repaint — which is exactly
   // how the colour picker once looked dead.
-  const before = new Map<number, PaintedStyle>([[0, { style: "idle", hex: "#22c55e" }]]);
-  const after = new Map<number, PaintedStyle>([[0, { style: "idle", hex: "#ef4444" }]]);
+  const before = new Map<number, PaintedStyle>([[0, { style: "base", hex: "#22c55e" }]]);
+  const after = new Map<number, PaintedStyle>([[0, { style: "base", hex: "#ef4444" }]]);
   expect(diffStyles(before, after).length).toBe(1);
 });
 
 test("an unchanged per-citation colour is not a diff", () => {
   const same = (): Map<number, PaintedStyle> =>
-    new Map([[0, { style: "idle", hex: "#22c55e" }]]);
+    new Map([[0, { style: "base", hex: "#22c55e" }]]);
   expect(diffStyles(same(), same()).length).toBe(0);
 });
 ```
@@ -985,8 +985,10 @@ existing `PaintedStyle`.
 
 - [ ] **Step 5: Run the studio suite to verify nothing regressed**
 
-Run: `export PATH="$HOME/Library/pnpm/bin:$PATH" && pnpm exec vitest run app/python-sdk/extraction-studio`
-Expected: PASS — the existing studio tests plus the 2 new ones.
+Run: `export PATH="$HOME/Library/pnpm/bin:$PATH" && pnpm exec vitest run app/python-sdk/extraction-studio && pnpm exec tsc --noEmit`
+Expected: tests PASS and typecheck clean.
+
+**The typecheck is not optional here.** vitest does not typecheck, so a test file can pass at runtime while `tsc` fails — an invalid `CitationStyle` literal did exactly that on the first attempt at this task.
 
 - [ ] **Step 6: Commit**
 
