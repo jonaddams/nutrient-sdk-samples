@@ -66,10 +66,10 @@ actually see it, which is not the same as ordered by effort.
    **DONE 2026-08-06.** Toggle removed (Jon's call); both no-ops written up as SDK-047/048.
    Only the *filing* remains, which is item 10.
 4. ~~**Whitespace pass (item 5)** — Jon's own ask.~~ **DONE 2026-08-06.** Details in item 5.
-5. **Scan signalling and the Claims label (item 6)** — need a wording call from Jon before
-   anything can be built. ← **next up, and it needs a decision first.**
+5. ~~**Scan signalling and the Claims label (item 6)**~~ **DONE 2026-08-06.** Details in item 6.
 6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
    the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
+   ← **next up, and the last item that needs no decision from Jon.**
 7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
    the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
@@ -290,15 +290,36 @@ padding-top still 18px).
 
 ### 6. Smaller items
 
-- **Claims label redundancy.** "Northgate auto claim (FNOL)" under a **Claims** header.
-  Invoice labels already dropped their redundant "invoice"; this one was left pending a
-  call on wording.
-- **`Scanned` reads thin** as a document label, and with the text/scanned badges removed
-  nothing signals which documents are scans — two of the four invoices are.
-- **`hasTextLayer` has no UI consumer** since the badges went. It stays in the manifest as
-  documented metadata (`docs.test.ts` pins it) and is what an OCR-oriented sample would
-  key on. `DocStrip.test.tsx` asserts the badge is *absent*, so re-adding one is
-  deliberate rather than reflex.
+- ~~**Claims label redundancy.**~~ **DONE 2026-08-06** (Jon's wording call).
+  "Northgate auto claim (FNOL)" → **"Northgate auto (FNOL)"**. Only the redundant "claim"
+  went: "auto" still distinguishes it from a property claim, and FNOL is jargon a claims
+  prospect reads as signal. `docs.test.ts` now pins the underlying rule — **no label may
+  restate its own category** — so this cannot quietly regress.
+- ~~**`Scanned` reads thin** as a document label.~~ **DONE 2026-08-06.** Renamed to
+  **"Vandelay Industries"**, the only proper noun the page carries. It was the one label
+  naming a *property* rather than a document, which made it read as a category beside its
+  neighbours — and it was misleading too, since it implied it was the only scan.
+
+  **There are four scans, not two.** Verified against the files (not trusted from the
+  manifest) 2026-08-06: `Lumen`, `Vandelay Industries`, `Westbridge submittal transmittal`
+  and `Straight bill of lading` all export **zero** characters; the other six export
+  90–406 words. `hasTextLayer` is accurate for all ten.
+- ~~**`hasTextLayer` has no UI consumer**~~ **It does now, as of 2026-08-06.** A small
+  uppercase `scan` marker renders on every document whose `hasTextLayer` is false.
+
+  **The trick is that the marker is a CHILD of `.doc-chip-name`, not a sibling.** The badge
+  #43 removed was a flex sibling, so it stole width from labels that already wrap in the
+  208px column — the width was the objection, not the marker. Inside the name it shares the
+  label's text flow and costs no fixed width: on "Vandelay Industries" the marker simply
+  wraps to a second line instead of squeezing the label. `DocStrip.test.tsx` pins the
+  nesting for that reason, so making it a sibling again fails a test.
+
+  **The space before it is load-bearing.** `margin-left` is visual only, so without a real
+  space the button's accessible name concatenated to "Lumenscan". There is a test asserting
+  the name reads `"Scanned invoice scan"`.
+
+  The old "asserts the badge is absent" test was replaced rather than deleted, and its
+  replacement explains why the flip was deliberate.
 - ~~**A custom citation colour is not displayed anywhere** except the hex field.~~
   **DONE 2026-08-06.** A 7px dot in the bottom-right of the dropper button now carries the
   current value. It goes there because the dropper glyph runs top-right to bottom-left and
