@@ -57,11 +57,9 @@ Reviewed with Jon 2026-08-05, after Bedrock shipped. Ordered by whether a prospe
 actually see it, which is not the same as ordered by effort.
 
 1. ~~**SDK-045 write-up (item 7).**~~ **DONE 2026-08-06** — and the mechanism turned out to
-   be different from what item 7 claimed. See `docs/sdk-defects/`. Two things still open
-   from it: **the NAPY tickets are written but not filed** (Jira reports no create
-   permission in the NAPY project — worth chasing, it blocks all future SDK filings), and
-   **SDK-046** was discovered on the way, which affects the shipped
-   `/python-sdk/document-to-markdown` sample.
+   be different from what item 7 claimed. See `docs/sdk-defects/`. It also turned up
+   **SDK-046**, which affects the shipped `/python-sdk/document-to-markdown` sample.
+   Filing the two tickets is now **item 10** below, deferred deliberately.
 2. **Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)** —
    both small, contained, and visible. The loading state is new as of the Bedrock work.
 3. **Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**
@@ -70,6 +68,8 @@ actually see it, which is not the same as ordered by effort.
    anything can be built.
 6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
    the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
+7. **File SDK-045 and SDK-046 upstream (item 10)** — blocked on a Jira permission, not on
+   the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
 The seven disabled `SOON` rail entries are the standing direction, not a loose end — see
 "Decided, do not re-litigate".
@@ -355,6 +355,35 @@ with the ordinary help text, so the first thing a prospect sees is a brief flash
 box. Failure is distinguishable (the help text changes); loading is not. The fix is small, and
 the gating that created it is worth keeping — it prevents an early click reaching a provider
 with no credentials and returning an opaque 500.
+
+### 10. File SDK-045 and SDK-046 upstream — blocked on a Jira permission
+
+**Deferred by Jon 2026-08-06.** Nothing about the write-ups is outstanding; this is purely
+the filing step.
+
+Both ticket bodies are finished and ready to paste, in NAPY house style (metadata table,
+self-contained repro, observed output, root-cause hypothesis, suggested fix, related):
+
+- `docs/sdk-defects/napy-ticket-sdk-045.md`
+- `docs/sdk-defects/napy-ticket-sdk-046.md`
+
+File each as **NAPY / Bug / priority High**, labels `python-sdk` `sdk-defect-hunting`
+`vision` — matching NAPY-15/16/17. Then write the returned issue key into the header of
+the corresponding `docs/sdk-defects/sdk-04*.md` (each says "Not yet filed upstream"), and
+into the backend's `DEFECTS.md` row.
+
+**The blocker:** creating them programmatically fails with
+
+```
+You do not have permission to create issues in this project.
+```
+
+and querying Jira for creatable projects returns **83 projects with NAPY absent** — so it
+is a project-permission gap, not a malformed request. That is despite NAPY-7 through
+NAPY-20 having been filed from this same account, so something changed in NAPY's
+permission scheme. **Worth chasing on its own merits: it blocks every future SDK defect
+filing, not just these two.** Filing from the browser may well work even though the API
+path does not — try that first, it is the cheapest test.
 
 ---
 
