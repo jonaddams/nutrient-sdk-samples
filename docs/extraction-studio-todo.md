@@ -65,9 +65,9 @@ actually see it, which is not the same as ordered by effort.
 3. ~~**Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**~~
    **DONE 2026-08-06.** Toggle removed (Jon's call); both no-ops written up as SDK-047/048.
    Only the *filing* remains, which is item 10.
-4. **Whitespace pass (item 5)** — Jon's own ask, still outstanding. ← **next up.**
+4. ~~**Whitespace pass (item 5)** — Jon's own ask.~~ **DONE 2026-08-06.** Details in item 5.
 5. **Scan signalling and the Claims label (item 6)** — need a wording call from Jon before
-   anything can be built.
+   anything can be built. ← **next up, and it needs a decision first.**
 6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
    the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
 7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
@@ -244,12 +244,49 @@ Local.
 
 Therefore `apply_provider()`'s `local` branch and the `LM_STUDIO_*` env vars all stay.
 
-### 5. Whitespace pass
+### 5. Whitespace pass — DONE 2026-08-06
 
-Jon, 2026-08-03: "there's more whitespace we can remove." The footer margin already went
-112px → 24px (`--space-9` → `--space-5`) and was verified across every sample. The two
-biggest remaining knobs in `app/globals.css`: `--space-9` is still used by
-`padding: var(--space-9) 0 var(--space-8)`, and `--section-gap` is 80px.
+Jon, 2026-08-03: "there's more whitespace we can remove." Magnitudes chosen by Jon
+2026-08-06 from measured options; both were the conservative pick.
+
+**The biggest offender was not either knob this section used to name.** It was the gap
+between the last content and the footer text on *every* sample page — **145px**, stacked
+from three separate sources:
+
+| Source | Was | Now |
+|---|---|---|
+| section `padding-bottom` (`--space-8` → `--space-7`) | 72px | **48px** |
+| `.footer` `margin-top` (`--space-5`, deleted) | 24px | **0** |
+| `.footer` `padding-top` (`--space-7`, unchanged) | 48px | 48px |
+| border | 1px | 1px |
+| **total** | **145px** | **97px** |
+
+The `margin-top` was pure redundancy — it stacked on the footer's own `padding-top`, and
+the border needs to sit against the content boundary anyway, so the separation belongs to
+the padding. That token swap hit **16 call sites**, but four of them are the shared layouts
+(`SampleCanvas`, `SampleFrame`, `PythonSampleLayout`, `JavaSampleLayout`), which is what
+covers most sample pages.
+
+**The landing hero went 112/72 → 72/48** (`.hero` in `app/globals.css`). 184px of a 548px
+hero was padding, and the 112px left a visibly empty band under the sticky topbar. Now
+484px, with the headline starting 184px down instead of 248px.
+
+**`--section-gap` is DEAD — do not reach for it.** This section used to call it one of "the
+two biggest remaining knobs". It is declared three times (`:root` 80px, spacious 112px,
+dense 56px) and **consumed nowhere**; changing it does nothing. Left in place with a comment
+saying so, because the density system is a documented feature and this is its natural hook.
+Same story for `--spacing-3xl`, though that one is deliberately part of the legacy-alias
+block, so leave the whole block alone.
+
+**Two pages keep their 112px bottom padding on purpose:** `/document-engine` and `/workflow`
+are short "In development" placeholders holding a single callout, and that padding is what
+stops the footer riding up under it. `/document-engine` measures `scrollHeight == innerHeight`
+exactly, so the padding is load-bearing rather than decorative.
+
+Verified in a real browser: 97px on `/web-sdk/annotation-presets` and `/dotnet-sdk/ocr`,
+light and dark, 1409px and 390px wide, no horizontal overflow, footer border intact, and the
+studio's `calc(100dvh-71px)` dependency untouched (topbar still 71px, `.topbar-inner`
+padding-top still 18px).
 
 ### 6. Smaller items
 
@@ -544,9 +581,17 @@ check for deleted files before assuming a regression — three test files have b
 in this repo's history (`git log --diff-filter=D --name-only -- '*.test.tsx'`).
 
 Scope Biome to the files you touched. `app/globals.css` reports **2 errors / 8 warnings
-and always has** — verified identical before and after the footer change — and
-`styles.css` carries 8 `noDescendingSpecificity` warnings that are inherent to the
-deliberate source-ordering described above. Neither is something you broke.
+and always has** — re-confirmed 2026-08-06 by diffing Biome output against `main`, where
+only the line numbers moved — and `styles.css` carries 8 `noDescendingSpecificity` warnings
+that are inherent to the deliberate source-ordering described above. Neither is something
+you broke.
+
+**Several sample pages also carry pre-existing Biome errors**, so "Biome is red on a file I
+touched" is not by itself evidence of a regression. The whitespace pass touched 14 `.tsx`
+files and Biome reported 8 errors / 4 warnings across them — every one a
+`lint/style/noNonNullAssertion` on a line the change never went near
+(`app/dotnet-sdk/{ocr,optimize,linearize}/page.tsx` and the `api/` pages). The reliable check
+is to diff Biome's output against `main` for the same file, which came back byte-identical.
 
 Backend: `cd ~/SE/code/python-fast-api && .venv/bin/uvicorn app.main:app --port 8080`
 (**not** 8000 — `.env.local` points at 8080; the backend has no `/` route, so health-check
