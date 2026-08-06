@@ -64,8 +64,14 @@ export function OcrConfig({
         >
           {/* Chips rather than <select multiple>, which is poor on touch and in
               a narrow panel. aria-pressed carries the state, matching how
-              CitationColor's preset swatches already work. */}
-          <div className="lang-chips">
+              CitationColor's preset swatches already work.
+              role="group" + aria-label repeats what Field's <label> already
+              says visually, because that <label> has no htmlFor target here
+              (there is no single input for a chip row to point at) and so is
+              not programmatically associated with anything — without this, a
+              screen reader announces each chip only as "eng, button,
+              pressed", with no indication of what is being chosen. */}
+          <div className="lang-chips" role="group" aria-label="Languages">
             {OCR_LANGUAGES.map((code) => (
               <button
                 key={code}
@@ -82,15 +88,24 @@ export function OcrConfig({
       </PanelSection>
 
       <PanelSection title="Output">
-        <Field label="Format" htmlFor="ocr-format" help="Structured elements with positions and confidence, or a Markdown rendering of the page.">
-          <Segmented
-            options={[
-              { label: "Elements", value: "json" },
-              { label: "Markdown", value: "markdown" },
-            ]}
-            value={outputFormat}
-            onChange={setOutputFormat}
-          />
+        {/* No htmlFor: Segmented takes no id prop and renders no element with
+            one, so pointing Field's <label for> at "ocr-format" would be a
+            dangling reference — Segmented is shared with StructuredConfig and
+            StructuredResults, so it does not get an id prop added just for
+            this one caller's label. The outer role="group" below (not
+            Segmented's own — that one carries no name) gives the pair of
+            option buttons an accessible name without touching Segmented. */}
+        <Field label="Format" help="Structured elements with positions and confidence, or a Markdown rendering of the page.">
+          <div role="group" aria-label="Format">
+            <Segmented
+              options={[
+                { label: "Elements", value: "json" },
+                { label: "Markdown", value: "markdown" },
+              ]}
+              value={outputFormat}
+              onChange={setOutputFormat}
+            />
+          </div>
         </Field>
         <Toggle
           checked={tableDetection}

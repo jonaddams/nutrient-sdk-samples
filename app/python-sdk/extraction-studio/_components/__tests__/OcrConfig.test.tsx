@@ -78,6 +78,24 @@ test("table detection and output format are configurable", () => {
   );
 });
 
+test("groups the language chips under an accessible name", () => {
+  // Without this, a screen reader announces each chip only as "eng, button,
+  // pressed", with no indication of what is being chosen — Field's own
+  // <label> has no htmlFor target for a chip row, so it is not
+  // programmatically associated with anything on its own.
+  render(<OcrConfig {...props} onRun={vi.fn()} runSignal={0} />);
+  const group = screen.getByRole("group", { name: "Languages" });
+  expect(group).toContainElement(screen.getByRole("button", { name: "eng" }));
+});
+
+test("groups the format options under an accessible name", () => {
+  render(<OcrConfig {...props} onRun={vi.fn()} runSignal={0} />);
+  const group = screen.getByRole("group", { name: "Format" });
+  expect(group).toContainElement(
+    screen.getByRole("button", { name: "Markdown" }),
+  );
+});
+
 test("offers no control for the verified no-op options", () => {
   // favor_accuracy, preprocessing, skew detection and the word-confidence
   // threshold were byte-identical on two documents on 2026-08-06. A control
