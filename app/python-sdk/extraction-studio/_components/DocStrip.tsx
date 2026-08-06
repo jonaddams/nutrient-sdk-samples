@@ -32,12 +32,33 @@ export function DocStrip({
             {/* The manifest's readable label, not the docId — this gallery is
 					    prospect-facing, and "Atlas Construction invoice" reads better
 					    than "invoice-ac20251047". docId stays the selection key. */}
-            {/* No text/scanned badge: this list now lives in the 208px rail
-                column, where the badge competed with a label that already has
-                to wrap. `hasTextLayer` therefore has no UI consumer — it stays
-                in the manifest as documented metadata (docs.test.ts still pins
-                it) and is what an OCR-oriented sample would key on. */}
-            <span className="doc-chip-name">{d.label}</span>
+            {/* The scan marker is INSIDE .doc-chip-name, not a sibling of it.
+                That is the whole trick. The badge this replaces was a flex
+                sibling, so in the 208px rail column it stole width from labels
+                that already have to wrap — which is why #43 dropped it. As part
+                of the name's text flow it wraps alongside the label instead of
+                competing with it for width.
+
+                Four of the ten documents have no text layer (verified against
+                the files 2026-08-06, not merely trusted from the manifest), and
+                before this only one of them said so — via a label that named the
+                property rather than the document. `hasTextLayer` finally has a
+                UI consumer. */}
+            <span className="doc-chip-name">
+              {d.label}
+              {/* The space is load-bearing: margin-left is visual only, so
+                  without it the button's accessible name concatenates to
+                  "Lumenscan". Screen readers get "Lumen scan" instead. */}
+              {!d.hasTextLayer && " "}
+              {!d.hasTextLayer && (
+                <span
+                  className="doc-chip-scan"
+                  title="No text layer — extraction reads the page image"
+                >
+                  scan
+                </span>
+              )}
+            </span>
           </button>
         ))
       )}

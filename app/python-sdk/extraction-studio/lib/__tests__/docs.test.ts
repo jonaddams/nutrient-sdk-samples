@@ -37,6 +37,34 @@ describe("the document manifest", () => {
     expect(kinds.size).toBe(2);
   });
 
+  test("no label restates its own category", () => {
+    // The rail shows the category control directly above this list, so repeating
+    // the category word in the label spends the 208px column on something the
+    // user just picked. Invoice labels dropped "invoice" in #44; Claims dropped
+    // "claim" on 2026-08-06. This is the rule behind both, so a new document
+    // cannot quietly reintroduce the redundancy.
+    //
+    // Singularised crudely on purpose — "invoices" -> "invoice" is all the
+    // categories need, and a real inflector would be more machinery than the
+    // rule deserves.
+    for (const d of DOCUMENTS) {
+      const noun = d.category.replace(/s$/, "");
+      expect(d.label.toLowerCase()).not.toContain(noun);
+    }
+  });
+
+  test("no label names a property instead of the document", () => {
+    // "Scanned" used to be a label, which made one document read as a category
+    // while its neighbours read as names — and it was misleading besides, since
+    // three other documents are scans too. Scan-ness is DocStrip's job now.
+    const properties = ["scanned", "scan", "text layer", "ocr"];
+    for (const d of DOCUMENTS) {
+      for (const prop of properties) {
+        expect(d.label.toLowerCase()).not.toBe(prop);
+      }
+    }
+  });
+
   test("the duplicate documents are absent", () => {
     const ids = DOCUMENTS.map((d) => d.docId);
     expect(ids).not.toContain("construction");
