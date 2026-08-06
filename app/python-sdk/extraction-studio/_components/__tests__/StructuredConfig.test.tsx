@@ -133,6 +133,101 @@ test("switching provider drops the previous provider's model", async () => {
   );
 });
 
+// Loading and failure both disable the select, so "disabled" alone cannot tell
+// a prospect which one they are looking at. Before these, the in-flight state
+// showed the ready help text over an empty box, which reads as a broken
+// control rather than a pending one.
+test("shows a distinct loading state while the providers fetch is in flight", () => {
+  // Deliberately not awaited: this asserts the state DURING the fetch.
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  const select = screen.getByLabelText("Provider") as HTMLSelectElement;
+  expect(select.disabled).toBe(true);
+  expect(select).toHaveAttribute("aria-busy", "true");
+  // A placeholder option, so the box is never blank.
+  expect(
+    screen.getByRole("option", { name: "Loading providers…" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText("Checking which providers this backend can serve…"),
+  ).toBeInTheDocument();
+});
+
+test("the loading placeholder keeps the controlled select's value matched", () => {
+  // An option whose value is not `provider` would leave the controlled select
+  // with no matching option, and React would fall back to the first one.
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  const select = screen.getByLabelText("Provider") as HTMLSelectElement;
+  expect(select.value).toBe("openai");
+  expect(
+    (
+      screen.getByRole("option", {
+        name: "Loading providers…",
+      }) as HTMLOptionElement
+    ).value,
+  ).toBe("openai");
+});
+
+test("clears the loading state once providers resolve", async () => {
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
+  const select = screen.getByLabelText("Provider") as HTMLSelectElement;
+  expect(select.disabled).toBe(false);
+  expect(select).not.toHaveAttribute("aria-busy");
+  expect(
+    screen.queryByRole("option", { name: "Loading providers…" }),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByText("Which model backend runs the extraction."),
+  ).toBeInTheDocument();
+});
+
+test("a failed fetch reports failure, not loading", async () => {
+  stubProviders(null, false);
+  render(
+    <StructuredConfig
+      docPath="/documents/doc-1.pdf"
+      filename="doc-1.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+    />,
+  );
+  await waitFor(() =>
+    screen.getByText(
+      "Could not reach the backend, so the provider list is unavailable.",
+    ),
+  );
+  const select = screen.getByLabelText("Provider") as HTMLSelectElement;
+  expect(select).not.toHaveAttribute("aria-busy");
+  expect(
+    screen.queryByRole("option", { name: "Loading providers…" }),
+  ).not.toBeInTheDocument();
+});
+
 test("disables the provider select when the fetch fails", async () => {
   stubProviders(null, false);
   render(
