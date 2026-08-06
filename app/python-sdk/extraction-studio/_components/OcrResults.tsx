@@ -101,7 +101,7 @@ export function OcrResults({
                 {result.textElements.map((el, index) => (
                   <tr
                     key={`${el.readingOrder}-${el.text.slice(0, 12)}`}
-                    aria-selected={index === activeIndex}
+                    data-selected={index === activeIndex}
                     onClick={() => onSelectElement(index)}
                   >
                     <td className="mono muted">{el.readingOrder}</td>

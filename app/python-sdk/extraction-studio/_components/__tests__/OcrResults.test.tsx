@@ -72,6 +72,18 @@ test("clicking an element selects it", () => {
   expect(onSelectElement).toHaveBeenCalledWith(1);
 });
 
+test("marks the active row and only the active row as selected", () => {
+  render(<OcrResults {...props} activeIndex={1} />);
+  expect(screen.getByText("Invoice").closest("tr")).toHaveAttribute(
+    "data-selected",
+    "false",
+  );
+  expect(screen.getByText("Total").closest("tr")).toHaveAttribute(
+    "data-selected",
+    "true",
+  );
+});
+
 test("switches to the text view", () => {
   render(<OcrResults {...props} />);
   fireEvent.click(screen.getByRole("button", { name: "Text" }));
