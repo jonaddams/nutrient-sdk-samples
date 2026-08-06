@@ -67,9 +67,10 @@ actually see it, which is not the same as ordered by effort.
    Only the *filing* remains, which is item 10.
 4. ~~**Whitespace pass (item 5)** — Jon's own ask.~~ **DONE 2026-08-06.** Details in item 5.
 5. ~~**Scan signalling and the Claims label (item 6)**~~ **DONE 2026-08-06.** Details in item 6.
-6. **Structural cleanup (items 1, 2, 8)** — retiring Field Extraction, the two rail gaps, and
-   the code residuals left behind by the Bedrock PRs. None of it shows in a demo.
-   ← **next up, and the last item that needs no decision from Jon.**
+6. **Structural cleanup (items 1, 2, 8)** — **item 8 is CLEARED** (`python-fast-api#33` +
+   this repo's #57) and **item 2 is resolved as analysis** (the Text export mapping was wrong;
+   there are two rail gaps, not one open question). **Item 1 still needs a call from Jon:**
+   unlist `field-extraction` or delete it.
 7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
    the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
@@ -101,13 +102,33 @@ this yet?" is answered by what `/structured` can do — not by category labels.
 | VLM Extraction | `/api/extraction/vlm` | VLM-enhanced ICR |
 | VLM Transcription | `/api/extraction/describe` | Image description |
 | Image Alt Text | `/api/extraction/describe` | Image description |
-| Document to Markdown | `/api/extraction/markdown` | Text export — **a guess, confirm** |
+| Document to Markdown | `/api/extraction/markdown` | **nothing — the Text export guess is WRONG, see below** |
 | Table Extraction | `/api/extraction/tables` | **no rail entry exists yet** |
 | Field Extraction | `/api/extraction/fields` | already superseded, see above |
 | Structured Extraction | `/api/extraction/structured` | the studio itself |
 
-Two gaps fall out of that: **Table Extraction has no successor in the rail**, and
-**Document to Markdown → Text export is an assumption**, not a verified equivalence.
+**Confirmed 2026-08-06: the Document to Markdown → Text export mapping is wrong**, so there
+are **two** rail gaps rather than one open question.
+
+The rail's Text export entry describes itself as *"Pulls the plain text out of a PDF, keeping
+columns and spacing roughly as they appear on the page"* — that is `export_as_text`, a
+different output from markdown in both format and fidelity:
+
+| | `export_as_markdown()` | `export_as_text()` |
+|---|---|---|
+| Output | headings and `<table>` markup | layout-preserving plain text |
+| Token loss | **up to 40%** on 16 of 39 sample documents | none measured |
+
+The second row is [SDK-046](sdk-defects/sdk-046-markdown-column-word-loss.md), found this
+session. So the two are not interchangeable, and shipping Text export would not let Document
+to Markdown be retired — it would be a *new* capability alongside it.
+
+**Both gaps therefore need a rail entry before their samples can go:**
+
+- **Table Extraction** (`/api/extraction/tables`) — no rail entry exists.
+- **Document to Markdown** (`/api/extraction/markdown`) — no rail entry exists. Note it is
+  also the sample most affected by SDK-046, so a rail feature built on that endpoint inherits
+  the word loss until the SDK is fixed.
 
 ### 3. AWS Bedrock — SHIPPED and MERGED
 
@@ -374,27 +395,42 @@ the income statement) is **not** part of SDK-045 and was **not** re-verified —
 `LM_STUDIO_API_URL` is absent so Local is not listed. It needs its own id and repro if
 pursued; pairing it with the suppression is what produced the wrong mechanism above.
 
-### 8. Code residuals left by the Bedrock PRs
+### 8. Code residuals left by the Bedrock PRs — ALL CLEARED 2026-08-06
 
-All three were surfaced by review, judged non-blocking, and deliberately not fixed rather than
-overlooked. None is visible in a demo.
+Backend fixes in `python-fast-api#33`, frontend in this repo's #57. All were surfaced by
+review, judged non-blocking, and deliberately deferred rather than overlooked — none was
+visible in a demo, which is why they survived.
 
-- **`available_providers()` reads `BEDROCK_API_KEY` unstripped** while the validation path
-  `.strip()`s it. So a whitespace-only key lists Bedrock in the dropdown and then 400s on Run —
-  an asymmetry introduced by fixing only one side.
-- **`_validate_default_models()` uses `assert`**, which `python -O` / `PYTHONOPTIMIZE` strips,
-  silently removing the guard that stops `BEDROCK_STRUCTURED_MODEL` naming an unlisted model.
-  Not live — nothing in the Makefile passes `-O` — but `raise RuntimeError` would be sturdier.
-- **The generated snippet references an undefined `SCHEMA`** placeholder, so "runnable as
-  printed" holds only modulo that. Pre-existing, not from the Bedrock work, but the snippet
-  became more prominent now that it carries an endpoint and a key.
+- ~~**`available_providers()` reads `BEDROCK_API_KEY` unstripped**~~ **FIXED.** Both paths
+  strip now. The test asserts the two paths *agree*, rather than each separately — testing
+  them independently is what let them drift in the first place.
+- ~~**`_validate_default_models()` uses `assert`**~~ **FIXED** — now `raise RuntimeError`.
+  A test reads the function source to assert no `assert` creeps back, and the existing
+  invariant test moved from `AssertionError` to `RuntimeError`.
+- ~~**The generated snippet references an undefined `SCHEMA`**~~ **FIXED.** `_build_code()`
+  takes the schema and emits it, and the tests assert `compile()` over the result — the
+  strongest cheap form of "runnable as printed".
 
-Also parked, in descending order of plausibility: `fetchProviders()` validates only that the
-top-level `providers` value is an array, so a provider entry missing `models` would reach the
-component and crash `.models.map` (the backend always sends it, and both sides ship together);
-the two 400 `except` clauses in the router could be one tuple clause; the `aria-label`s on the
-provider and model selects duplicate `Field`'s `htmlFor` association, and the test suite now
-selects on them.
+  Two details worth keeping: it is **triple-quoted for readability** with a `json.dumps`
+  fallback for a schema containing three *bare* quotes (valid JSON escapes its quotes, so
+  that branch is effectively unreachable, but the snippet is built by concatenation and a
+  triple quote is the one sequence that would end the literal early); and **callers passing
+  no schema get an honest placeholder**, so no snippet this function produces can fail to
+  define `SCHEMA`. The first attempt fixed only the live path and left the other callers
+  emitting a dangling name.
+
+The parked list is also cleared:
+
+- ~~`fetchProviders()` validates only the outer array~~ **FIXED** — every entry is validated,
+  and a malformed one rejects the **whole** response rather than being filtered out.
+  Filtering would present a shorter list as though it were complete, and "OpenAI is missing"
+  is far worse to debug than "providers failed to load".
+- ~~the two 400 `except` clauses~~ **FIXED** — one tuple clause.
+- ~~the duplicated `aria-label`s~~ **REMOVED.** `Field`'s `<label htmlFor>` already names both
+  selects, and **`aria-label` wins over it**, so the copy was two sources for one name, free
+  to diverge on the next wording change while only the screen-reader half moved. All 13 test
+  call sites still pass untouched, because `getByLabelText` resolves the `<label for>`
+  association — verified, not assumed.
 
 ### 9. Multimodal toggle, the loading state, and two unfiled SDK defects
 
