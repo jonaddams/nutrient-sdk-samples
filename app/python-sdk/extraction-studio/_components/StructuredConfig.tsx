@@ -294,9 +294,14 @@ export function StructuredConfig({
               controlled <select> keeps a matching option throughout — an option
               with any other value would make React fall back to rendering the
               first one, and there is none. */}
+          {/* No aria-label. Field renders <label htmlFor> which already names
+              this select, and aria-label WINS over it — so a redundant copy is
+              two sources for one name, free to drift apart on the next wording
+              change while only the screen-reader half moves. Tests select with
+              getByLabelText, which resolves the <label for> association, so they
+              are unaffected. Same for the Model select below. */}
           <select
             id="cfg-provider"
-            aria-label="Provider"
             value={provider}
             disabled={providersFailed || providersLoading}
             aria-busy={providersLoading || undefined}
@@ -329,7 +334,6 @@ export function StructuredConfig({
           >
             <select
               id="cfg-model"
-              aria-label="Model"
               value={model ?? selected.defaultModel}
               onChange={(e) => setModel(e.target.value)}
             >

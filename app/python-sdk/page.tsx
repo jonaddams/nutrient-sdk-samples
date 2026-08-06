@@ -93,13 +93,17 @@ const samples: Sample[] = [
       "Convert a complex document to clean Markdown for RAG and LLM ingestion pipelines",
     path: "/python-sdk/markdown-extraction",
   },
-  {
-    name: "Field Extraction",
-    category: "Extraction",
-    description:
-      "Pull labeled fields into clean values — native key-value regions plus schema-driven extraction with a custom prompt",
-    path: "/python-sdk/field-extraction",
-  },
+  // Field Extraction UNLISTED 2026-08-06 (Jon's call: unlist, do not delete).
+  // The extraction studio supersedes it — both do schema-driven field
+  // extraction, but this one hand-writes a VLM prompt and post-parses the JSON
+  // reply, while /structured calls the SDK's native extract_structured() and
+  // gets grounded citations back. It is also built on
+  // VisionFeatures.KEY_VALUE_REGION, which is a no-op (SDK-037 / NAPY-15),
+  // worked around with describe().
+  //
+  // app/python-sdk/field-extraction/ is deliberately KEPT: the route still
+  // works, and a demo of the pre-SDK-native approach has archival value while
+  // SDK-037 is open. Re-listing is uncommenting this block.
   {
     name: "Structured Extraction",
     category: "Extraction",

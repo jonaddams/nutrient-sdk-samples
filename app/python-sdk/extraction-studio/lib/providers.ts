@@ -34,5 +34,30 @@ export async function fetchProviders(): Promise<ProviderInfo[]> {
     // said something we do not understand.
     throw new Error("malformed providers response");
   }
+  // Validate each ENTRY, not just the array. Previously only the outer shape was
+  // checked, so an entry missing `models` reached the component and crashed
+  // `.models.map` — a TypeError inside render rather than the handled
+  // "providers failed" state this function exists to produce. The backend always
+  // sends `models` and both sides ship together, so this is defence against a
+  // future divergence rather than a live bug.
+  //
+  // Deliberately strict: a malformed entry rejects the whole response rather
+  // than being filtered out. Silently dropping a provider would present a
+  // shorter list as though it were complete, and "OpenAI is missing" is a much
+  // worse failure to debug than "providers failed to load".
+  for (const p of body.providers) {
+    const valid =
+      p &&
+      typeof p.id === "string" &&
+      typeof p.label === "string" &&
+      typeof p.defaultModel === "string" &&
+      Array.isArray(p.models) &&
+      p.models.every(
+        (m) => m && typeof m.id === "string" && typeof m.label === "string",
+      );
+    if (!valid) {
+      throw new Error("malformed providers response");
+    }
+  }
   return body.providers;
 }
