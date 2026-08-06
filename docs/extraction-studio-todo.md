@@ -67,28 +67,60 @@ actually see it, which is not the same as ordered by effort.
    Only the *filing* remains, which is item 10.
 4. ~~**Whitespace pass (item 5)** — Jon's own ask.~~ **DONE 2026-08-06.** Details in item 5.
 5. ~~**Scan signalling and the Claims label (item 6)**~~ **DONE 2026-08-06.** Details in item 6.
-6. **Structural cleanup (items 1, 2, 8)** — **item 8 is CLEARED** (`python-fast-api#33` +
-   this repo's #57) and **item 2 is resolved as analysis** (the Text export mapping was wrong;
-   there are two rail gaps, not one open question). **Item 1 still needs a call from Jon:**
-   unlist `field-extraction` or delete it.
+6. ~~**Structural cleanup (items 1, 2, 8)**~~ **DONE 2026-08-06.** Item 8 cleared
+   (`python-fast-api#33` + this repo's #57), item 2 resolved as analysis (the Text export
+   mapping was wrong — two rail gaps, not one open question), item 1 unlisted per Jon.
+
+**All six priorities are now closed.** What remains from this list, in rough order:
+
+- **Item 10** — file SDK-045 through SDK-048 upstream. Blocked on the NAPY Jira permission,
+  not on the write-ups.
+- **Item 2's two rail gaps** — Table Extraction and Document to Markdown have no successor,
+  so those samples cannot be retired yet.
+- **The landing page's sample counts should be derived, not hand-maintained** — see item 1.
+- The seven disabled `SOON` rail entries, which are the standing direction rather than a
+  loose end.
 7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
    the write-ups, which are finished. Deferred by Jon 2026-08-06.
 
 The seven disabled `SOON` rail entries are the standing direction, not a loose end — see
 "Decided, do not re-litigate".
 
-### 1. Field Extraction is removable now — no new work needed
+### 1. Field Extraction — UNLISTED 2026-08-06
 
-`/python-sdk/field-extraction` is the one sample the studio genuinely supersedes. Both do
-schema-driven field extraction, but `/api/extraction/fields` hand-writes a VLM prompt and
-post-parses the JSON reply, while `/structured` calls the SDK's native
-`extract_structured()` and gets grounded citations back. It is also built on
-`VisionFeatures.KEY_VALUE_REGION`, which the SDK defect registry records as a **no-op**
-(SDK-037), worked around with `describe()`.
+**Jon's call: unlist only, do not delete.** Removed from `app/python-sdk/page.tsx`;
+`app/python-sdk/field-extraction/` stays and the route still returns 200. Re-listing is
+uncommenting one block. The folder is kept because a working demo of the pre-SDK-native
+approach has archival value while SDK-037 is still open.
 
-Decide: unlist from `app/python-sdk/page.tsx` only, or also delete
-`app/python-sdk/field-extraction/`. Everything else in the Extraction category should
-stay until its rail feature ships.
+Why it was the one sample the studio genuinely supersedes: both do schema-driven field
+extraction, but `/api/extraction/fields` hand-writes a VLM prompt and post-parses the JSON
+reply, while `/structured` calls the SDK's native `extract_structured()` and gets grounded
+citations back. It is also built on `VisionFeatures.KEY_VALUE_REGION`, a **no-op** (SDK-037 /
+NAPY-15) worked around with `describe()`.
+
+Everything else in the Extraction category stays until its rail feature ships — and per
+item 2, two of those features do not exist yet.
+
+**Trap found while doing this: the landing page's sample counts are hand-maintained and had
+rotted badly.** `app/page.tsx` stores each SDK's count inside a prose string (`foot: "33
+samples"`) and the headline total is produced by **regex-parsing the leading digits back out
+of those strings**. Nothing derives from the actual sample arrays, so the front door had been
+quietly understating the collection:
+
+| SDK | claimed | actual |
+|---|---|---|
+| Web SDK | 33 | **39** |
+| Python SDK | 7 | **18** |
+| DWS API | 5 | **6** |
+| Document Authoring | 3 | **4** |
+| **total** | **57** | **76** |
+
+All corrected (total now reads **75**, after this unlisting). But it will rot again: the
+counts live in a different file from the arrays they describe, and nothing fails when they
+disagree. **The durable fix is to derive them** — export each page's `samples` array, or move
+the registry somewhere shared, and compute both the per-SDK count and the total. Not done
+here because it is a refactor across eight pages and well outside this item's scope.
 
 ### 2. Which rail feature replaces which sample
 
