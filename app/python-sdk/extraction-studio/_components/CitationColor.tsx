@@ -68,6 +68,17 @@ export function CitationColor({
           data-custom={activePreset ? undefined : "true"}
         >
           <DropperIcon width={13} height={13} />
+          {/* The corner dot is what makes a CUSTOM colour visible: without it the
+              only place a hand-picked colour appeared was the hex field, since
+              this control deliberately does not tint itself. Kept to a dot in
+              the bottom-right — where the dropper glyph has no ink, it runs
+              top-right to bottom-left — so it reads as a state indicator on a
+              control rather than turning the button back into a swatch. */}
+          <span
+            className="citation-dot"
+            style={{ background: value }}
+            aria-hidden="true"
+          />
           <input
             type="color"
             className="citation-color-native"

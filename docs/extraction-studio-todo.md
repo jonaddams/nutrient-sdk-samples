@@ -260,9 +260,14 @@ biggest remaining knobs in `app/globals.css`: `--space-9` is still used by
   documented metadata (`docs.test.ts` pins it) and is what an OCR-oriented sample would
   key on. `DocStrip.test.tsx` asserts the badge is *absent*, so re-adding one is
   deliberate rather than reflex.
-- **A custom citation colour is not displayed anywhere** except the hex field — the trade
-  for not tinting the picker, which was the original ambiguity. A small colour dot in the
-  corner of the dropper button would give both.
+- ~~**A custom citation colour is not displayed anywhere** except the hex field.~~
+  **DONE 2026-08-06.** A 7px dot in the bottom-right of the dropper button now carries the
+  current value. It goes there because the dropper glyph runs top-right to bottom-left and
+  leaves that corner empty. Two rings — an inner `--surface` border punching a gap out of
+  the button, an outer `--line-strong` shadow — so a pale value does not vanish into the
+  button and a dark one does not vanish into the dark theme; verified in both. The button
+  itself still refuses to tint, and there is a test pinning that (`picker.style.background`
+  stays empty), because tinting it is what made it read as a fifth preset.
 
 ### 7. Known issue, not ours — SDK-045 (RESOLVED as an investigation, 2026-08-06)
 
@@ -349,11 +354,18 @@ SDK-037's no-op `VisionFeatures.KEY_VALUE_REGION`:
 - `groundingScore` comes back null for Bedrock model ids even though the endpoint returns
   `logprobs`. OpenAI returns 0.95 on the same document.
 
-**The provider dropdown has no distinct loading state.** New as of the Bedrock work: gating Run
-on the providers fetch means that while `providers === null` the select is empty and disabled
-with the ordinary help text, so the first thing a prospect sees is a brief flash of an empty
-box. Failure is distinguishable (the help text changes); loading is not. The fix is small, and
-the gating that created it is worth keeping — it prevents an early click reaching a provider
+~~**The provider dropdown has no distinct loading state.**~~ **DONE 2026-08-06.** While the
+fetch is in flight the select now carries `aria-busy`, a `Loading providers…` placeholder
+option so the box is never blank, and its own help text ("Checking which providers this
+backend can serve…"). All three clear on resolve, and a failed fetch shows the failure text
+with no `aria-busy` — so loading, ready and failed are now mutually distinguishable, where
+before loading and ready shared one help text over an empty box.
+
+**The placeholder option must carry `provider`'s current value.** Any other value leaves the
+controlled `<select>` with no matching option, and React falls back to rendering the first —
+of which there is none while loading. There is a test pinning this specifically.
+
+The Run gating that created the flash stays: it prevents an early click reaching a provider
 with no credentials and returning an opaque 500.
 
 ### 10. File SDK-045 and SDK-046 upstream — blocked on a Jira permission
