@@ -17,6 +17,7 @@
 - **Exactly three options get controls:** `languages`, `table_detection`, `output_format`. `favor_accuracy`, `enable_preprocessing`, `enable_skew_detection` and `WordsDetectionSettings.confidence_threshold` are **verified no-ops** and must get no parameter and no control.
 - **Language codes join with `+` only.** The twenty verified codes: `eng deu fra spa ita por nld swe dan pol rus jpn kor chi_sim chi_tra ara heb hin tur ell`. Any other separator returns an empty document silently.
 - **Backend test command:** `cd ~/SE/code/python-fast-api && .venv/bin/python -m pytest <path> -v`. Do **not** run the full suite: it takes ~7 minutes and makes real provider calls.
+- **`-k "not extract"` silently deselects whole files.** pytest matches `-k` against the module name too, so any filter containing `not extract` drops every test in `tests/test_extraction_geometry.py` and `tests/test_extraction.py`. A run can report `48 passed, 17 deselected` and look green while never executing the tests you just wrote. Run new geometry/extraction test files UNFILTERED, in their own command.
 - **Frontend test command:** `export PATH="$HOME/Library/pnpm/bin:$PATH"` first (pnpm is missing from non-interactive shells), then `pnpm exec vitest run <path>`.
 - **Frontend baseline before starting:** 273 tests / 31 files. `app/globals.css` reports 2 Biome errors / 8 warnings and always has; `styles.css` carries 8 `noDescendingSpecificity` warnings. Neither is yours.
 - **CSS source-order trap:** every rule in `app/python-sdk/extraction-studio/styles.css` is scoped under `.studio-shell` with identical specificity, so **source order alone decides**. The `@media (max-width: 1024px)` block must remain the LAST rules for its selectors.
@@ -141,8 +142,14 @@ from app.services.geometry import normalize_bbox
 
 - [ ] **Step 5: Run both test files to verify nothing regressed**
 
-Run: `cd ~/SE/code/python-fast-api && .venv/bin/python -m pytest tests/test_extraction_geometry.py tests/test_structured.py -q -k "not live and not endpoint and not extract"`
-Expected: PASS — the new 3 plus the existing structured tests (48 before this change).
+Run: `cd ~/SE/code/python-fast-api && .venv/bin/python -m pytest tests/test_extraction_geometry.py -q && .venv/bin/python -m pytest tests/test_structured.py -q -k "not live and not endpoint and not extract"`
+Expected: `3 passed` then `48 passed`.
+
+**Two commands, deliberately.** `-k "not extract"` matches the MODULE name as well
+as test names, so `tests/test_extraction_geometry.py` — which contains "extract" —
+is silently deselected by that filter. A combined run reports `48 passed, 17
+deselected` and looks green while never executing the new tests. Verified
+2026-08-06. Keep the geometry run unfiltered and separate.
 
 - [ ] **Step 6: Commit**
 
@@ -304,6 +311,12 @@ Expected: PASS — 6 tests.
 
 Run: `cd ~/SE/code/python-fast-api && .venv/bin/python -m pytest tests/ --ignore=tests/sdk -q -k "not live and not endpoint and not extract and not vlm and not describe and not markdown and not tables and not ocr and not icr and not fields"`
 Expected: PASS — 50 passed, 1 xfailed (the pre-change baseline).
+
+Note this filter also deselects `tests/test_extraction_geometry.py` and
+`tests/test_extraction.py`, because `not extract` matches their module names. That
+is fine HERE — this step exists to prove the other services still work — but it
+means this command alone never proves the geometry tests pass. Step 5 above is
+what does that.
 
 - [ ] **Step 7: Commit**
 
