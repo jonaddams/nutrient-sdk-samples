@@ -816,7 +816,7 @@ remembered number.** "283 across 36 files" was wrong (there were 28 test files a
 36) and cost a few minutes chasing 64 phantom tests; 219/30 was correct on 2026-08-06 and is
 simply superseded — #59 and #60 added four files and 90 tests. There is no `*.spec.*`, no
 Playwright suite, and `tests/` holds only `setup.ts`, so `pnpm test` covers everything. If a
-future count comes in *below* 309, check for deleted files before assuming a regression —
+future count comes in *below* 319, check for deleted files before assuming a regression —
 three test files have been deleted in this repo's history
 (`git log --diff-filter=D --name-only -- '*.test.tsx'`).
 
