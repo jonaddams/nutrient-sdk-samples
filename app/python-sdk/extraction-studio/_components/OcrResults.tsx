@@ -61,6 +61,36 @@ export function OcrResults({
   // The JSON view deliberately drops `code`: the snippet has its own segment.
   const { code, ...resultJson } = result;
 
+  // Keyed to the view, so what the button hands over is what is on screen —
+  // the same contract as StructuredResults' actions row.
+  const payload = () => {
+    if (view === "code") return code ?? "";
+    if (view === "markdown") return result.markdown ?? "";
+    if (view === "text") return result.fullText ?? "";
+    return JSON.stringify(resultJson, null, 2);
+  };
+
+  const FILE_FOR_VIEW: Record<string, { type: string; name: string }> = {
+    code: { type: "text/x-python", name: "ocr.py" },
+    markdown: { type: "text/markdown", name: "ocr.md" },
+    text: { type: "text/plain", name: "ocr.txt" },
+  };
+
+  const download = () => {
+    const { type, name } = FILE_FOR_VIEW[view] ?? {
+      type: "application/json",
+      name: "ocr.json",
+    };
+    const url = URL.createObjectURL(new Blob([payload()], { type }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    // Deferred: revoking synchronously races the browser's internal blob fetch
+    // for the download in some browsers (notably older Safari).
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
   return (
     <div>
       <div className="results-meta">
@@ -104,31 +134,45 @@ export function OcrResults({
         </div>
       ) : (
         <>
-          <Segmented
-            options={
-              isMarkdown
-                ? [
-                    { label: "Markdown", value: "markdown" },
-                    { label: "Code", value: "code" },
-                    { label: "JSON", value: "raw" },
-                  ]
-                : [
-                    { label: "Elements", value: "elements" },
-                    { label: "Text", value: "text" },
-                    { label: "JSON", value: "raw" },
-                    { label: "Code", value: "code" },
-                  ]
-            }
-            // Genuinely `view`, not `isMarkdown ? "markdown" : view` — that
-            // forced value made the segmented control lie about which pane
-            // was showing: clicking JSON switched the pane but the Markdown
-            // button stayed aria-pressed="true", because `value` ignored
-            // `view` whenever isMarkdown was true. `view` is kept in sync
-            // with `isMarkdown` by the effect above, so it is always one of
-            // the options currently on offer.
-            value={view}
-            onChange={setView}
-          />
+          <div className="panel-row-h panel-row results-actions">
+            <Segmented
+              options={
+                isMarkdown
+                  ? [
+                      { label: "Markdown", value: "markdown" },
+                      { label: "Code", value: "code" },
+                      { label: "JSON", value: "raw" },
+                    ]
+                  : [
+                      { label: "Elements", value: "elements" },
+                      { label: "Text", value: "text" },
+                      { label: "JSON", value: "raw" },
+                      { label: "Code", value: "code" },
+                    ]
+              }
+              // Genuinely `view`, not `isMarkdown ? "markdown" : view` — that
+              // forced value made the segmented control lie about which pane
+              // was showing: clicking JSON switched the pane but the Markdown
+              // button stayed aria-pressed="true", because `value` ignored
+              // `view` whenever isMarkdown was true. `view` is kept in sync
+              // with `isMarkdown` by the effect above, so it is always one of
+              // the options currently on offer.
+              value={view}
+              onChange={setView}
+            />
+            <div className="results-actions-btns">
+              <button
+                type="button"
+                className="btn ghost sm"
+                onClick={() => navigator.clipboard.writeText(payload())}
+              >
+                Copy
+              </button>
+              <button type="button" className="btn ghost sm" onClick={download}>
+                Download
+              </button>
+            </div>
+          </div>
 
           {view === "code" ? (
             // First, not folded into the chain below: `isMarkdown && view !==

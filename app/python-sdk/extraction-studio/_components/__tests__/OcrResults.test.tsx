@@ -229,3 +229,90 @@ test("the JSON view omits the code snippet", () => {
   expect(screen.queryByText(/"code":/)).not.toBeInTheDocument();
   expect(screen.getByText(/"filename": "scan.pdf"/)).toBeInTheDocument();
 });
+
+test("Copy writes the current view's payload to the clipboard", async () => {
+  const writeText = vi.fn((_text: string) => Promise.resolve());
+  vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+
+  // Elements view (default): the JSON, minus the snippet.
+  fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+  expect(writeText).toHaveBeenCalledTimes(1);
+  expect(writeText.mock.calls[0][0]).toContain('"filename": "scan.pdf"');
+  expect(writeText.mock.calls[0][0]).not.toContain('"code":');
+
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+  expect(writeText).toHaveBeenNthCalledWith(2, CODE);
+
+  vi.unstubAllGlobals();
+});
+
+test("Download names the file after the view it was taken from", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  const revokeObjectURL = vi.fn();
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL });
+
+  // The component never appends its anchor to the DOM, so intercepting its
+  // creation is the only way to read the `download` filename back.
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  const clickSpy = vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+  expect(createObjectURL).toHaveBeenCalledTimes(1);
+  expect((createObjectURL.mock.calls[0][0] as Blob).type).toBe(
+    "application/json",
+  );
+  expect(anchors[0]?.download).toBe("ocr.json");
+
+  // Deferred revoke: revoking synchronously races the browser's own blob fetch.
+  expect(revokeObjectURL).not.toHaveBeenCalled();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
+
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+  const codeBlob = createObjectURL.mock.calls[1][0] as Blob;
+  expect(codeBlob.type).toBe("text/x-python");
+  await expect(codeBlob.text()).resolves.toBe(CODE);
+  expect(anchors[1]?.download).toBe("ocr.py");
+
+  expect(clickSpy).toHaveBeenCalledTimes(2);
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+test("Download writes markdown as .md, not .json", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  expect(blob.type).toBe("text/markdown");
+  await expect(blob.text()).resolves.toBe("# Invoice");
+  expect(anchors[0]?.download).toBe("ocr.md");
+
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
