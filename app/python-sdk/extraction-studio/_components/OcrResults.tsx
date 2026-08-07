@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { confidenceTone, type OcrResult } from "../lib/ocr";
+import { confidenceTone, type OcrColorMode, type OcrResult } from "../lib/ocr";
+import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
@@ -10,12 +11,20 @@ export function OcrResults({
   onSelectElement,
   showRegions,
   onShowRegionsChange,
+  colorMode,
+  onColorModeChange,
+  citationHex,
+  onCitationHexChange,
 }: {
   result: OcrResult;
   activeIndex: number | null;
   onSelectElement: (index: number) => void;
   showRegions: boolean;
   onShowRegionsChange: (value: boolean) => void;
+  colorMode: OcrColorMode;
+  onColorModeChange: (mode: OcrColorMode) => void;
+  citationHex: string;
+  onCitationHexChange: (hex: string) => void;
 }) {
   const isMarkdown = result.config.outputFormat === "markdown";
   // Seeded from the CURRENT result so a fresh mount already shows the right
@@ -93,6 +102,38 @@ export function OcrResults({
           label="Show regions"
         />
       </div>
+
+      {/* Paired with Show regions, exactly as StructuredResults pairs
+          HighlightColor with Show citations: a colour control is meaningless
+          when nothing is drawn.
+
+          By confidence is the default and stays so. The tint is what makes the
+          overlay say WHERE OCR was unsure, which is the reason this panel had
+          no picker at all until now — Custom trades that signal away
+          deliberately, and only on request. The element table's confidence
+          dots are unaffected in either mode, so the signal never leaves the
+          panel entirely. */}
+      {showRegions && (
+        <div className="citation-color">
+          <span className="eyebrow">Region color</span>
+          <Segmented
+            options={[
+              { label: "By confidence", value: "confidence" },
+              { label: "Custom", value: "custom" },
+            ]}
+            value={colorMode}
+            onChange={(v) => onColorModeChange(v as OcrColorMode)}
+          />
+          {colorMode === "custom" && (
+            <HighlightColor
+              label="Region color"
+              hideLabel
+              value={citationHex}
+              onChange={onCitationHexChange}
+            />
+          )}
+        </div>
+      )}
 
       {empty ? (
         // Named, never a blank table. A malformed language string makes the SDK

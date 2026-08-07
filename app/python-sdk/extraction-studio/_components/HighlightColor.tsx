@@ -18,10 +18,15 @@ import { CITATION_PRESETS, hexToRgb, rgbToHex } from "../lib/citations";
  */
 export function HighlightColor({
   label,
+  hideLabel,
   value,
   onChange,
 }: {
   label: string;
+  /** Suppress the visible label when the parent already renders one. The
+   *  aria-labels still derive from `label`, so nothing is lost to a screen
+   *  reader — this only avoids printing the same words twice. */
+  hideLabel?: boolean;
   value: string;
   onChange: (hex: string) => void;
 }) {
@@ -46,7 +51,7 @@ export function HighlightColor({
 
   return (
     <div className="citation-color">
-      <span className="eyebrow">{label}</span>
+      {!hideLabel && <span className="eyebrow">{label}</span>}
 
       <div className="citation-swatches">
         {CITATION_PRESETS.map((p) => (

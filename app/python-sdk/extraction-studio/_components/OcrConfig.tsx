@@ -64,7 +64,7 @@ export function OcrConfig({
         >
           {/* Chips rather than <select multiple>, which is poor on touch and in
               a narrow panel. aria-pressed carries the state, matching how
-              CitationColor's preset swatches already work.
+              HighlightColor's preset swatches already work.
               role="group" + aria-label repeats what Field's <label> already
               says visually, because that <label> has no htmlFor target here
               (there is no single input for a chip row to point at) and so is

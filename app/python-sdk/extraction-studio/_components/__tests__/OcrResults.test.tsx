@@ -52,6 +52,10 @@ const props = {
   onSelectElement: vi.fn(),
   showRegions: true,
   onShowRegionsChange: vi.fn(),
+  colorMode: "confidence" as const,
+  onColorModeChange: vi.fn(),
+  citationHex: "#ffc107",
+  onCitationHexChange: vi.fn(),
 };
 
 test("shows timing, element count and average confidence", () => {
@@ -341,4 +345,83 @@ test("Download writes the Text view as .txt, not .json", async () => {
   expect(blob.type).toBe("text/plain");
   await expect(blob.text()).resolves.toBe(RESULT.fullText);
   expect(anchors[0]?.download).toBe("ocr.txt");
+});
+
+test("offers the region colour mode when regions are shown", () => {
+  render(<OcrResults {...props} />);
+  expect(screen.getByText("Region color")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "By confidence" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(screen.getByRole("button", { name: "Custom" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+});
+
+test("hides the whole colour block when regions are hidden", () => {
+  // It cannot do anything when nothing is drawn, and Show regions already
+  // gates the overlay — same pairing StructuredResults uses.
+  render(<OcrResults {...props} showRegions={false} />);
+  expect(screen.queryByText("Region color")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "By confidence" }),
+  ).not.toBeInTheDocument();
+});
+
+test("shows swatches only in Custom mode", () => {
+  const { rerender } = render(<OcrResults {...props} />);
+  // Confidence mode: the mode control is there, the swatches are not.
+  expect(
+    screen.queryByRole("button", { name: "Amber" }),
+  ).not.toBeInTheDocument();
+
+  rerender(<OcrResults {...props} colorMode="custom" />);
+  expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
+  expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
+});
+
+test("reports a mode change rather than owning the state", () => {
+  // page.tsx owns it: the overlay is built there, so a locally-held mode
+  // would show a Custom button that repainted nothing.
+  const onColorModeChange = vi.fn();
+  render(<OcrResults {...props} onColorModeChange={onColorModeChange} />);
+  fireEvent.click(screen.getByRole("button", { name: "Custom" }));
+  expect(onColorModeChange).toHaveBeenCalledWith("custom");
+});
+
+test("passes the hex through to the picker and reports changes", () => {
+  const onCitationHexChange = vi.fn();
+  render(
+    <OcrResults
+      {...props}
+      colorMode="custom"
+      citationHex="#00a3e0"
+      onCitationHexChange={onCitationHexChange}
+    />,
+  );
+  expect(screen.getByRole("button", { name: "Cyan" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Magenta" }));
+  expect(onCitationHexChange).toHaveBeenCalledWith("#d63384");
+});
+
+test("the colour block survives an empty result", () => {
+  // Show regions is rendered above the No-text-found callout, so the control
+  // paired with it must be too — otherwise the panel contradicts itself.
+  render(
+    <OcrResults
+      {...props}
+      result={{
+        ...RESULT,
+        textElements: [],
+        statistics: { ...RESULT.statistics, totalElements: 0, textElements: 0 },
+      }}
+    />,
+  );
+  expect(screen.getByText(/no text found/i)).toBeInTheDocument();
+  expect(screen.getByText("Region color")).toBeInTheDocument();
 });

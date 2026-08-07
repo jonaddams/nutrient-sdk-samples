@@ -206,3 +206,19 @@ test("the label names the control and reaches both aria-labels", () => {
   ).toBeInTheDocument();
   expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 });
+
+test("hideLabel drops the visible label but keeps the aria-labels", () => {
+  render(
+    <HighlightColor
+      label="Region color"
+      hideLabel
+      value={AMBER}
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.queryByText("Region color")).not.toBeInTheDocument();
+  expect(
+    screen.getByLabelText("Pick a custom region color"),
+  ).toBeInTheDocument();
+  expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
+});
