@@ -1,13 +1,15 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { CITATION_PRESETS } from "../../lib/citations";
-import { CitationColor } from "../CitationColor";
+import { HighlightColor } from "../HighlightColor";
 
 const AMBER = "#ffc107";
 const CYAN = "#00a3e0";
 
 test("renders a swatch per preset plus the native picker", () => {
-  render(<CitationColor value={AMBER} onChange={() => {}} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
+  );
   for (const p of CITATION_PRESETS) {
     expect(screen.getByRole("button", { name: p.label })).toBeInTheDocument();
   }
@@ -19,7 +21,9 @@ test("renders a swatch per preset plus the native picker", () => {
 test("the picker is a real colour input, not a stand-in button", () => {
   // The dropper icon is chrome over a live <input type="color">. Replacing it
   // with a click handler would lose the OS picker and system eyedropper.
-  render(<CitationColor value={AMBER} onChange={() => {}} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
+  );
   const input = screen.getByLabelText("Pick a custom citation color");
   expect(input.tagName).toBe("INPUT");
   expect(input).toHaveAttribute("type", "color");
@@ -30,7 +34,7 @@ test("the picker shows an icon rather than a fifth colour swatch", () => {
   // regression this guards is someone tinting the BUTTON with the current
   // value — the corner dot below is the sanctioned way to show the colour.
   const { container } = render(
-    <CitationColor value={AMBER} onChange={() => {}} />,
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
   );
   const picker = container.querySelector<HTMLElement>(".citation-picker");
   expect(picker).not.toBeNull();
@@ -46,7 +50,7 @@ test("a corner dot displays the current colour, including a custom one", () => {
   // field, because the picker button refuses to tint itself. The dot is the
   // compromise — it shows the value without turning the control into a swatch.
   const { container, rerender } = render(
-    <CitationColor value={AMBER} onChange={() => {}} />,
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
   );
   const dot = () => container.querySelector<HTMLElement>(".citation-dot");
   expect(dot()).not.toBeNull();
@@ -55,7 +59,13 @@ test("a corner dot displays the current colour, including a custom one", () => {
   expect(dot()).toHaveAttribute("aria-hidden", "true");
 
   // The case the item was raised for: a colour matching no preset.
-  rerender(<CitationColor value="#123456" onChange={() => {}} />);
+  rerender(
+    <HighlightColor
+      label="Citation color"
+      value="#123456"
+      onChange={() => {}}
+    />,
+  );
   expect(dot()).toHaveStyle({ background: "#123456" });
 });
 
@@ -64,7 +74,7 @@ test("the dot lives inside the picker, so it cannot steal the click", () => {
   // receiving the click. The dot is a child of the same label (and
   // pointer-events: none in CSS), not a sibling laid over it.
   const { container } = render(
-    <CitationColor value={CYAN} onChange={() => {}} />,
+    <HighlightColor label="Citation color" value={CYAN} onChange={() => {}} />,
   );
   const picker = container.querySelector(".citation-picker");
   expect(picker?.querySelector(".citation-dot")).not.toBeNull();
@@ -73,16 +83,24 @@ test("the dot lives inside the picker, so it cannot steal the click", () => {
 
 test("marks the picker as custom only when no preset matches", () => {
   const { container, rerender } = render(
-    <CitationColor value={AMBER} onChange={() => {}} />,
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
   );
   const picker = () => container.querySelector(".citation-picker");
   expect(picker()).not.toHaveAttribute("data-custom");
-  rerender(<CitationColor value="#123456" onChange={() => {}} />);
+  rerender(
+    <HighlightColor
+      label="Citation color"
+      value="#123456"
+      onChange={() => {}}
+    />,
+  );
   expect(picker()).toHaveAttribute("data-custom", "true");
 });
 
 test("marks the swatch matching the current value", () => {
-  render(<CitationColor value={CYAN} onChange={() => {}} />);
+  render(
+    <HighlightColor label="Citation color" value={CYAN} onChange={() => {}} />,
+  );
   expect(screen.getByRole("button", { name: "Cyan" })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -95,7 +113,13 @@ test("marks the swatch matching the current value", () => {
 
 test("matches the preset case-insensitively", () => {
   // A value round-tripped through the native input can come back uppercase.
-  render(<CitationColor value={CYAN.toUpperCase()} onChange={() => {}} />);
+  render(
+    <HighlightColor
+      label="Citation color"
+      value={CYAN.toUpperCase()}
+      onChange={() => {}}
+    />,
+  );
   expect(screen.getByRole("button", { name: "Cyan" })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -104,14 +128,18 @@ test("matches the preset case-insensitively", () => {
 
 test("reports the preset that was clicked", () => {
   const onChange = vi.fn();
-  render(<CitationColor value={AMBER} onChange={onChange} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={onChange} />,
+  );
   fireEvent.click(screen.getByRole("button", { name: "Cyan" }));
   expect(onChange).toHaveBeenCalledWith(CYAN);
 });
 
 test("commits a valid hex typed into the text field", () => {
   const onChange = vi.fn();
-  render(<CitationColor value={AMBER} onChange={onChange} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={onChange} />,
+  );
   fireEvent.change(screen.getByLabelText("Citation color hex value"), {
     target: { value: "#123456" },
   });
@@ -120,7 +148,9 @@ test("commits a valid hex typed into the text field", () => {
 
 test("normalises shorthand and bare hex before committing", () => {
   const onChange = vi.fn();
-  render(<CitationColor value={AMBER} onChange={onChange} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={onChange} />,
+  );
   const field = screen.getByLabelText("Citation color hex value");
   fireEvent.change(field, { target: { value: "#fff" } });
   expect(onChange).toHaveBeenLastCalledWith("#ffffff");
@@ -132,7 +162,9 @@ test("does NOT commit half-typed input", () => {
   // The annotation layer only ever receives a paintable colour, so partial
   // input must be held in the field rather than pushed to the canvas.
   const onChange = vi.fn();
-  render(<CitationColor value={AMBER} onChange={onChange} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={onChange} />,
+  );
   const field = screen.getByLabelText("Citation color hex value");
   for (const partial of ["#", "#f", "#ff", "#fff0"]) {
     fireEvent.change(field, { target: { value: partial } });
@@ -143,7 +175,9 @@ test("does NOT commit half-typed input", () => {
 });
 
 test("reverts the draft on blur when it never became valid", () => {
-  render(<CitationColor value={AMBER} onChange={() => {}} />);
+  render(
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
+  );
   const field = screen.getByLabelText("Citation color hex value");
   fireEvent.change(field, { target: { value: "nope" } });
   fireEvent.blur(field);
@@ -152,8 +186,23 @@ test("reverts the draft on blur when it never became valid", () => {
 
 test("follows an externally changed value", () => {
   const { rerender } = render(
-    <CitationColor value={AMBER} onChange={() => {}} />,
+    <HighlightColor label="Citation color" value={AMBER} onChange={() => {}} />,
   );
-  rerender(<CitationColor value={CYAN} onChange={() => {}} />);
+  rerender(
+    <HighlightColor label="Citation color" value={CYAN} onChange={() => {}} />,
+  );
   expect(screen.getByLabelText("Citation color hex value")).toHaveValue(CYAN);
+});
+
+test("the label names the control and reaches both aria-labels", () => {
+  // One component, two panels: structured calls these citations, OCR calls
+  // them regions. A screen reader must hear the right noun in each.
+  render(
+    <HighlightColor label="Region color" value={AMBER} onChange={() => {}} />,
+  );
+  expect(screen.getByText("Region color")).toBeInTheDocument();
+  expect(
+    screen.getByLabelText("Pick a custom region color"),
+  ).toBeInTheDocument();
+  expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 });

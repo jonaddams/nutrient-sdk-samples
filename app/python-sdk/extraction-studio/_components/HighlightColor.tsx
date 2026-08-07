@@ -4,17 +4,24 @@ import { DropperIcon } from "@/app/_components/icons";
 import { CITATION_PRESETS, hexToRgb, rgbToHex } from "../lib/citations";
 
 /**
- * Preset swatches plus a free color choice for the citation highlights.
+ * Preset swatches plus a free color choice for a highlight layer.
+ *
+ * Shared by both results panels: structured extraction calls these citations,
+ * OCR calls them regions, so the noun arrives as `label` rather than being
+ * hardcoded — including in the aria-labels, which is the whole reason it is a
+ * prop and not just a heading.
  *
  * The committed value is always a valid 6-digit hex, so the annotation layer
  * never has to defend against half-typed input. The text field keeps its own
  * draft state for exactly that reason: while someone types "#ff", that string is
  * unparseable and must not be pushed to the canvas.
  */
-export function CitationColor({
+export function HighlightColor({
+  label,
   value,
   onChange,
 }: {
+  label: string;
   value: string;
   onChange: (hex: string) => void;
 }) {
@@ -39,7 +46,7 @@ export function CitationColor({
 
   return (
     <div className="citation-color">
-      <span className="eyebrow">Citation color</span>
+      <span className="eyebrow">{label}</span>
 
       <div className="citation-swatches">
         {CITATION_PRESETS.map((p) => (
@@ -83,7 +90,7 @@ export function CitationColor({
             type="color"
             className="citation-color-native"
             value={value}
-            aria-label="Pick a custom citation color"
+            aria-label={`Pick a custom ${label.toLowerCase()}`}
             onChange={(e) => onChange(e.target.value)}
           />
         </label>
@@ -93,7 +100,7 @@ export function CitationColor({
           className="citation-hex mono"
           value={draft}
           spellCheck={false}
-          aria-label="Citation color hex value"
+          aria-label={`${label} hex value`}
           placeholder="#ffc107"
           onChange={(e) => {
             setDraft(e.target.value);
