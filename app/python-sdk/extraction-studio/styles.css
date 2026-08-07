@@ -689,6 +689,25 @@
   flex: 1;
 }
 
+/* OCR's variant. Four items in one flex row wrapped mid-phrase at the panel's
+   real width ("Show / regions", "39 / elements"), so each gets a whole cell in
+   a 2-column grid instead: elapsed time and element count on the first row,
+   confidence and the toggle on the second.
+ *
+ * A modifier rather than a change to .results-meta, because structured
+ * extraction's row holds two items, has never wrapped, and would get an empty
+ * cell out of this. Both panels keep sharing .results-meta for the border and
+ * spacing above, so that stays one source of truth.
+ *
+ * `auto` on the second column keeps the toggle hard right; `1fr` on the first
+ * absorbs the slack, so the two rows' left edges align. */
+.studio-shell .results-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+}
+
 .studio-shell .results-actions-btns {
   display: flex;
   gap: var(--space-2);
