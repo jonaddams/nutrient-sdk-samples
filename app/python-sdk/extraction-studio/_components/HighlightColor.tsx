@@ -18,15 +18,19 @@ import { CITATION_PRESETS, hexToRgb, rgbToHex } from "../lib/citations";
  */
 export function HighlightColor({
   label,
-  hideLabel,
+  embedded,
   value,
   onChange,
 }: {
   label: string;
-  /** Suppress the visible label when the parent already renders one. The
-   *  aria-labels still derive from `label`, so nothing is lost to a screen
-   *  reader — this only avoids printing the same words twice. */
-  hideLabel?: boolean;
+  /** Set when the parent already renders its own `.citation-color` block
+   *  around this control (its eyebrow label, its padding). Renders the
+   *  swatch row alone, as a fragment, instead of a second nested
+   *  `.citation-color` — nesting them double-applies that block's padding,
+   *  since the shared CSS rule matches both regardless of depth. Also
+   *  suppresses the visible label; the aria-labels still derive from
+   *  `label` unconditionally, so nothing is lost to a screen reader. */
+  embedded?: boolean;
   value: string;
   onChange: (hex: string) => void;
 }) {
@@ -49,9 +53,9 @@ export function HighlightColor({
     (p) => p.hex.toLowerCase() === value.toLowerCase(),
   );
 
-  return (
-    <div className="citation-color">
-      {!hideLabel && <span className="eyebrow">{label}</span>}
+  const content = (
+    <>
+      {!embedded && <span className="eyebrow">{label}</span>}
 
       <div className="citation-swatches">
         {CITATION_PRESETS.map((p) => (
@@ -114,6 +118,13 @@ export function HighlightColor({
           onBlur={() => setDraft(value)}
         />
       </div>
-    </div>
+    </>
   );
+
+  // Structured Extraction (embedded unset) gets its own `.citation-color`
+  // wrapper — one dose of the shared block padding. OCR's Custom mode
+  // (embedded) is already inside its parent's `.citation-color`, so a second
+  // wrapper here would double that padding: the CSS rule keys on the class,
+  // not on nesting depth.
+  return embedded ? content : <div className="citation-color">{content}</div>;
 }

@@ -207,16 +207,21 @@ test("the label names the control and reaches both aria-labels", () => {
   expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 });
 
-test("hideLabel drops the visible label but keeps the aria-labels", () => {
-  render(
+test("embedded drops both the visible label and the wrapper, but keeps the aria-labels", () => {
+  // embedded means "I am inside a parent's .citation-color block already" —
+  // the parent supplies its own label and the shared block padding. A second
+  // nested .citation-color here would double that padding, since the CSS
+  // rule matches the class regardless of nesting depth.
+  const { container } = render(
     <HighlightColor
       label="Region color"
-      hideLabel
+      embedded
       value={AMBER}
       onChange={() => {}}
     />,
   );
   expect(screen.queryByText("Region color")).not.toBeInTheDocument();
+  expect(container.querySelector(".citation-color")).not.toBeInTheDocument();
   expect(
     screen.getByLabelText("Pick a custom region color"),
   ).toBeInTheDocument();

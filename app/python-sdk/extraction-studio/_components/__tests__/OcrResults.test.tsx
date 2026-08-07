@@ -382,6 +382,16 @@ test("shows swatches only in Custom mode", () => {
   expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 });
 
+test("Region color appears exactly once in Custom mode", () => {
+  // The precise integration point `embedded` exists for: OcrResults renders
+  // its own "Region color" eyebrow beside the Segmented control, and
+  // HighlightColor renders a second one internally unless told not to. The
+  // label-only test above never catches a duplicate because it only runs in
+  // confidence mode, where HighlightColor isn't rendered at all.
+  render(<OcrResults {...props} colorMode="custom" />);
+  expect(screen.getAllByText("Region color")).toHaveLength(1);
+});
+
 test("reports a mode change rather than owning the state", () => {
   // page.tsx owns it: the overlay is built there, so a locally-held mode
   // would show a Custom button that repainted nothing.

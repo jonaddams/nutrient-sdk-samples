@@ -127,7 +127,7 @@ export function OcrResults({
           {colorMode === "custom" && (
             <HighlightColor
               label="Region color"
-              hideLabel
+              embedded
               value={citationHex}
               onChange={onCitationHexChange}
             />
