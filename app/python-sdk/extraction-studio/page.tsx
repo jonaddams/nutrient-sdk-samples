@@ -24,6 +24,7 @@ import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
 import {
   extractOcr,
+  type OcrColorMode,
   type OcrRequest,
   type OcrResult,
   ocrCitationsFor,
@@ -52,6 +53,10 @@ export default function ExtractionStudio() {
   const [citationHex, setCitationHex] = useState(DEFAULT_CITATION_HEX);
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
   const [showRegions, setShowRegions] = useState(true);
+  // Shared with structured extraction's citations on purpose — one studio-wide
+  // highlight colour that survives a rail switch, not two knobs that look
+  // linked and are not. Only the MODE is OCR's own.
+  const [ocrColorMode, setOcrColorMode] = useState<OcrColorMode>("confidence");
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -119,11 +124,9 @@ export default function ExtractionStudio() {
     setActiveIndex(null);
   }, [feature]);
 
-  // Mode is hardcoded here and wired to state in a later task — this call is
-  // byte-for-byte what the inline version produced.
   const ocrCitations = useMemo(
-    () => ocrCitationsFor(ocrResult?.textElements ?? [], "confidence"),
-    [ocrResult],
+    () => ocrCitationsFor(ocrResult?.textElements ?? [], ocrColorMode),
+    [ocrResult, ocrColorMode],
   );
 
   const viewerCitations = feature === "structured" ? citations : ocrCitations;
@@ -359,6 +362,10 @@ export default function ExtractionStudio() {
                   onSelectElement={setActiveIndex}
                   showRegions={showRegions}
                   onShowRegionsChange={setShowRegions}
+                  colorMode={ocrColorMode}
+                  onColorModeChange={setOcrColorMode}
+                  citationHex={citationHex}
+                  onCitationHexChange={setCitationHex}
                 />
               ) : (
                 <div className="panel-section">
