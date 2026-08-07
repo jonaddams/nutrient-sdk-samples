@@ -1,35 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { OcrResult } from "../lib/ocr";
+import { confidenceTone, type OcrResult } from "../lib/ocr";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
-
-/** Bands a confidence score into the three tones `.match-dot` already styles.
- *
- *  A sibling of matchDotTone() in StructuredResults, NOT a reuse of it: that one
- *  keys on match strings ("exact", "not_found") while this takes a float.
- *  Conflating the two would mean one function with two unrelated input types. */
-export function confidenceTone(n: number): "good" | "partial" | "bad" {
-  if (n >= 0.85) return "good";
-  if (n >= 0.5) return "partial";
-  return "bad";
-}
-
-/** Fill colour for a region box, so the overlay shows WHERE OCR was unsure.
- *  This is why OcrResults has no colour picker: a user-chosen colour would
- *  fight the confidence tint.
- *
- *  Values MUST match `.match-dot.good/.partial/.bad` in styles.css — that is
- *  the source of truth for these three tones. They used to diverge (this
- *  function had its own brighter #22c55e/#eab308/#ef4444), so the dot next to
- *  an element and the box drawn for that same element were visibly different
- *  greens. */
-export function confidenceHex(n: number): string {
-  const tone = confidenceTone(n);
-  if (tone === "good") return "#4a9d6a";
-  if (tone === "partial") return "#c9a227";
-  return "#c8553c";
-}
 
 export function OcrResults({
   result,

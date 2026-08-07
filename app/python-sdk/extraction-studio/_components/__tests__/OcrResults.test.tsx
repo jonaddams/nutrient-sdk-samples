@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { OcrResult } from "../../lib/ocr";
-import { confidenceTone, OcrResults } from "../OcrResults";
+import { OcrResults } from "../OcrResults";
 
 // Unconditional, not tail-of-body: an assertion that throws mid-test would
 // otherwise skip the tail cleanup and leak a stubbed global or an active
@@ -53,12 +53,6 @@ const props = {
   showRegions: true,
   onShowRegionsChange: vi.fn(),
 };
-
-test("confidenceTone bands a score into three tones", () => {
-  expect(confidenceTone(0.95)).toBe("good");
-  expect(confidenceTone(0.6)).toBe("partial");
-  expect(confidenceTone(0.2)).toBe("bad");
-});
 
 test("shows timing, element count and average confidence", () => {
   render(<OcrResults {...props} />);

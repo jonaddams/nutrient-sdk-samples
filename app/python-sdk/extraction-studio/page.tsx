@@ -8,7 +8,7 @@ import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
 import { OcrConfig } from "./_components/OcrConfig";
-import { confidenceHex, OcrResults } from "./_components/OcrResults";
+import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
 import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
@@ -22,7 +22,12 @@ import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
 import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
-import { extractOcr, type OcrRequest, type OcrResult } from "./lib/ocr";
+import {
+  extractOcr,
+  type OcrRequest,
+  type OcrResult,
+  ocrCitationsFor,
+} from "./lib/ocr";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -114,24 +119,10 @@ export default function ExtractionStudio() {
     setActiveIndex(null);
   }, [feature]);
 
-  // OCR elements already arrive as fractional citations from the backend, so the
-  // existing overlay draws them with no new drawing code. Each carries its own
-  // hex, which is why IndexedCitation has an optional per-citation colour.
-  // IndexedCitation is { fieldIndex, citation } — a wrapper. Spreading the
-  // citation's own fields in would produce the wrong shape and paint nothing.
+  // Mode is hardcoded here and wired to state in a later task — this call is
+  // byte-for-byte what the inline version produced.
   const ocrCitations = useMemo(
-    () =>
-      (ocrResult?.textElements ?? []).flatMap((el, index) =>
-        el.citation
-          ? [
-              {
-                fieldIndex: index,
-                citation: el.citation,
-                hex: confidenceHex(el.confidence),
-              },
-            ]
-          : [],
-      ),
+    () => ocrCitationsFor(ocrResult?.textElements ?? [], "confidence"),
     [ocrResult],
   );
 
