@@ -6,8 +6,12 @@ Revised 2026-08-05, when the Bedrock provider was built, live-verified, and merg
 `python-fast-api#32` + this repo's `#49`. Item 3 was rewritten twice that day: first because the
 SigV4 shim it prescribed turned out to be unnecessary and the credentials it called a
 non-blocker were the only blocker, then again once real Bedrock proved both provisional model
-ids wrong. Item 4 is resolved. Items 8 and 9 are new, and **"Next session — start here" below
-is the priority order agreed with Jon** — read that before picking anything up.
+ids wrong. Item 4 is resolved. Items 8 and 9 are new.
+
+Revised 2026-08-07. Adaptive OCR shipped (#59 + `python-fast-api#34`), the sample was renamed
+**Extraction Studio** (#60), and **"Next session — start here" was rewritten from scratch** —
+every priority on the 2026-08-05 list is closed, so that list is gone rather than left as a
+column of strikethroughs. Read the new one before picking anything up.
 
 The studio came from the standalone `nutrient-data-extraction-demo`, now retired. **This
 file is the part that matters for working in the studio from here** — everything actively
@@ -34,14 +38,20 @@ The sample documents themselves are already here in `public/documents/` and
 ## Decided, do not re-litigate
 
 **Build the rail out; the studio absorbs the samples over time.** Jon, 2026-08-03. The
-seven disabled `SOON` rail entries stay and get built. This *reverses* an earlier
-decision that they should become registry samples instead — do not flip it back without
-talking to Jon.
+disabled `SOON` rail entries stay and get built — seven when this was decided, **six** since
+Adaptive OCR shipped. This *reverses* an earlier decision that they should become registry
+samples instead — do not flip it back without talking to Jon.
 
 **The existing extraction samples stay until the studio actually replaces them**, then
-retire one at a time. Checked 2026-08-03: the studio implements structured extraction
-ONLY, and no other sample shares its endpoint. Unlisting them early deletes working
-demos in favour of disabled buttons.
+retire one at a time. Unlisting them early deletes working demos in favour of disabled
+buttons.
+
+Re-checked 2026-08-07: the studio now implements **two** features, structured extraction and
+Adaptive OCR, so it shares `/api/extraction/ocr` with the **OCR Extraction** sample — the
+first genuine retirement candidate the rail has produced. It is not retired yet, and that is
+deliberate: `adaptive_ocr` covers only one of the three OCR rail entries that sample maps to
+(see item 2's table). Retire it once Multilingual and Fast OCR ship, or once Jon decides
+Adaptive alone is enough — his call, not an inference from the endpoint overlap.
 
 **Citation colour is session state, not persisted.** Every demo opens in the same
 known-good colour rather than inheriting whatever the last viewer picked. It also avoids
@@ -51,54 +61,114 @@ reading `localStorage` during render, which would be a hydration mismatch.
 
 ## TODO
 
-### Next session — start here
+### Where the studio stands, 2026-08-07
 
-Reviewed with Jon 2026-08-05, after Bedrock shipped. Ordered by whether a prospect would
-actually see it, which is not the same as ordered by effort.
+**Two features live, six `SOON`.** Structured extraction, and Adaptive OCR as of 2026-08-06
+(#59 + `python-fast-api#34`). Building the rail out is the standing direction, not a loose end
+— see "Decided, do not re-litigate".
 
-1. ~~**SDK-045 write-up (item 7).**~~ **DONE 2026-08-06** — and the mechanism turned out to
-   be different from what item 7 claimed. See `docs/sdk-defects/`. It also turned up
-   **SDK-046**, which affects the shipped `/python-sdk/document-to-markdown` sample.
-   Filing all four tickets is now **item 10** below, deferred deliberately.
-2. ~~**Citation-colour dot (item 6)** and **the provider dropdown's loading state (item 9)**.~~
-   **DONE 2026-08-06** (#52). Details under items 6 and 9.
-3. ~~**Decide the Multimodal toggle's fate, and file the two SDK no-op defects (item 9).**~~
-   **DONE 2026-08-06.** Toggle removed (Jon's call); both no-ops written up as SDK-047/048.
-   Only the *filing* remains, which is item 10.
-4. ~~**Whitespace pass (item 5)** — Jon's own ask.~~ **DONE 2026-08-06.** Details in item 5.
-5. ~~**Scan signalling and the Claims label (item 6)**~~ **DONE 2026-08-06.** Details in item 6.
-6. ~~**Structural cleanup (items 1, 2, 8)**~~ **DONE 2026-08-06.** Item 8 cleared
-   (`python-fast-api#33` + this repo's #57), item 2 resolved as analysis (the Text export
-   mapping was wrong — two rail gaps, not one open question), item 1 unlisted per Jon.
+**The sample is called "Extraction Studio"** as of 2026-08-07 (#60). It read "Structured
+Extraction" for a day after OCR shipped, which named a third of what the shell does and
+collided with the rail's own `Structured extraction` *feature* label. The name now matches the
+URL, the spec, the plan and this file. The **feature** label is still `Structured extraction`
+and is correct — it names one technique among eight. A test pins the page header to the
+registry card's name, because those are two literals that already drifted apart once.
 
-**All six priorities are now closed.** What remains from this list, in rough order:
+Two things the OCR work settled:
 
-- **Item 10** — file SDK-045 through SDK-048 upstream. Blocked on the NAPY Jira permission,
-  not on the write-ups.
-- **Item 2's two rail gaps** — Table Extraction and Document to Markdown have no successor,
-  so those samples cannot be retired yet.
-- **The landing page's sample counts should be derived, not hand-maintained** — see item 1.
-- The seven disabled `SOON` rail entries, which are the standing direction rather than a
-  loose end.
-7. **File SDK-045 through SDK-048 upstream (item 10)** — blocked on a Jira permission, not on
-   the write-ups, which are finished. Deferred by Jon 2026-08-06.
-
-**Adaptive OCR is LIVE as of 2026-08-06** — the second feature in the rail after Structured
-extraction. Six `SOON` entries remain, and they are the standing direction rather than a loose
-end (see "Decided, do not re-litigate").
-
-Two things that work settled while building it:
-
-- **Multilingual OCR is now known to be buildable.** Multi-language works, with `+` as the
-  separator — `eng+deu+fra` scored higher than any single language. Its rail entry is a
-  decision, no longer an unknown.
-- **Adaptive OCR needs no new documents**, which is why it was built before Local ICR. The
+- **Multilingual OCR is buildable.** Multi-language works with `+` as the separator, and
+  `eng+deu+fra` scored higher than any single language. Its rail entry is now a decision rather
+  than an unknown. **Any other separator returns an empty document silently** — that is what
+  the server-side language allowlist exists to prevent, and it is worth filing as SDK-049
+  (priority 4 below).
+- **Adaptive OCR needed no new documents**, which is why it was built before Local ICR. The
   manifest's four zero-text-layer scans are its corpus, and #56 already marks them `SCAN`.
 
-Full design at `docs/specs/2026-08-06-adaptive-ocr-design.md`; plan at
-`docs/plans/2026-08-06-adaptive-ocr.md`. Three options ship (languages, table detection,
-output format) because only three of seven candidates measurably change the output — the
-other four are verified no-ops and deliberately have no controls.
+Design at `docs/specs/2026-08-06-adaptive-ocr-design.md`; plan at
+`docs/plans/2026-08-06-adaptive-ocr.md`. Three options ship (languages, table detection, output
+format) because only three of seven candidates measurably change the output — the other four are
+**verified no-ops** and deliberately have no controls. Do not add one back without re-measuring;
+that is the Multimodal-toggle mistake (item 9).
+
+### Next session — start here
+
+Rewritten 2026-08-07. Every priority on the 2026-08-05 list is closed, so this is a fresh list
+rather than a column of strikethroughs. **Not yet reviewed with Jon** — the 2026-08-05 list was,
+so treat this ordering as a proposal. It is ordered by what a prospect would notice, which is
+not the same as ordered by effort.
+
+The immediate context is that Jon intends to **send the studio to colleagues for review**. That
+raises the value of items 1 and 2, both of which a reviewer meets in the first minute, above
+everything else on this list.
+
+1. **The OCR results panel has no Code view, and the spec says it should.** The spec's
+   `OcrResults` section calls for four segments — Text / Elements / JSON / **Code** — and only
+   three shipped (Elements / Text / JSON, or Markdown / JSON in markdown mode). This was
+   **dropped in the plan, not in implementation**: the plan never mentioned the fourth segment,
+   so all eight tasks built faithfully to a plan that had already lost it.
+
+   It reads as a regression when switching features, because **Structured extraction does have
+   a Code segment**. A prospect who learns "every result gives you the code that produced it"
+   loses that promise by clicking one rail entry.
+
+   Not a frontend-only change: the snippet is built server-side by `_build_code()` in
+   `python-fast-api/app/services/structured.py:346`, and the OCR response has **no `code`
+   field at all** — `app/services/ocr*.py` has no equivalent builder. So this is a backend
+   addition mirroring `_build_code`, keeping its two hard-won rules: **every name the snippet
+   references must be defined in the snippet** (item 8), and **tests must `compile()` the
+   output** rather than string-matching it.
+
+   Either build it or amend the spec to say three segments and why. Leaving spec and code
+   disagreeing is the worst of the three.
+
+2. **In Markdown mode the meta row reads "0 elements · 0% avg confidence".** Honest — markdown
+   output carries no elements and no per-element confidence — but it reads as a failed run to
+   anyone who has not been told. `OcrResults.tsx:64-74` renders all three stats
+   unconditionally; the fix is hiding the element count and the confidence figure when
+   `isMarkdown`, leaving the timing. Small, and the first thing a reviewer flipping the Output
+   control will see.
+
+3. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
+   not on the write-ups, which are finished and ready to paste. Deferred by Jon 2026-08-06.
+   **Try the browser first** — the API path is what fails, and that is the cheapest test.
+   Worth chasing on its own merits: it blocks every future SDK defect filing.
+
+4. **Write up SDK-049 — a malformed `default_languages` string returns an empty document
+   silently.** The only one of the five with no write-up yet. Measured 2026-08-06: `eng,deu`,
+   `eng;deu`, `eng|deu`, `eng deu` and two-letter codes all yield 154 chars / 0 elements with
+   **no exception raised**. `eng,deu` is the obvious first guess a caller makes, so they
+   conclude the page is blank.
+
+   **The repro is already committed and already run** —
+   [`repro/napy_049_language_separator.py`](sdk-defects/repro/napy_049_language_separator.py),
+   re-verified 2026-08-07, five of five malformed strings empty and the four confidence
+   figures re-derived to the digit. What is missing is only the prose: a
+   `docs/sdk-defects/sdk-049-*.md` and a `napy-ticket-sdk-049.md` in the house style the
+   other four use. Then it joins the item 10 filing queue.
+
+5. **The two rail gaps (item 2)** — Table Extraction and Document to Markdown have no rail
+   successor, so those samples cannot be retired. Note Document to Markdown is also the sample
+   most affected by SDK-046, so a rail feature built on that endpoint inherits the word loss.
+
+6. **The next rail feature, when there is appetite for one.** Rough order of cheapness, given
+   what is now known:
+   - **Multilingual OCR** — cheapest by far. Same endpoint, same panel, same results component;
+     the language multi-select already exists and `+` is proven. Arguably it is a *preset* of
+     Adaptive OCR rather than a feature, which is a design question worth settling before
+     building: two rail entries that differ only in a default may read as padding.
+   - **Fast OCR** — different output (an invisible text layer on the PDF, not extracted data),
+     so it needs a genuinely different results panel. Would retire nothing on its own.
+   - **Local ICR / VLM-enhanced ICR** — still blocked on the corpus. Jon: "I don't have a great
+     selection of handwriting sample documents." Needs documents before it needs code.
+   - **Table Extraction / Document to Markdown** — no rail entry exists yet, so these start
+     with a `FEATURES` entry and a name, not a panel.
+
+   **When a third feature lands, the abstraction question reopens.** The spec deliberately
+   refused a feature registry at two features, on the grounds that a shared contract inferred
+   from a sample of two whose shapes genuinely differ (schema-in/fields-out versus
+   options-in/elements-out) would be inferred from too little. A third is when to look again —
+   `page.tsx`'s feature-keyed panel switching and per-feature result clearing are the two
+   places that will show the strain first.
 
 ### 1. Field Extraction — UNLISTED 2026-08-06
 
@@ -532,18 +602,22 @@ of which there is none while loading. There is a test pinning this specifically.
 The Run gating that created the flash stays: it prevents an early click reaching a provider
 with no credentials and returning an opaque 500.
 
-### 10. File SDK-045 through SDK-048 upstream — blocked on a Jira permission
+### 10. File SDK-045 through SDK-049 upstream — blocked on a Jira permission
 
-**Deferred by Jon 2026-08-06.** Nothing about the write-ups is outstanding; this is purely
-the filing step.
+**Deferred by Jon 2026-08-06.** For SDK-045 through 048, nothing about the write-ups is
+outstanding; this is purely the filing step. **SDK-049 still needs writing up** — see the
+"Next session" list.
 
-Both ticket bodies are finished and ready to paste, in NAPY house style (metadata table,
+Four ticket bodies are finished and ready to paste, in NAPY house style (metadata table,
 self-contained repro, observed output, root-cause hypothesis, suggested fix, related):
 
 - `docs/sdk-defects/napy-ticket-sdk-045.md` — text destroyed under a rotated stamp
 - `docs/sdk-defects/napy-ticket-sdk-046.md` — markdown/HTML word loss at column boundaries
 - `docs/sdk-defects/napy-ticket-sdk-047.md` — `include_page_images` no-op
 - `docs/sdk-defects/napy-ticket-sdk-048.md` — `confidenceComponents` null on Bedrock ids
+- **SDK-049 — malformed `default_languages` returns an empty document silently. NOT YET
+  WRITTEN UP.** The repro is committed and verified
+  (`repro/napy_049_language_separator.py`); the two markdown files are not written.
 
 File each as **NAPY / Bug / priority High**, labels `python-sdk` `sdk-defect-hunting`
 `vision` — matching NAPY-15/16/17. Then write the returned issue key into the header of
@@ -567,7 +641,7 @@ path does not — try that first, it is the cheapest test.
 
 ## Facts that will cost you time if you rediscover them
 
-### `useCitationAnnotations.ts` — four invariants enforced only by comments
+### `useCitationAnnotations.ts` — five invariants enforced only by comments
 
 It owns the citation annotation lifecycle behind a single serialised FIFO mutation queue.
 
@@ -584,6 +658,14 @@ It owns the citation annotation lifecycle behind a single serialised FIFO mutati
    the picker looked dead. Extend `PaintedStyle` and the comparison; do **not** add a
    "restyle everything" bypass, because a second mutation path is what the queue exists to
    prevent. Whatever you add also belongs in both effects' dependency arrays.
+5. **`citations` is a COMPACTED array, so its array position is not a field index.** A field
+   with no citation is absent from it, which is why `IndexedCitation` carries `fieldIndex`
+   explicitly — `citations[fieldIndex]` is the misalignment bug fixed in `77fa9c1`.
+   Destructure `fieldIndex` from the loop; never index into `citations` by it. Related:
+   **`IndexedCitation` is a wrapper**, `{ fieldIndex, citation, hex? }`, not a flattened
+   citation — spreading a citation's own fields in produces the wrong shape and paints
+   nothing. Both mistakes appeared in the OCR *plan*, so they cost review rounds rather than
+   runtime bugs, which is the only reason they are cheap enough to write down here.
 
 Also: `page.tsx`'s `citations` memo is keyed on `[result]`, **not** `[fields]`, with a lint
 suppression. `fields` is rebuilt every render, so keying on it makes the sync effect delete
@@ -657,6 +739,22 @@ not describe the models as doing vision. Multimodal models still work — just n
 reason. Probably a genuine SDK defect, in the same family as SDK-037's no-op
 `KEY_VALUE_REGION`, and worth filing.
 
+### The frontend response type is a claim about the backend, not a check on it
+
+The OCR panel crashed hard in Markdown mode because the backend's markdown branch omitted four
+fields the frontend's `OcrResult` declared **required**. TypeScript cannot catch this — the
+type describes a JSON payload it never sees — so the guarantee was fictional in exactly the
+branch nobody exercised.
+
+It survived **eight task reviews and a live manual pass**, because the manual pass only
+exercised Elements, and the one "markdown" unit test spread a JSON-shaped fixture over the
+markdown case, so the fixture supplied the fields the backend did not. A test whose fixture is
+built from the wrong branch's shape proves nothing about the branch it names.
+
+Two rules: **exercise every branch of an output-format control by hand**, and **build each
+branch's test fixture from that branch's actual response**, captured from the backend, not
+adapted from a sibling.
+
 ### Providers
 
 - `/structured` accepts `openai`, `azure`, `anthropic` (alias `claude`), `bedrock` and `local`.
@@ -677,22 +775,38 @@ reason. Probably a genuine SDK defect, in the same family as SDK-037's no-op
 
 ## Baselines
 
-Run from the repo root. Re-measured on `main` at `13cc4ef` (after #50), 2026-08-06.
+Run from the repo root. Re-measured 2026-08-07 on the `#60` branch (rename).
 
 | | Value | Command |
 |---|---|---|
-| Tests | **219 across 30 files** | `pnpm test` |
+| Frontend tests | **309 across 34 files** | `pnpm test` |
 | Typecheck | clean | `pnpm exec tsc --noEmit` |
 | Biome, changed files | 0 errors | `pnpm exec biome check <paths>` |
+| Backend, pure subset | **77 passed / 14 deselected in ~1s** | see below |
 
-**The previous figure in this table — "283 across 36 files, verified on `main` after
-#48" — was wrong, and cost a few minutes chasing 64 phantom tests.** There were only
-**28** test files in the tree at #48 (`git ls-tree -r --name-only 3948b6c | grep -c
-'\.test\.tsx\?$'`), and 30 now, #49 having added `providers.test.ts` and `page.test.tsx`.
-Thirty is also all that exist: no `*.spec.*`, no Playwright suite, and `tests/` holds only
-`setup.ts`, so `pnpm test` covers everything. If a future count comes in *below* 219,
-check for deleted files before assuming a regression — three test files have been deleted
-in this repo's history (`git log --diff-filter=D --name-only -- '*.test.tsx'`).
+The backend pure subset, which is the one worth running constantly because it touches no
+provider and no SDK:
+
+```
+cd ~/SE/code/python-fast-api && .venv/bin/pytest \
+  tests/test_ocr_options.py tests/test_extraction_geometry.py \
+  tests/test_extraction_merge.py tests/test_extraction_pages.py \
+  tests/test_structured.py -q -k "not live and not endpoint"
+```
+
+**Earlier figures in this table were wrong twice, so re-measure rather than trusting a
+remembered number.** "283 across 36 files" was wrong (there were 28 test files at #48, not
+36) and cost a few minutes chasing 64 phantom tests; 219/30 was correct on 2026-08-06 and is
+simply superseded — #59 and #60 added four files and 90 tests. There is no `*.spec.*`, no
+Playwright suite, and `tests/` holds only `setup.ts`, so `pnpm test` covers everything. If a
+future count comes in *below* 309, check for deleted files before assuming a regression —
+three test files have been deleted in this repo's history
+(`git log --diff-filter=D --name-only -- '*.test.tsx'`).
+
+**A green `pnpm test` is not evidence for a type change.** Vitest transpiles without
+typechecking, so a test run passes over errors `tsc` rejects — this happened during the OCR
+work with an invalid `CitationStyle` value that vitest ran happily and `tsc --noEmit`
+refused. Run both.
 
 Scope Biome to the files you touched. `app/globals.css` reports **2 errors / 8 warnings
 and always has** — re-confirmed 2026-08-06 by diffing Biome output against `main`, where
@@ -732,6 +846,13 @@ but zsh only sources `.zshrc` for *interactive* shells, so scripts and agent she
 inherit a stale entry and fail with `command not found` while your terminal is fine.
 Prefix `export PATH="$HOME/Library/pnpm/bin:$PATH"`, or move the block to `~/.zshenv`.
 
+**`uvicorn` without `--reload` serves the code as of when you started it.** A fix that is
+correct in the file will appear "not taken" indefinitely, and the natural next move — reading
+the source again — confirms the fix is there and sends you looking for a second bug. This
+happened during the OCR work and the fix was already correct. **Restart the backend, or start
+it with `--reload`, before concluding a backend change did not land.** The frontend has the
+mirror-image version of this problem, below.
+
 **HMR does not reliably connect here, so a clean-looking check can be a stale bundle.**
 Hard-reload before browser checks, and when a CSS or config change appears to do nothing,
 **fetch the served chunk and grep it** before debugging the source. That caught two real
@@ -753,7 +874,25 @@ Worth fixing properly at some point: an environment-dependent assertion that fli
 whether an unrelated app happens to be open is a bad citizen in a default suite.
 
 **That run is not free and not fast.** 68 tests took **7 minutes** and several endpoints
-make real provider calls. `--ignore=tests/sdk` skips the SDK defect-hunting suite but not
-the live extraction endpoints. Budget for it, and prefer targeted runs
-(`pytest tests/test_structured.py -k "not live and not endpoint and not extract"`, which
-is pure and finishes in well under a second).
+make real provider calls (125 collected as of 2026-08-07). `--ignore=tests/sdk` skips the SDK
+defect-hunting suite but not the live extraction endpoints. Budget for it, and prefer the
+targeted pure subset in "Baselines" above.
+
+**`-k "not extract"` silently deselects whole FILES, and an earlier version of this section
+recommended it.** `-k` matches against the module name too, so `not extract` excludes every
+`test_extraction*.py` file in its entirety — not merely the tests whose own names say
+"extract". Measured 2026-08-07:
+
+```
+pytest tests/test_extraction_merge.py    -q --collect-only  →  7 collected
+pytest tests/test_extraction_merge.py    -q -k "not extract" --collect-only  →  0
+pytest tests/test_extraction_geometry.py -q -k "not extract" --collect-only  →  0 of 6
+pytest tests/ --ignore=tests/sdk         -q -k "not extract" --collect-only  →  84 of 125
+```
+
+**This hid a real regression during the OCR work**: `test_extraction_merge.py` was asserting
+the pre-`pages` response shape and failing, and the filtered run reported green. It was then
+reported as pre-existing, and only checking `main` (7 passed) against the branch (1 failed)
+showed otherwise. Two rules follow — **name files explicitly instead of filtering them out
+with `-k`**, and **verify any "pre-existing failure" claim against `main`** rather than
+accepting it.
