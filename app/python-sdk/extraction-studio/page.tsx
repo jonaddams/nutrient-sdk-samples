@@ -235,8 +235,8 @@ export default function ExtractionStudio() {
       style={{ background: "var(--bg)" }}
     >
       <PythonSampleHeader
-        title="Structured Extraction"
-        description="Pull a JSON schema's fields out of a document with the SDK's native structured extraction — every value carries a citation you can click to find it on the page."
+        title="Extraction Studio"
+        description="One shell for the Python SDK's extraction techniques. Pull a JSON schema's fields out of a document, or read a scan into structured content with Adaptive OCR — every result carries a citation you can click to find it on the page."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
