@@ -127,12 +127,20 @@ export function ocrCitationsFor(
 
 ```tsx
 // _components/HighlightColor.tsx
-export function HighlightColor({ label, value, onChange }: {
+export function HighlightColor({ label, hideLabel, value, onChange }: {
   label: string;                      // "Citation color" | "Region color"
+  hideLabel?: boolean;                // suppress the VISIBLE label only
   value: string;
   onChange: (hex: string) => void;
 }): JSX.Element;
 ```
+
+`hideLabel` was not in the original five decisions; it fell out of writing the plan. In the OCR
+panel the heading has to be visible in **both** modes, but `HighlightColor` only renders in
+Custom — so the OCR block owns the `<span className="eyebrow">Region color</span>` itself, and
+`hideLabel` stops the component printing the same words a second time. The aria-labels still
+derive from `label`, so nothing is lost to a screen reader. `StructuredResults` does not pass
+it and is visually unchanged.
 
 `OcrResults` gains four props, the same shape `StructuredResults` already takes:
 `colorMode`, `onColorModeChange`, `citationHex`, `onCitationHexChange`.
