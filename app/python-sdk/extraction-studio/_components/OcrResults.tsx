@@ -179,7 +179,13 @@ export function OcrResults({
             // "raw"` is true when view is "code", so leading with that test
             // would render the markdown pane over the Code segment.
             <pre className="ocr-text mono">
-              {code ?? "# run OCR to see the code"}
+              {/* Not "run OCR to see the code": `code` is optional so this view
+                  can merge before the backend deploys, and in that window the
+                  reader has JUST run OCR — telling them to do it again reads as
+                  a broken control rather than a pending deploy. Code stays in
+                  the segment list either way (design decision 3): a control
+                  that vanishes based on state is the worse failure. */}
+              {code ?? "# code snippet unavailable from this backend"}
             </pre>
           ) : isMarkdown && view !== "raw" ? (
             <pre className="ocr-text mono">{result.markdown}</pre>

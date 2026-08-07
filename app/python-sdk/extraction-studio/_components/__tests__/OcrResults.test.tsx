@@ -225,9 +225,16 @@ test("Code wins over the markdown pane in markdown mode", () => {
 test("degrades to a Python-commented placeholder when code is absent", () => {
   // Optional on purpose: the response type is a claim about the backend, not a
   // check on it, and this view ships before the backend deploy reaches Railway.
+  //
+  // The wording has to be true in exactly that window. This panel only renders
+  // after a run, so "run OCR to see the code" instructs the reader to do the
+  // thing they just did — it reads as a broken button, not a pending deploy.
   render(<OcrResults {...props} />);
   fireEvent.click(screen.getByRole("button", { name: "Code" }));
-  expect(screen.getByText(/^# run OCR to see the code$/)).toBeInTheDocument();
+  expect(
+    screen.getByText(/^# code snippet unavailable from this backend$/),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/run OCR to see/)).not.toBeInTheDocument();
 });
 
 test("the JSON view omits the code snippet", () => {
