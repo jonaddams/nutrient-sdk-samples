@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import ExtractionStudio from "../page";
 
@@ -57,4 +57,146 @@ test("Run extraction stays unavailable after a failed providers fetch", async ()
     ).toBe(true),
   );
   expect(run).toBeDisabled();
+});
+
+/** The existing stubProvidersFetch() THROWS on any unexpected URL, so an OCR
+ *  test has to account for all three fetches the flow makes: the providers
+ *  endpoint, the document itself from public/, and the OCR endpoint. */
+function stubOcrFetch() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/ocr")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            engine: "ADAPTIVE_OCR",
+            filename: "scan.pdf",
+            statistics: {
+              totalElements: 1,
+              textElements: 1,
+              averageConfidence: 0.9,
+              lowConfidenceElements: 0,
+            },
+            fullText: "[0] Invoice",
+            textElements: [
+              {
+                readingOrder: 0,
+                type: "paragraph",
+                text: "Invoice",
+                confidence: 0.9,
+                page: 0,
+                citation: { page: 0, x0: 0.1, y0: 0.1, x1: 0.2, y1: 0.2 },
+              },
+            ],
+            pages: [{ page: 1, width: 1654, height: 2338 }],
+            config: {
+              languages: "eng",
+              outputFormat: "json",
+              tableDetection: true,
+            },
+            timingMs: 800,
+          }),
+        };
+      }
+      // the document fetched from public/ before upload
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+test("Adaptive OCR is selectable and swaps in its own panel", () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  // OCR's own control appears...
+  expect(screen.getByText("Languages")).toBeInTheDocument();
+  // ...and structured extraction's schema builder is gone.
+  expect(screen.queryByText("Schema builder")).toBeNull();
+});
+
+test("Run is enabled for OCR even with no providers configured", async () => {
+  // OCR needs no credentials. Gating its Run button on the providers fetch
+  // would leave it permanently disabled on a backend with no LLM keys.
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /run extraction/i }),
+    ).not.toBeDisabled(),
+  );
+});
+
+test("switching feature clears the previous feature's results", async () => {
+  // Stale structured results under an OCR panel is the obvious bug in a
+  // feature-switching shell.
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /structured extraction/i }),
+  );
+  expect(screen.queryByText("Invoice")).toBeNull();
+});
+
+// Critical, reproduced by hand: OCR "Vandelay Industries", switch the
+// document to "Lumen", reopen Results — Vandelay's elements (and their
+// citations, drawn at Vandelay's coordinates) were still on screen because
+// selectDoc cleared `result` but not `ocrResult`. selectDoc also flips the
+// tab back to "config", which hides the results panel and masks the bug
+// until Results is reopened — so this test reopens it rather than trusting
+// the click-through alone.
+test("switching documents clears OCR results", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+  // selectDoc sends the tab back to "config" — reopen Results rather than
+  // taking the config view's silence as proof the results actually cleared.
+  fireEvent.click(screen.getByRole("button", { name: "Results" }));
+  expect(screen.queryByText("Invoice")).toBeNull();
+});
+
+// Reproduces the exact demo move from the review: select a row to box it,
+// change a config option, Run again. handleRun (structured) has always
+// cleared activeIndex on a new run; the inline OCR onRun did not, so a stale
+// selection survived a re-run and dimmed every box via
+// styleFor(fieldIndex, activeIndex) — worse, if the new run returned fewer
+// elements than before, it marked none. This asserts the row is no longer
+// selected after a second run even though it was never clicked again.
+test("re-running OCR clears the previous selection instead of leaving it stale", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByText("Invoice"));
+  expect(screen.getByText("Invoice").closest("tr")).toHaveAttribute(
+    "data-selected",
+    "true",
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByText("Invoice").closest("tr")).toHaveAttribute(
+      "data-selected",
+      "false",
+    ),
+  );
 });
