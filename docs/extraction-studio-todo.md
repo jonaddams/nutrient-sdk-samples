@@ -101,39 +101,55 @@ The immediate context is that Jon intends to **send the studio to colleagues for
 raises the value of items 1 and 2, both of which a reviewer meets in the first minute, above
 everything else on this list.
 
-1. **The OCR results panel has no Code view, and the spec says it should.** The spec's
-   `OcrResults` section calls for four segments — Text / Elements / JSON / **Code** — and only
-   three shipped (Elements / Text / JSON, or Markdown / JSON in markdown mode). This was
-   **dropped in the plan, not in implementation**: the plan never mentioned the fourth segment,
-   so all eight tasks built faithfully to a plan that had already lost it.
+1. ~~**The OCR results panel has no Code view, and the spec says it should.**~~ **DONE
+   2026-08-07** — `python-fast-api#35` (backend, `_build_ocr_code()`) and this repo's #63
+   (frontend, the `Code` segment in both output modes plus the Copy/Download row). Design:
+   `docs/specs/2026-08-07-ocr-code-view-design.md`. Plan:
+   `docs/plans/2026-08-07-ocr-code-view.md`.
 
-   It reads as a regression when switching features, because **Structured extraction does have
+   Live-verified against a real backend: the multi-page branch (`Invoice AC-2025-1047.pdf`,
+   2 pages — **not** Westbridge, which turned out to be single-page despite its name; every
+   scan in the corpus except the flagship invoice is single-page) and the single-page
+   `paths or ["page.jpg"]` fallback (`scanned-invoice.pdf`) were both copied out of the UI and
+   actually run in the backend venv, and both printed real elements rather than raising or
+   returning `[]`.
+
+   The spec's `OcrResults` section calls for four segments — Text / Elements / JSON /
+   **Code** — and only three shipped (Elements / Text / JSON, or Markdown / JSON in markdown
+   mode). This was **dropped in the plan, not in implementation**: the plan never mentioned the
+   fourth segment, so all eight tasks built faithfully to a plan that had already lost it.
+
+   It read as a regression when switching features, because **Structured extraction does have
    a Code segment**. A prospect who learns "every result gives you the code that produced it"
    loses that promise by clicking one rail entry.
 
    Not a frontend-only change: the snippet is built server-side by `_build_code()` in
-   `python-fast-api/app/services/structured.py:346`, and the OCR response has **no `code`
-   field at all** — `app/services/ocr*.py` has no equivalent builder. So this is a backend
-   addition mirroring `_build_code`, keeping its two hard-won rules: **every name the snippet
-   references must be defined in the snippet** (item 8), and **tests must `compile()` the
-   output** rather than string-matching it.
+   `python-fast-api/app/services/structured.py:346`, and the OCR response had **no `code`
+   field at all** — `app/services/ocr*.py` had no equivalent builder. `_build_ocr_code()`
+   mirrors it, keeping its two hard-won rules: **every name the snippet references must be
+   defined in the snippet** (item 8), and **tests must `compile()` the output** rather than
+   string-matching it.
 
-   Either build it or amend the spec to say three segments and why. Leaving spec and code
-   disagreeing is the worst of the three.
+2. ~~**In Markdown mode the meta row reads "0 elements · 0% avg confidence".**~~ **DONE, #62.**
+   It shipped in that PR but this list was never updated to say so. `OcrResults.tsx` now hides
+   the element count and the confidence figure when `isMarkdown`, leaving the timing.
 
-2. **In Markdown mode the meta row reads "0 elements · 0% avg confidence".** Honest — markdown
-   output carries no elements and no per-element confidence — but it reads as a failed run to
-   anyone who has not been told. `OcrResults.tsx:64-74` renders all three stats
-   unconditionally; the fix is hiding the element count and the confidence figure when
-   `isMarkdown`, leaving the timing. Small, and the first thing a reviewer flipping the Output
-   control will see.
+3. **`Show regions` is inert in Markdown mode.** Found 2026-08-07 while live-verifying the
+   Code view. `OcrResults.tsx` renders the toggle unconditionally, but the box it controls is
+   driven off `ocrCitations`, which `page.tsx` derives from `ocrResult.textElements` —
+   `[]` on every markdown-mode response (`extract_text_ocr`'s markdown branch always returns
+   `"textElements": []`). So there is nothing to paint regardless of the toggle's state: a
+   reviewer flipping it in Markdown mode sees no change, on either setting. **Left open — Jon's
+   call, not an inference.** Options span from hiding the toggle in Markdown mode (matching the
+   precedent set by hiding the element-count/confidence stats for the same reason) to leaving it
+   as an honest no-op with help text, and it wasn't this session's place to pick.
 
-3. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
+4. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
    not on the write-ups, which are finished and ready to paste. Deferred by Jon 2026-08-06.
    **Try the browser first** — the API path is what fails, and that is the cheapest test.
    Worth chasing on its own merits: it blocks every future SDK defect filing.
 
-4. **Write up SDK-049 — a malformed `default_languages` string returns an empty document
+5. **Write up SDK-049 — a malformed `default_languages` string returns an empty document
    silently.** The only one of the five with no write-up yet. Measured 2026-08-06: `eng,deu`,
    `eng;deu`, `eng|deu`, `eng deu` and two-letter codes all yield 154 chars / 0 elements with
    **no exception raised**. `eng,deu` is the obvious first guess a caller makes, so they
@@ -146,11 +162,11 @@ everything else on this list.
    `docs/sdk-defects/sdk-049-*.md` and a `napy-ticket-sdk-049.md` in the house style the
    other four use. Then it joins the item 10 filing queue.
 
-5. **The two rail gaps (item 2)** — Table Extraction and Document to Markdown have no rail
+6. **The two rail gaps (item 2)** — Table Extraction and Document to Markdown have no rail
    successor, so those samples cannot be retired. Note Document to Markdown is also the sample
    most affected by SDK-046, so a rail feature built on that endpoint inherits the word loss.
 
-6. **The next rail feature, when there is appetite for one.** Rough order of cheapness, given
+7. **The next rail feature, when there is appetite for one.** Rough order of cheapness, given
    what is now known:
    - **Multilingual OCR** — cheapest by far. Same endpoint, same panel, same results component;
      the language multi-select already exists and `+` is proven. Arguably it is a *preset* of
@@ -775,14 +791,15 @@ adapted from a sibling.
 
 ## Baselines
 
-Run from the repo root. Re-measured 2026-08-07 on the `#60` branch (rename).
+Run from the repo root. Re-measured 2026-08-07 on the `ocr-code-view` branch, after the OCR
+Code view shipped (this repo's PR + `python-fast-api#35`).
 
 | | Value | Command |
 |---|---|---|
-| Frontend tests | **309 across 34 files** | `pnpm test` |
+| Frontend tests | **320 across 34 files** | `pnpm test` |
 | Typecheck | clean | `pnpm exec tsc --noEmit` |
 | Biome, changed files | 0 errors | `pnpm exec biome check <paths>` |
-| Backend, pure subset | **77 passed / 14 deselected in ~1s** | see below |
+| Backend, pure subset | **89 passed / 14 deselected in ~1s** | see below |
 
 The backend pure subset, which is the one worth running constantly because it touches no
 provider and no SDK:
@@ -791,7 +808,7 @@ provider and no SDK:
 cd ~/SE/code/python-fast-api && .venv/bin/pytest \
   tests/test_ocr_options.py tests/test_extraction_geometry.py \
   tests/test_extraction_merge.py tests/test_extraction_pages.py \
-  tests/test_structured.py -q -k "not live and not endpoint"
+  tests/test_structured.py tests/test_extraction_code.py -q -k "not live and not endpoint"
 ```
 
 **Earlier figures in this table were wrong twice, so re-measure rather than trusting a
@@ -799,7 +816,7 @@ remembered number.** "283 across 36 files" was wrong (there were 28 test files a
 36) and cost a few minutes chasing 64 phantom tests; 219/30 was correct on 2026-08-06 and is
 simply superseded — #59 and #60 added four files and 90 tests. There is no `*.spec.*`, no
 Playwright suite, and `tests/` holds only `setup.ts`, so `pnpm test` covers everything. If a
-future count comes in *below* 309, check for deleted files before assuming a regression —
+future count comes in *below* 320, check for deleted files before assuming a regression —
 three test files have been deleted in this repo's history
 (`git log --diff-filter=D --name-only -- '*.test.tsx'`).
 

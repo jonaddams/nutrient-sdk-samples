@@ -1,7 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import type { OcrResult } from "../../lib/ocr";
 import { confidenceTone, OcrResults } from "../OcrResults";
+
+// Unconditional, not tail-of-body: an assertion that throws mid-test would
+// otherwise skip the tail cleanup and leak a stubbed global or an active
+// spy into every later test in this file (this file has no other global
+// mocks that would be perturbed by a blanket restoreAllMocks() — the table
+// rows and view toggle tests above touch no globals at all).
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 const RESULT: OcrResult = {
   engine: "ADAPTIVE_OCR",
@@ -184,4 +194,157 @@ test("degrades to an empty table instead of throwing if a future backend respons
     render(<OcrResults {...props} result={malformed} />),
   ).not.toThrow();
   expect(screen.getByText(/no text found/i)).toBeInTheDocument();
+});
+
+const CODE = "import glob, json, re\nprint('hi')\n";
+
+test("offers a Code segment in JSON mode and renders the snippet", () => {
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/import glob, json, re/)).toBeInTheDocument();
+});
+
+test("offers a Code segment in markdown mode too", () => {
+  // The spec asks for Code in the JSON segment list. Shipping it there only
+  // would make the promise vanish when a reviewer flips the Output control —
+  // the same disappearing-promise problem one control deeper.
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/import glob, json, re/)).toBeInTheDocument();
+});
+
+test("Code wins over the markdown pane in markdown mode", () => {
+  // The render chain used to lead with `isMarkdown && view !== "raw"`, which is
+  // true when view is "code", so clicking Code in markdown mode would have
+  // silently re-rendered the markdown.
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.queryByText("# Invoice")).not.toBeInTheDocument();
+});
+
+test("degrades to a Python-commented placeholder when code is absent", () => {
+  // Optional on purpose: the response type is a claim about the backend, not a
+  // check on it, and this view ships before the backend deploy reaches Railway.
+  //
+  // The wording has to be true in exactly that window. This panel only renders
+  // after a run, so "run OCR to see the code" instructs the reader to do the
+  // thing they just did — it reads as a broken button, not a pending deploy.
+  render(<OcrResults {...props} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(
+    screen.getByText(/^# code snippet unavailable from this backend$/),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/run OCR to see/)).not.toBeInTheDocument();
+});
+
+test("the JSON view omits the code snippet", () => {
+  // The snippet has its own segment; inlining 40 lines of Python as one escaped
+  // string is the entire JSON pane's worth of noise. StructuredResults has the
+  // same shape — its raw view shows data.extraction, not the envelope.
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+  expect(screen.queryByText(/"code":/)).not.toBeInTheDocument();
+  expect(screen.getByText(/"filename": "scan.pdf"/)).toBeInTheDocument();
+});
+
+test("Copy writes the current view's payload to the clipboard", async () => {
+  const writeText = vi.fn((_text: string) => Promise.resolve());
+  vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+
+  // Elements view (default): the JSON, minus the snippet.
+  fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+  expect(writeText).toHaveBeenCalledTimes(1);
+  expect(writeText.mock.calls[0][0]).toContain('"filename": "scan.pdf"');
+  expect(writeText.mock.calls[0][0]).not.toContain('"code":');
+
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+  expect(writeText).toHaveBeenNthCalledWith(2, CODE);
+});
+
+test("Download names the file after the view it was taken from", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  const revokeObjectURL = vi.fn();
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL });
+
+  // The component never appends its anchor to the DOM, so intercepting its
+  // creation is the only way to read the `download` filename back.
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  const clickSpy = vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+  expect(createObjectURL).toHaveBeenCalledTimes(1);
+  expect((createObjectURL.mock.calls[0][0] as Blob).type).toBe(
+    "application/json",
+  );
+  expect(anchors[0]?.download).toBe("ocr.json");
+
+  // Deferred revoke: revoking synchronously races the browser's own blob fetch.
+  expect(revokeObjectURL).not.toHaveBeenCalled();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
+
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+  const codeBlob = createObjectURL.mock.calls[1][0] as Blob;
+  expect(codeBlob.type).toBe("text/x-python");
+  await expect(codeBlob.text()).resolves.toBe(CODE);
+  expect(anchors[1]?.download).toBe("ocr.py");
+
+  expect(clickSpy).toHaveBeenCalledTimes(2);
+});
+
+test("Download writes markdown as .md, not .json", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  expect(blob.type).toBe("text/markdown");
+  await expect(blob.text()).resolves.toBe("# Invoice");
+  expect(anchors[0]?.download).toBe("ocr.md");
+});
+
+test("Download writes the Text view as .txt, not .json", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Text" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  expect(blob.type).toBe("text/plain");
+  await expect(blob.text()).resolves.toBe(RESULT.fullText);
+  expect(anchors[0]?.download).toBe("ocr.txt");
 });
