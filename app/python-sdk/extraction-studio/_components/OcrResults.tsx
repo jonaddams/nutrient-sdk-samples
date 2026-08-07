@@ -5,6 +5,12 @@ import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
+// Shared between the visible eyebrow and the `label` passed to HighlightColor
+// below — the latter also feeds both of that component's aria-labels via
+// `label.toLowerCase()`. A literal duplicated in two places is free to drift;
+// this keeps the accessible name matching the visible one by construction.
+const REGION_COLOR = "Region color";
+
 export function OcrResults({
   result,
   activeIndex,
@@ -115,7 +121,7 @@ export function OcrResults({
           panel entirely. */}
       {showRegions && (
         <div className="citation-color">
-          <span className="eyebrow">Region color</span>
+          <span className="eyebrow">{REGION_COLOR}</span>
           <Segmented
             options={[
               { label: "By confidence", value: "confidence" },
@@ -126,7 +132,7 @@ export function OcrResults({
           />
           {colorMode === "custom" && (
             <HighlightColor
-              label="Region color"
+              label={REGION_COLOR}
               embedded
               value={citationHex}
               onChange={onCitationHexChange}
