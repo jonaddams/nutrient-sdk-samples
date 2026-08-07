@@ -65,13 +65,23 @@ export function OcrResults({
         <span className="mono muted">
           {(result.timingMs / 1000).toFixed(1)}s
         </span>
-        <span className="mono muted">
-          {result.statistics?.textElements ?? 0} elements
-        </span>
-        <span className="mono muted">
-          {Math.round((result.statistics?.averageConfidence ?? 0) * 100)}% avg
-          confidence
-        </span>
+        {/* Markdown output carries no elements and no per-element
+            confidence, so both figures are structurally zero in that mode.
+            Rendering them anyway was honest and read as a failed run —
+            "0 elements · 0% avg confidence" is what a prospect sees first
+            after flipping the Output control. Timing still means something,
+            so it stays. */}
+        {!isMarkdown && (
+          <>
+            <span className="mono muted">
+              {result.statistics?.textElements ?? 0} elements
+            </span>
+            <span className="mono muted">
+              {Math.round((result.statistics?.averageConfidence ?? 0) * 100)}%
+              avg confidence
+            </span>
+          </>
+        )}
         <Toggle
           checked={showRegions}
           onChange={onShowRegionsChange}

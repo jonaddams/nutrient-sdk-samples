@@ -136,6 +136,17 @@ test("shows the markdown view when that format was requested, without throwing",
   expect(screen.getByText("# Invoice")).toBeInTheDocument();
 });
 
+test("omits the element count and confidence in markdown mode, keeping the timing", () => {
+  // Markdown output carries no elements and no per-element confidence, so the
+  // honest zeroes ("0 elements · 0% avg confidence") read as a failed run to
+  // anyone who has not been told. Timing is the one stat that still means
+  // something in this mode.
+  render(<OcrResults {...props} result={MARKDOWN_RESULT} />);
+  expect(screen.getByText("0.6s")).toBeInTheDocument();
+  expect(screen.queryByText(/\d+ elements/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/avg confidence/)).not.toBeInTheDocument();
+});
+
 test("the view toggle reflects the actual pane in markdown mode, both ways", () => {
   render(<OcrResults {...props} result={MARKDOWN_RESULT} />);
 
