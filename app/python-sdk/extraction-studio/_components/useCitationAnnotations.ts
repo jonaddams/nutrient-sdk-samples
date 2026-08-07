@@ -7,6 +7,7 @@ import {
   fracToRect,
   type IndexedCitation,
   type PaintedStyle,
+  resolveHex,
   styleFor,
 } from "../lib/citations";
 import { getNutrientViewer } from "../lib/nutrient";
@@ -94,8 +95,11 @@ async function applyEmphasis(
   // fails to build. Harmless (a discarded `.map`/`.filter` over a small list),
   // but worth knowing so it isn't mistaken for a leak or a bug on rediscovery.
   const next = new Map<number, PaintedStyle>();
-  for (const { fieldIndex } of citations) {
-    next.set(fieldIndex, { style: styleFor(fieldIndex, activeIndex), hex });
+  for (const entry of citations) {
+    next.set(entry.fieldIndex, {
+      style: styleFor(entry.fieldIndex, activeIndex),
+      hex: resolveHex(entry, hex),
+    });
   }
   const changed = diffStyles(styles, next);
   if (!changed.length) return;
@@ -289,9 +293,12 @@ export function useCitationAnnotations(opts: {
               throw new Error(`no page info for page ${citation.page}`);
             const { width, height } = info;
             const rect = fracToRect(citation, width, height);
+            // A citation's own hex wins, so a box is created with its
+            // confidence colour rather than created in the picker's colour
+            // and then repainted by the emphasis effect.
             const style = appearance(
               styleFor(fieldIndex, selected),
-              citationHex,
+              resolveHex(entry, citationHex),
             );
             built.push(
               new NutrientViewer.Annotations.RectangleAnnotation({
@@ -354,12 +361,15 @@ export function useCitationAnnotations(opts: {
           // `created` is positional against `built`, not the original
           // `citations` — a skipped citation would otherwise shift every
           // later index and map the wrong annotation id to the wrong field.
-          const { fieldIndex } = buildable[i];
+          const entry = buildable[i];
+          const { fieldIndex } = entry;
           idToField.current.set(annotation.id, fieldIndex);
           fieldToAnnotation.current.set(fieldIndex, annotation);
           styles.current.set(fieldIndex, {
             style: styleFor(fieldIndex, selected),
-            hex: citationHex,
+            // Must match the hex actually used to build the annotation above,
+            // or the very next diff would see a mismatch and repaint it.
+            hex: resolveHex(entry, citationHex),
           });
         });
 

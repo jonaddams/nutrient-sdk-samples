@@ -8,8 +8,10 @@ import {
   diffStyles,
   fracToRect,
   hexToRgb,
+  type IndexedCitation,
   indexCitations,
   type PaintedStyle,
+  resolveHex,
   rgbToHex,
   styleFor,
 } from "../citations";
@@ -61,6 +63,43 @@ describe("indexCitations", () => {
 
   test("returns an empty list when no field has a citation", () => {
     expect(indexCitations([{ citation: null }])).toEqual([]);
+  });
+});
+
+describe("resolveHex", () => {
+  // `resolveHex` IS the fallback useCitationAnnotations.ts calls at all three
+  // sites (the emphasis restyle, and both bookkeeping writes in the sync
+  // effect's citation-build loop) — not a copy of its expression. An earlier
+  // version of this test defined its own `c.hex ?? componentHex` and asserted
+  // against that, which would keep passing even if the real precedence in the
+  // hook were flipped to `hex ?? ownHex`. Testing the actual export closes
+  // that gap; the hook itself still isn't under test here — doing that would
+  // mean mocking the Nutrient viewer Instance the hook drives (annotation
+  // create/update), out of proportion for what is a one-line fallback — but
+  // every call site now routes through this one function, so this test can't
+  // drift from the real behaviour the way the hand-copied version could.
+  const componentHex = DEFAULT_CITATION_HEX; // e.g. the citation-colour picker
+  const ownHex = "#ef4444"; // e.g. OCR's low-confidence red
+
+  test("a citation's own hex beats the component-level colour", () => {
+    const withOwnHex: IndexedCitation = {
+      fieldIndex: 0,
+      citation: cite(0),
+      hex: ownHex,
+    };
+    expect(resolveHex(withOwnHex, componentHex)).toBe(ownHex);
+    expect(resolveHex(withOwnHex, componentHex)).not.toBe(componentHex);
+    expect(
+      appearance("base", resolveHex(withOwnHex, componentHex)).fill,
+    ).toEqual(hexToRgb(ownHex));
+  });
+
+  test("a citation with no own hex falls back to the component-level colour", () => {
+    const withoutOwnHex: IndexedCitation = { fieldIndex: 1, citation: cite(1) };
+    expect(resolveHex(withoutOwnHex, componentHex)).toBe(componentHex);
+    expect(
+      appearance("base", resolveHex(withoutOwnHex, componentHex)).fill,
+    ).toEqual(hexToRgb(componentHex));
   });
 });
 
@@ -200,4 +239,23 @@ describe("diffStyles sees a colour change", () => {
     const next = painted([[0, "base"]], "#ffc107");
     expect(diffStyles(prev, next)).toEqual([]);
   });
+});
+
+test("a per-citation colour change registers as a diff", () => {
+  // Invariant 4: anything affecting appearance must be inside PaintedStyle, or
+  // diffStyles reports no change and the boxes never repaint — which is exactly
+  // how the colour picker once looked dead.
+  const before = new Map<number, PaintedStyle>([
+    [0, { style: "base", hex: "#22c55e" }],
+  ]);
+  const after = new Map<number, PaintedStyle>([
+    [0, { style: "base", hex: "#ef4444" }],
+  ]);
+  expect(diffStyles(before, after).length).toBe(1);
+});
+
+test("an unchanged per-citation colour is not a diff", () => {
+  const same = (): Map<number, PaintedStyle> =>
+    new Map([[0, { style: "base", hex: "#22c55e" }]]);
+  expect(diffStyles(same(), same()).length).toBe(0);
 });
