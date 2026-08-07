@@ -4,17 +4,33 @@ import { DropperIcon } from "@/app/_components/icons";
 import { CITATION_PRESETS, hexToRgb, rgbToHex } from "../lib/citations";
 
 /**
- * Preset swatches plus a free color choice for the citation highlights.
+ * Preset swatches plus a free color choice for a highlight layer.
+ *
+ * Shared by both results panels: structured extraction calls these citations,
+ * OCR calls them regions, so the noun arrives as `label` rather than being
+ * hardcoded — including in the aria-labels, which is the whole reason it is a
+ * prop and not just a heading.
  *
  * The committed value is always a valid 6-digit hex, so the annotation layer
  * never has to defend against half-typed input. The text field keeps its own
  * draft state for exactly that reason: while someone types "#ff", that string is
  * unparseable and must not be pushed to the canvas.
  */
-export function CitationColor({
+export function HighlightColor({
+  label,
+  embedded,
   value,
   onChange,
 }: {
+  label: string;
+  /** Set when the parent already renders its own `.citation-color` block
+   *  around this control (its eyebrow label, its padding). Renders the
+   *  swatch row alone, as a fragment, instead of a second nested
+   *  `.citation-color` — nesting them double-applies that block's padding,
+   *  since the shared CSS rule matches both regardless of depth. Also
+   *  suppresses the visible label; the aria-labels still derive from
+   *  `label` unconditionally, so nothing is lost to a screen reader. */
+  embedded?: boolean;
   value: string;
   onChange: (hex: string) => void;
 }) {
@@ -37,9 +53,9 @@ export function CitationColor({
     (p) => p.hex.toLowerCase() === value.toLowerCase(),
   );
 
-  return (
-    <div className="citation-color">
-      <span className="eyebrow">Citation color</span>
+  const content = (
+    <>
+      {!embedded && <span className="eyebrow">{label}</span>}
 
       <div className="citation-swatches">
         {CITATION_PRESETS.map((p) => (
@@ -83,7 +99,7 @@ export function CitationColor({
             type="color"
             className="citation-color-native"
             value={value}
-            aria-label="Pick a custom citation color"
+            aria-label={`Pick a custom ${label.toLowerCase()}`}
             onChange={(e) => onChange(e.target.value)}
           />
         </label>
@@ -93,7 +109,7 @@ export function CitationColor({
           className="citation-hex mono"
           value={draft}
           spellCheck={false}
-          aria-label="Citation color hex value"
+          aria-label={`${label} hex value`}
           placeholder="#ffc107"
           onChange={(e) => {
             setDraft(e.target.value);
@@ -102,6 +118,13 @@ export function CitationColor({
           onBlur={() => setDraft(value)}
         />
       </div>
-    </div>
+    </>
   );
+
+  // Structured Extraction (embedded unset) gets its own `.citation-color`
+  // wrapper — one dose of the shared block padding. OCR's Custom mode
+  // (embedded) is already inside its parent's `.citation-color`, so a second
+  // wrapper here would double that padding: the CSS rule keys on the class,
+  // not on nesting depth.
+  return embedded ? content : <div className="citation-color">{content}</div>;
 }
