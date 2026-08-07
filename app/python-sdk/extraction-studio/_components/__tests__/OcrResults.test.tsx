@@ -1,7 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import type { OcrResult } from "../../lib/ocr";
 import { confidenceTone, OcrResults } from "../OcrResults";
+
+// Unconditional, not tail-of-body: an assertion that throws mid-test would
+// otherwise skip the tail cleanup and leak a stubbed global or an active
+// spy into every later test in this file (this file has no other global
+// mocks that would be perturbed by a blanket restoreAllMocks() — the table
+// rows and view toggle tests above touch no globals at all).
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 const RESULT: OcrResult = {
   engine: "ADAPTIVE_OCR",
@@ -245,8 +255,6 @@ test("Copy writes the current view's payload to the clipboard", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Code" }));
   fireEvent.click(screen.getByRole("button", { name: "Copy" }));
   expect(writeText).toHaveBeenNthCalledWith(2, CODE);
-
-  vi.unstubAllGlobals();
 });
 
 test("Download names the file after the view it was taken from", async () => {
@@ -289,8 +297,6 @@ test("Download names the file after the view it was taken from", async () => {
   expect(anchors[1]?.download).toBe("ocr.py");
 
   expect(clickSpy).toHaveBeenCalledTimes(2);
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
 });
 
 test("Download writes markdown as .md, not .json", async () => {
@@ -312,7 +318,26 @@ test("Download writes markdown as .md, not .json", async () => {
   expect(blob.type).toBe("text/markdown");
   await expect(blob.text()).resolves.toBe("# Invoice");
   expect(anchors[0]?.download).toBe("ocr.md");
+});
 
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
+test("Download writes the Text view as .txt, not .json", async () => {
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const anchors: HTMLAnchorElement[] = [];
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+    const el = originalCreateElement(tagName, options);
+    if (tagName === "a") anchors.push(el as HTMLAnchorElement);
+    return el;
+  });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Text" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  expect(blob.type).toBe("text/plain");
+  await expect(blob.text()).resolves.toBe(RESULT.fullText);
+  expect(anchors[0]?.download).toBe("ocr.txt");
 });
