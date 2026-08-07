@@ -162,7 +162,7 @@ this yet?" is answered by what `/structured` can do — not by category labels.
 | Document to Markdown | `/api/extraction/markdown` | **nothing — the Text export guess is WRONG, see below** |
 | Table Extraction | `/api/extraction/tables` | **no rail entry exists yet** |
 | Field Extraction | `/api/extraction/fields` | already superseded, see above |
-| Structured Extraction | `/api/extraction/structured` | the studio itself |
+| Extraction Studio | `/api/extraction/structured`, `/api/extraction/ocr` | the studio itself |
 
 **Confirmed 2026-08-06: the Document to Markdown → Text export mapping is wrong**, so there
 are **two** rail gaps rather than one open question.

@@ -117,10 +117,10 @@ export const samples: Sample[] = [
   // works, and a demo of the pre-SDK-native approach has archival value while
   // SDK-037 is open. Re-listing is uncommenting this block.
   {
-    name: "Structured Extraction",
+    name: "Extraction Studio",
     category: "Extraction",
     description:
-      "Extract a JSON schema's fields with the SDK's native structured extraction — every value carries a clickable citation on the page",
+      "Two extraction techniques in one shell — schema-driven fields with clickable citations, and Adaptive OCR that reads a scan into structured content",
     path: "/python-sdk/extraction-studio",
   },
   {

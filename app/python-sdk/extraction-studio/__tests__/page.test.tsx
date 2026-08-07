@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
+import { samples } from "../../samples";
 import ExtractionStudio from "../page";
 
 afterEach(() => {
@@ -199,4 +200,19 @@ test("re-running OCR clears the previous selection instead of leaving it stale",
       "false",
     ),
   );
+});
+
+// The page and the landing-page registry card each carry the studio's
+// prospect-facing name in their own string literal, so they can drift apart —
+// which is exactly what happened when Adaptive OCR shipped and the page still
+// read "Structured Extraction" while hosting two features. Pin them together.
+test("the page header and the registry card agree on the studio's name", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+
+  const entry = samples.find((s) => s.path === "/python-sdk/extraction-studio");
+  expect(entry).toBeDefined();
+  expect(
+    screen.getByRole("heading", { level: 1, name: entry?.name }),
+  ).toBeInTheDocument();
 });
