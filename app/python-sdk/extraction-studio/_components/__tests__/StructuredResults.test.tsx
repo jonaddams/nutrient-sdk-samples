@@ -205,3 +205,27 @@ test("scrolls the active field card into view", () => {
   const activeCard = screen.getByText("b").closest("button");
   expect(scrollIntoView.mock.contexts[0]).toBe(activeCard);
 });
+
+test("degrades to a Python-commented placeholder when code is absent", () => {
+  // Mirrors OcrResults. `code` is optional so the view can merge before the
+  // backend deploys, but the placeholder only ever shows to someone who has
+  // already run an extraction — so it must not tell them to run one.
+  render(
+    <StructuredResults
+      data={data as never}
+      activeIndex={null}
+      onSelectField={() => {}}
+      showCitations={true}
+      citationHex="#ffc107"
+      onCitationHexChange={() => {}}
+      onShowCitationsChange={() => {}}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(
+    screen.getByText(/^# code snippet unavailable from this backend$/),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByText(/run an extraction to see/),
+  ).not.toBeInTheDocument();
+});
