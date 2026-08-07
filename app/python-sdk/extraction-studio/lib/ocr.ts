@@ -1,5 +1,6 @@
 import { API_BASE } from "./api";
 import type { Citation } from "./api";
+import type { IndexedCitation } from "./citations";
 
 /**
  * Adaptive OCR — runs entirely on the backend machine. No provider, no API key,
@@ -33,6 +34,62 @@ export type OcrElement = {
   citation: Citation | null;
   words?: OcrWord[];
 };
+
+/** Which colour the OCR overlay paints its region boxes. */
+export type OcrColorMode = "confidence" | "custom";
+
+/** Bands a confidence score into the three tones `.match-dot` already styles.
+ *
+ *  A sibling of matchDotTone() in StructuredResults, NOT a reuse of it: that one
+ *  keys on match strings ("exact", "not_found") while this takes a float.
+ *  Conflating the two would mean one function with two unrelated input types. */
+export function confidenceTone(n: number): "good" | "partial" | "bad" {
+  if (n >= 0.85) return "good";
+  if (n >= 0.5) return "partial";
+  return "bad";
+}
+
+/** Fill colour for a region box, so the overlay shows WHERE OCR was unsure.
+ *
+ *  Values MUST match `.match-dot.good/.partial/.bad` in styles.css — that is
+ *  the source of truth for these three tones. They used to diverge (this
+ *  function had its own brighter #22c55e/#eab308/#ef4444), so the dot next to
+ *  an element and the box drawn for that same element were visibly different
+ *  greens. */
+export function confidenceHex(n: number): string {
+  const tone = confidenceTone(n);
+  if (tone === "good") return "#4a9d6a";
+  if (tone === "partial") return "#c9a227";
+  return "#c8553c";
+}
+
+/** Build the document overlay's boxes for one OCR run.
+ *
+ *  `fieldIndex` is the index into the FULL element list, not into the array
+ *  returned here: uncited elements are dropped, so the result is COMPACTED and
+ *  its array position is not the row a click should select.
+ *
+ *  In `custom` mode each entry omits `hex` ENTIRELY rather than setting it to
+ *  undefined, so resolveHex (`citation.hex ?? fallback`) falls through to the
+ *  studio-wide picker value — the same path structured extraction takes. */
+export function ocrCitationsFor(
+  elements: OcrElement[],
+  mode: OcrColorMode,
+): IndexedCitation[] {
+  return elements.flatMap((el, index) =>
+    el.citation
+      ? [
+          {
+            fieldIndex: index,
+            citation: el.citation,
+            ...(mode === "confidence"
+              ? { hex: confidenceHex(el.confidence) }
+              : {}),
+          },
+        ]
+      : [],
+  );
+}
 
 export type OcrResult = {
   engine: string;

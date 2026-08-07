@@ -1,35 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { OcrResult } from "../lib/ocr";
+import { confidenceTone, type OcrColorMode, type OcrResult } from "../lib/ocr";
+import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
-/** Bands a confidence score into the three tones `.match-dot` already styles.
- *
- *  A sibling of matchDotTone() in StructuredResults, NOT a reuse of it: that one
- *  keys on match strings ("exact", "not_found") while this takes a float.
- *  Conflating the two would mean one function with two unrelated input types. */
-export function confidenceTone(n: number): "good" | "partial" | "bad" {
-  if (n >= 0.85) return "good";
-  if (n >= 0.5) return "partial";
-  return "bad";
-}
-
-/** Fill colour for a region box, so the overlay shows WHERE OCR was unsure.
- *  This is why OcrResults has no colour picker: a user-chosen colour would
- *  fight the confidence tint.
- *
- *  Values MUST match `.match-dot.good/.partial/.bad` in styles.css — that is
- *  the source of truth for these three tones. They used to diverge (this
- *  function had its own brighter #22c55e/#eab308/#ef4444), so the dot next to
- *  an element and the box drawn for that same element were visibly different
- *  greens. */
-export function confidenceHex(n: number): string {
-  const tone = confidenceTone(n);
-  if (tone === "good") return "#4a9d6a";
-  if (tone === "partial") return "#c9a227";
-  return "#c8553c";
-}
+// Shared between the visible eyebrow and the `label` passed to HighlightColor
+// below — the latter also feeds both of that component's aria-labels via
+// `label.toLowerCase()`. A literal duplicated in two places is free to drift;
+// this keeps the accessible name matching the visible one by construction.
+const REGION_COLOR = "Region color";
 
 export function OcrResults({
   result,
@@ -37,12 +17,20 @@ export function OcrResults({
   onSelectElement,
   showRegions,
   onShowRegionsChange,
+  colorMode,
+  onColorModeChange,
+  citationHex,
+  onCitationHexChange,
 }: {
   result: OcrResult;
   activeIndex: number | null;
   onSelectElement: (index: number) => void;
   showRegions: boolean;
   onShowRegionsChange: (value: boolean) => void;
+  colorMode: OcrColorMode;
+  onColorModeChange: (mode: OcrColorMode) => void;
+  citationHex: string;
+  onCitationHexChange: (hex: string) => void;
 }) {
   const isMarkdown = result.config.outputFormat === "markdown";
   // Seeded from the CURRENT result so a fresh mount already shows the right
@@ -120,6 +108,38 @@ export function OcrResults({
           label="Show regions"
         />
       </div>
+
+      {/* Paired with Show regions, exactly as StructuredResults pairs
+          HighlightColor with Show citations: a colour control is meaningless
+          when nothing is drawn.
+
+          By confidence is the default and stays so. The tint is what makes the
+          overlay say WHERE OCR was unsure, which is the reason this panel had
+          no picker at all until now — Custom trades that signal away
+          deliberately, and only on request. The element table's confidence
+          dots are unaffected in either mode, so the signal never leaves the
+          panel entirely. */}
+      {showRegions && (
+        <div className="citation-color">
+          <span className="eyebrow">{REGION_COLOR}</span>
+          <Segmented
+            options={[
+              { label: "By confidence", value: "confidence" },
+              { label: "Custom", value: "custom" },
+            ]}
+            value={colorMode}
+            onChange={(v) => onColorModeChange(v as OcrColorMode)}
+          />
+          {colorMode === "custom" && (
+            <HighlightColor
+              label={REGION_COLOR}
+              embedded
+              value={citationHex}
+              onChange={onCitationHexChange}
+            />
+          )}
+        </div>
+      )}
 
       {empty ? (
         // Named, never a blank table. A malformed language string makes the SDK

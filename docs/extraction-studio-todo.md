@@ -144,6 +144,14 @@ everything else on this list.
    precedent set by hiding the element-count/confidence stats for the same reason) to leaving it
    as an honest no-op with help text, and it wasn't this session's place to pick.
 
+   **The surface of this grew, 2026-08-07 (#64).** Flipping `Show regions` on in Markdown mode
+   no longer reveals one inert toggle — it reveals the whole region-colour block underneath: the
+   "Region color" label, the `By confidence | Custom` mode toggle, and, in Custom, up to seven
+   inert controls (four preset swatches, the dropper/native picker, and the hex field), none of
+   which paint anything for the same `textElements: []` reason. Still Jon's call and still not
+   closed by this note — the fix for the toggle would fix this block too, since they are gated
+   on the same dead state — but a reviewer now meets more surface area doing nothing, not less.
+
 4. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
    not on the write-ups, which are finished and ready to paste. Deferred by Jon 2026-08-06.
    **Try the browser first** — the API path is what fails, and that is the cheapest test.
@@ -492,6 +500,20 @@ padding-top still 18px).
   button and a dark one does not vanish into the dark theme; verified in both. The button
   itself still refuses to tint, and there is a test pinning that (`picker.style.background`
   stays empty), because tinting it is what made it read as a fifth preset.
+- **OCR's region overlay gained a colour control, matching Structured Extraction's citation
+  colour.** Shipped 2026-08-07, PR #64. `Show regions` now pairs with a
+  `By confidence | Custom` mode toggle (`OcrResults.tsx`, `HighlightColor.tsx`). **By
+  confidence stays the default** — it is what makes the overlay show WHERE OCR was unsure,
+  and that signal is not something Custom should cost a reviewer by accident. Custom hands
+  the regions to the same colour value **Structured Extraction's "Citation color" control
+  already uses** — there is one studio-wide highlight colour, not two independent ones, so
+  setting either control also moves the other. That is intentional (it is what lets the
+  colour survive a rail switch instead of resetting), but the two controls have different
+  names in different panels, so meeting this cold reads as a bug rather than a feature — if
+  you notice "Region color" changing when you never touched it, check whether Structured
+  Extraction's citation colour was set first. Design:
+  `docs/specs/2026-08-07-ocr-highlight-color-design.md`. Plan:
+  `docs/plans/2026-08-07-ocr-highlight-color.md`.
 
 ### 7. Known issue, not ours — SDK-045 (RESOLVED as an investigation, 2026-08-06)
 
@@ -791,12 +813,12 @@ adapted from a sibling.
 
 ## Baselines
 
-Run from the repo root. Re-measured 2026-08-07 on the `ocr-code-view` branch, after the OCR
-Code view shipped (this repo's PR + `python-fast-api#35`).
+Run from the repo root. Re-measured 2026-08-07 on the `ocr-highlight-color` branch, after the
+OCR region-colour control shipped (PR #64).
 
 | | Value | Command |
 |---|---|---|
-| Frontend tests | **320 across 34 files** | `pnpm test` |
+| Frontend tests | **334 across 34 files** | `pnpm test` |
 | Typecheck | clean | `pnpm exec tsc --noEmit` |
 | Biome, changed files | 0 errors | `pnpm exec biome check <paths>` |
 | Backend, pure subset | **89 passed / 14 deselected in ~1s** | see below |
@@ -814,10 +836,13 @@ cd ~/SE/code/python-fast-api && .venv/bin/pytest \
 **Earlier figures in this table were wrong twice, so re-measure rather than trusting a
 remembered number.** "283 across 36 files" was wrong (there were 28 test files at #48, not
 36) and cost a few minutes chasing 64 phantom tests; 219/30 was correct on 2026-08-06 and is
-simply superseded — #59 and #60 added four files and 90 tests. There is no `*.spec.*`, no
-Playwright suite, and `tests/` holds only `setup.ts`, so `pnpm test` covers everything. If a
-future count comes in *below* 320, check for deleted files before assuming a regression —
-three test files have been deleted in this repo's history
+simply superseded — #59 and #60 added four files and 90 tests, then #63 (OCR Code view)
+brought it to 320/34, and #64 (OCR region colour) brought it to the current 334/34 — 14 more
+tests in the same 34 files (`CitationColor.test.tsx` was renamed to `HighlightColor.test.tsx`
+along with the component, not added). There is no `*.spec.*`, no Playwright suite, and
+`tests/` holds only `setup.ts`, so `pnpm test` covers everything. If a future count comes in
+*below* 334, check for deleted files before assuming a regression — three test files have
+been deleted in this repo's history
 (`git log --diff-filter=D --name-only -- '*.test.tsx'`).
 
 **A green `pnpm test` is not evidence for a type change.** Vitest transpiles without

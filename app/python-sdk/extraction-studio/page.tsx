@@ -8,7 +8,7 @@ import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
 import { OcrConfig } from "./_components/OcrConfig";
-import { confidenceHex, OcrResults } from "./_components/OcrResults";
+import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
 import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
@@ -22,7 +22,13 @@ import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
 import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
 import { DOCUMENTS, findDoc } from "./lib/docs";
-import { extractOcr, type OcrRequest, type OcrResult } from "./lib/ocr";
+import {
+  extractOcr,
+  type OcrColorMode,
+  type OcrRequest,
+  type OcrResult,
+  ocrCitationsFor,
+} from "./lib/ocr";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -47,6 +53,10 @@ export default function ExtractionStudio() {
   const [citationHex, setCitationHex] = useState(DEFAULT_CITATION_HEX);
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
   const [showRegions, setShowRegions] = useState(true);
+  // Shared with structured extraction's citations on purpose — one studio-wide
+  // highlight colour that survives a rail switch, not two knobs that look
+  // linked and are not. Only the MODE is OCR's own.
+  const [ocrColorMode, setOcrColorMode] = useState<OcrColorMode>("confidence");
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -114,25 +124,9 @@ export default function ExtractionStudio() {
     setActiveIndex(null);
   }, [feature]);
 
-  // OCR elements already arrive as fractional citations from the backend, so the
-  // existing overlay draws them with no new drawing code. Each carries its own
-  // hex, which is why IndexedCitation has an optional per-citation colour.
-  // IndexedCitation is { fieldIndex, citation } — a wrapper. Spreading the
-  // citation's own fields in would produce the wrong shape and paint nothing.
   const ocrCitations = useMemo(
-    () =>
-      (ocrResult?.textElements ?? []).flatMap((el, index) =>
-        el.citation
-          ? [
-              {
-                fieldIndex: index,
-                citation: el.citation,
-                hex: confidenceHex(el.confidence),
-              },
-            ]
-          : [],
-      ),
-    [ocrResult],
+    () => ocrCitationsFor(ocrResult?.textElements ?? [], ocrColorMode),
+    [ocrResult, ocrColorMode],
   );
 
   const viewerCitations = feature === "structured" ? citations : ocrCitations;
@@ -368,6 +362,10 @@ export default function ExtractionStudio() {
                   onSelectElement={setActiveIndex}
                   showRegions={showRegions}
                   onShowRegionsChange={setShowRegions}
+                  colorMode={ocrColorMode}
+                  onColorModeChange={setOcrColorMode}
+                  citationHex={citationHex}
+                  onCitationHexChange={setCitationHex}
                 />
               ) : (
                 <div className="panel-section">
