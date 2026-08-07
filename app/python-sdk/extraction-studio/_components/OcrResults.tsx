@@ -58,6 +58,8 @@ export function OcrResults({
   // panel the way the markdown branch's missing textElements once did.
   const textElements = result.textElements ?? [];
   const empty = textElements.length === 0 && !result.markdown;
+  // The JSON view deliberately drops `code`: the snippet has its own segment.
+  const { code, ...resultJson } = result;
 
   return (
     <div>
@@ -107,12 +109,14 @@ export function OcrResults({
               isMarkdown
                 ? [
                     { label: "Markdown", value: "markdown" },
+                    { label: "Code", value: "code" },
                     { label: "JSON", value: "raw" },
                   ]
                 : [
                     { label: "Elements", value: "elements" },
                     { label: "Text", value: "text" },
                     { label: "JSON", value: "raw" },
+                    { label: "Code", value: "code" },
                   ]
             }
             // Genuinely `view`, not `isMarkdown ? "markdown" : view` — that
@@ -126,11 +130,18 @@ export function OcrResults({
             onChange={setView}
           />
 
-          {isMarkdown && view !== "raw" ? (
+          {view === "code" ? (
+            // First, not folded into the chain below: `isMarkdown && view !==
+            // "raw"` is true when view is "code", so leading with that test
+            // would render the markdown pane over the Code segment.
+            <pre className="ocr-text mono">
+              {code ?? "# run OCR to see the code"}
+            </pre>
+          ) : isMarkdown && view !== "raw" ? (
             <pre className="ocr-text mono">{result.markdown}</pre>
           ) : view === "raw" ? (
             <pre className="ocr-text mono">
-              {JSON.stringify(result, null, 2)}
+              {JSON.stringify(resultJson, null, 2)}
             </pre>
           ) : view === "text" ? (
             <pre className="ocr-text mono">{result.fullText ?? ""}</pre>

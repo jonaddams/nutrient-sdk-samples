@@ -121,7 +121,7 @@ export function StructuredResults({
 
       {view === "code" ? (
         <pre className="mono">
-          {code ?? "// run an extraction to see the code"}
+          {code ?? "# run an extraction to see the code"}
         </pre>
       ) : view === "raw" ? (
         <pre className="mono">{JSON.stringify(data.extraction, null, 2)}</pre>

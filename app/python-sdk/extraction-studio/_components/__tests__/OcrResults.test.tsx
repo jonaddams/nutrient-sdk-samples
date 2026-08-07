@@ -185,3 +185,47 @@ test("degrades to an empty table instead of throwing if a future backend respons
   ).not.toThrow();
   expect(screen.getByText(/no text found/i)).toBeInTheDocument();
 });
+
+const CODE = "import glob, json, re\nprint('hi')\n";
+
+test("offers a Code segment in JSON mode and renders the snippet", () => {
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/import glob, json, re/)).toBeInTheDocument();
+});
+
+test("offers a Code segment in markdown mode too", () => {
+  // The spec asks for Code in the JSON segment list. Shipping it there only
+  // would make the promise vanish when a reviewer flips the Output control —
+  // the same disappearing-promise problem one control deeper.
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/import glob, json, re/)).toBeInTheDocument();
+});
+
+test("Code wins over the markdown pane in markdown mode", () => {
+  // The render chain used to lead with `isMarkdown && view !== "raw"`, which is
+  // true when view is "code", so clicking Code in markdown mode would have
+  // silently re-rendered the markdown.
+  render(<OcrResults {...props} result={{ ...MARKDOWN_RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.queryByText("# Invoice")).not.toBeInTheDocument();
+});
+
+test("degrades to a Python-commented placeholder when code is absent", () => {
+  // Optional on purpose: the response type is a claim about the backend, not a
+  // check on it, and this view ships before the backend deploy reaches Railway.
+  render(<OcrResults {...props} />);
+  fireEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/^# run OCR to see the code$/)).toBeInTheDocument();
+});
+
+test("the JSON view omits the code snippet", () => {
+  // The snippet has its own segment; inlining 40 lines of Python as one escaped
+  // string is the entire JSON pane's worth of noise. StructuredResults has the
+  // same shape — its raw view shows data.extraction, not the envelope.
+  render(<OcrResults {...props} result={{ ...RESULT, code: CODE }} />);
+  fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+  expect(screen.queryByText(/"code":/)).not.toBeInTheDocument();
+  expect(screen.getByText(/"filename": "scan.pdf"/)).toBeInTheDocument();
+});

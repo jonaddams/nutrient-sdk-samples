@@ -48,6 +48,11 @@ export type OcrResult = {
   pages: { page: number; width: number; height: number }[];
   /** Present only when outputFormat was "markdown". */
   markdown?: string;
+  /** The 'how you'd do this yourself' snippet the backend builds for this run.
+   *  Optional deliberately, matching StructuredResults: this type is a claim
+   *  about the backend's shape, not a check on it, and the frontend can deploy
+   *  before the backend does. */
+  code?: string;
   config: { languages: string; outputFormat: string; tableDetection: boolean };
   timingMs: number;
 };
