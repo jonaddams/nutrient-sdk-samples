@@ -121,7 +121,10 @@ export function StructuredResults({
 
       {view === "code" ? (
         <pre className="mono">
-          {code ?? "// run an extraction to see the code"}
+          {/* Same wording as OcrResults: the placeholder only ever shows after
+              a run (the panel does not render otherwise), so an instruction to
+              run again would describe the reader's own last action. */}
+          {code ?? "# code snippet unavailable from this backend"}
         </pre>
       ) : view === "raw" ? (
         <pre className="mono">{JSON.stringify(data.extraction, null, 2)}</pre>
