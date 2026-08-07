@@ -783,7 +783,9 @@ pnpm exec biome check app/python-sdk/extraction-studio/_components/OcrResults.ts
 
 Expected: **333 tests across 34 files** (326 + 6 + 1). `tsc` silent, biome 0 new errors.
 
-`page.tsx` does not yet pass the four props, so `tsc` **will** fail here with "Property 'colorMode' is missing". That is expected and Task 4 fixes it — if that is the only `tsc` error, proceed and note it in your report.
+`page.tsx` does not yet pass the four props, so `tsc` **will** fail here with "Property 'colorMode' is missing".
+
+**Tasks 3 and 4 were merged into one task before execution** (Jon, 2026-08-07), precisely so this never happens: a task that ends with a red build is not independently reviewable, and telling a reviewer to expect it would be pre-judging a legitimate finding. Do Task 4's steps in the same task, and treat the `tsc` gate below as advisory until Task 4 Step 4 — the two halves are meaningless apart. Two commits are still correct; one review covers both.
 
 - [ ] **Step 7: Commit**
 
@@ -990,5 +992,5 @@ EOF
 
 - **Spec coverage.** Design decision 1 (mode toggle) → Task 3 Step 4 + Task 1's `ocrCitationsFor`; 2 (shared colour value) → Task 4 Steps 1/3, passing `citationHex`/`setCitationHex`; 3 (`HighlightColor` + `label`) → Task 2; 4 (`Segmented` above swatches, swatches only in Custom) → Task 3 Step 4 and its `shows swatches only in Custom mode` test; 5 (pure functions in `lib/ocr.ts`) → Task 1. The spec's testing section maps to Task 1 Step 2, Task 2 Step 1, Task 3 Steps 1/5, Task 4 Step 5.
 - **The duplicate-label problem was found while writing Task 3** and is why `hideLabel` exists. It is not in the design doc, because it only appears once you put `HighlightColor` inside a block that already has a heading. Flagged rather than silently added: if a reviewer prefers dropping the outer `<span>` and letting the label vanish in confidence mode, that is a smaller diff but a worse panel.
-- **Task 3 leaves `tsc` failing on purpose** — `page.tsx` cannot supply the new props until Task 4. This is called out in Task 3 Step 6 so a reviewer does not read it as a defect. A reviewer who wants every task green in isolation should merge Tasks 3 and 4.
+- **Tasks 3 and 4 were merged before execution** (Jon, 2026-08-07). Task 3 alone would have ended with `tsc` red, since `page.tsx` cannot supply the new props until Task 4 — not independently reviewable, and warning the reviewer off it would be pre-judging. They run as one task with two commits and one review gate.
 - **Test counts are cumulative predictions** (325 → 326 → 333). Re-measure rather than trusting them; one test moves files in Task 1, so the total is not a simple sum of additions.
