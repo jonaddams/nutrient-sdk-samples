@@ -81,9 +81,15 @@ export function OcrResults({
 
   return (
     <div>
-      <div className="results-meta">
+      {/* Two columns, not one row. OCR carries four items here where structured
+          carries two, and at the panel's real width they wrapped mid-phrase —
+          "Show / regions" over two lines, "39 / elements" over two. A grid gives
+          each item a whole cell, so the pairs line up and nothing wraps.
+          In markdown mode the middle two are hidden, so this collapses to a
+          single row of elapsed time and the toggle. */}
+      <div className="results-meta results-meta-grid">
         <span className="mono muted">
-          {(result.timingMs / 1000).toFixed(1)}s
+          Elapsed time: {(result.timingMs / 1000).toFixed(1)}s
         </span>
         {/* Markdown output carries no elements and no per-element
             confidence, so both figures are structurally zero in that mode.

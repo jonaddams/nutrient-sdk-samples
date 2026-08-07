@@ -60,7 +60,7 @@ const props = {
 
 test("shows timing, element count and average confidence", () => {
   render(<OcrResults {...props} />);
-  expect(screen.getByText("0.8s")).toBeInTheDocument();
+  expect(screen.getByText(/Elapsed time: 0\.8s/)).toBeInTheDocument();
   expect(screen.getByText(/2 elements/)).toBeInTheDocument();
   expect(screen.getByText(/90%/)).toBeInTheDocument();
 });
@@ -150,7 +150,7 @@ test("omits the element count and confidence in markdown mode, keeping the timin
   // anyone who has not been told. Timing is the one stat that still means
   // something in this mode.
   render(<OcrResults {...props} result={MARKDOWN_RESULT} />);
-  expect(screen.getByText("0.6s")).toBeInTheDocument();
+  expect(screen.getByText(/Elapsed time: 0\.6s/)).toBeInTheDocument();
   expect(screen.queryByText(/\d+ elements/)).not.toBeInTheDocument();
   expect(screen.queryByText(/avg confidence/)).not.toBeInTheDocument();
 });
