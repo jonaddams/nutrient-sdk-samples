@@ -13,6 +13,12 @@ Revised 2026-08-07. Adaptive OCR shipped (#59 + `python-fast-api#34`), the sampl
 every priority on the 2026-08-05 list is closed, so that list is gone rather than left as a
 column of strikethroughs. Read the new one before picking anything up.
 
+Revised again end of 2026-08-07, after three stacked PRs merged (`python-fast-api#35`, then
+`#63` the OCR Code view, then `#64` the OCR region highlight colour). The next-session list was
+renumbered — its old items 1 and 2 are done — and a new **item 6** records the deferred review
+findings from both branches. That item is the only place those findings exist; the review
+ledgers were scratch and were deleted after merge.
+
 The studio came from the standalone `nutrient-data-extraction-demo`, now retired. **This
 file is the part that matters for working in the studio from here** — everything actively
 needed has been carried over.
@@ -67,6 +73,27 @@ reading `localStorage` during render, which would be a hydration mismatch.
 (#59 + `python-fast-api#34`). Building the rail out is the standing direction, not a loose end
 — see "Decided, do not re-litigate".
 
+**End of 2026-08-07: three stacked PRs merged, nothing open in either repo.**
+`python-fast-api#35` (`8a76dd5`), then `#63` (`77366c7`, the OCR Code view), then `#64`
+(`5e01f86`, the OCR region highlight colour). Both `main`s verified green after merging —
+frontend 334/34 with `tsc` clean, backend pure subset 89 passed. The Adaptive OCR panel now
+has everything Structured Extraction has: four segments including **Code**, a Copy/Download
+row, and a colour control.
+
+Two things worth carrying forward from that day, both found by review rather than by tests:
+
+- **A generated snippet that writes files must write them somewhere it owns.** `#35`'s OCR
+  snippet exported page images to `page.jpg` in the *current directory*. Run it on a 3-page
+  PDF then a 1-page PDF in the same folder and the stale `page-1..3.jpg` made the glob
+  non-empty, so the single-page fallback never fired and it silently OCR'd the **previous**
+  document, exit code 0. Reproduced, then fixed with `tempfile.TemporaryDirectory()`.
+  Production was never affected — `_prepared_pages` always used a unique temp basename.
+- **A component dropped into a block that reuses its own class name doubles that class's
+  padding.** `#64` nested `.citation-color` inside `.citation-color`, and that rule's padding
+  matches at any depth. jsdom computes no layout, so no unit test could see it; it took a
+  reviewer reading CSS and then a `getBoundingClientRect()` measurement. `HighlightColor`'s
+  `embedded` prop now returns a bare fragment to prevent it.
+
 **The sample is called "Extraction Studio"** as of 2026-08-07 (#60). It read "Structured
 Extraction" for a day after OCR shipped, which named a third of what the shell does and
 collided with the rail's own `Structured extraction` *feature* label. The name now matches the
@@ -80,7 +107,7 @@ Two things the OCR work settled:
   `eng+deu+fra` scored higher than any single language. Its rail entry is now a decision rather
   than an unknown. **Any other separator returns an empty document silently** — that is what
   the server-side language allowlist exists to prevent, and it is worth filing as SDK-049
-  (priority 4 below).
+  (priority 3 below).
 - **Adaptive OCR needed no new documents**, which is why it was built before Local ICR. The
   manifest's four zero-text-layer scans are its corpus, and #56 already marks them `SCAN`.
 
@@ -92,49 +119,34 @@ that is the Multimodal-toggle mistake (item 9).
 
 ### Next session — start here
 
-Rewritten 2026-08-07. Every priority on the 2026-08-05 list is closed, so this is a fresh list
-rather than a column of strikethroughs. **Not yet reviewed with Jon** — the 2026-08-05 list was,
-so treat this ordering as a proposal. It is ordered by what a prospect would notice, which is
-not the same as ordered by effort.
+Renumbered end of 2026-08-07, after the day's three PRs merged. The previous items 1 and 2 are
+closed and dropped; the note directly below keeps the two corpus facts that were buried in
+them. **Ordering is a proposal, not reviewed with Jon.** It is ordered by what a prospect would
+notice, which is not the same as ordered by effort.
 
-The immediate context is that Jon intends to **send the studio to colleagues for review**. That
-raises the value of items 1 and 2, both of which a reviewer meets in the first minute, above
-everything else on this list.
+The immediate context is unchanged: Jon intends to **send the studio to colleagues for
+review**. Item 1 is the thing a reviewer is now most likely to trip over, and it is a decision
+rather than a build.
 
-1. ~~**The OCR results panel has no Code view, and the spec says it should.**~~ **DONE
-   2026-08-07** — `python-fast-api#35` (backend, `_build_ocr_code()`) and this repo's #63
-   (frontend, the `Code` segment in both output modes plus the Copy/Download row). Design:
-   `docs/specs/2026-08-07-ocr-code-view-design.md`. Plan:
-   `docs/plans/2026-08-07-ocr-code-view.md`.
+**Start here:** item 1 needs a five-minute decision from Jon and nothing else. Items 2-3 are
+write-ups blocked on a Jira permission that is worth one browser attempt. Item 6 is where the
+new code debt is recorded — none of it is urgent, but it is now written down nowhere else,
+because this session's scratch workspaces were deleted after merge.
 
-   Live-verified against a real backend: the multi-page branch (`Invoice AC-2025-1047.pdf`,
-   2 pages — **not** Westbridge, which turned out to be single-page despite its name; every
-   scan in the corpus except the flagship invoice is single-page) and the single-page
-   `paths or ["page.jpg"]` fallback (`scanned-invoice.pdf`) were both copied out of the UI and
-   actually run in the backend venv, and both printed real elements rather than raising or
-   returning `[]`.
+**Closed 2026-08-07 and dropped from this list**, since the detail now lives in git and in the
+committed design/plan docs: the OCR **Code view** (`python-fast-api#35` + `#63`; design at
+`docs/specs/2026-08-07-ocr-code-view-design.md`) and the Markdown meta row reading
+"0 elements · 0% avg confidence" (#62). Also shipped that day, and never on this list: the
+OCR **region highlight colour** (`#64`; design at
+`docs/specs/2026-08-07-ocr-highlight-color-design.md`).
 
-   The spec's `OcrResults` section calls for four segments — Text / Elements / JSON /
-   **Code** — and only three shipped (Elements / Text / JSON, or Markdown / JSON in markdown
-   mode). This was **dropped in the plan, not in implementation**: the plan never mentioned the
-   fourth segment, so all eight tasks built faithfully to a plan that had already lost it.
+One corpus fact from live-verifying them is worth keeping out of the archaeology: **every scan
+in the corpus except the flagship `Invoice AC-2025-1047.pdf` is single-page.** Westbridge is
+single-page despite its name, which cost a verification pass that believed it was exercising
+the multi-page branch. `Invoice AC-2025-1047.pdf` lives in `public/invoices/`, not
+`public/documents/` — that cost a second agent a wrong-directory search.
 
-   It read as a regression when switching features, because **Structured extraction does have
-   a Code segment**. A prospect who learns "every result gives you the code that produced it"
-   loses that promise by clicking one rail entry.
-
-   Not a frontend-only change: the snippet is built server-side by `_build_code()` in
-   `python-fast-api/app/services/structured.py:346`, and the OCR response had **no `code`
-   field at all** — `app/services/ocr*.py` had no equivalent builder. `_build_ocr_code()`
-   mirrors it, keeping its two hard-won rules: **every name the snippet references must be
-   defined in the snippet** (item 8), and **tests must `compile()` the output** rather than
-   string-matching it.
-
-2. ~~**In Markdown mode the meta row reads "0 elements · 0% avg confidence".**~~ **DONE, #62.**
-   It shipped in that PR but this list was never updated to say so. `OcrResults.tsx` now hides
-   the element count and the confidence figure when `isMarkdown`, leaving the timing.
-
-3. **`Show regions` is inert in Markdown mode.** Found 2026-08-07 while live-verifying the
+1. **`Show regions` is inert in Markdown mode.** Found 2026-08-07 while live-verifying the
    Code view. `OcrResults.tsx` renders the toggle unconditionally, but the box it controls is
    driven off `ocrCitations`, which `page.tsx` derives from `ocrResult.textElements` —
    `[]` on every markdown-mode response (`extract_text_ocr`'s markdown branch always returns
@@ -152,12 +164,12 @@ everything else on this list.
    closed by this note — the fix for the toggle would fix this block too, since they are gated
    on the same dead state — but a reviewer now meets more surface area doing nothing, not less.
 
-4. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
+2. **File SDK-045 through SDK-048 upstream (item 10).** Blocked on the NAPY Jira permission,
    not on the write-ups, which are finished and ready to paste. Deferred by Jon 2026-08-06.
    **Try the browser first** — the API path is what fails, and that is the cheapest test.
    Worth chasing on its own merits: it blocks every future SDK defect filing.
 
-5. **Write up SDK-049 — a malformed `default_languages` string returns an empty document
+3. **Write up SDK-049 — a malformed `default_languages` string returns an empty document
    silently.** The only one of the five with no write-up yet. Measured 2026-08-06: `eng,deu`,
    `eng;deu`, `eng|deu`, `eng deu` and two-letter codes all yield 154 chars / 0 elements with
    **no exception raised**. `eng,deu` is the obvious first guess a caller makes, so they
@@ -170,11 +182,11 @@ everything else on this list.
    `docs/sdk-defects/sdk-049-*.md` and a `napy-ticket-sdk-049.md` in the house style the
    other four use. Then it joins the item 10 filing queue.
 
-6. **The two rail gaps (item 2)** — Table Extraction and Document to Markdown have no rail
+4. **The two rail gaps (item 2)** — Table Extraction and Document to Markdown have no rail
    successor, so those samples cannot be retired. Note Document to Markdown is also the sample
    most affected by SDK-046, so a rail feature built on that endpoint inherits the word loss.
 
-7. **The next rail feature, when there is appetite for one.** Rough order of cheapness, given
+5. **The next rail feature, when there is appetite for one.** Rough order of cheapness, given
    what is now known:
    - **Multilingual OCR** — cheapest by far. Same endpoint, same panel, same results component;
      the language multi-select already exists and `+` is proven. Arguably it is a *preset* of
@@ -193,6 +205,36 @@ everything else on this list.
    options-in/elements-out) would be inferred from too little. A third is when to look again —
    `page.tsx`'s feature-keyed panel switching and per-feature result clearing are the two
    places that will show the strain first.
+
+6. **Deferred findings from the #63 and #64 reviews.** None blocks anything; all were
+   explicitly triaged as deferrable by the final reviewers. **This is the only record** — the
+   scratch workspaces that held the review ledgers were deleted after merge, by design.
+
+   Ranked by value, and the first three are each under an hour:
+
+   | Fix | Why it is worth doing | Where |
+   |---|---|---|
+   | Make `Segmented` generic (`<T extends string>`) | Kills the unchecked `as OcrColorMode` cast. A typo in an `options` value currently typechecks and silently falls through to a default. This is the first `Segmented` feeding a union rather than a `string`, so the hole is new. | `Segmented.tsx`, ~4 lines; benefits every call site |
+   | Extract a shared `downloadText()` | `payload`/`FILE_FOR_VIEW`/`download` are duplicated between `OcrResults` and `StructuredResults`, including the deferred-`revokeObjectURL` comment verbatim. Second instance, so extraction is no longer premature. | new `lib/download.ts`, ~20 duplicated lines collapse |
+   | Give `Segmented` an accessible name | It renders `role="group"` with no `aria-label` (its own biome-ignore admits this). A screen-reader user now meets **two** unnamed groups in the OCR panel — the view switcher and the colour mode. Pre-existing pattern, newly doubled. | `Segmented.tsx` + both call sites |
+   | Snippet prints the PDF pre-render even for image input | `_build_ocr_code` only receives `filename`, so it cannot make the `%PDF` check `_prepared_pages` makes. POST a PNG and the returned `code` describes a rasterisation that did not happen. Invisible in the studio (corpus is all PDFs, no upload) but the endpoint is public. | `python-fast-api`, pass `is_pdf` down |
+   | Snippet has no page cap | Production caps at `MAX_PRERENDER_PAGES = 10` and reports `processedPages`; the snippet processes every page, so an 11-page PDF gives a prospect more output than the panel showed. A one-line comment would settle it. | `python-fast-api` |
+   | `clipboard.writeText` has no `.catch` | A denied-permission rejection is unhandled, and in a non-secure context `navigator.clipboard` is `undefined` and it throws synchronously. Both panels share the gap — fix both or neither. | `OcrResults.tsx`, `StructuredResults.tsx` |
+   | No Code segment on an empty result | The actions row and `Segmented` live inside the non-`empty` branch, so a "No text found" run offers no Code view — arguably the moment a prospect most wants to see which languages were used. | `OcrResults.tsx` |
+   | Extract `<OcrRegionColor>` | `OcrResults.tsx` now carries view switching, download, the element table, and the colour block. Not unreasonable yet; the next addition is the moment. | ~25-line lift |
+
+   **Two things the reviews corrected that are worth not re-deriving:**
+
+   - **Dependency arrays are lint-enforced.** `biome.json` enables `domains.react:
+     recommended`, so `useExhaustiveDependencies` is on. A reviewer removed `ocrColorMode`
+     from the `useMemo` deps and biome errored. Do not write a test to "guard" a dependency
+     array — CI already does.
+   - **A test can look like a regression guard without being one.** `#64` added "Region color
+     appears exactly once in Custom mode" alongside the padding fix; it would have passed
+     *before* the fix too, because the bug was a duplicated `<div>` with no text of its own.
+     The real guards are `HighlightColor.test.tsx`'s wrapper-absence assertion and the live
+     `getBoundingClientRect()` measurement. `OcrResults.tsx` also hoists `REGION_COLOR` to a
+     constant now, because that test does **not** catch the two literals drifting apart.
 
 ### 1. Field Extraction — UNLISTED 2026-08-06
 
