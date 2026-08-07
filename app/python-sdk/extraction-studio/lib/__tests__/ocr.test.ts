@@ -1,5 +1,11 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { extractOcr, OCR_LANGUAGES } from "../ocr";
+import {
+  confidenceHex,
+  confidenceTone,
+  extractOcr,
+  OCR_LANGUAGES,
+  ocrCitationsFor,
+} from "../ocr";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -117,4 +123,70 @@ test("surfaces the backend's detail message", async () => {
       outputFormat: "json",
     }),
   ).rejects.toThrow("klingon");
+});
+
+const ELEMENT = {
+  readingOrder: 0,
+  type: "paragraph",
+  text: "Invoice",
+  confidence: 0.95,
+  page: 0,
+  citation: { page: 0, x0: 0.1, y0: 0.1, x1: 0.2, y1: 0.2 },
+};
+
+test("confidenceTone bands a score into three tones", () => {
+  expect(confidenceTone(0.95)).toBe("good");
+  expect(confidenceTone(0.6)).toBe("partial");
+  expect(confidenceTone(0.2)).toBe("bad");
+});
+
+test("confidenceHex returns the exact .match-dot values", () => {
+  // Asserted as literals on purpose. These MUST equal
+  // .match-dot.good/.partial/.bad in styles.css — they diverged once, and the
+  // dot beside an element and the box drawn for that same element were
+  // visibly different greens. A test that recomputed them would not have
+  // caught that.
+  expect(confidenceHex(0.95)).toBe("#4a9d6a");
+  expect(confidenceHex(0.6)).toBe("#c9a227");
+  expect(confidenceHex(0.2)).toBe("#c8553c");
+});
+
+test("confidence mode gives every region its own tint", () => {
+  const out = ocrCitationsFor(
+    [ELEMENT, { ...ELEMENT, readingOrder: 1, confidence: 0.2 }],
+    "confidence",
+  );
+  expect(out.map((c) => c.hex)).toEqual(["#4a9d6a", "#c8553c"]);
+});
+
+test("custom mode omits hex entirely, rather than setting it undefined", () => {
+  // resolveHex is `citation.hex ?? fallback`, so an explicit `hex: undefined`
+  // would still fall back correctly today — but asserting absence pins the
+  // shape the design relies on and survives a future `??` becoming `||` or a
+  // spread that treats the key as present.
+  const out = ocrCitationsFor([ELEMENT], "custom");
+  expect(out).toHaveLength(1);
+  expect("hex" in out[0]).toBe(false);
+});
+
+test("elements without a citation drop out, in both modes", () => {
+  const withNone = { ...ELEMENT, readingOrder: 1, citation: null };
+  expect(ocrCitationsFor([ELEMENT, withNone], "confidence")).toHaveLength(1);
+  expect(ocrCitationsFor([ELEMENT, withNone], "custom")).toHaveLength(1);
+});
+
+test("fieldIndex is the position in the FULL element list, not the compacted one", () => {
+  // The trap: the returned array is COMPACTED (uncited elements are dropped),
+  // so array position is not fieldIndex. fieldIndex has to keep pointing at
+  // the original textElements row, or clicking a region in the document
+  // selects the wrong row in the table.
+  const out = ocrCitationsFor(
+    [
+      { ...ELEMENT, citation: null },
+      { ...ELEMENT, readingOrder: 1 },
+    ],
+    "confidence",
+  );
+  expect(out).toHaveLength(1);
+  expect(out[0].fieldIndex).toBe(1);
 });

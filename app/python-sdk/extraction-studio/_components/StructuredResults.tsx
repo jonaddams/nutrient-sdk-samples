@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
-import { CitationColor } from "./CitationColor";
+import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
 
@@ -92,7 +92,11 @@ export function StructuredResults({
       {/* Colour lives next to the visibility toggle: same concern, and it is
           only meaningful once there are citations on the page. */}
       {showCitations && (
-        <CitationColor value={citationHex} onChange={onCitationHexChange} />
+        <HighlightColor
+          label="Citation color"
+          value={citationHex}
+          onChange={onCitationHexChange}
+        />
       )}
 
       <div className="panel-row-h panel-row results-actions">
