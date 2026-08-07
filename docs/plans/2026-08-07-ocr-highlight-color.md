@@ -707,6 +707,12 @@ Immediately after the closing `</div>` of `<div className="results-meta">` and *
 
 So the outer `<span>` stays and owns the heading in both modes, and `HighlightColor` gains a `hideLabel?: boolean` that suppresses **only** its visible label. The aria-labels still derive from `label`, so screen readers lose nothing.
 
+**Amendment, post-merge:** the prop that actually shipped is `embedded`, not `hideLabel`, and it
+suppresses more than the label — see `docs/specs/2026-08-07-ocr-highlight-color-design.md`'s
+Interfaces section for what it does and why (double `.citation-color` padding, fixed in
+`5cfbe02`). The steps below are left as written for the historical record of how the plan was
+executed; do not copy the `hideLabel` name or signature from here.
+
 Add the prop to `HighlightColor.tsx`:
 
 ```tsx
@@ -991,6 +997,6 @@ EOF
 ## Self-review notes
 
 - **Spec coverage.** Design decision 1 (mode toggle) → Task 3 Step 4 + Task 1's `ocrCitationsFor`; 2 (shared colour value) → Task 4 Steps 1/3, passing `citationHex`/`setCitationHex`; 3 (`HighlightColor` + `label`) → Task 2; 4 (`Segmented` above swatches, swatches only in Custom) → Task 3 Step 4 and its `shows swatches only in Custom mode` test; 5 (pure functions in `lib/ocr.ts`) → Task 1. The spec's testing section maps to Task 1 Step 2, Task 2 Step 1, Task 3 Steps 1/5, Task 4 Step 5.
-- **The duplicate-label problem was found while writing Task 3** and is why `hideLabel` exists. It is not in the design doc, because it only appears once you put `HighlightColor` inside a block that already has a heading. Flagged rather than silently added: if a reviewer prefers dropping the outer `<span>` and letting the label vanish in confidence mode, that is a smaller diff but a worse panel.
+- **The duplicate-label problem was found while writing Task 3** and is why `hideLabel` was planned. It is not in the design doc, because it only appears once you put `HighlightColor` inside a block that already has a heading. Flagged rather than silently added: if a reviewer prefers dropping the outer `<span>` and letting the label vanish in confidence mode, that is a smaller diff but a worse panel. **Amendment:** `hideLabel` did not survive to the shipped code — a follow-up fix (`5cfbe02`) renamed it to `embedded` and widened what it suppresses, to stop Custom mode double-applying `.citation-color`'s padding. See the design doc's Interfaces section.
 - **Tasks 3 and 4 were merged before execution** (Jon, 2026-08-07). Task 3 alone would have ended with `tsc` red, since `page.tsx` cannot supply the new props until Task 4 — not independently reviewable, and warning the reviewer off it would be pre-judging. They run as one task with two commits and one review gate.
 - **Test counts are cumulative predictions** (325 → 326 → 333). Re-measure rather than trusting them; one test moves files in Task 1, so the total is not a simple sum of additions.

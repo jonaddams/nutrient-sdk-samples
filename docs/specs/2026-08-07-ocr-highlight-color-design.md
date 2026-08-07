@@ -127,20 +127,31 @@ export function ocrCitationsFor(
 
 ```tsx
 // _components/HighlightColor.tsx
-export function HighlightColor({ label, hideLabel, value, onChange }: {
+export function HighlightColor({ label, embedded, value, onChange }: {
   label: string;                      // "Citation color" | "Region color"
-  hideLabel?: boolean;                // suppress the VISIBLE label only
+  embedded?: boolean;                 // parent already renders the wrapper + label
   value: string;
   onChange: (hex: string) => void;
 }): JSX.Element;
 ```
 
-`hideLabel` was not in the original five decisions; it fell out of writing the plan. In the OCR
-panel the heading has to be visible in **both** modes, but `HighlightColor` only renders in
-Custom — so the OCR block owns the `<span className="eyebrow">Region color</span>` itself, and
-`hideLabel` stops the component printing the same words a second time. The aria-labels still
-derive from `label`, so nothing is lost to a screen reader. `StructuredResults` does not pass
-it and is visually unchanged.
+Shipped as `embedded`, not the `hideLabel` this section originally described. `hideLabel` was
+never in the original five decisions; it fell out of writing the plan, to stop the OCR block's
+own `<span className="eyebrow">Region color</span>` printing the same words a second time
+alongside `HighlightColor`'s. That much of the reasoning still holds — the aria-labels still
+derive from `label` unconditionally, so a hidden visible label loses nothing to a screen
+reader, and `StructuredResults` still doesn't pass the flag and is still visually unchanged.
+
+What changed during implementation is *what else* the flag has to suppress. `HighlightColor`
+normally wraps its swatch row in its own `.citation-color` div. The OCR block already renders
+`.citation-color` around the whole region-colour section (heading, mode toggle, and — in Custom
+mode — `HighlightColor` itself), so a `hideLabel`-only flag would nest a second `.citation-color`
+inside the first. `styles.css` scopes that rule at `.studio-shell .citation-color { padding:
+var(--space-3) 0 var(--space-4); }`, which matches at any depth, so Custom mode ended up with
+roughly double Structured Extraction's padding. `embedded` fixes that by also swapping the
+component's root: when set, it returns a bare fragment (the swatch row alone, label already
+suppressed) instead of the `.citation-color` wrapper, so nesting never happens. See `5cfbe02`'s
+commit message for the full before/after.
 
 `OcrResults` gains four props, the same shape `StructuredResults` already takes:
 `colorMode`, `onColorModeChange`, `citationHex`, `onCitationHexChange`.
