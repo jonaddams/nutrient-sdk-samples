@@ -370,7 +370,7 @@ export function StructuredConfig({
 
             The request plumbing is intact (`includePageImages` in lib/api.ts),
             so restoring this is a Toggle plus one piece of state once the SDK
-            honours the flag. See docs/sdk-defects/sdk-047-*.md. */}
+            honours the flag. */}
       </PanelSection>
     </div>
   );

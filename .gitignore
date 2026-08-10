@@ -49,6 +49,12 @@ next-env.d.ts
 .worktrees
 docs/superpowers/
 PROJECT.md
+
+# Internal working notes — their own private repo, cloned in as docs/internal:
+#   git clone git@github.com:jonaddams/nutrient-sdk-samples-internal.git docs/internal
+# This repo is public. SDK defect write-ups, design specs and handoff notes live
+# there so they are still version-controlled without being published.
+docs/internal/
 Claude Design - Nutrient SDK Samples Website/
 
 .dev-server.log

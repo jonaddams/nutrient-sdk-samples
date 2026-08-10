@@ -303,7 +303,7 @@ test("mounting with a given runSignal does not call onRun", () => {
 // `include_page_images` is a no-op on extract_structured() (re-verified that day
 // by capturing the request with the flag both ways: no image reaches the wire).
 // Re-adding it should be a considered decision that also updates this test, not
-// a reflex. See docs/sdk-defects/sdk-047-*.md.
+// a reflex.
 test("offers no Multimodal toggle, because the SDK ignores the flag", () => {
   render(
     <StructuredConfig
