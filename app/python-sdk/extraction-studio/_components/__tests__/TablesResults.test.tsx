@@ -421,6 +421,103 @@ describe("TablesResults", () => {
     expect(document.activeElement).toBe(narrow);
   });
 
+  it("offsets a clicked cell's index by every earlier table's cell count", async () => {
+    // The multi-table misalignment class this codebase already fixed once in
+    // 77fa9c1: a cell's flat index must be offsets[tableIndex] + its
+    // within-table position, not the within-table position alone. Every
+    // other click test in this file uses a single-table result, where that
+    // offset is always 0 and cannot expose a regression here.
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    const multi = result({
+      tableCount: 2,
+      tables: [
+        { rowCount: 1, columnCount: 2, cells: fullGrid(1, 2, "a") },
+        { rowCount: 1, columnCount: 2, cells: fullGrid(1, 2, "b") },
+      ],
+    });
+    render(
+      <TablesResults {...base} result={multi} onSelectCell={onSelectCell} />,
+    );
+    // "b0-1" is table 2's second cell — within-table index 1. Table 1 has 2
+    // cells, so the correct flat index is 2 + 1 = 3, not 1.
+    await user.click(screen.getByText("b0-1"));
+    expect(onSelectCell).toHaveBeenCalledWith(3);
+  });
+
+  it("Home/End move focus to the row's first/last real cell, skipping a span's hole", async () => {
+    // rowEdge is reachable only via Home/End, and nothing else in this file
+    // presses them. Reuses the span layout from the ArrowRight-over-a-hole
+    // test above: [Wide(colSpan 2), null, Narrow] — End from Wide must land
+    // on Narrow (skipping the null the span leaves at column 1), and Home
+    // from Narrow must land back on Wide.
+    const user = userEvent.setup();
+    const spanned = result({
+      tableCount: 1,
+      tables: [
+        {
+          rowCount: 1,
+          columnCount: 3,
+          cells: [
+            {
+              row: 0,
+              column: 0,
+              rowSpan: 1,
+              colSpan: 2,
+              text: "Wide",
+              confidence: 0.9,
+              bounds: null,
+            },
+            {
+              row: 0,
+              column: 2,
+              rowSpan: 1,
+              colSpan: 1,
+              text: "Narrow",
+              confidence: 0.9,
+              bounds: null,
+            },
+          ],
+        },
+      ],
+    });
+    render(<TablesResults {...base} result={spanned} />);
+    const wide = screen
+      .getByText("Wide")
+      .closest("button") as HTMLButtonElement;
+    const narrow = screen
+      .getByText("Narrow")
+      .closest("button") as HTMLButtonElement;
+    await tabTo(user, wide);
+    await user.keyboard("{End}");
+    expect(document.activeElement).toBe(narrow);
+    await user.keyboard("{Home}");
+    expect(document.activeElement).toBe(wide);
+  });
+
+  it("a click also sets the roving position, so tabbing back returns to the clicked cell", async () => {
+    // Standard roving-tabindex behaviour: without this, a click selected the
+    // cell but left tabIndex=0 on the table's previous roving position (the
+    // grid's first cell, since no arrow key has moved it yet), so leaving
+    // and re-entering the table by Tab landed somewhere other than what was
+    // just clicked.
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    render(
+      <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
+    );
+    const target = screen
+      .getByText("120")
+      .closest("button") as HTMLButtonElement;
+    const defaultCell = screen
+      .getByText("Item")
+      .closest("button") as HTMLButtonElement;
+    await user.click(target);
+    expect(onSelectCell).toHaveBeenCalledWith(3);
+    expect(target.tabIndex).toBe(0);
+    expect(defaultCell.tabIndex).toBe(-1);
+  });
+
   it("describes the arrow-key navigation for screen-reader users", () => {
     // Native table semantics were kept over role="grid" (see the component's
     // comment), so nothing built into ARIA announces that arrow keys work

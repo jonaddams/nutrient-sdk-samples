@@ -1304,8 +1304,18 @@
   font-weight: 600;
 }
 
+/* overflow-x: auto + max-width: 100%, NOT on .field-table itself: that class
+   also styles the field-row key/value list (see the block comment at the top
+   of this file), whose overflow: hidden clips its own border-radius corners
+   and must stay put. This is the per-table container instead — the wide
+   16-column table on the flagship invoice was otherwise CLIPPED at a narrow
+   viewport rather than scrolling. Scoped here, not on .studio-table, so the
+   box that scrolls is exactly the box the eyebrow label sits above; the page
+   body itself must never scroll horizontally. */
 .studio-shell .studio-table-block {
   margin-bottom: var(--space-4);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .studio-shell .studio-table {

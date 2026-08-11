@@ -443,7 +443,26 @@ export function TablesResults({
                                     col: colIndex,
                                   })
                                 }
-                                onClick={() => onSelectCell(cellIndex)}
+                                onClick={() => {
+                                  // Syncs the roving position to the clicked cell —
+                                  // standard roving-tabindex behaviour. Without this,
+                                  // clicking a cell selected it but left tabIndex=0 on
+                                  // whatever the table's last ARROW-KEYED position was
+                                  // (or the grid's first cell if none), so tabbing away
+                                  // and back landed somewhere other than what was just
+                                  // clicked. DOM focus is already on this button via
+                                  // the native click; only the state needs updating,
+                                  // not an imperative .focus() (that's focusCell's job
+                                  // for arrow keys, which move focus without a click).
+                                  setRovingByTable((prev) => ({
+                                    ...prev,
+                                    [tableIndex]: {
+                                      row: rowIndex,
+                                      col: colIndex,
+                                    },
+                                  }));
+                                  onSelectCell(cellIndex);
+                                }}
                               >
                                 {c.text}
                                 <span

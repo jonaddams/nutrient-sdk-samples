@@ -1,375 +1,251 @@
 {
-    "engine": "VLM_TABLES",
-    "filename": "ac2025-page2-only.pdf",
-    "provider": "claude",
-    "tableCount": 0,
-    "tables": [],
-    "rawElements": [
-        {
-            "type": "picture",
-            "classification": "logo",
-            "classificationConfidence": 0.9997017,
-            "altDescription": "Company logo for Atlas Construction featuring an orange square with the letter 'A' on the left, followed by the company name 'ATLAS CONSTRUCTION' in bold dark text and subtitle 'General Contractors & Project Management' in smaller gray text.",
-            "readingOrder": 0,
-            "pageNumber": 1,
-            "id": "38ad2532-373b-468b-8d6e-9cd69ddc6496",
-            "bounds": {
-                "x": 82.893265,
-                "y": 49.843464,
-                "width": 616.57495,
-                "height": 79.58563
-            },
-            "points": [
-                [
-                    82.893265,
-                    49.843464
-                ],
-                [
-                    699.4682,
-                    49.843464
-                ],
-                [
-                    699.4682,
-                    129.4291
-                ],
-                [
-                    82.893265,
-                    129.4291
-                ]
-            ],
-            "confidence": 0.6779035
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "General Contractors & Project Management",
-            "readingOrder": 1,
-            "pageNumber": 1,
-            "id": "888b899a-e381-4dbe-aae7-c16f2cb21455",
-            "bounds": {
-                "x": 191.50346,
-                "y": 106.36176,
-                "width": 445.02515,
-                "height": 18.212791
-            },
-            "points": [
-                [
-                    191.50346,
-                    106.36176
-                ],
-                [
-                    636.5286,
-                    106.36176
-                ],
-                [
-                    636.5286,
-                    124.574554
-                ],
-                [
-                    191.50346,
-                    124.574554
-                ]
-            ],
-            "confidence": 0.58761257
-        },
-        {
-            "type": "paragraph",
-            "role": "SectionHeader",
-            "text": "Payment Terms & Conditions",
-            "readingOrder": 2,
-            "pageNumber": 1,
-            "id": "b48d9777-8d67-416d-8cd2-f485cb3b0641",
-            "bounds": {
-                "x": 117.19295,
-                "y": 402.21744,
-                "width": 318.93024,
-                "height": 23.038818
-            },
-            "points": [
-                [
-                    117.19295,
-                    402.21744
-                ],
-                [
-                    436.12317,
-                    402.21744
-                ],
-                [
-                    436.12317,
-                    425.25626
-                ],
-                [
-                    117.19295,
-                    425.25626
-                ]
-            ],
-            "confidence": 0.9391622
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "Payment due within 30 days of invoice date per AIA Document A201-2017, General Conditions. 10% retainage held until substantial completion. Lien waivers provided upon payment. Late payments accrue interest at 1% per month. All work performed in accordance with Contract #RMD-2024-003 and approved shop drawings. Change orders require written approval from Owner and Architect prior to execution.",
-            "readingOrder": 3,
-            "pageNumber": 1,
-            "id": "baf5753e-376f-47df-bd81-ccd5ef4049d6",
-            "bounds": {
-                "x": 116.707794,
-                "y": 455.36298,
-                "width": 1393.3622,
-                "height": 92.9505
-            },
-            "points": [
-                [
-                    116.707794,
-                    455.36298
-                ],
-                [
-                    1510.07,
-                    455.36298
-                ],
-                [
-                    1510.07,
-                    548.3135
-                ],
-                [
-                    116.707794,
-                    548.3135
-                ]
-            ],
-            "confidence": 0.9803719
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "LICENSED & INSURED",
-            "readingOrder": 4,
-            "pageNumber": 1,
-            "id": "d9833f66-4c31-4ed6-b555-5652890392d8",
-            "bounds": {
-                "x": 942.3897,
-                "y": 103.48054,
-                "width": 201.8952,
-                "height": 17.288673
-            },
-            "points": [
-                [
-                    942.3897,
-                    103.48054
-                ],
-                [
-                    1144.2849,
-                    103.48054
-                ],
-                [
-                    1144.2849,
-                    120.76921
-                ],
-                [
-                    942.3897,
-                    120.76921
-                ]
-            ],
-            "confidence": 0.7619698
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "OSHA CERTIFIED",
-            "readingOrder": 5,
-            "pageNumber": 1,
-            "id": "24d55964-e75f-4de5-9d71-056da07302ce",
-            "bounds": {
-                "x": 1196.2036,
-                "y": 103.8088,
-                "width": 156.85156,
-                "height": 16.735672
-            },
-            "points": [
-                [
-                    1196.2036,
-                    103.8088
-                ],
-                [
-                    1353.0552,
-                    103.8088
-                ],
-                [
-                    1353.0552,
-                    120.54447
-                ],
-                [
-                    1196.2036,
-                    120.54447
-                ]
-            ],
-            "confidence": 0.77291465
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "LEED PARTNER",
-            "readingOrder": 6,
-            "pageNumber": 1,
-            "id": "c6e2c771-3fae-4586-aaf3-f7d45e0b5d05",
-            "bounds": {
-                "x": 1408.045,
-                "y": 103.56308,
-                "width": 139.62732,
-                "height": 16.912231
-            },
-            "points": [
-                [
-                    1408.045,
-                    103.56308
-                ],
-                [
-                    1547.6724,
-                    103.56308
-                ],
-                [
-                    1547.6724,
-                    120.47531
-                ],
-                [
-                    1408.045,
-                    120.47531
-                ]
-            ],
-            "confidence": 0.76767266
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "$345,015.00",
-            "readingOrder": 7,
-            "pageNumber": 1,
-            "id": "1a00f7c8-d62f-4917-b7a1-07b4ba43e0f9",
-            "bounds": {
-                "x": 1386.2278,
-                "y": 228.87321,
-                "width": 162.78076,
-                "height": 27.027664
-            },
-            "points": [
-                [
-                    1386.2278,
-                    228.87321
-                ],
-                [
-                    1549.0085,
-                    228.87321
-                ],
-                [
-                    1549.0085,
-                    255.90088
-                ],
-                [
-                    1386.2278,
-                    255.90088
-                ]
-            ],
-            "confidence": 0.8636293
-        },
-        {
-            "type": "paragraph",
-            "role": "Text",
-            "text": "Amount Due",
-            "readingOrder": 8,
-            "pageNumber": 1,
-            "id": "e8448d7e-9e61-4b10-a654-624480ab0c22",
-            "bounds": {
-                "x": 998.76764,
-                "y": 229.74438,
-                "width": 172.67767,
-                "height": 22.905945
-            },
-            "points": [
-                [
-                    998.76764,
-                    229.74438
-                ],
-                [
-                    1171.4453,
-                    229.74438
-                ],
-                [
-                    1171.4453,
-                    252.65033
-                ],
-                [
-                    998.76764,
-                    252.65033
-                ]
-            ],
-            "confidence": 0.87493765
-        },
-        {
-            "type": "paragraph",
-            "role": "Footer",
-            "text": "Atlas Construction LLC | 1500 Builder's Way, Denver, CO 80202 | License CO-GC-2019-44821 | accounting@atlasconstruction.com",
-            "readingOrder": 9,
-            "pageNumber": 1,
-            "id": "d52200db-fcf4-476e-bfca-178c49a3d191",
-            "bounds": {
-                "x": 80.5919,
-                "y": 2262.8582,
-                "width": 709.4397,
-                "height": 37.316162
-            },
-            "points": [
-                [
-                    80.5919,
-                    2262.8582
-                ],
-                [
-                    790.0316,
-                    2262.8582
-                ],
-                [
-                    790.0316,
-                    2300.1743
-                ],
-                [
-                    80.5919,
-                    2300.1743
-                ]
-            ],
-            "confidence": 0.9077959
-        },
-        {
-            "type": "paragraph",
-            "role": "Footer",
-            "text": "Page 2 of 2",
-            "readingOrder": 10,
-            "pageNumber": 1,
-            "id": "47b51793-ec25-4bb7-a6ae-e2a1608c5e77",
-            "bounds": {
-                "x": 1479.7653,
-                "y": 2262.7861,
-                "width": 86.76294,
-                "height": 17.539307
-            },
-            "points": [
-                [
-                    1479.7653,
-                    2262.7861
-                ],
-                [
-                    1566.5282,
-                    2262.7861
-                ],
-                [
-                    1566.5282,
-                    2280.3254
-                ],
-                [
-                    1479.7653,
-                    2280.3254
-                ]
-            ],
-            "confidence": 0.91228276
-        }
-    ],
-    "totalPages": 1,
-    "processedPages": 1
+  "engine": "VLM_TABLES",
+  "filename": "ac2025-page2-only.pdf",
+  "provider": "claude",
+  "tableCount": 0,
+  "pages": [
+    {
+      "page": 1,
+      "width": 1650,
+      "height": 2350
+    }
+  ],
+  "tables": [],
+  "rawElements": [
+    {
+      "type": "picture",
+      "classification": "logo",
+      "classificationConfidence": 0.9997017,
+      "altDescription": "Company logo for Atlas Construction featuring an orange square with the letter 'A' on the left, followed by the company name 'ATLAS CONSTRUCTION' in bold dark text and subtitle 'General Contractors & Project Management' in smaller gray text.",
+      "readingOrder": 0,
+      "pageNumber": 1,
+      "id": "5516967f-7148-4b1b-97bb-e451e667f517",
+      "bounds": {
+        "x": 82.893265,
+        "y": 49.843464,
+        "width": 616.57495,
+        "height": 79.58563
+      },
+      "points": [
+        [82.893265, 49.843464],
+        [699.4682, 49.843464],
+        [699.4682, 129.4291],
+        [82.893265, 129.4291]
+      ],
+      "confidence": 0.6779035
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "General Contractors & Project Management",
+      "readingOrder": 1,
+      "pageNumber": 1,
+      "id": "398e88ef-493b-4339-aeae-66d8de01cf19",
+      "bounds": {
+        "x": 191.50346,
+        "y": 106.36176,
+        "width": 445.02515,
+        "height": 18.212791
+      },
+      "points": [
+        [191.50346, 106.36176],
+        [636.5286, 106.36176],
+        [636.5286, 124.574554],
+        [191.50346, 124.574554]
+      ],
+      "confidence": 0.58761257
+    },
+    {
+      "type": "paragraph",
+      "role": "SectionHeader",
+      "text": "Payment Terms & Conditions",
+      "readingOrder": 2,
+      "pageNumber": 1,
+      "id": "02a588c3-7316-4528-815e-e6ab541e4902",
+      "bounds": {
+        "x": 117.19295,
+        "y": 402.21744,
+        "width": 318.93024,
+        "height": 23.038818
+      },
+      "points": [
+        [117.19295, 402.21744],
+        [436.12317, 402.21744],
+        [436.12317, 425.25626],
+        [117.19295, 425.25626]
+      ],
+      "confidence": 0.9391622
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Payment due within 30 days of invoice date per AIA Document A201-2017, General Conditions. 10% retainage held until substantial completion. Lien waivers provided upon payment. Late payments accrue interest at 1% per month. All work performed in accordance with Contract #RMD-2024-003 and approved shop drawings. Change orders require written approval from Owner and Architect prior to execution.",
+      "readingOrder": 3,
+      "pageNumber": 1,
+      "id": "abbd6e22-1eed-4798-afff-c4785a34db81",
+      "bounds": {
+        "x": 116.707794,
+        "y": 455.36298,
+        "width": 1393.3622,
+        "height": 92.9505
+      },
+      "points": [
+        [116.707794, 455.36298],
+        [1510.07, 455.36298],
+        [1510.07, 548.3135],
+        [116.707794, 548.3135]
+      ],
+      "confidence": 0.9803719
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "LICENSED & INSURED",
+      "readingOrder": 4,
+      "pageNumber": 1,
+      "id": "ab6f9e00-60db-4884-afb9-0004dcf73767",
+      "bounds": {
+        "x": 942.3897,
+        "y": 103.48054,
+        "width": 201.8952,
+        "height": 17.288673
+      },
+      "points": [
+        [942.3897, 103.48054],
+        [1144.2849, 103.48054],
+        [1144.2849, 120.76921],
+        [942.3897, 120.76921]
+      ],
+      "confidence": 0.7619698
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "OSHA CERTIFIED",
+      "readingOrder": 5,
+      "pageNumber": 1,
+      "id": "fd83c691-13e8-408a-bd5a-6fe6a2cc1bc6",
+      "bounds": {
+        "x": 1196.2036,
+        "y": 103.8088,
+        "width": 156.85156,
+        "height": 16.735672
+      },
+      "points": [
+        [1196.2036, 103.8088],
+        [1353.0552, 103.8088],
+        [1353.0552, 120.54447],
+        [1196.2036, 120.54447]
+      ],
+      "confidence": 0.77291465
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "LEED PARTNER",
+      "readingOrder": 6,
+      "pageNumber": 1,
+      "id": "64a1e970-f255-4535-bc7f-b8f7d710cb4f",
+      "bounds": {
+        "x": 1408.045,
+        "y": 103.56308,
+        "width": 139.62732,
+        "height": 16.912231
+      },
+      "points": [
+        [1408.045, 103.56308],
+        [1547.6724, 103.56308],
+        [1547.6724, 120.47531],
+        [1408.045, 120.47531]
+      ],
+      "confidence": 0.76767266
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "$345,015.00",
+      "readingOrder": 7,
+      "pageNumber": 1,
+      "id": "acc3c16d-77e7-45d8-8f88-12922f1bb89a",
+      "bounds": {
+        "x": 1386.2278,
+        "y": 228.87321,
+        "width": 162.78076,
+        "height": 27.027664
+      },
+      "points": [
+        [1386.2278, 228.87321],
+        [1549.0085, 228.87321],
+        [1549.0085, 255.90088],
+        [1386.2278, 255.90088]
+      ],
+      "confidence": 0.8636293
+    },
+    {
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Amount Due",
+      "readingOrder": 8,
+      "pageNumber": 1,
+      "id": "a0c23ba1-ad50-4391-a166-0b5650634036",
+      "bounds": {
+        "x": 998.76764,
+        "y": 229.74438,
+        "width": 172.67767,
+        "height": 22.905945
+      },
+      "points": [
+        [998.76764, 229.74438],
+        [1171.4453, 229.74438],
+        [1171.4453, 252.65033],
+        [998.76764, 252.65033]
+      ],
+      "confidence": 0.87493765
+    },
+    {
+      "type": "paragraph",
+      "role": "Footer",
+      "text": "Atlas Construction LLC | 1500 Builder's Way, Denver, CO 80202 | License CO-GC-2019-44821 | accounting@atlasconstruction.com",
+      "readingOrder": 9,
+      "pageNumber": 1,
+      "id": "2934a428-4f7e-4b30-8625-fc1924c8c555",
+      "bounds": {
+        "x": 80.5919,
+        "y": 2262.8582,
+        "width": 709.4397,
+        "height": 37.316162
+      },
+      "points": [
+        [80.5919, 2262.8582],
+        [790.0316, 2262.8582],
+        [790.0316, 2300.1743],
+        [80.5919, 2300.1743]
+      ],
+      "confidence": 0.9077959
+    },
+    {
+      "type": "paragraph",
+      "role": "Footer",
+      "text": "Page 2 of 2",
+      "readingOrder": 10,
+      "pageNumber": 1,
+      "id": "4a3452cc-c9b2-4d76-bb37-4e2376a2bc9b",
+      "bounds": {
+        "x": 1479.7653,
+        "y": 2262.7861,
+        "width": 86.76294,
+        "height": 17.539307
+      },
+      "points": [
+        [1479.7653, 2262.7861],
+        [1566.5282, 2262.7861],
+        [1566.5282, 2280.3254],
+        [1479.7653, 2280.3254]
+      ],
+      "confidence": 0.91228276
+    }
+  ],
+  "totalPages": 1,
+  "processedPages": 1,
+  "code": "import glob\nimport json\nimport os\nimport re\nimport tempfile\n\nfrom nutrient_sdk import (Document, ImageExportFormat, Vision,\n                          VisionEngine, VisionFeatures)\n\n# Table extraction reads page images, so render each PDF page to a JPEG\n# first. export_as_image() does the whole document in one call.\n# The pages go to a private temporary directory, so the glob below can\n# only ever match this run's own output \u2014 point the snippet at a second\n# document and it cannot pick up the first one's pages \u2014 and nothing is\n# left behind in your working directory.\nwith tempfile.TemporaryDirectory() as pages_dir:\n    base = os.path.join(pages_dir, \"page.jpg\")\n    with Document.open(\"ac2025-page2-only.pdf\") as document:\n        images = document.get_settings().get_image_settings()\n        images.set_export_format(ImageExportFormat.JPEG)\n        document.export_as_image(base)\n\n    # Multi-page writes page-1.jpg, page-2.jpg, \u2026; a single-page\n    # document is written to page.jpg itself, which is why the glob\n    # needs the `base` fallback. Sort numerically so 10 follows 9.\n    paths = sorted(glob.glob(os.path.join(pages_dir, \"page-*.jpg\")),\n                   key=lambda p: int(re.search(r\"-(\\d+)\\.jpg$\", p).group(1)))\n    paths = paths or [base]\n    # The studio stops at the first 10 pages (MAX_PRERENDER_PAGES) and\n    # reports how many it processed. Drop this slice to do the whole\n    # document \u2014 but then a long PDF yields more than the panel showed.\n    paths = paths[:10]\n\n    # Still inside the with: the JPEGs are deleted when it exits, so\n    # every page has to be read before then.\n    raws = []\n    for path in paths:\n        with Document.open(path) as page:\n            settings = page.get_settings()\n            vision = settings.get_vision_settings()\n            vision.set_engine(VisionEngine.VLM)\n            # VisionFeatures.ALL rather than a TABLE-specific flag: the\n            # narrower features are a no-op (NAPY-20), so ask for\n            # everything and filter the elements afterwards.\n            vision.set_features(VisionFeatures.ALL.value)\n            raws.append(Vision.set(page).extract_content())\n\ntables = []\nfor page_idx, raw in enumerate(raws, start=1):\n    for element in json.loads(raw).get(\"elements\", []):\n        if str(element.get(\"type\", \"\")).lower() == \"table\":\n            element[\"pageNumber\"] = page_idx\n            tables.append(element)\n\nprint(f\"{len(tables)} tables\")\nprint(json.dumps(tables, indent=2))\n"
 }
