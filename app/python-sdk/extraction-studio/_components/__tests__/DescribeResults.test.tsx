@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { DescribeResult } from "../../lib/describe";
 import { DescribeResults } from "../DescribeResults";
 
@@ -64,6 +64,22 @@ describe("DescribeResults", () => {
     render(<DescribeResults result={result({ code: undefined })} />);
     await userEvent.click(screen.getByRole("button", { name: "Code" }));
     expect(screen.getByText(/code snippet unavailable/i)).toBeInTheDocument();
+  });
+
+  it("hands Copy the same placeholder the pane shows, not an empty string", async () => {
+    // payload() used to fall back to "" while the pane displayed the
+    // placeholder text — Copy/Download silently produced an empty file that
+    // contradicted what was on screen. The two must read from one constant.
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+
+    render(<DescribeResults result={result({ code: undefined })} />);
+    await userEvent.click(screen.getByRole("button", { name: "Code" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining("code snippet unavailable"),
+    );
   });
 
   it("names its empty state rather than showing a blank pane", () => {

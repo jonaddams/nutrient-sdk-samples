@@ -6,6 +6,14 @@ import { Segmented } from "./Segmented";
 
 type DescribeView = "text" | "json" | "code";
 
+// Single source of truth for both what the pane shows AND what Copy/Download
+// hand over. Two independent literals here previously let the pane say
+// "unavailable" while `payload()` handed Copy/Download an empty string — the
+// buttons contradicting the screen. Every other panel's Copy/Download match
+// what is displayed; this constant is what keeps this one from drifting back
+// out of that contract.
+const CODE_UNAVAILABLE = "# code snippet unavailable from this backend";
+
 const FILE_FOR_VIEW: Record<DescribeView, { type: string; name: string }> = {
   text: { type: "text/plain", name: "description.txt" },
   json: { type: "application/json", name: "description.json" },
@@ -20,7 +28,7 @@ export function DescribeResults({ result }: { result: DescribeResult }) {
   const { code, ...resultJson } = result;
 
   const payload = () => {
-    if (view === "code") return code ?? "";
+    if (view === "code") return code ?? CODE_UNAVAILABLE;
     if (view === "json") return JSON.stringify(resultJson, null, 2);
     return result.text;
   };
@@ -77,9 +85,7 @@ export function DescribeResults({ result }: { result: DescribeResult }) {
       </div>
 
       {view === "code" ? (
-        <pre className="ocr-text mono">
-          {code ?? "# code snippet unavailable from this backend"}
-        </pre>
+        <pre className="ocr-text mono">{code ?? CODE_UNAVAILABLE}</pre>
       ) : view === "json" ? (
         <pre className="ocr-text mono">
           {JSON.stringify(resultJson, null, 2)}

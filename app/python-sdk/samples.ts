@@ -113,7 +113,7 @@ export const samples: Sample[] = [
     name: "Extraction Studio",
     category: "Extraction",
     description:
-      "Two extraction techniques in one shell — schema-driven fields with clickable citations, and Adaptive OCR that reads a scan into structured content",
+      "Four extraction techniques in one shell — schema-driven fields with clickable citations, Adaptive OCR, table extraction, and image description",
     path: "/python-sdk/extraction-studio",
   },
   {
