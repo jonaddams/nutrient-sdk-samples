@@ -733,16 +733,52 @@ test("the page header and the registry card agree on the studio's name", () => {
   ).toBeInTheDocument();
 });
 
-test("every enabled rail feature renders a configuration panel", async () => {
+// One entry per enabled feature, each asserting on something ONLY that
+// feature's own config component renders — never on `.studio-sec` alone
+// (PanelSection.tsx's class) and never on the shared "Provider" field/select
+// label, because StructuredConfig, TablesConfig and DescribeConfig all mount
+// one of those. A query that only proves "some PanelSection mounted" or
+// "some Provider field mounted" still passes when `panels[feature]` falls
+// through to `panels.structured` — StructuredConfig has both — so it can't
+// tell the intended panel apart from the fallback.
+//
+//   structured   -> "Schema builder" is StructuredConfig's own PanelSection
+//                    (StructuredConfig.tsx); nothing else renders it.
+//   adaptive_ocr -> "Languages" is OcrConfig's language-chip group
+//                    (OcrConfig.tsx); OCR is the only feature offering
+//                    languages at all.
+//   tables       -> TablesConfig has no group/label of its own — its
+//                    PanelSection is titled "Configuration" (shared with
+//                    DescribeConfig) and its Field is labelled "Provider"
+//                    (shared with StructuredConfig and DescribeConfig too).
+//                    The one thing that is TablesConfig's alone is the id it
+//                    gives its own <select> (TablesConfig.tsx's
+//                    `tables-provider`), so that is what this checks.
+//   describe     -> "Detail" is DescribeConfig's own Segmented group
+//                    (DescribeConfig.tsx); no other config offers a detail
+//                    level.
+const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
+  structured: () =>
+    expect(
+      screen.getByRole("group", { name: "Schema builder" }),
+    ).toBeInTheDocument(),
+  adaptive_ocr: () =>
+    expect(
+      screen.getByRole("group", { name: "Languages" }),
+    ).toBeInTheDocument(),
+  tables: () => expect(document.querySelector("#tables-provider")).toBeTruthy(),
+  describe: () =>
+    expect(screen.getByRole("group", { name: "Detail" })).toBeInTheDocument(),
+};
+
+test("every enabled rail feature renders its OWN configuration panel", async () => {
   // The map's own guard. FeatureRail.test.tsx pins a hardcoded RENDERABLE set;
   // this proves the panel actually mounts, which a set literal cannot. An
-  // enabled feature with no map entry falls through to the structured panel,
-  // and that silent fallback is exactly what this catches.
-  //
-  // Asserts on `.studio-sec` (PanelSection.tsx's own class), not the
-  // similarly-named `.panel-section` CSS rule in styles.css — that one only
-  // ever appears in the Results tab's empty state, never on the Config tab
-  // this test lands on, so it can never observe a mounted config panel.
+  // enabled feature with no map entry (or a misspelled key) falls through to
+  // `panels.structured`, and that silent fallback — Structured's config
+  // rendered under a different feature's heading — is exactly what this
+  // catches, because each marker above is absent from every OTHER feature's
+  // config panel, including Structured's.
   for (const f of FEATURES.filter((x) => x.enabled)) {
     const { unmount } = render(<ExtractionStudio />);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(f.label) }));
@@ -751,7 +787,11 @@ test("every enabled rail feature renders a configuration panel", async () => {
         screen.getByRole("button", { name: /Run extraction/ }),
       ).toBeTruthy(),
     );
-    expect(document.querySelector(".studio-sec")).toBeTruthy();
+    const assertOwnPanel = CONFIG_PANEL_MARKERS[f.id];
+    // Fails loudly for a feature this map hasn't been taught about yet,
+    // rather than silently skipping it.
+    expect(assertOwnPanel).toBeDefined();
+    assertOwnPanel();
     unmount();
   }
 });

@@ -378,10 +378,14 @@ export default function ExtractionStudio() {
   };
 
   // The rail only enables features that have an entry here, and
-  // FeatureRail.test.tsx's RENDERABLE guard plus the panel test in
-  // page.test.tsx both fail if that stops being true — so the fallback is
-  // unreachable rather than a behaviour. It exists because `feature` is a
-  // string, not a union.
+  // FeatureRail.test.tsx's RENDERABLE guard plus page.test.tsx's "renders its
+  // OWN configuration panel" test both fail if that stops being true. That
+  // test checks a marker unique to each feature's own config component (e.g.
+  // StructuredConfig's "Schema builder" group), not merely that some panel
+  // mounted — StructuredConfig mounts either way, so only a marker absent
+  // from ITS panel can tell "the right panel" apart from this fallback. So
+  // the fallback below is unreachable rather than a behaviour. It exists
+  // because `feature` is a string, not a union.
   const panel = panels[feature] ?? panels.structured;
 
   return (
