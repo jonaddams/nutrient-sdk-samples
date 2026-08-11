@@ -29,13 +29,27 @@ describe("buildGrid", () => {
   });
 
   it("nulls the positions a span covers, leaving only the anchor", () => {
-    const grid = buildGrid([cell({ text: "wide", colSpan: 2 })], 1, 2);
+    const grid = buildGrid(
+      [
+        cell({ row: 0, column: 0, text: "wide", colSpan: 2 }),
+        cell({ row: 0, column: 1, text: "covered" }),
+      ],
+      1,
+      2,
+    );
     expect(grid[0][0]?.text).toBe("wide");
     expect(grid[0][1]).toBeNull();
   });
 
   it("nulls positions covered by a row span", () => {
-    const grid = buildGrid([cell({ text: "tall", rowSpan: 2 })], 2, 1);
+    const grid = buildGrid(
+      [
+        cell({ row: 0, column: 0, text: "tall", rowSpan: 2 }),
+        cell({ row: 1, column: 0, text: "covered" }),
+      ],
+      2,
+      1,
+    );
     expect(grid[0][0]?.text).toBe("tall");
     expect(grid[1][0]).toBeNull();
   });
@@ -61,6 +75,7 @@ describe("buildGrid", () => {
   it("reconstructs every table in the captured response without throwing", () => {
     // The fixture is a real backend response, so this is the shape assertion
     // that matters: a type is a claim about the backend, not a check on it.
+    expect(multi.tables.length).toBeGreaterThan(0);
     for (const table of multi.tables) {
       const grid = buildGrid(
         table.cells as TableCell[],
