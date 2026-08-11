@@ -1424,6 +1424,14 @@
   margin-bottom: var(--space-1);
 }
 
+.studio-shell .describe-text {
+  margin: var(--space-3) 0 0;
+  max-width: 68ch;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: var(--ink);
+}
+
 @media (max-width: 1024px) {
   .studio-shell .rail-tip {
     left: 0;
