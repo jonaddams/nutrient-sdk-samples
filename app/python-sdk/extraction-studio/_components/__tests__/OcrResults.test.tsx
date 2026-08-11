@@ -442,16 +442,37 @@ test("hides the whole colour block when regions are hidden", () => {
   ).not.toBeInTheDocument();
 });
 
-test("shows swatches only in Custom mode", () => {
+test("shows swatches in both By confidence and Custom mode", () => {
+  // The owner's post-review complaint: the chooser looked absent in the
+  // default mode because HighlightColor was gated on colorMode === "custom".
+  // It must render in BOTH modes now — no disabled/greyed state either, it
+  // stays live in By confidence.
   const { rerender } = render(<OcrResults {...props} />);
-  // Confidence mode: the mode control is there, the swatches are not.
-  expect(
-    screen.queryByRole("button", { name: "Amber" }),
-  ).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
+  expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 
   rerender(<OcrResults {...props} colorMode="custom" />);
   expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
   expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
+});
+
+test("picking a preset swatch in By confidence mode sets the hex AND switches to Custom", () => {
+  // Composed at the call site (OcrResults' onChange to HighlightColor), not a
+  // new prop on the shared HighlightColor component: a swatch click must call
+  // BOTH the hex handler and onColorModeChange("custom").
+  const onCitationHexChange = vi.fn();
+  const onColorModeChange = vi.fn();
+  render(
+    <OcrResults
+      {...props}
+      colorMode="confidence"
+      onCitationHexChange={onCitationHexChange}
+      onColorModeChange={onColorModeChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Magenta" }));
+  expect(onCitationHexChange).toHaveBeenCalledWith("#d63384");
+  expect(onColorModeChange).toHaveBeenCalledWith("custom");
 });
 
 test("Region color appears exactly once in Custom mode", () => {

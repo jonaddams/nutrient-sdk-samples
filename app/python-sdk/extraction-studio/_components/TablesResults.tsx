@@ -274,19 +274,28 @@ export function TablesResults({
             value={colorMode}
             onChange={onColorModeChange}
           />
-          {colorMode === "custom" && (
-            // `embedded` is required, not decorative: HighlightColor's own
-            // wrapper carries .citation-color, and this block is already inside
-            // one. That rule's padding matches at ANY depth, so nesting them
-            // doubles the spacing — invisible to jsdom, caught only by reading
-            // the CSS and measuring.
-            <HighlightColor
-              label={REGION_COLOR}
-              embedded
-              value={citationHex}
-              onChange={onCitationHexChange}
-            />
-          )}
+          {/* `embedded` is required, not decorative: HighlightColor's own
+              wrapper carries .citation-color, and this block is already inside
+              one. That rule's padding matches at ANY depth, so nesting them
+              doubles the spacing — invisible to jsdom, caught only by reading
+              the CSS and measuring.
+
+              Rendered unconditionally now (no `colorMode === "custom"` gate):
+              the chooser stays visible in By confidence too, and picking a
+              colour is itself the gesture that switches to Custom. That
+              composition happens HERE, at the call site — not by adding a mode
+              prop to HighlightColor, which stays unaware that modes exist —
+              so a swatch/dropper/hex change both sets the hex and flips the
+              mode in one call. */}
+          <HighlightColor
+            label={REGION_COLOR}
+            embedded
+            value={citationHex}
+            onChange={(hex) => {
+              onCitationHexChange(hex);
+              onColorModeChange("custom");
+            }}
+          />
         </div>
       )}
 

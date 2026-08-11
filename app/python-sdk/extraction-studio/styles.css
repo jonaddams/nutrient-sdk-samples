@@ -482,7 +482,31 @@
 
 .studio-shell {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) clamp(340px, 30vw, 440px);
+  /* Viewer track: `minmax(0, 900px)`, NOT a flexible fr track — a fixed
+     upper bound, since the PDF page itself renders far narrower than that,
+     so past ~900px the extra width was just empty checkerboard background.
+     (`minmax(0, min(900px, 1fr))` was tried first so this track could still
+     be "flexible with a cap," but Chrome as shipped here rejects `fr` nested
+     inside `min()` in a track-sizing position — `CSS.supports` on that exact
+     string returns false, and the whole `grid-template-columns` declaration
+     was dropped as invalid, collapsing the shell to one implicit column.
+     Confirmed in a real browser, not assumed.)
+     Panel track: `minmax(340px, 1fr)` — flexible, floor 340px, NO upper cap.
+     It used to be `clamp(340px, 30vw, 440px)`, a fixed (non-fr) track that
+     maxed out at 440px regardless of how much space the viewer gave up. The
+     combination below still does what was wanted: CSS Grid's track-sizing
+     algorithm grows the non-flexible, capped viewer track first (up to its
+     900px growth limit), THEN hands whatever free space is left to the one
+     fr track, the panel — verified empirically in a real browser at 2000px
+     (240 / 900 / 812) and at 1050px, just above the breakpoint below (240 /
+     422 / 340, i.e. the panel sits at its floor and the viewer takes what's
+     left, never overflowing). A max-width on the viewer ALONE, with the
+     panel's track left fixed, would have just left that freed space as dead
+     space in the viewer's own column instead of handing it to the panel.
+     Below the ~1024px breakpoint this is moot: the @media block further down
+     switches .studio-shell to `display: block`, so grid-template-columns
+     stops applying entirely. */
+  grid-template-columns: 240px minmax(0, 900px) minmax(340px, 1fr);
   gap: var(--space-4);
   flex: 1;
   min-height: 0;

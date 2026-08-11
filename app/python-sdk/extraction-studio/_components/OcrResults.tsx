@@ -117,10 +117,11 @@ export function OcrResults({
 
       {/* `!isMarkdown` as well as showRegions: markdown-mode responses always
           carry textElements: [], so there is nothing to paint and every
-          control in here is inert — the toggle, the mode switch, and in Custom
-          the four swatches, the dropper and the hex field. Nine controls doing
-          nothing. Hiding them follows #62, which hid the element-count and
-          confidence stats for exactly the same dead-state reason.
+          control in here is inert — the toggle, the mode switch, and the four
+          swatches, the dropper and the hex field (visible in both modes; see
+          the HighlightColor comment below). Nine controls doing nothing.
+          Hiding them follows #62, which hid the element-count and confidence
+          stats for exactly the same dead-state reason.
 
           Paired with Show regions, exactly as StructuredResults pairs
           HighlightColor with Show citations: a colour control is meaningless
@@ -129,9 +130,10 @@ export function OcrResults({
           By confidence is the default and stays so. The tint is what makes the
           overlay say WHERE OCR was unsure, which is the reason this panel had
           no picker at all until now — Custom trades that signal away
-          deliberately, and only on request. The element table's confidence
-          dots are unaffected in either mode, so the signal never leaves the
-          panel entirely. */}
+          deliberately, and only when the reader actually reaches for a colour
+          (picking one is what switches the mode; see below). The element
+          table's confidence dots are unaffected in either mode, so the signal
+          never leaves the panel entirely. */}
       {!isMarkdown && showRegions && (
         <div className="citation-color">
           <span className="eyebrow">{REGION_COLOR}</span>
@@ -144,14 +146,21 @@ export function OcrResults({
             value={colorMode}
             onChange={onColorModeChange}
           />
-          {colorMode === "custom" && (
-            <HighlightColor
-              label={REGION_COLOR}
-              embedded
-              value={citationHex}
-              onChange={onCitationHexChange}
-            />
-          )}
+          {/* Rendered unconditionally (no `colorMode === "custom"` gate): the
+              chooser stays visible in By confidence too, and picking a colour
+              is itself the gesture that switches to Custom. Composed here at
+              the call site, not via a new mode-aware prop on HighlightColor —
+              see TablesResults, which does the same thing for the same
+              reason. */}
+          <HighlightColor
+            label={REGION_COLOR}
+            embedded
+            value={citationHex}
+            onChange={(hex) => {
+              onCitationHexChange(hex);
+              onColorModeChange("custom");
+            }}
+          />
         </div>
       )}
 

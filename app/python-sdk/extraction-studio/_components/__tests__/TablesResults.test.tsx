@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { TablesResult } from "../../lib/tables";
@@ -234,6 +234,43 @@ describe("TablesResults", () => {
       />,
     );
     expect(container.querySelectorAll(".citation-color")).toHaveLength(1);
+  });
+
+  it("shows the swatches and hex field in By confidence mode too, not just Custom", () => {
+    // The owner's post-review complaint: the chooser looked absent in the
+    // default mode because HighlightColor was gated on colorMode === "custom".
+    // It must render in BOTH modes now.
+    render(
+      <TablesResults
+        {...base}
+        result={result()}
+        showRegions={true}
+        colorMode="confidence"
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
+  });
+
+  it("picking a preset swatch in By confidence mode sets the hex AND switches to Custom", () => {
+    // Composed at the call site: a swatch click must call BOTH handlers, not
+    // just the hex setter — picking a colour is the gesture that expresses
+    // intent to leave By confidence.
+    const onCitationHexChange = vi.fn();
+    const onColorModeChange = vi.fn();
+    render(
+      <TablesResults
+        {...base}
+        result={result()}
+        showRegions={true}
+        colorMode="confidence"
+        onCitationHexChange={onCitationHexChange}
+        onColorModeChange={onColorModeChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Magenta" }));
+    expect(onCitationHexChange).toHaveBeenCalledWith("#d63384");
+    expect(onColorModeChange).toHaveBeenCalledWith("custom");
   });
 
   it("Tab reaches a table's roving cell, and Enter selects it", async () => {

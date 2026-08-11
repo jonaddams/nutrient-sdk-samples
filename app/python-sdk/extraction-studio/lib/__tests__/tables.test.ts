@@ -265,17 +265,22 @@ describe("tableCitationsFor", () => {
     expect(out[0]).not.toHaveProperty("x0");
   });
 
-  it("keeps every coordinate fractional, against the real fixture's citations", () => {
-    // Was asserted against hand-written 0..1 literals (`twoCells` above) piped
-    // through a function that does no coordinate arithmetic — a check that
-    // could not fail regardless of what tableCitationsFor actually does.
-    // Rewritten against `multi`, a real backend response captured after
-    // python-fast-api#36 added the `citation` field (see lib/tables.ts and
-    // this file's `buildGrid` describe block, which already uses the same
-    // fixture for the same reason). This is now an actual guard against the
-    // units bug: if the backend ever sent `bounds`-style absolute raster
-    // pixels (measured up to 4345x5542 on a real document) through the
-    // `citation` field instead, these coordinates would fail the <= 1 check.
+  it("passes through the backend's fractional citation rather than substituting absolute bounds", () => {
+    // Named for what this actually guards, not "keeps every coordinate
+    // fractional" — tableCitationsFor does no coordinate arithmetic, so a
+    // check against hand-written 0..1 literals piped straight through could
+    // never fail regardless of what the function does with them. What CAN
+    // fail it: swapping `citation: c.citation` for `citation: c.bounds` in
+    // tableCitationsFor's body. `bounds` is the raw, absolute raster-pixel
+    // box (measured up to 4345x5542 on a real document); `citation` is the
+    // backend's ready-made fractional 0..1 box. Run against `multi`, a real
+    // backend response captured after python-fast-api#36 added the
+    // `citation` field (see lib/tables.ts and this file's `buildGrid`
+    // describe block, which already uses the same fixture for the same
+    // reason). Verified by substitution: swapping in `c.bounds` (shape
+    // `{x, y, width, height}`, not `{x0, y0, x1, y1}`) makes `c.citation.x0`
+    // etc. read as `undefined`, which fails the numeric assertions below —
+    // this test does not survive that swap, unlike its predecessor.
     const out = tableCitationsFor(
       multi.tables as ExtractedTable[],
       "confidence",
