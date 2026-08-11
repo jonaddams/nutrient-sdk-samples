@@ -171,12 +171,6 @@ export default function ExtractionStudio() {
   // version once forgot to clear activeIndex, which let a stale selection
   // survive a re-run and dim every box via styleFor(fieldIndex, activeIndex).
   // One implementation makes that class of drift impossible.
-  //
-  // The ref-guard (featureRef/docRef) is load-bearing, in both the success
-  // and error branches: neither the rail nor the doc strip is disabled while
-  // busy, so the user can switch feature or document mid-request, and a
-  // response landing after that switch must not repopulate state the switch
-  // already cleared.
   const runFeature = async <Req, Res>(
     req: Req,
     fetcher: (r: Req) => Promise<Res>,
@@ -184,9 +178,11 @@ export default function ExtractionStudio() {
     fallbackError: string,
   ) => {
     // Captured at request start and compared against the refs (which track the
-    // LATEST feature/doc) once it resolves. Neither the rail nor the doc strip
-    // is disabled while busy, so the user can switch either mid-request, and a
-    // response landing after that switch must not repopulate cleared state.
+    // LATEST feature/doc) once it resolves — in BOTH the success and error
+    // branches. Neither the rail nor the doc strip is disabled while busy, so
+    // the user can switch either mid-request, and a response landing after that
+    // switch must not repopulate state the switch already cleared. Each clause
+    // has its own test; removing either one turns a test red.
     const requestFeature = feature;
     const requestDocId = doc;
     setBusy(true);
