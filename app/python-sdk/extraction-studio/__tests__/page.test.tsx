@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { samples } from "../../samples";
 import ExtractionStudio from "../page";
@@ -154,6 +155,31 @@ test("Table extraction is selectable and swaps in its own panel", () => {
   expect(screen.getByLabelText("Provider")).toBeInTheDocument();
   // ...and OCR's panel — the ternary's fallback branch — does not.
   expect(screen.queryByText("Languages")).toBeNull();
+});
+
+test("Image description is selectable and swaps in its own panel", async () => {
+  // Its config panel is identifiable by the Detail control, which no other
+  // feature has.
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  await userEvent.click(
+    screen.getByRole("button", { name: /Image description/ }),
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("group", { name: "Detail" })).toBeInTheDocument(),
+  );
+});
+
+test("draws no citation overlay for Image description", async () => {
+  // Output is prose with no coordinates, so there is nothing to paint and no
+  // Show regions control.
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  await userEvent.click(
+    screen.getByRole("button", { name: /Image description/ }),
+  );
+  expect(screen.queryByLabelText("Show regions")).toBeNull();
+  expect(screen.queryByLabelText("Show citations")).toBeNull();
 });
 
 test("Run is enabled for OCR even with no providers configured", async () => {
