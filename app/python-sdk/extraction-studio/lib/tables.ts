@@ -1,4 +1,7 @@
 import type { Citation } from "./api";
+import { API_BASE } from "./api";
+import type { IndexedCitation } from "./citations";
+import { confidenceHex } from "./ocr";
 
 /**
  * Table Extraction — /api/extraction/tables.
@@ -151,4 +154,94 @@ export function tablesToCsv(tables: ExtractedTable[]): string {
     .filter((block) => block.length > 0)
     .map((block) => `${block}\n`)
     .join("\n");
+}
+
+/** Which colour the table overlay paints its cell boxes. Mirrors OcrColorMode;
+ *  kept separate so the two features' modes can diverge without one silently
+ *  retyping the other. */
+export type TableColorMode = "confidence" | "custom";
+
+/** A flat index over every cell of every table, in table then cell order.
+ *  This is the `fieldIndex` space — a click on a box maps back through it. */
+export function flattenCells(tables: ExtractedTable[]): TableCell[] {
+  return tables.flatMap((t) => t.cells);
+}
+
+/** Build the document overlay's boxes for one table run.
+ *
+ *  `fieldIndex` is the index into the FULL flattened cell list, not into the
+ *  array returned here: cells without bounds are dropped, so the result is
+ *  COMPACTED and its array position is not the cell a click should select.
+ *  That is the misalignment bug fixed in 77fa9c1.
+ *
+ *  In `custom` mode each entry omits `hex` ENTIRELY rather than setting it to
+ *  undefined, so resolveHex (`citation.hex ?? fallback`) falls through to the
+ *  studio-wide picker value — the same path structured extraction and OCR both
+ *  take. Setting `hex: undefined` would satisfy the type and break the
+ *  fall-through, because `??` tests for null/undefined on a key that is
+ *  PRESENT. That is why the test asserts `"hex" in c === false`.
+ *
+ *  NO COORDINATE ARITHMETIC. `cell.citation` arrives fractional with a 0-based
+ *  page, converted server-side by geometry.normalize_bbox — the same function
+ *  the structured and OCR paths use, called where the page's raster dimensions
+ *  actually live. The raw `bounds` on the same cell are ABSOLUTE raster pixels
+ *  (measured up to 4345x5542) and must never reach the overlay: they would
+ *  collapse every box into the page's top-left corner. Dividing here instead
+ *  would double-convert. */
+export function tableCitationsFor(
+  tables: ExtractedTable[],
+  mode: TableColorMode,
+): IndexedCitation[] {
+  return flattenCells(tables).flatMap((c, index) =>
+    c.citation
+      ? [
+          {
+            fieldIndex: index,
+            citation: c.citation,
+            ...(mode === "confidence"
+              ? { hex: confidenceHex(c.confidence) }
+              : {}),
+          },
+        ]
+      : [],
+  );
+}
+
+export type TablesRequest = {
+  /** Public URL of the PDF, e.g. "/documents/lumen-invoice.pdf". Fetched here
+   *  and posted as multipart, because the backend holds no document registry. */
+  docPath: string;
+  filename: string;
+  /** "claude" | "openai" — this endpoint's vocabulary, NOT the studio's. The
+   *  caller maps "anthropic" to "claude" before getting here. */
+  provider: string;
+};
+
+export async function extractTables(req: TablesRequest): Promise<TablesResult> {
+  const fileResp = await fetch(req.docPath);
+  if (!fileResp.ok) {
+    throw new Error(`could not load ${req.docPath}: ${fileResp.status}`);
+  }
+  const blob = await fileResp.blob();
+
+  const form = new FormData();
+  form.append("file", new File([blob], req.filename));
+
+  const params = new URLSearchParams({ provider: req.provider });
+
+  // No content-type header — the browser must set the multipart boundary.
+  const resp = await fetch(`${API_BASE}/api/extraction/tables?${params}`, {
+    method: "POST",
+    body: form,
+  });
+  if (!resp.ok) {
+    // FastAPI reports failures as {"detail": "..."}. A 503 here means the
+    // local VLM is unreachable, which is only diagnosable from that message.
+    const detail = await resp
+      .json()
+      .then((b) => (typeof b?.detail === "string" ? b.detail : null))
+      .catch(() => null);
+    throw new Error(detail ?? `table extraction failed: ${resp.status}`);
+  }
+  return (await resp.json()) as TablesResult;
 }

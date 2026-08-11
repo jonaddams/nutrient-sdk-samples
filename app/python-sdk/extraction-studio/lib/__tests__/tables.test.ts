@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { confidenceHex } from "../ocr";
 import {
   buildGrid,
   type ExtractedTable,
   type TableCell,
+  tableCitationsFor,
   tablesToCsv,
 } from "../tables";
 import multi from "./fixtures/tables-multi.json";
@@ -212,5 +214,138 @@ describe("tablesToCsv", () => {
       expect(counts.size).toBe(1);
       expect([...counts][0]).toBe(table.columnCount);
     }
+  });
+});
+
+describe("tableCitationsFor", () => {
+  // `citation` is what the backend sends and what the overlay draws: fractional
+  // 0..1, 0-based page. `bounds` stays absolute raster pixels and is not used
+  // here — see the invariants above.
+  const cit = (x0: number, page = 0) => ({
+    page,
+    x0,
+    y0: 0.2,
+    x1: x0 + 0.3,
+    y1: 0.25,
+  });
+
+  const twoCells: ExtractedTable[] = [
+    {
+      page: 0,
+      rowCount: 1,
+      columnCount: 2,
+      cells: [
+        cell({ column: 0, text: "low", confidence: 0.2, citation: cit(0.1) }),
+        cell({ column: 1, text: "high", confidence: 0.95, citation: cit(0.5) }),
+      ],
+    },
+  ];
+
+  it("omits hex entirely in custom mode, so resolveHex falls through", () => {
+    // The mechanism the whole overlay rests on: resolveHex is
+    // `citation.hex ?? fallback`, so the key must be ABSENT, not undefined.
+    const out = tableCitationsFor(twoCells, "custom");
+    expect(out).toHaveLength(2);
+    for (const c of out) expect("hex" in c).toBe(false);
+  });
+
+  it("tints each cell by its own confidence in confidence mode", () => {
+    const out = tableCitationsFor(twoCells, "confidence");
+    expect(out[0].hex).toBe(confidenceHex(0.2));
+    expect(out[1].hex).toBe(confidenceHex(0.95));
+    expect(out[0].hex).not.toBe(out[1].hex);
+  });
+
+  it("returns IndexedCitation wrappers, not flattened citations", () => {
+    const out = tableCitationsFor(twoCells, "custom");
+    expect(out[0]).toHaveProperty("fieldIndex");
+    expect(out[0]).toHaveProperty("citation");
+    expect(out[0].citation).toMatchObject({ x0: 0.1, y0: 0.2 });
+    // A flattened shape would put x0 on the wrapper and paint nothing.
+    expect(out[0]).not.toHaveProperty("x0");
+  });
+
+  it("keeps every coordinate fractional", () => {
+    // The guard against the units bug: absolute raster pixels here would
+    // collapse every box into the page's top-left corner.
+    for (const c of tableCitationsFor(twoCells, "confidence")) {
+      for (const v of [
+        c.citation.x0,
+        c.citation.y0,
+        c.citation.x1,
+        c.citation.y1,
+      ]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("skips cells with no citation, and fieldIndex stays the index into the FULL cell list", () => {
+    // The array is COMPACTED, so position is not fieldIndex — the misalignment
+    // bug fixed in 77fa9c1. A cell whose bounds the backend could not normalise
+    // has citation null and must still consume an index.
+    const withGap: ExtractedTable[] = [
+      {
+        page: 0,
+        rowCount: 1,
+        columnCount: 3,
+        cells: [
+          cell({ column: 0, citation: null }),
+          cell({ column: 1, citation: cit(0.1) }),
+          cell({ column: 2, citation: cit(0.3) }),
+        ],
+      },
+    ];
+    const out = tableCitationsFor(withGap, "custom");
+    expect(out).toHaveLength(2);
+    expect(out[0].fieldIndex).toBe(1);
+    expect(out[1].fieldIndex).toBe(2);
+  });
+
+  it("treats a cell with no citation key at all the same as a null one", () => {
+    // A backend predating the citation field omits the key entirely.
+    const older: ExtractedTable[] = [
+      { page: 0, rowCount: 1, columnCount: 1, cells: [cell({ column: 0 })] },
+    ];
+    expect(tableCitationsFor(older, "custom")).toEqual([]);
+  });
+
+  it("numbers cells continuously across tables and keeps each on its own page", () => {
+    // The page comes from the backend's citation, already 0-based. A single
+    // hardcoded page would put every table's boxes on the first page — wrong
+    // for the flagship multi-page demo document.
+    const spread: ExtractedTable[] = [
+      {
+        page: 0,
+        rowCount: 1,
+        columnCount: 1,
+        cells: [cell({ citation: cit(0.1, 0) })],
+      },
+      {
+        page: 3,
+        rowCount: 1,
+        columnCount: 1,
+        cells: [cell({ citation: cit(0.1, 3) })],
+      },
+    ];
+    const out = tableCitationsFor(spread, "custom");
+    expect(out.map((c) => c.fieldIndex)).toEqual([0, 1]);
+    expect(out.map((c) => c.citation.page)).toEqual([0, 3]);
+  });
+
+  it("passes the backend's citation through untouched", () => {
+    // No arithmetic here: the backend already normalised these with the same
+    // geometry.normalize_bbox the structured and OCR paths use. Dividing by a
+    // page width in the frontend would double-convert.
+    const c = cit(0.1);
+    const one: ExtractedTable[] = [
+      { page: 0, rowCount: 1, columnCount: 1, cells: [cell({ citation: c })] },
+    ];
+    expect(tableCitationsFor(one, "custom")[0].citation).toEqual(c);
+  });
+
+  it("returns nothing for no tables", () => {
+    expect(tableCitationsFor([], "confidence")).toEqual([]);
   });
 });
