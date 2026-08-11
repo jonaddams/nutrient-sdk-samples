@@ -394,6 +394,31 @@ test("Download writes the Text view as .txt, not .json", async () => {
   expect(anchors[0]?.download).toBe("ocr.txt");
 });
 
+test("hides Show regions and the whole colour block in markdown mode", () => {
+  // textElements is [] on every markdown-mode response, so the box the
+  // toggle controls cannot be painted on either setting. Same reason #62
+  // hid the element-count and confidence stats.
+  render(
+    <OcrResults
+      {...props}
+      result={MARKDOWN_RESULT}
+      showRegions={true}
+      colorMode="custom"
+    />,
+  );
+  expect(screen.queryByLabelText("Show regions")).not.toBeInTheDocument();
+  expect(screen.queryByText("Region color")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("group", { name: /region color/i }),
+  ).not.toBeInTheDocument();
+});
+
+test("still shows Show regions in elements mode", () => {
+  render(<OcrResults {...props} showRegions={true} />);
+  expect(screen.getByLabelText("Show regions")).toBeInTheDocument();
+  expect(screen.getByText("Region color")).toBeInTheDocument();
+});
+
 test("offers the region colour mode when regions are shown", () => {
   render(<OcrResults {...props} />);
   expect(screen.getByText("Region color")).toBeInTheDocument();

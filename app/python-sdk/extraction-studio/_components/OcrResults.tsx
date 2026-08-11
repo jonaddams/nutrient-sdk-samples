@@ -79,8 +79,12 @@ export function OcrResults({
           carries two, and at the panel's real width they wrapped mid-phrase —
           "Show / regions" over two lines, "39 / elements" over two. A grid gives
           each item a whole cell, so the pairs line up and nothing wraps.
-          In markdown mode the middle two are hidden, so this collapses to a
-          single row of elapsed time and the toggle. */}
+          In markdown mode all three of the middle/last items are hidden, so
+          this collapses to a single row: just elapsed time. Show regions
+          joined the other two in that gate because markdown-mode responses
+          always carry textElements: [] — the box it controls is exactly as
+          inert as the element-count and confidence figures, for the same
+          reason. */}
       <div className="results-meta results-meta-grid">
         <span className="mono muted">
           Elapsed time: {(result.timingMs / 1000).toFixed(1)}s
@@ -90,7 +94,9 @@ export function OcrResults({
             Rendering them anyway was honest and read as a failed run —
             "0 elements · 0% avg confidence" is what a prospect sees first
             after flipping the Output control. Timing still means something,
-            so it stays. */}
+            so it stays. Show regions is gated here too: it controls an
+            overlay derived from textElements, which is always [] on this
+            branch, so the toggle would paint nothing on either setting. */}
         {!isMarkdown && (
           <>
             <span className="mono muted">
@@ -100,16 +106,23 @@ export function OcrResults({
               {Math.round((result.statistics?.averageConfidence ?? 0) * 100)}%
               avg confidence
             </span>
+            <Toggle
+              checked={showRegions}
+              onChange={onShowRegionsChange}
+              label="Show regions"
+            />
           </>
         )}
-        <Toggle
-          checked={showRegions}
-          onChange={onShowRegionsChange}
-          label="Show regions"
-        />
       </div>
 
-      {/* Paired with Show regions, exactly as StructuredResults pairs
+      {/* `!isMarkdown` as well as showRegions: markdown-mode responses always
+          carry textElements: [], so there is nothing to paint and every
+          control in here is inert — the toggle, the mode switch, and in Custom
+          the four swatches, the dropper and the hex field. Nine controls doing
+          nothing. Hiding them follows #62, which hid the element-count and
+          confidence stats for exactly the same dead-state reason.
+
+          Paired with Show regions, exactly as StructuredResults pairs
           HighlightColor with Show citations: a colour control is meaningless
           when nothing is drawn.
 
@@ -119,7 +132,7 @@ export function OcrResults({
           deliberately, and only on request. The element table's confidence
           dots are unaffected in either mode, so the signal never leaves the
           panel entirely. */}
-      {showRegions && (
+      {!isMarkdown && showRegions && (
         <div className="citation-color">
           <span className="eyebrow">{REGION_COLOR}</span>
           <Segmented
