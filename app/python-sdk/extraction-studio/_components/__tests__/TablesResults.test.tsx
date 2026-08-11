@@ -1,7 +1,24 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import type { TablesResult } from "../../lib/tables";
 import { TablesResults } from "../TablesResults";
+
+/** Real Tab presses until `target` is focused, capped so a markup regression
+ *  that drops the control from the tab order fails the test with a clear
+ *  assertion instead of hanging. A hardcoded tab count would be brittle —
+ *  it would silently start counting a DIFFERENT button the moment an
+ *  unrelated control (e.g. a HighlightColor swatch) is added earlier in the
+ *  DOM, without this test's markup changing at all. */
+async function tabTo(
+  user: ReturnType<typeof userEvent.setup>,
+  target: Element,
+) {
+  for (let i = 0; i < 40 && document.activeElement !== target; i++) {
+    await user.tab();
+  }
+  expect(document.activeElement).toBe(target);
+}
 
 const base = {
   activeIndex: null,
@@ -195,5 +212,35 @@ describe("TablesResults", () => {
       />,
     );
     expect(container.querySelectorAll(".citation-color")).toHaveLength(1);
+  });
+
+  it("selects a cell from the keyboard, Tab then Enter", async () => {
+    // The gap this closes: a bare `<td onClick>` is mouse-only. The fix is a
+    // real <button> inside the cell, which is reachable by Tab and activates
+    // on Enter with no tabIndex/onKeyDown/ARIA of its own.
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    render(
+      <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
+    );
+    const target = screen.getByText("Concrete").closest("button");
+    expect(target).not.toBeNull();
+    await tabTo(user, target as HTMLButtonElement);
+    await user.keyboard("{Enter}");
+    // "Concrete" is row 1, column 0 of the only table — flat cell index 2.
+    expect(onSelectCell).toHaveBeenCalledWith(2);
+  });
+
+  it("also selects a cell from the keyboard with Space", async () => {
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    render(
+      <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
+    );
+    const target = screen.getByText("120").closest("button");
+    expect(target).not.toBeNull();
+    await tabTo(user, target as HTMLButtonElement);
+    await user.keyboard(" ");
+    expect(onSelectCell).toHaveBeenCalledWith(3);
   });
 });

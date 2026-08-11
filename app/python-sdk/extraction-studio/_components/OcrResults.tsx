@@ -226,7 +226,31 @@ export function OcrResults({
                     data-selected={index === activeIndex}
                     onClick={() => onSelectElement(index)}
                   >
-                    <td className="mono muted">{el.readingOrder}</td>
+                    <td className="mono muted">
+                      {/* A real <button>, not tabIndex+onKeyDown on the <tr>:
+                          it is keyboard-activatable for free and keeps the row
+                          as a plain <tr>, not a widget with an invented role.
+                          Placed in the FIRST cell — the reading-order number,
+                          already the row's natural leading landmark — rather
+                          than spanning the row, because a <button> cannot
+                          legally wrap sibling <td>s. Mouse behaviour is
+                          unchanged: the <tr onClick> above still fires from a
+                          click anywhere in the row via bubbling, exactly as
+                          before this button existed; stopPropagation here only
+                          prevents that same handler firing twice for a click
+                          that lands on the button itself. */}
+                      <button
+                        type="button"
+                        className="row-select"
+                        aria-label={`Select element ${el.readingOrder}: ${el.text.slice(0, 40)}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectElement(index);
+                        }}
+                      >
+                        {el.readingOrder}
+                      </button>
+                    </td>
                     <td className="mono muted">{el.type}</td>
                     <td>{el.text}</td>
                     <td className="mono">

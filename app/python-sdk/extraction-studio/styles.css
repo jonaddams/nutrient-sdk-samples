@@ -1313,11 +1313,14 @@
   border-collapse: collapse;
 }
 
+/* Padding moved off the <td> and onto .cell-select below: the button fills
+   the cell (border-box, 100%/100%), so its own padding is what actually
+   determines the clickable area now — the same area the removed td onClick
+   used to cover. Leaving padding on both would double it. */
 .studio-shell .studio-table td {
   border: 1px solid var(--line);
-  padding: var(--space-1) var(--space-2);
+  padding: 0;
   vertical-align: top;
-  cursor: pointer;
 }
 
 /* Mirrors .ocr-elements tr[data-selected="true"] — the same accent tint plus
@@ -1328,6 +1331,56 @@
 .studio-shell .studio-table td[data-selected="true"] {
   background: var(--accent-tint);
   box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* The keyboard-accessibility fix for both results panels (round 1 review):
+   a real <button> replaces what used to be a bare onClick on the <td>, so it
+   is reachable by Tab and activates on Enter/Space with no ARIA of its own —
+   while the <td> keeps its cell semantics. Reset to invisible chrome so it
+   reads as plain cell text in this demo, not as a form control: no border,
+   no background, inherited font and colour, flush against the cell's own
+   former padding (now here instead, see the td rule above). */
+.studio-shell .studio-table .cell-select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-1) var(--space-2);
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.studio-shell .studio-table .cell-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Same fix, applied to .ocr-elements' row click: the <tr onClick> stays (it
+   is what keeps a click ANYWHERE in the row selecting it — mouse behaviour is
+   untouched), and this button in the row's first cell is what makes the same
+   selection reachable from the keyboard. Unlike .cell-select, it does not need
+   to fill anything: the row's mouse hit area was already the whole <tr> via
+   event bubbling, regardless of what markup sits inside one cell, so this
+   button is sized to its own text and reset to look identical to the plain
+   number it replaced. */
+.studio-shell .ocr-elements .row-select {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.studio-shell .ocr-elements .row-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1024px) {

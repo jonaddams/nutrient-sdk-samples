@@ -1,7 +1,24 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import type { OcrResult } from "../../lib/ocr";
 import { OcrResults } from "../OcrResults";
+
+/** Real Tab presses until `target` is focused, capped so a markup regression
+ *  that drops the control from the tab order fails with a clear assertion
+ *  instead of hanging. A hardcoded tab count would be brittle — it would
+ *  silently start counting a DIFFERENT button the moment an unrelated
+ *  control earlier in the DOM changed, without this test's own markup
+ *  changing at all. */
+async function tabTo(
+  user: ReturnType<typeof userEvent.setup>,
+  target: Element,
+) {
+  for (let i = 0; i < 40 && document.activeElement !== target; i++) {
+    await user.tab();
+  }
+  expect(document.activeElement).toBe(target);
+}
 
 // Unconditional, not tail-of-body: an assertion that throws mid-test would
 // otherwise skip the tail cleanup and leak a stubbed global or an active
@@ -78,6 +95,36 @@ test("clicking an element selects it", () => {
   render(<OcrResults {...props} onSelectElement={onSelectElement} />);
   fireEvent.click(screen.getByText("Total"));
   expect(onSelectElement).toHaveBeenCalledWith(1);
+});
+
+test("selects a row from the keyboard, Tab then Enter", async () => {
+  // The gap this closes: the row's onClick lives on <tr>, which cannot be
+  // Tabbed to or activated by Enter/Space on its own. The fix is a real
+  // <button> in the row's first cell (the reading-order number) — reachable
+  // by Tab, activates on Enter, and needs no tabIndex/onKeyDown/ARIA of its
+  // own. The row's onClick stays for mouse users; this proves the keyboard
+  // path independently reaches the same handler with the same index.
+  const user = userEvent.setup();
+  const onSelectElement = vi.fn();
+  render(<OcrResults {...props} onSelectElement={onSelectElement} />);
+  const target = screen.getByRole("button", {
+    name: /Select element 1: Total/,
+  });
+  await tabTo(user, target);
+  await user.keyboard("{Enter}");
+  expect(onSelectElement).toHaveBeenCalledWith(1);
+});
+
+test("also selects a row from the keyboard with Space", async () => {
+  const user = userEvent.setup();
+  const onSelectElement = vi.fn();
+  render(<OcrResults {...props} onSelectElement={onSelectElement} />);
+  const target = screen.getByRole("button", {
+    name: /Select element 0: Invoice/,
+  });
+  await tabTo(user, target);
+  await user.keyboard(" ");
+  expect(onSelectElement).toHaveBeenCalledWith(0);
 });
 
 test("marks the active row and only the active row as selected", () => {

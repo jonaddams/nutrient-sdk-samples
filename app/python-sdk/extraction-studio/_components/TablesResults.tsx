@@ -208,21 +208,35 @@ export function TablesResults({
                         const cellIndex =
                           offsets[tableIndex] + table.cells.indexOf(c);
                         return (
-                          // biome-ignore lint/a11y/useKeyWithClickEvents: mirrors OcrResults' <tr onClick> element table row (that one isn't flagged only because the rule targets <td>, not <tr>) — clicking a cell is a supplementary shortcut alongside clicking its overlay box, so no keyboard-only user loses access to content.
                           <td
                             // biome-ignore lint/suspicious/noArrayIndexKey: column index is a stable grid position
                             key={colIndex}
                             rowSpan={Math.max(1, c.rowSpan || 1)}
                             colSpan={Math.max(1, c.colSpan || 1)}
                             data-selected={cellIndex === activeIndex}
-                            onClick={() => onSelectCell(cellIndex)}
                           >
-                            {c.text}
-                            <span
-                              className={`match-dot ${confidenceTone(c.confidence)}`}
-                              role="img"
-                              aria-label={`confidence ${Math.round(c.confidence * 100)}%`}
-                            />
+                            {/* A real <button>, not a div/td onClick: it is
+                                keyboard-activatable for free (focus ring, Enter
+                                and Space both work) with no tabIndex, onKeyDown
+                                or ARIA role needed — and the <td> above keeps
+                                its cell semantics rather than being overloaded
+                                with a role="button" that would strip it from a
+                                screen reader's table navigation. Fills the cell
+                                (see .studio-table .cell-select in styles.css),
+                                so the mouse click area is exactly what the old
+                                td onClick covered. */}
+                            <button
+                              type="button"
+                              className="cell-select"
+                              onClick={() => onSelectCell(cellIndex)}
+                            >
+                              {c.text}
+                              <span
+                                className={`match-dot ${confidenceTone(c.confidence)}`}
+                                role="img"
+                                aria-label={`confidence ${Math.round(c.confidence * 100)}%`}
+                              />
+                            </button>
                           </td>
                         );
                       })}
