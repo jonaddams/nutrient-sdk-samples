@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
@@ -182,16 +182,6 @@ export default function ExtractionStudio() {
     [tablesResult, tableColorMode],
   );
 
-  const viewerCitations =
-    feature === "structured"
-      ? citations
-      : feature === "tables"
-        ? tableCitations
-        : feature === "describe"
-          ? NO_CITATIONS
-          : ocrCitations;
-  const viewerShow = feature === "structured" ? showCitations : showRegions;
-
   const currentFeature = FEATURES.find((f) => f.id === feature);
 
   // Shared shape for all three Run handlers below. It used to be three
@@ -261,6 +251,139 @@ export default function ExtractionStudio() {
       "Description failed",
     );
 
+  /** Everything that varies per rail feature, in one place.
+   *
+   *  Five sites used to branch on `feature` independently — viewer citations,
+   *  the viewer's visibility toggle, the Run button's provider gate, the config
+   *  panel and the results panel — and a new feature meant editing all five in
+   *  sync. This does NOT unify result shapes: `citations` is still derived per
+   *  feature by its own memo above, because what each feature calls a citation
+   *  genuinely differs. It unifies the dispatch, nothing else.
+   *
+   *  Rebuilt every render, which is free: these are React *elements*, not
+   *  mounted components. Only the one read off `panel` below is ever mounted,
+   *  exactly as the ternaries behaved. The `citations` values are the memoised
+   *  arrays, so DocViewer's annotation-sync effect still sees a stable identity
+   *  across renders. */
+  type FeaturePanel = {
+    /** Run stays disabled until the config panel's provider fetch resolves. */
+    needsProviders: boolean;
+    citations: IndexedCitation[];
+    /** Which visibility toggle the viewer reads for this feature. */
+    show: boolean;
+    config: ReactNode;
+    /** null when nothing has been run yet; the caller renders the empty state. */
+    results: ReactNode | null;
+  };
+
+  const panels: Record<string, FeaturePanel> = {
+    structured: {
+      needsProviders: true,
+      citations,
+      show: showCitations,
+      config: (
+        <StructuredConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleRun}
+          runSignal={runSignal}
+          schemaPreset={schemaPreset}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: result ? (
+        <StructuredResults
+          data={result.data as StructuredData}
+          code={result.code}
+          timingMs={result.timingMs}
+          activeIndex={activeIndex}
+          onSelectField={setActiveIndex}
+          showCitations={showCitations}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+          onShowCitationsChange={setShowCitations}
+        />
+      ) : null,
+    },
+    adaptive_ocr: {
+      needsProviders: false,
+      citations: ocrCitations,
+      show: showRegions,
+      config: (
+        <OcrConfig
+          docPath={current.path}
+          filename={current.filename}
+          runSignal={runSignal}
+          onRun={handleOcrRun}
+        />
+      ),
+      results: ocrResult ? (
+        <OcrResults
+          result={ocrResult}
+          activeIndex={activeIndex}
+          onSelectElement={setActiveIndex}
+          showRegions={showRegions}
+          onShowRegionsChange={setShowRegions}
+          colorMode={ocrColorMode}
+          onColorModeChange={setOcrColorMode}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+        />
+      ) : null,
+    },
+    tables: {
+      needsProviders: true,
+      citations: tableCitations,
+      show: showRegions,
+      config: (
+        <TablesConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleTablesRun}
+          runSignal={runSignal}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: tablesResult ? (
+        <TablesResults
+          result={tablesResult}
+          activeIndex={activeIndex}
+          onSelectCell={setActiveIndex}
+          showRegions={showRegions}
+          onShowRegionsChange={setShowRegions}
+          colorMode={tableColorMode}
+          onColorModeChange={setTableColorMode}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+        />
+      ) : null,
+    },
+    describe: {
+      needsProviders: true,
+      citations: NO_CITATIONS,
+      show: showRegions,
+      config: (
+        <DescribeConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleDescribeRun}
+          runSignal={runSignal}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: describeResult ? (
+        <DescribeResults result={describeResult} />
+      ) : null,
+    },
+  };
+
+  // The rail only enables features that have an entry here, and
+  // FeatureRail.test.tsx's RENDERABLE guard plus the panel test in
+  // page.test.tsx both fail if that stops being true — so the fallback is
+  // unreachable rather than a behaviour. It exists because `feature` is a
+  // string, not a union.
+  const panel = panels[feature] ?? panels.structured;
+
   return (
     // A DEFINITE height, not min-height: .studio-shell is `flex: 1;
     // min-height: 0`, so it needs a parent of definite height to fill.
@@ -316,9 +439,9 @@ export default function ExtractionStudio() {
         <section className="studio-viewer">
           <DocViewer
             docPath={current.path}
-            citations={viewerCitations}
+            citations={panel.citations}
             activeIndex={activeIndex}
-            showCitations={viewerShow}
+            showCitations={panel.show}
             citationHex={citationHex}
             onCitationPress={(i) => {
               setActiveIndex(i);
@@ -348,13 +471,7 @@ export default function ExtractionStudio() {
               <button
                 type="button"
                 className="panel-button primary"
-                disabled={
-                  busy ||
-                  ((feature === "structured" ||
-                    feature === "tables" ||
-                    feature === "describe") &&
-                    !providersReady)
-                }
+                disabled={busy || (panel.needsProviders && !providersReady)}
                 onClick={() => setRunSignal((n) => n + 1)}
               >
                 {busy ? "Running…" : "Run extraction"}
@@ -378,99 +495,9 @@ export default function ExtractionStudio() {
                 the user built and the `runSignal` consumer, so unmounting it
                 on the Results tab reset the schema to defaults on every round
                 trip and left `Run extraction` inert. */}
-            <div hidden={tab !== "config"}>
-              {feature === "structured" ? (
-                <StructuredConfig
-                  docPath={current.path}
-                  filename={current.filename}
-                  onRun={handleRun}
-                  runSignal={runSignal}
-                  schemaPreset={schemaPreset}
-                  onProvidersReady={setProvidersReady}
-                />
-              ) : feature === "tables" ? (
-                <TablesConfig
-                  docPath={current.path}
-                  filename={current.filename}
-                  onRun={handleTablesRun}
-                  runSignal={runSignal}
-                  onProvidersReady={setProvidersReady}
-                />
-              ) : feature === "describe" ? (
-                <DescribeConfig
-                  docPath={current.path}
-                  filename={current.filename}
-                  onRun={handleDescribeRun}
-                  runSignal={runSignal}
-                  onProvidersReady={setProvidersReady}
-                />
-              ) : (
-                <OcrConfig
-                  docPath={current.path}
-                  filename={current.filename}
-                  runSignal={runSignal}
-                  onRun={handleOcrRun}
-                />
-              )}
-            </div>
+            <div hidden={tab !== "config"}>{panel.config}</div>
             {tab === "results" &&
-              (feature === "structured" ? (
-                result ? (
-                  <StructuredResults
-                    data={result.data as StructuredData}
-                    code={result.code}
-                    timingMs={result.timingMs}
-                    activeIndex={activeIndex}
-                    onSelectField={setActiveIndex}
-                    showCitations={showCitations}
-                    citationHex={citationHex}
-                    onCitationHexChange={setCitationHex}
-                    onShowCitationsChange={setShowCitations}
-                  />
-                ) : (
-                  <div className="panel-section">
-                    <p className="muted">Run an extraction to see results.</p>
-                  </div>
-                )
-              ) : feature === "tables" ? (
-                tablesResult ? (
-                  <TablesResults
-                    result={tablesResult}
-                    activeIndex={activeIndex}
-                    onSelectCell={setActiveIndex}
-                    showRegions={showRegions}
-                    onShowRegionsChange={setShowRegions}
-                    colorMode={tableColorMode}
-                    onColorModeChange={setTableColorMode}
-                    citationHex={citationHex}
-                    onCitationHexChange={setCitationHex}
-                  />
-                ) : (
-                  <div className="panel-section">
-                    <p className="muted">Run an extraction to see results.</p>
-                  </div>
-                )
-              ) : feature === "describe" ? (
-                describeResult ? (
-                  <DescribeResults result={describeResult} />
-                ) : (
-                  <div className="panel-section">
-                    <p className="muted">Run an extraction to see results.</p>
-                  </div>
-                )
-              ) : ocrResult ? (
-                <OcrResults
-                  result={ocrResult}
-                  activeIndex={activeIndex}
-                  onSelectElement={setActiveIndex}
-                  showRegions={showRegions}
-                  onShowRegionsChange={setShowRegions}
-                  colorMode={ocrColorMode}
-                  onColorModeChange={setOcrColorMode}
-                  citationHex={citationHex}
-                  onCitationHexChange={setCitationHex}
-                />
-              ) : (
+              (panel.results ?? (
                 <div className="panel-section">
                   <p className="muted">Run an extraction to see results.</p>
                 </div>

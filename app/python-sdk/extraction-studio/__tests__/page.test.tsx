@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { samples } from "../../samples";
+import { FEATURES } from "../_components/FeatureRail";
 import type { IndexedCitation } from "../lib/citations";
 import ExtractionStudio from "../page";
 
@@ -730,4 +731,27 @@ test("the page header and the registry card agree on the studio's name", () => {
   expect(
     screen.getByRole("heading", { level: 1, name: entry?.name }),
   ).toBeInTheDocument();
+});
+
+test("every enabled rail feature renders a configuration panel", async () => {
+  // The map's own guard. FeatureRail.test.tsx pins a hardcoded RENDERABLE set;
+  // this proves the panel actually mounts, which a set literal cannot. An
+  // enabled feature with no map entry falls through to the structured panel,
+  // and that silent fallback is exactly what this catches.
+  //
+  // Asserts on `.studio-sec` (PanelSection.tsx's own class), not the
+  // similarly-named `.panel-section` CSS rule in styles.css — that one only
+  // ever appears in the Results tab's empty state, never on the Config tab
+  // this test lands on, so it can never observe a mounted config panel.
+  for (const f of FEATURES.filter((x) => x.enabled)) {
+    const { unmount } = render(<ExtractionStudio />);
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(f.label) }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /Run extraction/ }),
+      ).toBeTruthy(),
+    );
+    expect(document.querySelector(".studio-sec")).toBeTruthy();
+    unmount();
+  }
 });
