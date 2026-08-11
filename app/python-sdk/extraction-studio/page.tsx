@@ -9,6 +9,8 @@ import { DescribeResults } from "./_components/DescribeResults";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
+import { HandwritingConfig } from "./_components/HandwritingConfig";
+import { HandwritingResults } from "./_components/HandwritingResults";
 import { OcrConfig } from "./_components/OcrConfig";
 import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
@@ -35,6 +37,12 @@ import {
   extractDescription,
 } from "./lib/describe";
 import { DOCUMENTS, findDoc } from "./lib/docs";
+import {
+  extractHandwriting,
+  type HandwritingRequest,
+  type HandwritingResult,
+  handwritingCitationsFor,
+} from "./lib/handwriting";
 import {
   extractOcr,
   type OcrColorMode,
@@ -95,6 +103,12 @@ export default function ExtractionStudio() {
   const [describeResult, setDescribeResult] = useState<DescribeResult | null>(
     null,
   );
+  const [handwritingResult, setHandwritingResult] =
+    useState<HandwritingResult | null>(null);
+  // Its own mode, sharing citationHex with the other features — one studio-wide
+  // highlight colour that survives a rail switch.
+  const [handwritingColorMode, setHandwritingColorMode] =
+    useState<OcrColorMode>("confidence");
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -130,6 +144,7 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setHandwritingResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -162,6 +177,7 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setHandwritingResult(null);
     setError(null);
     setActiveIndex(null);
     // Only one config panel is mounted at a time, so `providersReady` is left
@@ -180,6 +196,11 @@ export default function ExtractionStudio() {
   const tableCitations = useMemo(
     () => tableCitationsFor(tablesResult?.tables ?? [], tableColorMode),
     [tablesResult, tableColorMode],
+  );
+
+  const handwritingCitations = useMemo(
+    () => handwritingCitationsFor(handwritingResult, handwritingColorMode),
+    [handwritingResult, handwritingColorMode],
   );
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
@@ -249,6 +270,14 @@ export default function ExtractionStudio() {
       extractDescription,
       setDescribeResult,
       "Description failed",
+    );
+
+  const handleHandwritingRun = (req: HandwritingRequest) =>
+    runFeature(
+      req,
+      extractHandwriting,
+      setHandwritingResult,
+      "Handwriting recognition failed",
     );
 
   /** Everything that varies per rail feature, in one place.
@@ -375,6 +404,35 @@ export default function ExtractionStudio() {
         <DescribeResults result={describeResult} />
       ) : null,
     },
+    handwriting: {
+      // True even though Local ICR needs no provider: HandwritingConfig reports
+      // ready on mount in that mode, so the gate simply never closes there.
+      needsProviders: true,
+      citations: handwritingCitations,
+      show: showRegions,
+      config: (
+        <HandwritingConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleHandwritingRun}
+          runSignal={runSignal}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: handwritingResult ? (
+        <HandwritingResults
+          result={handwritingResult}
+          activeIndex={activeIndex}
+          onSelectElement={setActiveIndex}
+          showRegions={showRegions}
+          onShowRegionsChange={setShowRegions}
+          colorMode={handwritingColorMode}
+          onColorModeChange={setHandwritingColorMode}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+        />
+      ) : null,
+    },
   };
 
   // The rail only enables features that have an entry here, and
@@ -411,7 +469,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, lift every table off the page, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, or describe what's on it in plain language."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents

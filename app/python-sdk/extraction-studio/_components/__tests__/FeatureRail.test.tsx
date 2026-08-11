@@ -12,13 +12,14 @@ test("rail lists features and selects an enabled one", () => {
   expect(onSelect).toHaveBeenCalledWith("structured");
 });
 
-test("adaptive OCR, table extraction and image description are enabled and the other SOON entries are not", () => {
+test("the five live features are enabled and the other SOON entries are not", () => {
   const byId = Object.fromEntries(FEATURES.map((f) => [f.id, f]));
   expect(byId.structured.enabled).toBe(true);
+  expect(byId.handwriting.enabled).toBe(true);
   expect(byId.adaptive_ocr.enabled).toBe(true);
   expect(byId.tables.enabled).toBe(true);
   expect(byId.describe.enabled).toBe(true);
-  for (const id of ["icr", "vlm_icr", "multilingual", "fast_ocr", "text"]) {
+  for (const id of ["multilingual", "fast_ocr", "text"]) {
     expect(byId[id].enabled).toBe(false);
   }
 });
@@ -28,6 +29,7 @@ test("every enabled feature is one the studio can render", () => {
   // This is the guard: enabling a rail entry must fail here until it is wired.
   const RENDERABLE = new Set([
     "structured",
+    "handwriting",
     "adaptive_ocr",
     "tables",
     "describe",

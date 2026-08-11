@@ -744,6 +744,11 @@ test("the page header and the registry card agree on the studio's name", () => {
 //
 //   structured   -> "Schema builder" is StructuredConfig's own PanelSection
 //                    (StructuredConfig.tsx); nothing else renders it.
+//   handwriting  -> "Engine" is HandwritingConfig's own Segmented group
+//                    (HandwritingConfig.tsx); confirmed by grep to be the
+//                    only `label="Engine"`/group named "Engine" anywhere
+//                    under _components — no other config offers an engine
+//                    toggle.
 //   adaptive_ocr -> "Languages" is OcrConfig's language-chip group
 //                    (OcrConfig.tsx); OCR is the only feature offering
 //                    languages at all.
@@ -762,6 +767,8 @@ const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
     expect(
       screen.getByRole("group", { name: "Schema builder" }),
     ).toBeInTheDocument(),
+  handwriting: () =>
+    expect(screen.getByRole("group", { name: "Engine" })).toBeInTheDocument(),
   adaptive_ocr: () =>
     expect(
       screen.getByRole("group", { name: "Languages" }),
@@ -794,4 +801,53 @@ test("every enabled rail feature renders its OWN configuration panel", async () 
     assertOwnPanel();
     unmount();
   }
+});
+
+test("Handwriting recognition is selectable and swaps in its own panel", async () => {
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("group", { name: "Engine" })).toBeTruthy(),
+  );
+});
+
+test("Run is enabled for Local ICR even with no providers configured", async () => {
+  // The on-prem engine must be usable on a deployment with no API keys at all.
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({ ok: true, json: async () => ({ providers: [] }) })),
+  );
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(
+      screen
+        .getByRole("button", { name: /Run extraction/ })
+        .hasAttribute("disabled"),
+    ).toBe(false),
+  );
+});
+
+test("switching away from a populated handwriting run clears its overlay", async () => {
+  // Same class as the OCR→Image description test above: a stale overlay drawn
+  // over a different feature's document is the bug this guards. The mocked
+  // DocViewer at the top of this file has no element with testid
+  // "citation-count" — it exposes the count as `data-citation-count` on
+  // "doc-viewer", the same attribute every other switch-clears-overlay test
+  // in this file asserts on.
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: /Adaptive OCR/ }));
+  await waitFor(() =>
+    expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+      "data-citation-count",
+      "0",
+    ),
+  );
 });
