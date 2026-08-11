@@ -1304,6 +1304,32 @@
   font-weight: 600;
 }
 
+.studio-shell .studio-table-block {
+  margin-bottom: var(--space-4);
+}
+
+.studio-shell .studio-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.studio-shell .studio-table td {
+  border: 1px solid var(--line);
+  padding: var(--space-1) var(--space-2);
+  vertical-align: top;
+  cursor: pointer;
+}
+
+/* Mirrors .ocr-elements tr[data-selected="true"] — the same accent tint plus
+   inset bar the OCR element table already uses for a selected row, so the two
+   panels read as one system. `data-selected`, not `aria-selected`: this is a
+   plain <table>, not a role="grid", and aria-selected would be invalid ARIA
+   here. That reasoning is already recorded against the OCR rule. */
+.studio-shell .studio-table td[data-selected="true"] {
+  background: var(--accent-tint);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
 @media (max-width: 1024px) {
   .studio-shell .rail-tip {
     left: 0;
