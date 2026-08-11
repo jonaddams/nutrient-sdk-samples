@@ -4,6 +4,8 @@ import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 // Global CSS, deliberately scoped under .studio-shell — see styles.css.
 import "./styles.css";
 import { CategorySelect } from "./_components/CategorySelect";
+import { DescribeConfig } from "./_components/DescribeConfig";
+import { DescribeResults } from "./_components/DescribeResults";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
@@ -23,6 +25,11 @@ import type {
 import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
 import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
+import {
+  type DescribeRequest,
+  type DescribeResult,
+  extractDescription,
+} from "./lib/describe";
 import { DOCUMENTS, findDoc } from "./lib/docs";
 import {
   extractOcr,
@@ -71,6 +78,9 @@ export default function ExtractionStudio() {
   // studio-wide highlight colour that survives a rail switch.
   const [tableColorMode, setTableColorMode] =
     useState<TableColorMode>("confidence");
+  const [describeResult, setDescribeResult] = useState<DescribeResult | null>(
+    null,
+  );
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -105,6 +115,7 @@ export default function ExtractionStudio() {
     setResult(null);
     setOcrResult(null);
     setTablesResult(null);
+    setDescribeResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -136,6 +147,7 @@ export default function ExtractionStudio() {
     setResult(null);
     setOcrResult(null);
     setTablesResult(null);
+    setDescribeResult(null);
     setError(null);
     setActiveIndex(null);
     // Only one config panel is mounted at a time, so `providersReady` is left
@@ -161,7 +173,9 @@ export default function ExtractionStudio() {
       ? citations
       : feature === "tables"
         ? tableCitations
-        : ocrCitations;
+        : feature === "describe"
+          ? []
+          : ocrCitations;
   const viewerShow = feature === "structured" ? showCitations : showRegions;
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
@@ -224,6 +238,14 @@ export default function ExtractionStudio() {
 
   const handleRun = (req: StructuredRequest) =>
     runFeature(req, extractStructured, setResult, "Extraction failed");
+
+  const handleDescribeRun = (req: DescribeRequest) =>
+    runFeature(
+      req,
+      extractDescription,
+      setDescribeResult,
+      "Description failed",
+    );
 
   return (
     // A DEFINITE height, not min-height: .studio-shell is `flex: 1;
@@ -314,7 +336,9 @@ export default function ExtractionStudio() {
                 className="panel-button primary"
                 disabled={
                   busy ||
-                  ((feature === "structured" || feature === "tables") &&
+                  ((feature === "structured" ||
+                    feature === "tables" ||
+                    feature === "describe") &&
                     !providersReady)
                 }
                 onClick={() => setRunSignal((n) => n + 1)}
@@ -355,6 +379,14 @@ export default function ExtractionStudio() {
                   docPath={current.path}
                   filename={current.filename}
                   onRun={handleTablesRun}
+                  runSignal={runSignal}
+                  onProvidersReady={setProvidersReady}
+                />
+              ) : feature === "describe" ? (
+                <DescribeConfig
+                  docPath={current.path}
+                  filename={current.filename}
+                  onRun={handleDescribeRun}
                   runSignal={runSignal}
                   onProvidersReady={setProvidersReady}
                 />
@@ -399,6 +431,14 @@ export default function ExtractionStudio() {
                     citationHex={citationHex}
                     onCitationHexChange={setCitationHex}
                   />
+                ) : (
+                  <div className="panel-section">
+                    <p className="muted">Run an extraction to see results.</p>
+                  </div>
+                )
+              ) : feature === "describe" ? (
+                describeResult ? (
+                  <DescribeResults result={describeResult} />
                 ) : (
                   <div className="panel-section">
                     <p className="muted">Run an extraction to see results.</p>

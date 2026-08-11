@@ -93,9 +93,10 @@ export const FEATURES: Feature[] = [
     id: "describe",
     group: "Describe",
     label: "Image description",
-    enabled: false,
+    enabled: true,
+    blurb: "Describe a page in plain language — alt text, or a quick summary.",
     description:
-      "Writes a short description of each picture in a document. Mainly for accessibility, where every image needs alt text a screen reader can read out.",
+      "Looks at a page as a picture and writes what it sees, in ordinary language. Useful as alt text so a screen reader can describe a scan, or as a quick answer to 'what is this document?'. The same call transcribes handwriting or summarises the page if you ask it to. Reads the first page only.",
   },
 ];
 
