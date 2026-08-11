@@ -49,6 +49,32 @@ function firstCell(grid: (TableCell | null)[][]): RovingPos {
   return { row: 0, col: 0 };
 }
 
+/** Round 3's fix: `rovingByTable` persists across runs (this panel is never
+ *  remounted — page.tsx renders it with no `key`, same as OcrResults), so a
+ *  position arrow-keyed into a big table can point at nothing once `result`
+ *  is replaced by a smaller or differently-shaped one. Resolving the roving
+ *  position through this function at RENDER TIME, rather than an effect that
+ *  resets state when `result` changes, means a stale `{row, col}` simply
+ *  cannot survive being read — every render re-validates it against the grid
+ *  actually on screen and falls back to `firstCell` the instant it does not
+ *  correspond to a real cell. No extra state, nothing to keep in sync, and a
+ *  stored position can never be un-representable rather than merely "usually
+ *  fixed". Kept AS-IS when still valid, so an arrow-keyed position survives
+ *  an unrelated re-render (e.g. toggling Show regions). */
+function resolveRoving(
+  grid: (TableCell | null)[][],
+  stored: RovingPos | undefined,
+): RovingPos {
+  if (stored && grid[stored.row]?.[stored.col]) return stored;
+  return firstCell(grid);
+}
+
+/** Associates every table with the same visually-hidden instruction via
+ *  `aria-describedby`. One shared id, not one per table: the hint text is
+ *  identical for all of them, and aria-describedby resolves an id reference
+ *  at read time regardless of how many elements point at it. */
+const TABLE_NAV_HINT_ID = "tables-nav-hint";
+
 /** Moves one row/column at a time in the given direction, skipping positions
  *  buildGrid left null (covered by a neighbour's rowSpan/colSpan — nothing is
  *  rendered there, so a naive +1 could land the roving position on nothing).
@@ -119,8 +145,11 @@ export function TablesResults({
 
   // Roving tabindex: exactly one entry per table that has been arrow-keyed
   // into, keyed by tableIndex. A table with no entry yet still renders with
-  // exactly one tab stop, via the `?? firstCell(grid)` fallback below — no
-  // need to seed every table's position up front.
+  // exactly one tab stop, via `resolveRoving`'s fallback below — no need to
+  // seed every table's position up front. This state deliberately survives
+  // a new `result` (this panel is never remounted between runs), which is
+  // exactly why `resolveRoving` re-validates it against the CURRENT grid on
+  // every render instead of trusting it — see that function's comment.
   const [rovingByTable, setRovingByTable] = useState<Record<number, RovingPos>>(
     {},
   );
@@ -313,23 +342,35 @@ export function TablesResults({
           </p>
         </div>
       ) : (
-        result.tables.map((table, tableIndex) => {
-          const grid = buildGrid(
-            table.cells,
-            table.rowCount,
-            table.columnCount,
-          );
-          // Falls back to the grid's first real cell until an arrow key has
-          // actually visited this table — see the state comment above.
-          const roving = rovingByTable[tableIndex] ?? firstCell(grid);
-          return (
-            // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key, same precedent as app/python-sdk/table-extraction/page.tsx
-            <div className="studio-table-block" key={tableIndex}>
-              <span className="eyebrow">
-                Table {tableIndex + 1} of {result.tables.length} ·{" "}
-                {table.rowCount}×{table.columnCount}
-              </span>
-              {/* Kept as a native <table>/<tr>/<td>, NOT re-rolled with
+        <>
+          {/* Kept native table semantics over role="grid" (see the comment on
+              <table> below), so nothing built into the roles announces that
+              arrow keys work here. This is the discoverable substitute: a
+              hidden instruction every table's aria-describedby points at.
+              .sr-only already existed in app/globals.css — reused rather than
+              adding a second visually-hidden utility class. */}
+          <p id={TABLE_NAV_HINT_ID} className="sr-only">
+            Use the arrow keys to move between cells, then Enter to show a
+            cell's location on the page.
+          </p>
+          {result.tables.map((table, tableIndex) => {
+            const grid = buildGrid(
+              table.cells,
+              table.rowCount,
+              table.columnCount,
+            );
+            // Re-validated against THIS render's grid every time, not merely
+            // defaulted once — see resolveRoving's comment for why a stored
+            // position surviving a smaller/reshaped `result` was the round-3 bug.
+            const roving = resolveRoving(grid, rovingByTable[tableIndex]);
+            return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key, same precedent as app/python-sdk/table-extraction/page.tsx
+              <div className="studio-table-block" key={tableIndex}>
+                <span className="eyebrow">
+                  Table {tableIndex + 1} of {result.tables.length} ·{" "}
+                  {table.rowCount}×{table.columnCount}
+                </span>
+                {/* Kept as a native <table>/<tr>/<td>, NOT re-rolled with
                   role="grid"/"row"/"gridcell": the APG grid pattern is more
                   standards-correct for arrow-navigable content, but it
                   overrides the row/column announcements a screen-reader user
@@ -338,29 +379,32 @@ export function TablesResults({
                   (see the CSS comment on .studio-table td[data-selected]).
                   Roving tabindex lives purely on the <button>s below; it does
                   not require a grid role to work correctly. */}
-              <table className="field-table studio-table">
-                <tbody>
-                  {grid.map((row, rowIndex) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: row index is a stable grid position
-                    <tr key={rowIndex}>
-                      {row.map((c, colIndex) => {
-                        // A null position is covered by a neighbour's span, so
-                        // it renders nothing at all — not an empty <td>, which
-                        // would push the rest of the row sideways.
-                        if (!c) return null;
-                        const cellIndex =
-                          offsets[tableIndex] + table.cells.indexOf(c);
-                        const isRoving =
-                          roving.row === rowIndex && roving.col === colIndex;
-                        return (
-                          <td
-                            // biome-ignore lint/suspicious/noArrayIndexKey: column index is a stable grid position
-                            key={colIndex}
-                            rowSpan={Math.max(1, c.rowSpan || 1)}
-                            colSpan={Math.max(1, c.colSpan || 1)}
-                            data-selected={cellIndex === activeIndex}
-                          >
-                            {/* A real <button>, not a div/td onClick: it is
+                <table
+                  className="field-table studio-table"
+                  aria-describedby={TABLE_NAV_HINT_ID}
+                >
+                  <tbody>
+                    {grid.map((row, rowIndex) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: row index is a stable grid position
+                      <tr key={rowIndex}>
+                        {row.map((c, colIndex) => {
+                          // A null position is covered by a neighbour's span, so
+                          // it renders nothing at all — not an empty <td>, which
+                          // would push the rest of the row sideways.
+                          if (!c) return null;
+                          const cellIndex =
+                            offsets[tableIndex] + table.cells.indexOf(c);
+                          const isRoving =
+                            roving.row === rowIndex && roving.col === colIndex;
+                          return (
+                            <td
+                              // biome-ignore lint/suspicious/noArrayIndexKey: column index is a stable grid position
+                              key={colIndex}
+                              rowSpan={Math.max(1, c.rowSpan || 1)}
+                              colSpan={Math.max(1, c.colSpan || 1)}
+                              data-selected={cellIndex === activeIndex}
+                            >
+                              {/* A real <button>, not a div/td onClick: it is
                                 keyboard-activatable for free (focus ring, Enter
                                 and Space both work) with no onKeyDown of its
                                 own needed for THAT part — and the <td> above
@@ -380,44 +424,45 @@ export function TablesResults({
                                 introduced in round 1. onKeyDown is what moves
                                 the roving position itself with the arrow
                                 keys; it does not select. */}
-                            <button
-                              type="button"
-                              className="cell-select"
-                              tabIndex={isRoving ? 0 : -1}
-                              ref={(el) => {
-                                const key = refKey(
-                                  tableIndex,
-                                  rowIndex,
-                                  colIndex,
-                                );
-                                if (el) buttonRefs.current.set(key, el);
-                                else buttonRefs.current.delete(key);
-                              }}
-                              onKeyDown={(e) =>
-                                handleCellKeyDown(e, tableIndex, grid, {
-                                  row: rowIndex,
-                                  col: colIndex,
-                                })
-                              }
-                              onClick={() => onSelectCell(cellIndex)}
-                            >
-                              {c.text}
-                              <span
-                                className={`match-dot ${confidenceTone(c.confidence)}`}
-                                role="img"
-                                aria-label={`confidence ${Math.round(c.confidence * 100)}%`}
-                              />
-                            </button>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })
+                              <button
+                                type="button"
+                                className="cell-select"
+                                tabIndex={isRoving ? 0 : -1}
+                                ref={(el) => {
+                                  const key = refKey(
+                                    tableIndex,
+                                    rowIndex,
+                                    colIndex,
+                                  );
+                                  if (el) buttonRefs.current.set(key, el);
+                                  else buttonRefs.current.delete(key);
+                                }}
+                                onKeyDown={(e) =>
+                                  handleCellKeyDown(e, tableIndex, grid, {
+                                    row: rowIndex,
+                                    col: colIndex,
+                                  })
+                                }
+                                onClick={() => onSelectCell(cellIndex)}
+                              >
+                                {c.text}
+                                <span
+                                  className={`match-dot ${confidenceTone(c.confidence)}`}
+                                  role="img"
+                                  aria-label={`confidence ${Math.round(c.confidence * 100)}%`}
+                                />
+                              </button>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </>
       )}
     </div>
   );

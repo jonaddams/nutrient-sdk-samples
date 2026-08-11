@@ -31,6 +31,28 @@ const base = {
   onCitationHexChange: () => {},
 };
 
+/** Fills every row/column of a rowCount x columnCount grid with a real,
+ *  distinctly-labelled cell — hoisted so both the tab-stop-count test and
+ *  the stale-roving-position regression test below can build tables larger
+ *  than the four-cell default fixture without duplicating this. */
+function fullGrid(rows: number, cols: number, prefix: string) {
+  const cells = [];
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < cols; column++) {
+      cells.push({
+        row,
+        column,
+        rowSpan: 1,
+        colSpan: 1,
+        text: `${prefix}${row}-${column}`,
+        confidence: 0.9,
+        bounds: null,
+      });
+    }
+  }
+  return cells;
+}
+
 const result = (over: Partial<TablesResult> = {}): TablesResult => ({
   engine: "VLM_TABLES",
   filename: "x.pdf",
@@ -265,23 +287,6 @@ describe("TablesResults", () => {
     // sequential tab stops to get past one panel. Whatever the cell count,
     // the number of tabIndex=0 cell buttons must equal the number of TABLES —
     // never the number of cells — or this regresses silently again.
-    const fullGrid = (rows: number, cols: number, prefix: string) => {
-      const cells = [];
-      for (let row = 0; row < rows; row++) {
-        for (let column = 0; column < cols; column++) {
-          cells.push({
-            row,
-            column,
-            rowSpan: 1,
-            colSpan: 1,
-            text: `${prefix}${row}-${column}`,
-            confidence: 0.9,
-            bounds: null,
-          });
-        }
-      }
-      return cells;
-    };
     const multi = result({
       tableCount: 3,
       tables: [
@@ -328,5 +333,105 @@ describe("TablesResults", () => {
     // next row or leave the table.
     await user.keyboard("{ArrowRight}");
     expect(document.activeElement).toBe(last);
+  });
+
+  it("clamps a stale roving position when rerendered with a smaller table", async () => {
+    // Round 3's bug: rovingByTable persists across runs (this panel is never
+    // remounted — page.tsx renders it with no `key`), so a position
+    // arrow-keyed deep into a big table pointed at NOTHING once `result` was
+    // replaced by a smaller one — not just "that table has no reachable
+    // cell", but ZERO buttons anywhere with tabIndex=0, because the stored
+    // {row, col} matched no cell in the new grid. Uses `rerender` on ONE
+    // instance on purpose: a fresh `render` per result would pass even
+    // against the broken code, since a fresh mount never has a stale
+    // position to begin with.
+    const user = userEvent.setup();
+    const big = result({
+      tableCount: 1,
+      tables: [{ rowCount: 5, columnCount: 6, cells: fullGrid(5, 6, "x") }],
+    });
+    const { container, rerender } = render(
+      <TablesResults {...base} result={big} />,
+    );
+    const first = screen
+      .getByText("x0-0")
+      .closest("button") as HTMLButtonElement;
+    await tabTo(user, first);
+    // Arrow well past the 5x6 grid's bottom-right corner; step() clamps, so
+    // this reliably lands on the LAST real cell regardless of exact size.
+    await user.keyboard("{ArrowRight}".repeat(10) + "{ArrowDown}".repeat(10));
+
+    const small = result({
+      tableCount: 1,
+      tables: [{ rowCount: 1, columnCount: 3, cells: fullGrid(1, 3, "y") }],
+    });
+    rerender(<TablesResults {...base} result={small} />);
+
+    const rovingButtons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(".cell-select"),
+    ).filter((button) => button.tabIndex === 0);
+    expect(rovingButtons).toHaveLength(small.tables.length);
+  });
+
+  it("ArrowRight steps over a span's null hole to the next real cell", async () => {
+    // buildGrid leaves the position(s) a rowSpan/colSpan covers as null.
+    // step() is sound by inspection (it loops until it finds a truthy grid
+    // cell), but nothing pinned that before this test: a single row here is
+    // [Wide(colSpan 2), null, Narrow] — arrowing right from Wide must land on
+    // Narrow, not stop on the hole or land nowhere.
+    const user = userEvent.setup();
+    const spanned = result({
+      tableCount: 1,
+      tables: [
+        {
+          rowCount: 1,
+          columnCount: 3,
+          cells: [
+            {
+              row: 0,
+              column: 0,
+              rowSpan: 1,
+              colSpan: 2,
+              text: "Wide",
+              confidence: 0.9,
+              bounds: null,
+            },
+            {
+              row: 0,
+              column: 2,
+              rowSpan: 1,
+              colSpan: 1,
+              text: "Narrow",
+              confidence: 0.9,
+              bounds: null,
+            },
+          ],
+        },
+      ],
+    });
+    render(<TablesResults {...base} result={spanned} />);
+    const wide = screen
+      .getByText("Wide")
+      .closest("button") as HTMLButtonElement;
+    const narrow = screen
+      .getByText("Narrow")
+      .closest("button") as HTMLButtonElement;
+    await tabTo(user, wide);
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(narrow);
+  });
+
+  it("describes the arrow-key navigation for screen-reader users", () => {
+    // Native table semantics were kept over role="grid" (see the component's
+    // comment), so nothing built into ARIA announces that arrow keys work
+    // here. This is the discoverable substitute: aria-describedby pointing
+    // at a visually-hidden hint.
+    render(<TablesResults {...base} result={result()} />);
+    const table = screen.getByText("Item").closest("table");
+    const describedBy = table?.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy as string)).toHaveTextContent(
+      /arrow keys/i,
+    );
   });
 });
