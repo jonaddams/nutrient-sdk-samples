@@ -291,9 +291,15 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
   //     so this was dropped instead of forced in.
   //
   // `documentTitle` is the one field the set actually shares: "Apricot Cake."
-  // heads the recipe, "Heavenly Hamburgers" heads the card, "Employment
-  // Application" heads the form, and the note prints "NOTES" as a stationery
-  // header above "Dear Magnus,". Required, not optional — unlike the two
+  // heads the recipe, "Heavenly Hamburgers" heads the card, and "Employment
+  // Application" heads the form — all three describe that document's actual
+  // content. The note is weaker: it prints "NOTES" above "Dear Magnus,", but
+  // "NOTES" is the pre-printed stationery's own header, not a title anyone
+  // wrote for this note — the same word would appear at the top of any sheet
+  // torn off that pad. It still extracts a non-empty value, which is why
+  // `required` stays defensible, but say so plainly rather than imply all
+  // four are titled equally: three are grounded on content, one only on
+  // paper stock. Required, not optional, all the same — unlike the two
   // fields above, this one is genuinely on every document, so there's no
   // document to soften it for.
   handwriting: [
