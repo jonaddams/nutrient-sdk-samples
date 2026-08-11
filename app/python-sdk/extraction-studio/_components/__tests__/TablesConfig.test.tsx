@@ -72,6 +72,24 @@ describe("TablesConfig", () => {
     expect(screen.getByRole("combobox")).toHaveAttribute("aria-busy", "true");
   });
 
+  it("the loading placeholder keeps the controlled select's value matched", () => {
+    // An option whose value is not `provider` would leave the controlled
+    // select with no matching option, and React would fall back to the first
+    // one — of which there is none while loading, so the box would appear
+    // blank. Mirrors StructuredConfig.test.tsx's test of the same name.
+    vi.mocked(fetchProviders).mockReturnValue(new Promise(() => {}));
+    render(<TablesConfig {...props} />);
+    const select = screen.getByLabelText("Provider") as HTMLSelectElement;
+    expect(select.value).toBe("openai");
+    expect(
+      (
+        screen.getByRole("option", {
+          name: "Loading providers…",
+        }) as HTMLOptionElement
+      ).value,
+    ).toBe("openai");
+  });
+
   it("reports readiness once a usable provider list arrives", async () => {
     vi.mocked(fetchProviders).mockResolvedValue([provider("openai", "OpenAI")]);
     const onProvidersReady = vi.fn();

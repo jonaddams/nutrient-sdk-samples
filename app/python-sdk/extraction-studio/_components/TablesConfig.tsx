@@ -57,6 +57,14 @@ export function TablesConfig({
           // A legitimate answer, not a failure: the backend is healthy and
           // simply has neither OpenAI nor Claude configured. Distinguished from
           // providersFailed so the two can say different things.
+          //
+          // Deliberately returns without touching `provider`, so it stays at
+          // its initial "openai" while `usable` renders zero options — a
+          // <select> value with no matching option. That is inert here: the
+          // select is simultaneously `disabled` via `nothingUsable`, this
+          // effect never re-runs to loop on it, and React only warns for a
+          // literal null/undefined value, not one that simply matches nothing.
+          // Do not "fix" this into a refetch or a provider reset.
           onProvidersReady?.(false);
           return;
         }
