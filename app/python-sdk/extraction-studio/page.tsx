@@ -12,6 +12,8 @@ import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
 import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
+import { TablesConfig } from "./_components/TablesConfig";
+import { TablesResults } from "./_components/TablesResults";
 import type {
   Envelope,
   FieldResult,
@@ -29,6 +31,13 @@ import {
   type OcrResult,
   ocrCitationsFor,
 } from "./lib/ocr";
+import {
+  extractTables,
+  type TableColorMode,
+  type TablesRequest,
+  type TablesResult,
+  tableCitationsFor,
+} from "./lib/tables";
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -57,6 +66,11 @@ export default function ExtractionStudio() {
   // highlight colour that survives a rail switch, not two knobs that look
   // linked and are not. Only the MODE is OCR's own.
   const [ocrColorMode, setOcrColorMode] = useState<OcrColorMode>("confidence");
+  const [tablesResult, setTablesResult] = useState<TablesResult | null>(null);
+  // Its own mode, sharing citationHex with the other two features — one
+  // studio-wide highlight colour that survives a rail switch.
+  const [tableColorMode, setTableColorMode] =
+    useState<TableColorMode>("confidence");
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -90,6 +104,7 @@ export default function ExtractionStudio() {
     setDoc(docId);
     setResult(null);
     setOcrResult(null);
+    setTablesResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -120,8 +135,15 @@ export default function ExtractionStudio() {
   useEffect(() => {
     setResult(null);
     setOcrResult(null);
+    setTablesResult(null);
     setError(null);
     setActiveIndex(null);
+    // Only one config panel is mounted at a time, so `providersReady` is left
+    // `true` by whichever mounted last. Without this reset, running
+    // Structured (ready -> true) then switching to Tables would leave Run
+    // enabled before TablesConfig's own provider fetch has resolved — the
+    // exact early click the gate exists to prevent.
+    setProvidersReady(false);
   }, [feature]);
 
   const ocrCitations = useMemo(
@@ -129,7 +151,17 @@ export default function ExtractionStudio() {
     [ocrResult, ocrColorMode],
   );
 
-  const viewerCitations = feature === "structured" ? citations : ocrCitations;
+  const tableCitations = useMemo(
+    () => tableCitationsFor(tablesResult?.tables ?? [], tableColorMode),
+    [tablesResult, tableColorMode],
+  );
+
+  const viewerCitations =
+    feature === "structured"
+      ? citations
+      : feature === "tables"
+        ? tableCitations
+        : ocrCitations;
   const viewerShow = feature === "structured" ? showCitations : showRegions;
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
@@ -161,6 +193,37 @@ export default function ExtractionStudio() {
         docRef.current === requestDocId
       ) {
         setError(e instanceof Error ? e.message : "OCR failed");
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Mirrors handleOcrRun exactly: same busy/error/ref-guard/finally shape,
+  // because hand-maintained copies are how the inline OCR version once
+  // forgot to clear activeIndex.
+  const handleTablesRun = async (req: TablesRequest) => {
+    const requestFeature = feature;
+    const requestDocId = doc;
+    setBusy(true);
+    setError(null);
+    setActiveIndex(null);
+    setTablesResult(null);
+    try {
+      const tables = await extractTables(req);
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setTablesResult(tables);
+        setTab("results");
+      }
+    } catch (e) {
+      if (
+        featureRef.current === requestFeature &&
+        docRef.current === requestDocId
+      ) {
+        setError(e instanceof Error ? e.message : "Table extraction failed");
       }
     } finally {
       setBusy(false);
@@ -230,7 +293,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques. Pull a JSON schema's fields out of a document, or read a scan into structured content with Adaptive OCR — every result carries a citation you can click to find it on the page."
+        description="One shell for the Python SDK's extraction techniques. Pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, or lift every table off the page — every result carries a citation you can click to find it on the page."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
@@ -294,7 +357,11 @@ export default function ExtractionStudio() {
               <button
                 type="button"
                 className="panel-button primary"
-                disabled={busy || (feature === "structured" && !providersReady)}
+                disabled={
+                  busy ||
+                  ((feature === "structured" || feature === "tables") &&
+                    !providersReady)
+                }
                 onClick={() => setRunSignal((n) => n + 1)}
               >
                 {busy ? "Running…" : "Run extraction"}
@@ -328,6 +395,14 @@ export default function ExtractionStudio() {
                   schemaPreset={schemaPreset}
                   onProvidersReady={setProvidersReady}
                 />
+              ) : feature === "tables" ? (
+                <TablesConfig
+                  docPath={current.path}
+                  filename={current.filename}
+                  onRun={handleTablesRun}
+                  runSignal={runSignal}
+                  onProvidersReady={setProvidersReady}
+                />
               ) : (
                 <OcrConfig
                   docPath={current.path}
@@ -350,6 +425,24 @@ export default function ExtractionStudio() {
                     citationHex={citationHex}
                     onCitationHexChange={setCitationHex}
                     onShowCitationsChange={setShowCitations}
+                  />
+                ) : (
+                  <div className="panel-section">
+                    <p className="muted">Run an extraction to see results.</p>
+                  </div>
+                )
+              ) : feature === "tables" ? (
+                tablesResult ? (
+                  <TablesResults
+                    result={tablesResult}
+                    activeIndex={activeIndex}
+                    onSelectCell={setActiveIndex}
+                    showRegions={showRegions}
+                    onShowRegionsChange={setShowRegions}
+                    colorMode={tableColorMode}
+                    onColorModeChange={setTableColorMode}
+                    citationHex={citationHex}
+                    onCitationHexChange={setCitationHex}
                   />
                 ) : (
                   <div className="panel-section">
