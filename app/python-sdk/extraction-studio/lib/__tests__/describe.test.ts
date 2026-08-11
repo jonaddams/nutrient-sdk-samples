@@ -74,7 +74,7 @@ describe("extractDescription", () => {
       new Response(JSON.stringify(fixture), { status: 200 }),
     );
     await extractDescription({ ...req, prompt: "" });
-    const body = (fetchMock.mock.calls[1][1].body as FormData);
+    const body = fetchMock.mock.calls[1][1].body as FormData;
     expect(body.has("prompt")).toBe(false);
   });
 
@@ -83,7 +83,7 @@ describe("extractDescription", () => {
       new Response(JSON.stringify(fixture), { status: 200 }),
     );
     await extractDescription({ ...req, prompt: "Transcribe it." });
-    const body = (fetchMock.mock.calls[1][1].body as FormData);
+    const body = fetchMock.mock.calls[1][1].body as FormData;
     expect(body.get("prompt")).toBe("Transcribe it.");
   });
 
