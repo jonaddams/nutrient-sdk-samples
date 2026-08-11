@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildGrid, type TableCell } from "../tables";
+import {
+  buildGrid,
+  type ExtractedTable,
+  type TableCell,
+  tablesToCsv,
+} from "../tables";
 import multi from "./fixtures/tables-multi.json";
 
 const cell = (over: Partial<TableCell> = {}): TableCell => ({
@@ -84,6 +89,128 @@ describe("buildGrid", () => {
       );
       expect(grid).toHaveLength(table.rowCount);
       for (const row of grid) expect(row).toHaveLength(table.columnCount);
+    }
+  });
+});
+
+describe("tablesToCsv", () => {
+  it("renders a table as rows of comma-separated cells", () => {
+    const csv = tablesToCsv([
+      {
+        rowCount: 2,
+        columnCount: 2,
+        cells: [
+          cell({ row: 0, column: 0, text: "Item" }),
+          cell({ row: 0, column: 1, text: "Qty" }),
+          cell({ row: 1, column: 0, text: "Concrete" }),
+          cell({ row: 1, column: 1, text: "120" }),
+        ],
+      },
+    ]);
+    expect(csv).toBe("Item,Qty\nConcrete,120\n");
+  });
+
+  it("quotes a field containing a comma", () => {
+    const csv = tablesToCsv([
+      { rowCount: 1, columnCount: 1, cells: [cell({ text: "Smith, John" })] },
+    ]);
+    expect(csv).toBe('"Smith, John"\n');
+  });
+
+  it("quotes and doubles an embedded double quote", () => {
+    const csv = tablesToCsv([
+      { rowCount: 1, columnCount: 1, cells: [cell({ text: 'say "hi"' })] },
+    ]);
+    expect(csv).toBe('"say ""hi"""\n');
+  });
+
+  it("quotes a field containing a newline", () => {
+    const csv = tablesToCsv([
+      { rowCount: 1, columnCount: 1, cells: [cell({ text: "line1\nline2" })] },
+    ]);
+    expect(csv).toBe('"line1\nline2"\n');
+  });
+
+  it("leaves span-covered positions empty so columns stay aligned", () => {
+    // The header spans both columns; the second column of row 0 must be an
+    // empty field, not a repeat of the anchor's text.
+    const csv = tablesToCsv([
+      {
+        rowCount: 2,
+        columnCount: 2,
+        cells: [
+          cell({ row: 0, column: 0, text: "Totals", colSpan: 2 }),
+          cell({ row: 1, column: 0, text: "A" }),
+          cell({ row: 1, column: 1, text: "B" }),
+        ],
+      },
+    ]);
+    expect(csv).toBe("Totals,\nA,B\n");
+  });
+
+  it("separates multiple tables with a blank line", () => {
+    const csv = tablesToCsv([
+      { rowCount: 1, columnCount: 1, cells: [cell({ text: "one" })] },
+      { rowCount: 1, columnCount: 1, cells: [cell({ text: "two" })] },
+    ]);
+    expect(csv).toBe("one\n\ntwo\n");
+  });
+
+  it("returns an empty string for no tables", () => {
+    expect(tablesToCsv([])).toBe("");
+  });
+
+  it("gives every row of a real table the same number of fields", () => {
+    // NOTE: the brief's version of this test split the whole CSV block on
+    // "\n" and re-derived quote state from scratch on each resulting line.
+    // That is wrong for any quoted field that itself contains a literal
+    // newline (exercised by the "quotes a field containing a newline" test
+    // above): the embedded "\n" fractures one logical CSV row into two
+    // fake "lines", each starting from inQuotes = false, so a row that
+    // legitimately spans two text lines gets scored as two separate rows
+    // with wrong field counts. It doesn't fail against this fixture only
+    // because no cell in it happens to contain a newline — a fixture that
+    // did would make it fail for the wrong reason (row fracturing), not
+    // catch a real alignment bug. Rewritten to split into logical rows by
+    // tracking quote state across the whole block, so a newline inside an
+    // open quote does not end a row.
+    for (const table of multi.tables as ExtractedTable[]) {
+      const block = tablesToCsv([table]);
+      if (!block) continue;
+
+      const rows: string[][] = [[]];
+      let field = "";
+      let inQuotes = false;
+      const text = block.trimEnd();
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuotes) {
+          if (ch === '"' && text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            field += ch;
+          }
+        } else if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ",") {
+          rows[rows.length - 1].push(field);
+          field = "";
+        } else if (ch === "\n") {
+          rows[rows.length - 1].push(field);
+          field = "";
+          rows.push([]);
+        } else {
+          field += ch;
+        }
+      }
+      rows[rows.length - 1].push(field);
+
+      const counts = new Set(rows.map((r) => r.length));
+      expect(counts.size).toBe(1);
+      expect([...counts][0]).toBe(table.columnCount);
     }
   });
 });

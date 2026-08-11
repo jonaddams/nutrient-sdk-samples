@@ -124,3 +124,31 @@ export function buildGrid(
 
   return grid;
 }
+
+/** Quote per RFC 4180: a field containing a comma, a double quote or a newline
+ *  is wrapped in quotes, and embedded quotes are doubled. */
+function csvField(text: string): string {
+  if (!/[",\n\r]/.test(text)) return text;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+/** Every table as CSV, separated by a blank line.
+ *
+ *  Renders the RECONSTRUCTED GRID, not the flat cell list, so a spanning cell
+ *  leaves its covered positions empty and the columns of later rows still line
+ *  up. Emitting the flat list in cell order silently shifts every row that
+ *  contains a span.
+ *
+ *  Blank-line separation rather than a "# Table 2" comment: spreadsheet
+ *  importers tolerate the blank line and would treat the comment as data. */
+export function tablesToCsv(tables: ExtractedTable[]): string {
+  return tables
+    .map((table) =>
+      buildGrid(table.cells, table.rowCount, table.columnCount)
+        .map((row) => row.map((c) => csvField(c?.text ?? "")).join(","))
+        .join("\n"),
+    )
+    .filter((block) => block.length > 0)
+    .map((block) => `${block}\n`)
+    .join("\n");
+}
