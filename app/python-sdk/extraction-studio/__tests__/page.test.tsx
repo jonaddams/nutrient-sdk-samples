@@ -411,6 +411,181 @@ test("a failed Tables re-run clears the previously-rendered result", async () =>
   expect(screen.queryByText("Concrete")).toBeNull();
 });
 
+/** OCR endpoint whose response the caller lands on demand, so a document or
+ *  feature switch that happens after Run is clicked but before the response
+ *  resolves is reproducible on command rather than racing real network
+ *  timing. Providers and the pre-upload document fetch resolve immediately,
+ *  exactly like stubOcrFetch() — only OCR's own endpoint is deferred. */
+function stubOcrFetchDeferred() {
+  let resolve!: (value: unknown) => void;
+  let reject!: (reason?: unknown) => void;
+  const ocrResponse = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/ocr")) {
+        return ocrResponse;
+      }
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+
+  return {
+    /** Lands the in-flight request as a success carrying "Invoice", the same
+     *  body stubOcrFetch() uses. */
+    landSuccess: () =>
+      resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          engine: "ADAPTIVE_OCR",
+          filename: "scan.pdf",
+          statistics: {
+            totalElements: 1,
+            textElements: 1,
+            averageConfidence: 0.9,
+            lowConfidenceElements: 0,
+          },
+          fullText: "[0] Invoice",
+          textElements: [
+            {
+              readingOrder: 0,
+              type: "paragraph",
+              text: "Invoice",
+              confidence: 0.9,
+              page: 0,
+              citation: { page: 0, x0: 0.1, y0: 0.1, x1: 0.2, y1: 0.2 },
+            },
+          ],
+          pages: [{ page: 1, width: 1654, height: 2338 }],
+          config: {
+            languages: "eng",
+            outputFormat: "json",
+            tableDetection: true,
+          },
+          timingMs: 800,
+        }),
+      }),
+    /** Lands the in-flight request as a failure. */
+    landFailure: (message: string) => reject(new Error(message)),
+  };
+}
+
+// runFeature captures `feature`/`doc` at request start and compares them
+// against featureRef/docRef once the request resolves — neither the rail nor
+// the doc strip is disabled while busy, so the user is free to switch either
+// mid-request, and a response that lands after that switch must not
+// repopulate state the switch already cleared. A reviewer proved this
+// uncovered: dropping the docRef comparison from the success path left the
+// entire suite passing. These three tests land a response AFTER performing
+// the switch, so the race is genuine rather than assumed.
+test("a document switch mid-flight discards the OCR result that lands after it", async () => {
+  const { landSuccess } = stubOcrFetchDeferred();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /running/i }),
+    ).toBeInTheDocument(),
+  );
+
+  // Neither the doc strip nor the rail disables while busy — switch documents
+  // before the in-flight request resolves.
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+
+  landSuccess();
+  // Wait for runFeature's continuation (guarded or not) to fully settle —
+  // `busy` flips back to false in `finally`, unconditionally, regardless of
+  // which document is current, so this is a race-free sync point.
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /run extraction/i }),
+    ).toBeInTheDocument(),
+  );
+
+  // The switch itself already cleared ocrResult — that's not what's under
+  // test. What matters is whether the response that arrived AFTER the switch
+  // repopulated it. Navigate to Results explicitly and confirm it stayed
+  // empty, rather than trusting the config tab's silence.
+  fireEvent.click(screen.getByRole("button", { name: "Results" }));
+  expect(screen.queryByText("Invoice")).toBeNull();
+});
+
+test("a feature switch mid-flight discards the OCR result that lands after it", async () => {
+  const { landSuccess } = stubOcrFetchDeferred();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /running/i }),
+    ).toBeInTheDocument(),
+  );
+
+  // Neither the rail nor the doc strip disables while busy — switch feature
+  // before OCR's in-flight request resolves.
+  fireEvent.click(
+    screen.getByRole("button", { name: /structured extraction/i }),
+  );
+  // Confirm the switch actually took: Structured's own config panel is up,
+  // still on the Configuration tab — a feature switch never touches `tab`.
+  expect(screen.getByText("Schema builder")).toBeInTheDocument();
+
+  landSuccess();
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /run extraction/i }),
+    ).toBeInTheDocument(),
+  );
+
+  // Were the guard absent, the success path's unconditional setTab("results")
+  // would force the panel to Results even though Structured never ran
+  // anything, surfacing the shared "no results yet" placeholder there — the
+  // panel must stay on Configuration, and OCR's own result must not leak into
+  // the newly-selected feature either.
+  expect(screen.getByText("Schema builder")).toBeInTheDocument();
+  expect(screen.queryByText("Run an extraction to see results.")).toBeNull();
+  expect(screen.queryByText("Invoice")).toBeNull();
+});
+
+test("a late-landing OCR failure is discarded after a document switch mid-flight", async () => {
+  const { landFailure } = stubOcrFetchDeferred();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /running/i }),
+    ).toBeInTheDocument(),
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+
+  landFailure("boom: request abandoned by the switch");
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /run extraction/i }),
+    ).toBeInTheDocument(),
+  );
+
+  // The guard wraps the error branch too: an error surfacing for a request
+  // the user already switched away from is just as wrong as a stale result
+  // would be, and must not raise the error callout.
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
 // The page and the landing-page registry card each carry the studio's
 // prospect-facing name in their own string literal, so they can drift apart —
 // which is exactly what happened when Adaptive OCR shipped and the page still
