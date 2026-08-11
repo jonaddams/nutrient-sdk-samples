@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { copyText, downloadText } from "../lib/download";
 import { confidenceTone, type OcrColorMode, type OcrResult } from "../lib/ocr";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
@@ -69,14 +70,7 @@ export function OcrResults({
       type: "application/json",
       name: "ocr.json",
     };
-    const url = URL.createObjectURL(new Blob([payload()], { type }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    // Deferred: revoking synchronously races the browser's internal blob fetch
-    // for the download in some browsers (notably older Safari).
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    downloadText(payload(), name, type);
   };
 
   return (
@@ -85,8 +79,12 @@ export function OcrResults({
           carries two, and at the panel's real width they wrapped mid-phrase —
           "Show / regions" over two lines, "39 / elements" over two. A grid gives
           each item a whole cell, so the pairs line up and nothing wraps.
-          In markdown mode the middle two are hidden, so this collapses to a
-          single row of elapsed time and the toggle. */}
+          In markdown mode all three of the middle/last items are hidden, so
+          this collapses to a single row: just elapsed time. Show regions
+          joined the other two in that gate because markdown-mode responses
+          always carry textElements: [] — the box it controls is exactly as
+          inert as the element-count and confidence figures, for the same
+          reason. */}
       <div className="results-meta results-meta-grid">
         <span className="mono muted">
           Elapsed time: {(result.timingMs / 1000).toFixed(1)}s
@@ -96,7 +94,9 @@ export function OcrResults({
             Rendering them anyway was honest and read as a failed run —
             "0 elements · 0% avg confidence" is what a prospect sees first
             after flipping the Output control. Timing still means something,
-            so it stays. */}
+            so it stays. Show regions is gated here too: it controls an
+            overlay derived from textElements, which is always [] on this
+            branch, so the toggle would paint nothing on either setting. */}
         {!isMarkdown && (
           <>
             <span className="mono muted">
@@ -106,44 +106,61 @@ export function OcrResults({
               {Math.round((result.statistics?.averageConfidence ?? 0) * 100)}%
               avg confidence
             </span>
+            <Toggle
+              checked={showRegions}
+              onChange={onShowRegionsChange}
+              label="Show regions"
+            />
           </>
         )}
-        <Toggle
-          checked={showRegions}
-          onChange={onShowRegionsChange}
-          label="Show regions"
-        />
       </div>
 
-      {/* Paired with Show regions, exactly as StructuredResults pairs
+      {/* `!isMarkdown` as well as showRegions: markdown-mode responses always
+          carry textElements: [], so there is nothing to paint and every
+          control in here is inert — the toggle, the mode switch, and the four
+          swatches, the dropper and the hex field (visible in both modes; see
+          the HighlightColor comment below). Nine controls doing nothing.
+          Hiding them follows #62, which hid the element-count and confidence
+          stats for exactly the same dead-state reason.
+
+          Paired with Show regions, exactly as StructuredResults pairs
           HighlightColor with Show citations: a colour control is meaningless
           when nothing is drawn.
 
           By confidence is the default and stays so. The tint is what makes the
           overlay say WHERE OCR was unsure, which is the reason this panel had
           no picker at all until now — Custom trades that signal away
-          deliberately, and only on request. The element table's confidence
-          dots are unaffected in either mode, so the signal never leaves the
-          panel entirely. */}
-      {showRegions && (
+          deliberately, and only when the reader actually reaches for a colour
+          (picking one is what switches the mode; see below). The element
+          table's confidence dots are unaffected in either mode, so the signal
+          never leaves the panel entirely. */}
+      {!isMarkdown && showRegions && (
         <div className="citation-color">
           <span className="eyebrow">{REGION_COLOR}</span>
           <Segmented
+            label={REGION_COLOR}
             options={[
               { label: "By confidence", value: "confidence" },
               { label: "Custom", value: "custom" },
             ]}
             value={colorMode}
-            onChange={(v) => onColorModeChange(v as OcrColorMode)}
+            onChange={onColorModeChange}
           />
-          {colorMode === "custom" && (
-            <HighlightColor
-              label={REGION_COLOR}
-              embedded
-              value={citationHex}
-              onChange={onCitationHexChange}
-            />
-          )}
+          {/* Rendered unconditionally (no `colorMode === "custom"` gate): the
+              chooser stays visible in By confidence too, and picking a colour
+              is itself the gesture that switches to Custom. Composed here at
+              the call site, not via a new mode-aware prop on HighlightColor —
+              see TablesResults, which does the same thing for the same
+              reason. */}
+          <HighlightColor
+            label={REGION_COLOR}
+            embedded
+            value={citationHex}
+            onChange={(hex) => {
+              onCitationHexChange(hex);
+              onColorModeChange("custom");
+            }}
+          />
         </div>
       )}
 
@@ -162,6 +179,7 @@ export function OcrResults({
         <>
           <div className="panel-row-h panel-row results-actions">
             <Segmented
+              label="View"
               options={
                 isMarkdown
                   ? [
@@ -190,7 +208,7 @@ export function OcrResults({
               <button
                 type="button"
                 className="btn ghost sm"
-                onClick={() => navigator.clipboard.writeText(payload())}
+                onClick={() => copyText(payload())}
               >
                 Copy
               </button>
@@ -230,7 +248,31 @@ export function OcrResults({
                     data-selected={index === activeIndex}
                     onClick={() => onSelectElement(index)}
                   >
-                    <td className="mono muted">{el.readingOrder}</td>
+                    <td className="mono muted">
+                      {/* A real <button>, not tabIndex+onKeyDown on the <tr>:
+                          it is keyboard-activatable for free and keeps the row
+                          as a plain <tr>, not a widget with an invented role.
+                          Placed in the FIRST cell — the reading-order number,
+                          already the row's natural leading landmark — rather
+                          than spanning the row, because a <button> cannot
+                          legally wrap sibling <td>s. Mouse behaviour is
+                          unchanged: the <tr onClick> above still fires from a
+                          click anywhere in the row via bubbling, exactly as
+                          before this button existed; stopPropagation here only
+                          prevents that same handler firing twice for a click
+                          that lands on the button itself. */}
+                      <button
+                        type="button"
+                        className="row-select"
+                        aria-label={`Select element ${el.readingOrder}: ${el.text.slice(0, 40)}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectElement(index);
+                        }}
+                      >
+                        {el.readingOrder}
+                      </button>
+                    </td>
                     <td className="mono muted">{el.type}</td>
                     <td>{el.text}</td>
                     <td className="mono">

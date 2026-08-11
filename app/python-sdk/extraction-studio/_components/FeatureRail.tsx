@@ -73,6 +73,15 @@ export const FEATURES: Feature[] = [
       "Adds an invisible text layer to a scan so it becomes searchable and its text selectable, while looking exactly the same. Built for speed and high volume.",
   },
   {
+    id: "tables",
+    group: "Tables",
+    label: "Table extraction",
+    enabled: true,
+    blurb: "Pull every table off the page as rows, columns and cells.",
+    description:
+      "Finds the tables in a document and gives you back their actual structure — every row, column and cell, including cells that span more than one of either. Each cell carries how confident the model was and where it sits on the page, so you can check a figure against the original.",
+  },
+  {
     id: "text",
     group: "Text",
     label: "Text export",

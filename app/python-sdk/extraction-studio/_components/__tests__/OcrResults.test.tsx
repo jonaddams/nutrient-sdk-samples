@@ -1,7 +1,24 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import type { OcrResult } from "../../lib/ocr";
 import { OcrResults } from "../OcrResults";
+
+/** Real Tab presses until `target` is focused, capped so a markup regression
+ *  that drops the control from the tab order fails with a clear assertion
+ *  instead of hanging. A hardcoded tab count would be brittle — it would
+ *  silently start counting a DIFFERENT button the moment an unrelated
+ *  control earlier in the DOM changed, without this test's own markup
+ *  changing at all. */
+async function tabTo(
+  user: ReturnType<typeof userEvent.setup>,
+  target: Element,
+) {
+  for (let i = 0; i < 40 && document.activeElement !== target; i++) {
+    await user.tab();
+  }
+  expect(document.activeElement).toBe(target);
+}
 
 // Unconditional, not tail-of-body: an assertion that throws mid-test would
 // otherwise skip the tail cleanup and leak a stubbed global or an active
@@ -78,6 +95,36 @@ test("clicking an element selects it", () => {
   render(<OcrResults {...props} onSelectElement={onSelectElement} />);
   fireEvent.click(screen.getByText("Total"));
   expect(onSelectElement).toHaveBeenCalledWith(1);
+});
+
+test("selects a row from the keyboard, Tab then Enter", async () => {
+  // The gap this closes: the row's onClick lives on <tr>, which cannot be
+  // Tabbed to or activated by Enter/Space on its own. The fix is a real
+  // <button> in the row's first cell (the reading-order number) — reachable
+  // by Tab, activates on Enter, and needs no tabIndex/onKeyDown/ARIA of its
+  // own. The row's onClick stays for mouse users; this proves the keyboard
+  // path independently reaches the same handler with the same index.
+  const user = userEvent.setup();
+  const onSelectElement = vi.fn();
+  render(<OcrResults {...props} onSelectElement={onSelectElement} />);
+  const target = screen.getByRole("button", {
+    name: /Select element 1: Total/,
+  });
+  await tabTo(user, target);
+  await user.keyboard("{Enter}");
+  expect(onSelectElement).toHaveBeenCalledWith(1);
+});
+
+test("also selects a row from the keyboard with Space", async () => {
+  const user = userEvent.setup();
+  const onSelectElement = vi.fn();
+  render(<OcrResults {...props} onSelectElement={onSelectElement} />);
+  const target = screen.getByRole("button", {
+    name: /Select element 0: Invoice/,
+  });
+  await tabTo(user, target);
+  await user.keyboard(" ");
+  expect(onSelectElement).toHaveBeenCalledWith(0);
 });
 
 test("marks the active row and only the active row as selected", () => {
@@ -347,6 +394,31 @@ test("Download writes the Text view as .txt, not .json", async () => {
   expect(anchors[0]?.download).toBe("ocr.txt");
 });
 
+test("hides Show regions and the whole colour block in markdown mode", () => {
+  // textElements is [] on every markdown-mode response, so the box the
+  // toggle controls cannot be painted on either setting. Same reason #62
+  // hid the element-count and confidence stats.
+  render(
+    <OcrResults
+      {...props}
+      result={MARKDOWN_RESULT}
+      showRegions={true}
+      colorMode="custom"
+    />,
+  );
+  expect(screen.queryByLabelText("Show regions")).not.toBeInTheDocument();
+  expect(screen.queryByText("Region color")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("group", { name: /region color/i }),
+  ).not.toBeInTheDocument();
+});
+
+test("still shows Show regions in elements mode", () => {
+  render(<OcrResults {...props} showRegions={true} />);
+  expect(screen.getByLabelText("Show regions")).toBeInTheDocument();
+  expect(screen.getByText("Region color")).toBeInTheDocument();
+});
+
 test("offers the region colour mode when regions are shown", () => {
   render(<OcrResults {...props} />);
   expect(screen.getByText("Region color")).toBeInTheDocument();
@@ -370,16 +442,37 @@ test("hides the whole colour block when regions are hidden", () => {
   ).not.toBeInTheDocument();
 });
 
-test("shows swatches only in Custom mode", () => {
+test("shows swatches in both By confidence and Custom mode", () => {
+  // The owner's post-review complaint: the chooser looked absent in the
+  // default mode because HighlightColor was gated on colorMode === "custom".
+  // It must render in BOTH modes now — no disabled/greyed state either, it
+  // stays live in By confidence.
   const { rerender } = render(<OcrResults {...props} />);
-  // Confidence mode: the mode control is there, the swatches are not.
-  expect(
-    screen.queryByRole("button", { name: "Amber" }),
-  ).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
+  expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
 
   rerender(<OcrResults {...props} colorMode="custom" />);
   expect(screen.getByRole("button", { name: "Amber" })).toBeInTheDocument();
   expect(screen.getByLabelText("Region color hex value")).toBeInTheDocument();
+});
+
+test("picking a preset swatch in By confidence mode sets the hex AND switches to Custom", () => {
+  // Composed at the call site (OcrResults' onChange to HighlightColor), not a
+  // new prop on the shared HighlightColor component: a swatch click must call
+  // BOTH the hex handler and onColorModeChange("custom").
+  const onCitationHexChange = vi.fn();
+  const onColorModeChange = vi.fn();
+  render(
+    <OcrResults
+      {...props}
+      colorMode="confidence"
+      onCitationHexChange={onCitationHexChange}
+      onColorModeChange={onColorModeChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Magenta" }));
+  expect(onCitationHexChange).toHaveBeenCalledWith("#d63384");
+  expect(onColorModeChange).toHaveBeenCalledWith("custom");
 });
 
 test("Region color appears exactly once in Custom mode", () => {

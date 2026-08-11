@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
+import { copyText, downloadText } from "../lib/download";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -63,17 +64,11 @@ export function StructuredResults({
 
   const download = () => {
     const isCode = view === "code";
-    const blob = new Blob([payload()], {
-      type: isCode ? "text/x-python" : "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = isCode ? "extraction.py" : "extraction.json";
-    a.click();
-    // Deferred: revoking synchronously races the browser's internal blob
-    // fetch for the download in some browsers (notably older Safari).
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    downloadText(
+      payload(),
+      isCode ? "extraction.py" : "extraction.json",
+      isCode ? "text/x-python" : "application/json",
+    );
   };
 
   return (
@@ -101,6 +96,7 @@ export function StructuredResults({
 
       <div className="panel-row-h panel-row results-actions">
         <Segmented
+          label="View"
           options={[
             { label: "Fields", value: "fields" },
             { label: "JSON", value: "raw" },
@@ -113,7 +109,7 @@ export function StructuredResults({
           <button
             type="button"
             className="btn ghost sm"
-            onClick={() => navigator.clipboard.writeText(payload())}
+            onClick={() => copyText(payload())}
           >
             Copy
           </button>

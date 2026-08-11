@@ -482,7 +482,31 @@
 
 .studio-shell {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) clamp(340px, 30vw, 440px);
+  /* Viewer track: `minmax(0, 900px)`, NOT a flexible fr track — a fixed
+     upper bound, since the PDF page itself renders far narrower than that,
+     so past ~900px the extra width was just empty checkerboard background.
+     (`minmax(0, min(900px, 1fr))` was tried first so this track could still
+     be "flexible with a cap," but Chrome as shipped here rejects `fr` nested
+     inside `min()` in a track-sizing position — `CSS.supports` on that exact
+     string returns false, and the whole `grid-template-columns` declaration
+     was dropped as invalid, collapsing the shell to one implicit column.
+     Confirmed in a real browser, not assumed.)
+     Panel track: `minmax(340px, 1fr)` — flexible, floor 340px, NO upper cap.
+     It used to be `clamp(340px, 30vw, 440px)`, a fixed (non-fr) track that
+     maxed out at 440px regardless of how much space the viewer gave up. The
+     combination below still does what was wanted: CSS Grid's track-sizing
+     algorithm grows the non-flexible, capped viewer track first (up to its
+     900px growth limit), THEN hands whatever free space is left to the one
+     fr track, the panel — verified empirically in a real browser at 2000px
+     (240 / 900 / 812) and at 1050px, just above the breakpoint below (240 /
+     422 / 340, i.e. the panel sits at its floor and the viewer takes what's
+     left, never overflowing). A max-width on the viewer ALONE, with the
+     panel's track left fixed, would have just left that freed space as dead
+     space in the viewer's own column instead of handing it to the panel.
+     Below the ~1024px breakpoint this is moot: the @media block further down
+     switches .studio-shell to `display: block`, so grid-template-columns
+     stops applying entirely. */
+  grid-template-columns: 240px minmax(0, 900px) minmax(340px, 1fr);
   gap: var(--space-4);
   flex: 1;
   min-height: 0;
@@ -1302,6 +1326,95 @@
 .studio-shell .hint-em {
   color: var(--ink-2);
   font-weight: 600;
+}
+
+/* overflow-x: auto + max-width: 100%, NOT on .field-table itself: that class
+   also styles the field-row key/value list (see the block comment at the top
+   of this file), whose overflow: hidden clips its own border-radius corners
+   and must stay put. This is the per-table container instead — the wide
+   16-column table on the flagship invoice was otherwise CLIPPED at a narrow
+   viewport rather than scrolling. Scoped here, not on .studio-table, so the
+   box that scrolls is exactly the box the eyebrow label sits above; the page
+   body itself must never scroll horizontally. */
+.studio-shell .studio-table-block {
+  margin-bottom: var(--space-4);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.studio-shell .studio-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Padding moved off the <td> and onto .cell-select below: the button fills
+   the cell (border-box, 100%/100%), so its own padding is what actually
+   determines the clickable area now — the same area the removed td onClick
+   used to cover. Leaving padding on both would double it. */
+.studio-shell .studio-table td {
+  border: 1px solid var(--line);
+  padding: 0;
+  vertical-align: top;
+}
+
+/* Mirrors .ocr-elements tr[data-selected="true"] — the same accent tint plus
+   inset bar the OCR element table already uses for a selected row, so the two
+   panels read as one system. `data-selected`, not `aria-selected`: this is a
+   plain <table>, not a role="grid", and aria-selected would be invalid ARIA
+   here. That reasoning is already recorded against the OCR rule. */
+.studio-shell .studio-table td[data-selected="true"] {
+  background: var(--accent-tint);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* The keyboard-accessibility fix for both results panels (round 1 review):
+   a real <button> replaces what used to be a bare onClick on the <td>, so it
+   is reachable by Tab and activates on Enter/Space with no ARIA of its own —
+   while the <td> keeps its cell semantics. Reset to invisible chrome so it
+   reads as plain cell text in this demo, not as a form control: no border,
+   no background, inherited font and colour, flush against the cell's own
+   former padding (now here instead, see the td rule above). */
+.studio-shell .studio-table .cell-select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-1) var(--space-2);
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.studio-shell .studio-table .cell-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Same fix, applied to .ocr-elements' row click: the <tr onClick> stays (it
+   is what keeps a click ANYWHERE in the row selecting it — mouse behaviour is
+   untouched), and this button in the row's first cell is what makes the same
+   selection reachable from the keyboard. Unlike .cell-select, it does not need
+   to fill anything: the row's mouse hit area was already the whole <tr> via
+   event bubbling, regardless of what markup sits inside one cell, so this
+   button is sized to its own text and reset to look identical to the plain
+   number it replaced. */
+.studio-shell .ocr-elements .row-select {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.studio-shell .ocr-elements .row-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1024px) {

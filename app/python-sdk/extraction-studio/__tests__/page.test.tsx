@@ -44,6 +44,27 @@ test("Run extraction is unavailable until the providers fetch resolves", async (
   await waitFor(() => expect(run).not.toBeDisabled());
 });
 
+// Composed-page proof that switching feature actually resets the gate: only
+// one config panel is mounted at a time, so `providersReady` is left `true`
+// by whichever mounted last. Without resetting it on a feature change,
+// switching from Structured (already ready) to Tables would leave Run
+// enabled before TablesConfig's own provider fetch has resolved — the exact
+// early click the gate exists to prevent.
+test("switching from Structured to Table extraction re-gates Run until Tables' own provider fetch resolves", async () => {
+  stubProvidersFetch([
+    { id: "openai", label: "OpenAI", models: [], defaultModel: "gpt-5.4" },
+  ]);
+  render(<ExtractionStudio />);
+
+  const run = screen.getByRole("button", { name: /run extraction/i });
+  await waitFor(() => expect(run).not.toBeDisabled());
+
+  fireEvent.click(screen.getByRole("button", { name: /table extraction/i }));
+  expect(run).toBeDisabled();
+
+  await waitFor(() => expect(run).not.toBeDisabled());
+});
+
 test("Run extraction stays unavailable after a failed providers fetch", async () => {
   stubProvidersFetch(null, false);
   render(<ExtractionStudio />);
@@ -119,6 +140,20 @@ test("Adaptive OCR is selectable and swaps in its own panel", () => {
   expect(screen.getByText("Languages")).toBeInTheDocument();
   // ...and structured extraction's schema builder is gone.
   expect(screen.queryByText("Schema builder")).toBeNull();
+});
+
+// Composed-page proof that the tables ternary branch is wired: the studio's
+// feature ternaries are binary (`feature === "structured" ? … : …`), so
+// anything not "structured" used to fall through to the OCR branch. This is
+// the guard that a missed/reverted tables branch renders the wrong panel.
+test("Table extraction is selectable and swaps in its own panel", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /table extraction/i }));
+  // Tables' own control appears...
+  expect(screen.getByLabelText("Provider")).toBeInTheDocument();
+  // ...and OCR's panel — the ternary's fallback branch — does not.
+  expect(screen.queryByText("Languages")).toBeNull();
 });
 
 test("Run is enabled for OCR even with no providers configured", async () => {

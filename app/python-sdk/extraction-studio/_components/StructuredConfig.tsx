@@ -171,6 +171,7 @@ export function StructuredConfig({
       <PanelSection title="Schema builder">
         <div className="studio-sec-head">
           <Segmented
+            label="Editor mode"
             options={[
               { label: "Builder", value: "builder" },
               { label: "JSON", value: "json" },
