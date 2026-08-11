@@ -166,25 +166,39 @@ export default function ExtractionStudio() {
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
 
-  // Mirrors handleRun below: same busy/error/ref-guard/finally shape, because
-  // the two used to be hand-maintained copies (one here, one inline in the
-  // OcrConfig `onRun` prop) — the inline copy cleared everything EXCEPT
-  // activeIndex, which is exactly how a stale selection survived an OCR
-  // re-run and dimmed every box via styleFor(fieldIndex, activeIndex).
-  const handleOcrRun = async (req: OcrRequest) => {
+  // Shared shape for all three Run handlers below. It used to be three
+  // hand-maintained copies, and hand-maintained copies drift: the inline OCR
+  // version once forgot to clear activeIndex, which let a stale selection
+  // survive a re-run and dim every box via styleFor(fieldIndex, activeIndex).
+  // One implementation makes that class of drift impossible.
+  //
+  // The ref-guard (featureRef/docRef) is load-bearing, in both the success
+  // and error branches: neither the rail nor the doc strip is disabled while
+  // busy, so the user can switch feature or document mid-request, and a
+  // response landing after that switch must not repopulate state the switch
+  // already cleared.
+  const runFeature = async <Req, Res>(
+    req: Req,
+    fetcher: (r: Req) => Promise<Res>,
+    setResult: (r: Res | null) => void,
+    fallbackError: string,
+  ) => {
+    // Captured at request start and compared against the refs (which track the
+    // LATEST feature/doc) once it resolves. Neither the rail nor the doc strip
+    // is disabled while busy, so the user can switch either mid-request, and a
+    // response landing after that switch must not repopulate cleared state.
     const requestFeature = feature;
     const requestDocId = doc;
     setBusy(true);
     setError(null);
     setActiveIndex(null);
-    setOcrResult(null);
     try {
-      const ocr = await extractOcr(req);
+      const out = await fetcher(req);
       if (
         featureRef.current === requestFeature &&
         docRef.current === requestDocId
       ) {
-        setOcrResult(ocr);
+        setResult(out);
         setTab("results");
       }
     } catch (e) {
@@ -192,70 +206,7 @@ export default function ExtractionStudio() {
         featureRef.current === requestFeature &&
         docRef.current === requestDocId
       ) {
-        setError(e instanceof Error ? e.message : "OCR failed");
-      }
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  // Mirrors handleOcrRun exactly: same busy/error/ref-guard/finally shape,
-  // because hand-maintained copies are how the inline OCR version once
-  // forgot to clear activeIndex.
-  const handleTablesRun = async (req: TablesRequest) => {
-    const requestFeature = feature;
-    const requestDocId = doc;
-    setBusy(true);
-    setError(null);
-    setActiveIndex(null);
-    setTablesResult(null);
-    try {
-      const tables = await extractTables(req);
-      if (
-        featureRef.current === requestFeature &&
-        docRef.current === requestDocId
-      ) {
-        setTablesResult(tables);
-        setTab("results");
-      }
-    } catch (e) {
-      if (
-        featureRef.current === requestFeature &&
-        docRef.current === requestDocId
-      ) {
-        setError(e instanceof Error ? e.message : "Table extraction failed");
-      }
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const handleRun = async (req: StructuredRequest) => {
-    // Captured at request start, compared against the refs (which track the
-    // LATEST feature/doc) once the request resolves. Neither the rail nor
-    // the doc strip is disabled while busy, so the user can switch either
-    // mid-request — and a response that lands after that switch must not
-    // repopulate state the switch already cleared.
-    const requestFeature = feature;
-    const requestDocId = doc;
-    setBusy(true);
-    setError(null);
-    setActiveIndex(null);
-    try {
-      const envelope = await extractStructured(req);
-      if (
-        featureRef.current === requestFeature &&
-        docRef.current === requestDocId
-      ) {
-        setResult(envelope);
-        setTab("results");
-      }
-    } catch (e) {
-      if (
-        featureRef.current === requestFeature &&
-        docRef.current === requestDocId
-      ) {
-        setError(e instanceof Error ? e.message : "Extraction failed");
+        setError(e instanceof Error ? e.message : fallbackError);
         // Leaving the previous result rendered under the error callout shows
         // stale data as current — and after a document switch those citations
         // belong to a different document entirely.
@@ -263,12 +214,20 @@ export default function ExtractionStudio() {
         setActiveIndex(null);
       }
     } finally {
-      // Unconditional: Run is disabled while busy, so at most one request is
-      // ever in flight, and it just settled — nothing else is waiting on
-      // this flag.
+      // Unconditional: Run is disabled while busy, so at most one request is ever
+      // in flight, and it just settled.
       setBusy(false);
     }
   };
+
+  const handleOcrRun = (req: OcrRequest) =>
+    runFeature(req, extractOcr, setOcrResult, "OCR failed");
+
+  const handleTablesRun = (req: TablesRequest) =>
+    runFeature(req, extractTables, setTablesResult, "Table extraction failed");
+
+  const handleRun = (req: StructuredRequest) =>
+    runFeature(req, extractStructured, setResult, "Extraction failed");
 
   return (
     // A DEFINITE height, not min-height: .studio-shell is `flex: 1;

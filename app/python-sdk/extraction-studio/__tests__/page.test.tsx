@@ -237,6 +237,180 @@ test("re-running OCR clears the previous selection instead of leaving it stale",
   );
 });
 
+/** OCR provider stub whose SECOND call to the OCR endpoint fails, so a test
+ *  can run once successfully and then re-run into an error. */
+function stubOcrFetchFailingOnRerun() {
+  let ocrCalls = 0;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/ocr")) {
+        ocrCalls++;
+        if (ocrCalls > 1) {
+          return {
+            ok: false,
+            status: 500,
+            json: async () => ({ detail: "OCR backend unavailable" }),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            engine: "ADAPTIVE_OCR",
+            filename: "scan.pdf",
+            statistics: {
+              totalElements: 1,
+              textElements: 1,
+              averageConfidence: 0.9,
+              lowConfidenceElements: 0,
+            },
+            fullText: "[0] Invoice",
+            textElements: [
+              {
+                readingOrder: 0,
+                type: "paragraph",
+                text: "Invoice",
+                confidence: 0.9,
+                page: 0,
+                citation: { page: 0, x0: 0.1, y0: 0.1, x1: 0.2, y1: 0.2 },
+              },
+            ],
+            pages: [{ page: 1, width: 1654, height: 2338 }],
+            config: {
+              languages: "eng",
+              outputFormat: "json",
+              tableDetection: true,
+            },
+            timingMs: 800,
+          }),
+        };
+      }
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+// The unified behaviour this branch introduces: handleOcrRun used to clear
+// its result at the START of a run and never on error, so a failed re-run
+// left the previous successful OCR result on screen underneath the error
+// callout. runFeature's catch branch now clears it, closing that gap.
+test("a failed OCR re-run clears the previously-rendered result", async () => {
+  stubOcrFetchFailingOnRerun();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Invoice")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "OCR backend unavailable",
+    ),
+  );
+  expect(screen.queryByText("Invoice")).toBeNull();
+});
+
+/** Tables provider stub whose SECOND call to the tables endpoint fails, so a
+ *  test can run once successfully and then re-run into an error. */
+function stubTablesFetchFailingOnRerun() {
+  let tablesCalls = 0;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            providers: [
+              {
+                id: "openai",
+                label: "OpenAI",
+                models: [],
+                defaultModel: "gpt-5.4",
+              },
+            ],
+          }),
+        };
+      }
+      if (u.includes("/api/extraction/tables")) {
+        tablesCalls++;
+        if (tablesCalls > 1) {
+          return {
+            ok: false,
+            status: 500,
+            json: async () => ({ detail: "tables backend unavailable" }),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            engine: "VLM_TABLES",
+            filename: "x.pdf",
+            provider: "openai",
+            tableCount: 1,
+            tables: [
+              {
+                rowCount: 1,
+                columnCount: 1,
+                cells: [
+                  {
+                    row: 0,
+                    column: 0,
+                    rowSpan: 1,
+                    colSpan: 1,
+                    text: "Concrete",
+                    confidence: 0.95,
+                    bounds: null,
+                  },
+                ],
+              },
+            ],
+            rawElements: [],
+            totalPages: 1,
+            processedPages: 1,
+          }),
+        };
+      }
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+// Same unified behaviour, proven for Tables: handleTablesRun used to clear at
+// start and never on error, same gap as OCR's. Covering a second feature
+// (rather than trusting the OCR case alone) guards against the extraction
+// having special-cased one call site.
+test("a failed Tables re-run clears the previously-rendered result", async () => {
+  stubTablesFetchFailingOnRerun();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /table extraction/i }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /run extraction/i }),
+    ).not.toBeDisabled(),
+  );
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() => expect(screen.getByText("Concrete")).toBeInTheDocument());
+
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "tables backend unavailable",
+    ),
+  );
+  expect(screen.queryByText("Concrete")).toBeNull();
+});
+
 // The page and the landing-page registry card each carry the studio's
 // prospect-facing name in their own string literal, so they can drift apart —
 // which is exactly what happened when Adaptive OCR shipped and the page still
