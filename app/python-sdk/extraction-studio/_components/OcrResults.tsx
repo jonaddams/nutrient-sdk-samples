@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { copyText, downloadText } from "../lib/download";
 import { confidenceTone, type OcrColorMode, type OcrResult } from "../lib/ocr";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
@@ -69,14 +70,7 @@ export function OcrResults({
       type: "application/json",
       name: "ocr.json",
     };
-    const url = URL.createObjectURL(new Blob([payload()], { type }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    // Deferred: revoking synchronously races the browser's internal blob fetch
-    // for the download in some browsers (notably older Safari).
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    downloadText(payload(), name, type);
   };
 
   return (
@@ -192,7 +186,7 @@ export function OcrResults({
               <button
                 type="button"
                 className="btn ghost sm"
-                onClick={() => navigator.clipboard.writeText(payload())}
+                onClick={() => copyText(payload())}
               >
                 Copy
               </button>
