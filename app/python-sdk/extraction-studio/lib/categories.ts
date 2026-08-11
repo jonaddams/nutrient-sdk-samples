@@ -6,7 +6,8 @@ export type CategoryId =
   | "construction"
   | "logistics"
   | "healthcare"
-  | "claims";
+  | "claims"
+  | "handwriting";
 
 export const CATEGORY_ORDER: CategoryId[] = [
   "invoices",
@@ -15,6 +16,7 @@ export const CATEGORY_ORDER: CategoryId[] = [
   "logistics",
   "healthcare",
   "claims",
+  "handwriting",
 ];
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
@@ -24,6 +26,7 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   logistics: "Logistics",
   healthcare: "Healthcare",
   claims: "Claims",
+  handwriting: "Handwriting",
 };
 
 /** A preset row before it is given an id. */
@@ -256,6 +259,32 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       key: "estimatedDamage",
       type: "number",
       description: "The total estimated damage amount, digits only",
+      optional: true,
+    },
+  ],
+  // Unlike every other category, these four documents share no common form —
+  // a recipe, a thank-you note, a recipe card and an application. That is
+  // deliberate (see docs.ts), but it means there is no field every document
+  // is guaranteed to carry, so every row here is optional. A required field
+  // would nag on whichever three documents don't happen to have it.
+  handwriting: [
+    {
+      key: "documentTitle",
+      type: "string",
+      description: "The document's title or heading, as written or printed",
+      optional: true,
+    },
+    {
+      key: "writtenDate",
+      type: "string",
+      description: "Any date appearing on the document, as written",
+      optional: true,
+    },
+    {
+      key: "primaryName",
+      type: "string",
+      description:
+        "The main person named on the document — its author, signer, recipient or applicant",
       optional: true,
     },
   ],
