@@ -214,33 +214,119 @@ describe("TablesResults", () => {
     expect(container.querySelectorAll(".citation-color")).toHaveLength(1);
   });
 
-  it("selects a cell from the keyboard, Tab then Enter", async () => {
+  it("Tab reaches a table's roving cell, and Enter selects it", async () => {
     // The gap this closes: a bare `<td onClick>` is mouse-only. The fix is a
     // real <button> inside the cell, which is reachable by Tab and activates
-    // on Enter with no tabIndex/onKeyDown/ARIA of its own.
+    // on Enter with no onKeyDown of its own needed for THAT part. Only ONE
+    // button per table is reachable by Tab at all — see the roving-tabindex
+    // test below — so this targets "Item", the grid's first real cell and
+    // therefore the roving default before any arrow key has moved it.
     const user = userEvent.setup();
     const onSelectCell = vi.fn();
     render(
       <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
     );
-    const target = screen.getByText("Concrete").closest("button");
+    const target = screen.getByText("Item").closest("button");
     expect(target).not.toBeNull();
     await tabTo(user, target as HTMLButtonElement);
     await user.keyboard("{Enter}");
+    expect(onSelectCell).toHaveBeenCalledWith(0);
+  });
+
+  it("Space also selects the focused cell", async () => {
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    render(
+      <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
+    );
+    const target = screen.getByText("Item").closest("button");
+    expect(target).not.toBeNull();
+    await tabTo(user, target as HTMLButtonElement);
+    await user.keyboard(" ");
+    expect(onSelectCell).toHaveBeenCalledWith(0);
+  });
+
+  it("a click still selects a cell", async () => {
+    // Never actually asserted before this round — round 1 added Enter/Space
+    // coverage but not the plain mouse path the button was built to preserve.
+    const user = userEvent.setup();
+    const onSelectCell = vi.fn();
+    render(
+      <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
+    );
+    await user.click(screen.getByText("Concrete"));
     // "Concrete" is row 1, column 0 of the only table — flat cell index 2.
     expect(onSelectCell).toHaveBeenCalledWith(2);
   });
 
-  it("also selects a cell from the keyboard with Space", async () => {
+  it("gives each table exactly one tab stop, not one per cell", () => {
+    // Round 2's whole reason to exist: round 1 put a button in every <td>,
+    // which on the real fixture's 5 tables (24/42/12/5/12 cells) meant ~95
+    // sequential tab stops to get past one panel. Whatever the cell count,
+    // the number of tabIndex=0 cell buttons must equal the number of TABLES —
+    // never the number of cells — or this regresses silently again.
+    const fullGrid = (rows: number, cols: number, prefix: string) => {
+      const cells = [];
+      for (let row = 0; row < rows; row++) {
+        for (let column = 0; column < cols; column++) {
+          cells.push({
+            row,
+            column,
+            rowSpan: 1,
+            colSpan: 1,
+            text: `${prefix}${row}-${column}`,
+            confidence: 0.9,
+            bounds: null,
+          });
+        }
+      }
+      return cells;
+    };
+    const multi = result({
+      tableCount: 3,
+      tables: [
+        { rowCount: 2, columnCount: 2, cells: fullGrid(2, 2, "a") },
+        { rowCount: 3, columnCount: 3, cells: fullGrid(3, 3, "b") },
+        { rowCount: 1, columnCount: 1, cells: fullGrid(1, 1, "c") },
+      ],
+    });
+    const { container } = render(<TablesResults {...base} result={multi} />);
+    const rovingButtons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(".cell-select"),
+    ).filter((button) => button.tabIndex === 0);
+    expect(rovingButtons).toHaveLength(multi.tables.length);
+  });
+
+  it("ArrowRight moves focus to the next cell without selecting it", async () => {
     const user = userEvent.setup();
     const onSelectCell = vi.fn();
     render(
       <TablesResults {...base} result={result()} onSelectCell={onSelectCell} />,
     );
-    const target = screen.getByText("120").closest("button");
-    expect(target).not.toBeNull();
-    await tabTo(user, target as HTMLButtonElement);
-    await user.keyboard(" ");
-    expect(onSelectCell).toHaveBeenCalledWith(3);
+    const item = screen
+      .getByText("Item")
+      .closest("button") as HTMLButtonElement;
+    const qty = screen.getByText("Qty").closest("button") as HTMLButtonElement;
+    await tabTo(user, item);
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(qty);
+    expect(onSelectCell).not.toHaveBeenCalled();
+  });
+
+  it("clamps at the table's last cell instead of wrapping", async () => {
+    const user = userEvent.setup();
+    render(<TablesResults {...base} result={result()} />);
+    const item = screen
+      .getByText("Item")
+      .closest("button") as HTMLButtonElement;
+    const last = screen.getByText("120").closest("button") as HTMLButtonElement;
+    await tabTo(user, item);
+    // Item(0,0) -> Qty(0,1) -> 120(1,1): right, then down, then right again.
+    await user.keyboard("{ArrowRight}{ArrowDown}{ArrowRight}");
+    expect(document.activeElement).toBe(last);
+    // One more Right at the grid's last column: clamps, does not wrap to the
+    // next row or leave the table.
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(last);
   });
 });

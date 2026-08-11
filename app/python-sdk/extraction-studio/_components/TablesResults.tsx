@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { type KeyboardEvent, useRef, useState } from "react";
 import { copyText, downloadText } from "../lib/download";
 import { confidenceTone } from "../lib/ocr";
 import {
   buildGrid,
+  type TableCell,
   type TableColorMode,
   type TablesResult,
   tablesToCsv,
@@ -27,6 +28,72 @@ const FILE_FOR_VIEW: Record<TablesView, { type: string; name: string }> = {
   code: { type: "text/x-python", name: "tables.py" },
 };
 
+/** A position in ONE table's reconstructed grid — the roving-tabindex focus
+ *  position, entirely separate from `activeIndex` on the component below.
+ *  `activeIndex` is the SELECTED cell: global across every table, and it
+ *  drives which box the document overlay emphasises. This is only which
+ *  cell in THIS table currently owns tabIndex=0. Arrow keys move this and
+ *  must never select; only Enter/Space/click ever calls onSelectCell. */
+type RovingPos = { row: number; col: number };
+
+/** The grid's first real (non-null) position, in row-major order. Used as
+ *  a table's roving default before any arrow key has touched it, so every
+ *  table already has exactly one tab stop — round 2's whole point — without
+ *  needing to seed state for tables nobody has navigated into yet. */
+function firstCell(grid: (TableCell | null)[][]): RovingPos {
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      if (grid[row][col]) return { row, col };
+    }
+  }
+  return { row: 0, col: 0 };
+}
+
+/** Moves one row/column at a time in the given direction, skipping positions
+ *  buildGrid left null (covered by a neighbour's rowSpan/colSpan — nothing is
+ *  rendered there, so a naive +1 could land the roving position on nothing).
+ *  CLAMPS at the grid's edge: if stepping runs off the grid before finding
+ *  another real cell, `pos` is returned unchanged rather than wrapping to the
+ *  far side or leaving the table — arrow keys move within one table only. */
+function step(
+  grid: (TableCell | null)[][],
+  pos: RovingPos,
+  dRow: number,
+  dCol: number,
+): RovingPos {
+  const rows = grid.length;
+  const cols = grid[0]?.length ?? 0;
+  let { row, col } = pos;
+  while (true) {
+    row += dRow;
+    col += dCol;
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return pos;
+    if (grid[row][col]) return { row, col };
+  }
+}
+
+/** Home/End: the first or last real cell in the CURRENT row. Cheap enough —
+ *  one linear scan of a row that is at most a few dozen cells wide — that
+ *  there was no reason to skip it. */
+function rowEdge(
+  grid: (TableCell | null)[][],
+  pos: RovingPos,
+  dir: 1 | -1,
+): RovingPos {
+  const cols = grid[0]?.length ?? 0;
+  const { row } = pos;
+  if (dir === 1) {
+    for (let col = cols - 1; col >= 0; col--) {
+      if (grid[row][col]) return { row, col };
+    }
+  } else {
+    for (let col = 0; col < cols; col++) {
+      if (grid[row][col]) return { row, col };
+    }
+  }
+  return pos;
+}
+
 export function TablesResults({
   result,
   activeIndex,
@@ -49,6 +116,65 @@ export function TablesResults({
   onCitationHexChange: (hex: string) => void;
 }) {
   const [view, setView] = useState<TablesView>("table");
+
+  // Roving tabindex: exactly one entry per table that has been arrow-keyed
+  // into, keyed by tableIndex. A table with no entry yet still renders with
+  // exactly one tab stop, via the `?? firstCell(grid)` fallback below — no
+  // need to seed every table's position up front.
+  const [rovingByTable, setRovingByTable] = useState<Record<number, RovingPos>>(
+    {},
+  );
+  // Every cell button registers itself here regardless of its tabIndex, so
+  // arrow navigation can imperatively .focus() the target: moving tabIndex
+  // alone (a plain state + re-render) does not move DOM focus, and a
+  // tabIndex=-1 element is still a valid target for an explicit .focus()
+  // call — only sequential Tab navigation skips it.
+  const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const refKey = (t: number, r: number, c: number) => `${t}:${r}:${c}`;
+
+  const focusCell = (tableIndex: number, next: RovingPos) => {
+    setRovingByTable((prev) => ({ ...prev, [tableIndex]: next }));
+    buttonRefs.current.get(refKey(tableIndex, next.row, next.col))?.focus();
+  };
+
+  const handleCellKeyDown = (
+    e: KeyboardEvent<HTMLButtonElement>,
+    tableIndex: number,
+    grid: (TableCell | null)[][],
+    pos: RovingPos,
+  ) => {
+    let next: RovingPos;
+    switch (e.key) {
+      case "ArrowRight":
+        next = step(grid, pos, 0, 1);
+        break;
+      case "ArrowLeft":
+        next = step(grid, pos, 0, -1);
+        break;
+      case "ArrowDown":
+        next = step(grid, pos, 1, 0);
+        break;
+      case "ArrowUp":
+        next = step(grid, pos, -1, 0);
+        break;
+      case "Home":
+        next = rowEdge(grid, pos, -1);
+        break;
+      case "End":
+        next = rowEdge(grid, pos, 1);
+        break;
+      default:
+        // Anything else (Tab included) is left to the browser's own default
+        // handling — Tab must still leave the table via the native tab order.
+        return;
+    }
+    // Suppresses the browser's unrelated default for these keys (page
+    // scroll on Up/Down/Home/End) — including the no-op clamp case below,
+    // where the key was still "handled" in the sense that it did its job.
+    e.preventDefault();
+    if (next.row === pos.row && next.col === pos.col) return;
+    focusCell(tableIndex, next);
+  };
 
   const empty = result.tables.length === 0;
   // The JSON view deliberately drops `code`: the snippet has its own segment.
@@ -187,17 +313,34 @@ export function TablesResults({
           </p>
         </div>
       ) : (
-        result.tables.map((table, tableIndex) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key, same precedent as app/python-sdk/table-extraction/page.tsx
-          <div className="studio-table-block" key={tableIndex}>
-            <span className="eyebrow">
-              Table {tableIndex + 1} of {result.tables.length} ·{" "}
-              {table.rowCount}×{table.columnCount}
-            </span>
-            <table className="field-table studio-table">
-              <tbody>
-                {buildGrid(table.cells, table.rowCount, table.columnCount).map(
-                  (row, rowIndex) => (
+        result.tables.map((table, tableIndex) => {
+          const grid = buildGrid(
+            table.cells,
+            table.rowCount,
+            table.columnCount,
+          );
+          // Falls back to the grid's first real cell until an arrow key has
+          // actually visited this table — see the state comment above.
+          const roving = rovingByTable[tableIndex] ?? firstCell(grid);
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key, same precedent as app/python-sdk/table-extraction/page.tsx
+            <div className="studio-table-block" key={tableIndex}>
+              <span className="eyebrow">
+                Table {tableIndex + 1} of {result.tables.length} ·{" "}
+                {table.rowCount}×{table.columnCount}
+              </span>
+              {/* Kept as a native <table>/<tr>/<td>, NOT re-rolled with
+                  role="grid"/"row"/"gridcell": the APG grid pattern is more
+                  standards-correct for arrow-navigable content, but it
+                  overrides the row/column announcements a screen-reader user
+                  already gets for free from a real table — the same tradeoff
+                  this file already made for data-selected over aria-selected
+                  (see the CSS comment on .studio-table td[data-selected]).
+                  Roving tabindex lives purely on the <button>s below; it does
+                  not require a grid role to work correctly. */}
+              <table className="field-table studio-table">
+                <tbody>
+                  {grid.map((row, rowIndex) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: row index is a stable grid position
                     <tr key={rowIndex}>
                       {row.map((c, colIndex) => {
@@ -207,6 +350,8 @@ export function TablesResults({
                         if (!c) return null;
                         const cellIndex =
                           offsets[tableIndex] + table.cells.indexOf(c);
+                        const isRoving =
+                          roving.row === rowIndex && roving.col === colIndex;
                         return (
                           <td
                             // biome-ignore lint/suspicious/noArrayIndexKey: column index is a stable grid position
@@ -217,17 +362,43 @@ export function TablesResults({
                           >
                             {/* A real <button>, not a div/td onClick: it is
                                 keyboard-activatable for free (focus ring, Enter
-                                and Space both work) with no tabIndex, onKeyDown
-                                or ARIA role needed — and the <td> above keeps
-                                its cell semantics rather than being overloaded
-                                with a role="button" that would strip it from a
-                                screen reader's table navigation. Fills the cell
-                                (see .studio-table .cell-select in styles.css),
-                                so the mouse click area is exactly what the old
-                                td onClick covered. */}
+                                and Space both work) with no onKeyDown of its
+                                own needed for THAT part — and the <td> above
+                                keeps its cell semantics rather than being
+                                overloaded with a role="button" that would
+                                strip it from a screen reader's table
+                                navigation. Fills the cell (see
+                                .studio-table .cell-select in styles.css), so
+                                the mouse click area is exactly what the old
+                                td onClick covered.
+
+                                Exactly one button per table carries
+                                tabIndex={0} (the roving position); every
+                                other is -1, so Tab moves between TABLES, not
+                                between every cell — the round-2 fix for the
+                                95-tab-stop regression the per-cell button
+                                introduced in round 1. onKeyDown is what moves
+                                the roving position itself with the arrow
+                                keys; it does not select. */}
                             <button
                               type="button"
                               className="cell-select"
+                              tabIndex={isRoving ? 0 : -1}
+                              ref={(el) => {
+                                const key = refKey(
+                                  tableIndex,
+                                  rowIndex,
+                                  colIndex,
+                                );
+                                if (el) buttonRefs.current.set(key, el);
+                                else buttonRefs.current.delete(key);
+                              }}
+                              onKeyDown={(e) =>
+                                handleCellKeyDown(e, tableIndex, grid, {
+                                  row: rowIndex,
+                                  col: colIndex,
+                                })
+                              }
                               onClick={() => onSelectCell(cellIndex)}
                             >
                               {c.text}
@@ -241,12 +412,12 @@ export function TablesResults({
                         );
                       })}
                     </tr>
-                  ),
-                )}
-              </tbody>
-            </table>
-          </div>
-        ))
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })
       )}
     </div>
   );
