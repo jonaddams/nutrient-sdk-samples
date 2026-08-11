@@ -129,12 +129,13 @@ export function OcrResults({
         <div className="citation-color">
           <span className="eyebrow">{REGION_COLOR}</span>
           <Segmented
+            label={REGION_COLOR}
             options={[
               { label: "By confidence", value: "confidence" },
               { label: "Custom", value: "custom" },
             ]}
             value={colorMode}
-            onChange={(v) => onColorModeChange(v as OcrColorMode)}
+            onChange={onColorModeChange}
           />
           {colorMode === "custom" && (
             <HighlightColor
@@ -162,6 +163,7 @@ export function OcrResults({
         <>
           <div className="panel-row-h panel-row results-actions">
             <Segmented
+              label="View"
               options={
                 isMarkdown
                   ? [

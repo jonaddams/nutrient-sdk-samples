@@ -101,6 +101,7 @@ export function StructuredResults({
 
       <div className="panel-row-h panel-row results-actions">
         <Segmented
+          label="View"
           options={[
             { label: "Fields", value: "fields" },
             { label: "JSON", value: "raw" },

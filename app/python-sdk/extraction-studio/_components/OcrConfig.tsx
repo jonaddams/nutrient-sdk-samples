@@ -90,22 +90,20 @@ export function OcrConfig({
       <PanelSection title="Output">
         {/* No htmlFor: Segmented takes no id prop and renders no element with
             one, so pointing Field's <label for> at "ocr-format" would be a
-            dangling reference — Segmented is shared with StructuredConfig and
-            StructuredResults, so it does not get an id prop added just for
-            this one caller's label. The outer role="group" below (not
-            Segmented's own — that one carries no name) gives the pair of
-            option buttons an accessible name without touching Segmented. */}
+            dangling reference. Segmented now names its own role="group" via
+            its required `label` prop, so the wrapping group div this used to
+            need (to give the pair of option buttons an accessible name) is
+            gone — Segmented supplies that itself. */}
         <Field label="Format" help="Structured elements with positions and confidence, or a Markdown rendering of the page.">
-          <div role="group" aria-label="Format">
-            <Segmented
-              options={[
-                { label: "Elements", value: "json" },
-                { label: "Markdown", value: "markdown" },
-              ]}
-              value={outputFormat}
-              onChange={setOutputFormat}
-            />
-          </div>
+          <Segmented
+            label="Format"
+            options={[
+              { label: "Elements", value: "json" },
+              { label: "Markdown", value: "markdown" },
+            ]}
+            value={outputFormat}
+            onChange={setOutputFormat}
+          />
         </Field>
         <Toggle
           checked={tableDetection}

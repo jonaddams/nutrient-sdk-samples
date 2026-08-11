@@ -283,6 +283,7 @@ export default function ExtractionStudio() {
             </div>
             <div className="studio-panel-actions">
               <Segmented
+                label="Panel"
                 options={[
                   { label: "Configuration", value: "config" },
                   { label: "Results", value: "results" },
