@@ -2,7 +2,39 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { samples } from "../../samples";
+import type { IndexedCitation } from "../lib/citations";
 import ExtractionStudio from "../page";
+
+// DocViewer needs a real SDK global (window.NutrientViewer) to load anything,
+// which jsdom never provides, so every other test here has simply never
+// looked at what DocViewer receives. Recording the `citations` prop is the
+// only way to prove page.tsx's viewerCitations ternary picks the right
+// branch — see the tests below that assert on `data-citation-count`.
+//
+// `citationRenders` also captures EVERY render the mock sees, not just the
+// settled one `screen` can query after an interaction. That distinction
+// matters: switching feature triggers a React state update (the new feature)
+// immediately followed by a passive effect that clears every result
+// (page.tsx's `useEffect` keyed on `[feature]`). Testing Library's `act()`
+// flushes that cascading effect before `fireEvent.click` returns, so a plain
+// post-click DOM assertion only ever sees the FINAL settled render — it
+// cannot distinguish "computed 0 citations immediately" from "briefly
+// recomputed the previous feature's citations, then got cleared a beat
+// later". Only a spy on every render call can see that intermediate frame,
+// and that frame is exactly what `feature === "describe" ? NO_CITATIONS :`
+// exists to keep from ever being nonzero.
+const { citationRenders } = vi.hoisted(() => ({
+  citationRenders: [] as number[],
+}));
+
+vi.mock("../_components/DocViewer", () => ({
+  DocViewer: ({ citations }: { citations: IndexedCitation[] }) => {
+    citationRenders.push(citations.length);
+    return (
+      <div data-testid="doc-viewer" data-citation-count={citations.length} />
+    );
+  },
+}));
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -180,6 +212,79 @@ test("draws no citation overlay for Image description", async () => {
   );
   expect(screen.queryByLabelText("Show regions")).toBeNull();
   expect(screen.queryByLabelText("Show citations")).toBeNull();
+
+  // The controls-absence checks above are NOT proof of this: Show
+  // regions/Show citations live in the results panels, which never mount
+  // here (tab is "config", no result). This is the actual guarantee — what
+  // page.tsx hands DocViewer's `citations` prop for the "describe" branch.
+  // Without the `feature === "describe" ? NO_CITATIONS :` branch,
+  // viewerCitations's final `else` is `ocrCitations`, which would still be
+  // whatever a PREVIOUS OCR run left behind.
+  expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+    "data-citation-count",
+    "0",
+  );
+});
+
+// The test above is NOT the trap-proof version: it never gives OCR anything
+// to leave behind, so it would pass for the trivial reason that nothing has
+// any citations, whether or not the "describe" branch exists — the same trap
+// the pre-fix test fell into. Nor is a plain post-click DOM assertion enough
+// on its own here — see `citationRenders`'s comment above: the feature-change
+// effect that clears `ocrResult` gets flushed by `act()` before
+// `fireEvent.click` returns, so BOTH the buggy and the fixed code settle to a
+// final "0" and a bare `screen.getByTestId` assertion cannot tell them apart
+// (verified by hand: temporarily deleting the `NO_CITATIONS` branch left this
+// kind of assertion green). Reading every render the mock saw — not just the
+// last one — is what actually catches the stale frame.
+test("switching from a populated OCR run to Image description never paints a stale overlay", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+      "data-citation-count",
+      "1",
+    ),
+  );
+
+  // Only renders from this point on are relevant to the switch under test.
+  citationRenders.length = 0;
+  fireEvent.click(screen.getByRole("button", { name: /Image description/ }));
+
+  // Without `feature === "describe" ? NO_CITATIONS :`, the render that fires
+  // the instant `feature` becomes "describe" (before the clearing effect
+  // runs) still computes `viewerCitations` as `ocrCitations` — the previous
+  // OCR run's box, painted on the document for one commit. Every recorded
+  // render across the whole switch must be 0, not just the settled last one.
+  expect(citationRenders.every((count) => count === 0)).toBe(true);
+  expect(citationRenders.length).toBeGreaterThan(0);
+});
+
+// The trivial-pass trap the test above would fall into on its own: asserting
+// 0 citations for "describe" proves nothing if OCR's own branch is ALSO
+// always 0 in this test setup. This proves the OCR branch actually produces
+// citations when a result is present, so the "describe" test's 0 means what
+// it claims to mean.
+test("draws a citation overlay for Adaptive OCR once a result is present", async () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /adaptive ocr/i }));
+  expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+    "data-citation-count",
+    "0",
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /run extraction/i }));
+  await waitFor(() =>
+    expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+      "data-citation-count",
+      "1",
+    ),
+  );
 });
 
 test("Run is enabled for OCR even with no providers configured", async () => {

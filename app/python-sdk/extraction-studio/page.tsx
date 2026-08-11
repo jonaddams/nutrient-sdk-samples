@@ -24,7 +24,11 @@ import type {
 } from "./lib/api";
 import { extractStructured } from "./lib/api";
 import { presetFor } from "./lib/categories";
-import { DEFAULT_CITATION_HEX, indexCitations } from "./lib/citations";
+import {
+  DEFAULT_CITATION_HEX,
+  type IndexedCitation,
+  indexCitations,
+} from "./lib/citations";
 import {
   type DescribeRequest,
   type DescribeResult,
@@ -45,6 +49,16 @@ import {
   type TablesResult,
   tableCitationsFor,
 } from "./lib/tables";
+
+// Image description carries no citations — its output is prose with no
+// coordinates. A literal `[]` inline in viewerCitations below would be a
+// FRESH array every render, while the three sibling branches are all
+// useMemo'd; see the identity rule at the `citations` useMemo above
+// (page.tsx:136-142) — DocViewer's annotation-sync effect keys on `citations`
+// identity, and a new array every render would thrash it exactly the way that
+// comment warns against. Module-level keeps the identity stable across every
+// render without needing its own useMemo.
+const NO_CITATIONS: IndexedCitation[] = [];
 
 export default function ExtractionStudio() {
   const [feature, setFeature] = useState("structured");
@@ -174,7 +188,7 @@ export default function ExtractionStudio() {
       : feature === "tables"
         ? tableCitations
         : feature === "describe"
-          ? []
+          ? NO_CITATIONS
           : ocrCitations;
   const viewerShow = feature === "structured" ? showCitations : showRegions;
 
@@ -270,7 +284,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques. Pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, or lift every table off the page — every result carries a citation you can click to find it on the page."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, lift every table off the page, or describe what's on it in plain language."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
