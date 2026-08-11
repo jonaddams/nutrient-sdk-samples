@@ -100,7 +100,8 @@ export function HandwritingResults({
       {isVlm && (
         <p className="muted hint-em">
           Confidence scores come from the local recognition pass, not the
-          model's corrections, so they are not shown for this run.
+          model's corrections, so this panel leaves them out. The raw response
+          still carries them — see the JSON view.
         </p>
       )}
 

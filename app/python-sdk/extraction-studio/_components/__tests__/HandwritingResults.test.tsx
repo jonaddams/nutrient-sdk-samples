@@ -37,6 +37,10 @@ test("a VLM run hides the average confidence and says why", () => {
   renderResults(VLM);
   expect(screen.queryByText(/avg confidence/)).toBeNull();
   expect(screen.getByText(/local recognition pass/)).toBeTruthy();
+  // The hint must not overclaim: the raw response (JSON view) still carries
+  // these scores verbatim, so the panel has to point there rather than imply
+  // the numbers are gone entirely.
+  expect(screen.getByText(/raw response/)).toBeTruthy();
 });
 
 test("a VLM run offers no confidence colouring, only the colour picker", () => {
