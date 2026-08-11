@@ -1,0 +1,1169 @@
+{
+  "engine": "ICR",
+  "filename": "handwritten-cursive-dear-magnus-thank-you-note.jpg",
+  "statistics": {
+    "totalElements": 5,
+    "textElements": 4,
+    "averageConfidence": 0.71,
+    "lowConfidenceElements": 1
+  },
+  "fullText": "[1] NOTES\n[2] Dear Magnus,\n[3] The Business lean ot\nUniversity Usishes G express OUR\nGratitude fer\nOUR\nRecent\nor\nguest CURL\nlectures\n(Web 3.0 adhd the Melaverse. OUURL\nWere Insights nob\ntheoretic Only\nbut oso immensely\nOffers\nRUA cal perspective\non th, \u20acechno les.\npractical,\n[4] Youre\n&\" blend ability theoretical\nRrowledge Real- Udoeld experience\nmade the concepts\naccessible Gur tO\nStuclents.YOUR Passion foe the. Subject\nmates Was evident throughout . fe)\nenthousiasm and a Que Qudience\nWe deeply appreci\nded cakinn of\nlime ,\nand inv on contri lbudtor.\nenRiched OW\nto the BL- program. Youk presence\nhos\nx +\nKind Regards, Erik Tronel & Sanita x",
+  "textElements": [
+    {
+      "readingOrder": 1,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "NOTES",
+      "confidence": 0.66,
+      "words": [
+        {
+          "text": "NOTES",
+          "confidence": 0.97,
+          "bounds": {
+            "x": 429.96417,
+            "y": 316.08737,
+            "width": 135.31299,
+            "height": 32.44571
+          }
+        }
+      ],
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.36122016115351996,
+        "y0": 0.19875629770992367,
+        "x1": 0.48024474978795595,
+        "y1": 0.22254440012722648
+      },
+      "bounds": {
+        "x": 425.87857,
+        "y": 312.4449,
+        "width": 140.32999,
+        "height": 37.394897
+      }
+    },
+    {
+      "readingOrder": 2,
+      "type": "paragraph",
+      "role": "SectionHeader",
+      "text": "Dear Magnus,",
+      "confidence": 0.77,
+      "words": [
+        {
+          "text": "Dear",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 369.3783,
+            "y": 362.68848,
+            "width": 128.69452,
+            "height": 61.647095
+          }
+        },
+        {
+          "text": "Magnus,",
+          "confidence": 0.18,
+          "bounds": {
+            "x": 524.3712,
+            "y": 360.43176,
+            "width": 80.02557,
+            "height": 72.67789
+          }
+        }
+      ],
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.3096233248515691,
+        "y0": 0.21890083969465648,
+        "x1": 0.5788436556403732,
+        "y1": 0.2847917875318066
+      },
+      "bounds": {
+        "x": 365.0459,
+        "y": 344.11212,
+        "width": 317.41077,
+        "height": 103.58057
+      }
+    },
+    {
+      "readingOrder": 3,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "The Business lean ot\nUniversity Usishes G express OUR\nGratitude fer\nOUR\nRecent\nor\nguest CURL\nlectures\n(Web 3.0 adhd the Melaverse. OUURL\nWere Insights nob\ntheoretic Only\nbut oso immensely\nOffers\nRUA cal perspective\non th, \u20acechno les.\npractical,",
+      "confidence": 0.86,
+      "words": [
+        {
+          "text": "The",
+          "confidence": 0.84,
+          "bounds": {
+            "x": 109.81497,
+            "y": 484.4179,
+            "width": 77.45944,
+            "height": 52.66107
+          }
+        },
+        {
+          "text": "Business",
+          "confidence": 0.84,
+          "bounds": {
+            "x": 423.47467,
+            "y": 461.32346,
+            "width": 158.89282,
+            "height": 55.107086
+          }
+        },
+        {
+          "text": "lean",
+          "confidence": 0.54,
+          "bounds": {
+            "x": 676.5578,
+            "y": 459.1869,
+            "width": 72.138,
+            "height": 35.399628
+          }
+        },
+        {
+          "text": "ot",
+          "confidence": 0.81,
+          "bounds": {
+            "x": 773.10187,
+            "y": 452.0932,
+            "width": 40.315125,
+            "height": 33.885864
+          }
+        },
+        {
+          "text": "University",
+          "confidence": 0,
+          "bounds": {
+            "x": 258.00015,
+            "y": 524.56274,
+            "width": 171.87582,
+            "height": 69.008545
+          }
+        },
+        {
+          "text": "Usishes",
+          "confidence": 0,
+          "bounds": {
+            "x": 451.87286,
+            "y": 518.54004,
+            "width": 129.35455,
+            "height": 44.856384
+          }
+        },
+        {
+          "text": "G",
+          "confidence": 0.65,
+          "bounds": {
+            "x": 598.34125,
+            "y": 513.0709,
+            "width": 39.63202,
+            "height": 37.795105
+          }
+        },
+        {
+          "text": "express",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 651.884,
+            "y": 510.35278,
+            "width": 135.25763,
+            "height": 44.33026
+          }
+        },
+        {
+          "text": "OUR",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 803.25854,
+            "y": 500.66995,
+            "width": 80.79639,
+            "height": 32.118134
+          }
+        },
+        {
+          "text": "Gratitude",
+          "confidence": 0.36,
+          "bounds": {
+            "x": 143.76071,
+            "y": 589.6483,
+            "width": 172.1666,
+            "height": 60.114685
+          }
+        },
+        {
+          "text": "fer",
+          "confidence": 0.83,
+          "bounds": {
+            "x": 334.25037,
+            "y": 584.5254,
+            "width": 59.04419,
+            "height": 45.267334
+          }
+        },
+        {
+          "text": "OUR",
+          "confidence": 0.78,
+          "bounds": {
+            "x": 803.25854,
+            "y": 500.66995,
+            "width": 80.79639,
+            "height": 32.118134
+          }
+        },
+        {
+          "text": "Recent",
+          "confidence": 0.87,
+          "bounds": {
+            "x": 518.837,
+            "y": 568.0029,
+            "width": 108.788574,
+            "height": 35.31189
+          }
+        },
+        {
+          "text": "or",
+          "confidence": 0.73,
+          "bounds": {
+            "x": 128.74222,
+            "y": 650.71387,
+            "width": 46.27356,
+            "height": 21.475098
+          }
+        },
+        {
+          "text": "guest",
+          "confidence": 0.76,
+          "bounds": {
+            "x": 652.6593,
+            "y": 562.0493,
+            "width": 90.0271,
+            "height": 48.696472
+          }
+        },
+        {
+          "text": "CURL",
+          "confidence": 0.42,
+          "bounds": {
+            "x": 815.6183,
+            "y": 593.9879,
+            "width": 80.32562,
+            "height": 26.136597
+          }
+        },
+        {
+          "text": "lectures",
+          "confidence": 0.95,
+          "bounds": {
+            "x": 755.7895,
+            "y": 542.8313,
+            "width": 141.23907,
+            "height": 44.800964
+          }
+        },
+        {
+          "text": "(Web",
+          "confidence": 0.54,
+          "bounds": {
+            "x": 214.76791,
+            "y": 630.83575,
+            "width": 99.13321,
+            "height": 38.514954
+          }
+        },
+        {
+          "text": "3.0",
+          "confidence": 0.66,
+          "bounds": {
+            "x": 331.27338,
+            "y": 635.7605,
+            "width": 59.39038,
+            "height": 24.488953
+          }
+        },
+        {
+          "text": "adhd",
+          "confidence": 0.45,
+          "bounds": {
+            "x": 404.65295,
+            "y": 624.4207,
+            "width": 66.99646,
+            "height": 33.01355
+          }
+        },
+        {
+          "text": "the",
+          "confidence": 0.9,
+          "bounds": {
+            "x": 485.3248,
+            "y": 617.304,
+            "width": 63.848785,
+            "height": 30.784302
+          }
+        },
+        {
+          "text": "Melaverse.",
+          "confidence": 0.88,
+          "bounds": {
+            "x": 573.57965,
+            "y": 595.003,
+            "width": 183.10968,
+            "height": 48.096313
+          }
+        },
+        {
+          "text": "OUURL",
+          "confidence": 0.65,
+          "bounds": {
+            "x": 815.6183,
+            "y": 593.9879,
+            "width": 80.32562,
+            "height": 26.136597
+          }
+        },
+        {
+          "text": "Were",
+          "confidence": 0,
+          "bounds": {
+            "x": 301.59192,
+            "y": 676.0849,
+            "width": 99.50244,
+            "height": 30.618103
+          }
+        },
+        {
+          "text": "Insights",
+          "confidence": 0.8,
+          "bounds": {
+            "x": 131.25293,
+            "y": 675.0831,
+            "width": 144.6452,
+            "height": 62.902405
+          }
+        },
+        {
+          "text": "nob",
+          "confidence": 0.1,
+          "bounds": {
+            "x": 424.97427,
+            "y": 666.73895,
+            "width": 57.027313,
+            "height": 32.228943
+          }
+        },
+        {
+          "text": "theoretic",
+          "confidence": 0,
+          "bounds": {
+            "x": 590.4625,
+            "y": 644.8489,
+            "width": 169.67896,
+            "height": 41.094788
+          }
+        },
+        {
+          "text": "Only",
+          "confidence": 0.86,
+          "bounds": {
+            "x": 495.07233,
+            "y": 663.50836,
+            "width": 79.43024,
+            "height": 39.936584
+          }
+        },
+        {
+          "text": "but",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 323.64868,
+            "y": 703.78625,
+            "width": 70.77179,
+            "height": 43.21808
+          }
+        },
+        {
+          "text": "oso",
+          "confidence": 0.47,
+          "bounds": {
+            "x": 408.0174,
+            "y": 703.91565,
+            "width": 86.09482,
+            "height": 36.498108
+          }
+        },
+        {
+          "text": "immensely",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 514.2398,
+            "y": 698.49756,
+            "width": 137.85608,
+            "height": 39.581055
+          }
+        },
+        {
+          "text": "Offers",
+          "confidence": 0.81,
+          "bounds": {
+            "x": 132.17581,
+            "y": 765.71484,
+            "width": 113.03467,
+            "height": 51.497925
+          }
+        },
+        {
+          "text": "RUA",
+          "confidence": 0.58,
+          "bounds": {
+            "x": 643.9313,
+            "y": 747.8266,
+            "width": 43.59662,
+            "height": 25.227417
+          }
+        },
+        {
+          "text": "cal",
+          "confidence": 0.83,
+          "bounds": {
+            "x": 686.9326,
+            "y": 730.2699,
+            "width": 84.17944,
+            "height": 37.338074
+          }
+        },
+        {
+          "text": "perspective",
+          "confidence": 0.45,
+          "bounds": {
+            "x": 798.2735,
+            "y": 707.13824,
+            "width": 216.87097,
+            "height": 61.65149
+          }
+        },
+        {
+          "text": "on",
+          "confidence": 0.65,
+          "bounds": {
+            "x": 134.41876,
+            "y": 824.88354,
+            "width": 45.825867,
+            "height": 28.375183
+          }
+        },
+        {
+          "text": "th,",
+          "confidence": 0.7,
+          "bounds": {
+            "x": 200.42764,
+            "y": 809.7361,
+            "width": 45.535065,
+            "height": 37.26892
+          }
+        },
+        {
+          "text": "\u20acechno",
+          "confidence": 0.66,
+          "bounds": {
+            "x": 332.7823,
+            "y": 789.87665,
+            "width": 127.83148,
+            "height": 50.68097
+          }
+        },
+        {
+          "text": "les.",
+          "confidence": 0.19,
+          "bounds": {
+            "x": 519.6996,
+            "y": 799.7953,
+            "width": 55.40277,
+            "height": 24.17511
+          }
+        },
+        {
+          "text": "practical,",
+          "confidence": 0.79,
+          "bounds": {
+            "x": 730.02167,
+            "y": 671.5905,
+            "width": 175.91888,
+            "height": 57.437805
+          }
+        }
+      ],
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.08682077523324852,
+        "y0": 0.266243155216285,
+        "x1": 0.8662035826972011,
+        "y1": 0.5498105852417303
+      },
+      "bounds": {
+        "x": 102.361694,
+        "y": 418.53424,
+        "width": 918.89233,
+        "height": 445.768
+      }
+    },
+    {
+      "readingOrder": 4,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "Youre\n&\" blend ability theoretical\nRrowledge Real- Udoeld experience\nmade the concepts\naccessible Gur tO\nStuclents.YOUR Passion foe the. Subject\nmates Was evident throughout . fe)\nenthousiasm and a Que Qudience\nWe deeply appreci\nded cakinn of\nlime ,\nand inv on contri lbudtor.\nenRiched OW\nto the BL- program. Youk presence\nhos\nx +\nKind Regards, Erik Tronel & Sanita x",
+      "confidence": 0.77,
+      "words": [
+        {
+          "text": "Youre",
+          "confidence": 0.44,
+          "bounds": {
+            "x": 182.20612,
+            "y": 868.92346,
+            "width": 75.8118,
+            "height": 31.72583
+          }
+        },
+        {
+          "text": "&\"",
+          "confidence": 0.73,
+          "bounds": {
+            "x": 452.4261,
+            "y": 836.718,
+            "width": 62.325745,
+            "height": 36.608887
+          }
+        },
+        {
+          "text": "blend",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 519.5334,
+            "y": 832.7029,
+            "width": 97.453186,
+            "height": 42.345703
+          }
+        },
+        {
+          "text": "ability",
+          "confidence": 0.84,
+          "bounds": {
+            "x": 283.26398,
+            "y": 847.4532,
+            "width": 147.55753,
+            "height": 62.14087
+          }
+        },
+        {
+          "text": "theoretical",
+          "confidence": 0.55,
+          "bounds": {
+            "x": 632.2635,
+            "y": 814.79114,
+            "width": 224.82324,
+            "height": 49.397705
+          }
+        },
+        {
+          "text": "Rrowledge",
+          "confidence": 0.85,
+          "bounds": {
+            "x": 178.13068,
+            "y": 897.3358,
+            "width": 193.04645,
+            "height": 73.64691
+          }
+        },
+        {
+          "text": "Real-",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 512.64716,
+            "y": 885.7194,
+            "width": 92.99481,
+            "height": 36.050354
+          }
+        },
+        {
+          "text": "Udoeld",
+          "confidence": 0.45,
+          "bounds": {
+            "x": 617.69275,
+            "y": 866.6814,
+            "width": 128.59302,
+            "height": 47.768677
+          }
+        },
+        {
+          "text": "experience",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 765.7073,
+            "y": 853.51886,
+            "width": 224.6109,
+            "height": 59.288452
+          }
+        },
+        {
+          "text": "made",
+          "confidence": 0.81,
+          "bounds": {
+            "x": 130.76312,
+            "y": 964.43823,
+            "width": 112.48544,
+            "height": 44.51953
+          }
+        },
+        {
+          "text": "the",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 264.507,
+            "y": 958.82153,
+            "width": 75.12872,
+            "height": 35.63507
+          }
+        },
+        {
+          "text": "concepts",
+          "confidence": 0,
+          "bounds": {
+            "x": 368.94788,
+            "y": 940.139,
+            "width": 171.01282,
+            "height": 58.04242
+          }
+        },
+        {
+          "text": "accessible",
+          "confidence": 0.55,
+          "bounds": {
+            "x": 566.416,
+            "y": 922.61957,
+            "width": 207.79718,
+            "height": 47.066956
+          }
+        },
+        {
+          "text": "Gur",
+          "confidence": 0.66,
+          "bounds": {
+            "x": 877.84644,
+            "y": 913.71686,
+            "width": 72.742676,
+            "height": 30.49353
+          }
+        },
+        {
+          "text": "tO",
+          "confidence": 0.9,
+          "bounds": {
+            "x": 795.55005,
+            "y": 914.9767,
+            "width": 50.362732,
+            "height": 35.66736
+          }
+        },
+        {
+          "text": "Stuclents.YOUR",
+          "confidence": 0.72,
+          "bounds": {
+            "x": 130.75381,
+            "y": 985.92316,
+            "width": 326.3426,
+            "height": 93.05414
+          }
+        },
+        {
+          "text": "Passion",
+          "confidence": 0.62,
+          "bounds": {
+            "x": 478.77948,
+            "y": 985.7573,
+            "width": 156.82056,
+            "height": 53.953247
+          }
+        },
+        {
+          "text": "foe",
+          "confidence": 0.64,
+          "bounds": {
+            "x": 654.23694,
+            "y": 978.69604,
+            "width": 71.24255,
+            "height": 49.199585
+          }
+        },
+        {
+          "text": "the.",
+          "confidence": 0.81,
+          "bounds": {
+            "x": 734.20264,
+            "y": 961.82245,
+            "width": 78.06409,
+            "height": 47.755005
+          }
+        },
+        {
+          "text": "Subject",
+          "confidence": 0.69,
+          "bounds": {
+            "x": 833.1328,
+            "y": 951.7106,
+            "width": 147.1098,
+            "height": 69.04083
+          }
+        },
+        {
+          "text": "mates",
+          "confidence": 0.71,
+          "bounds": {
+            "x": 136.7721,
+            "y": 1065.1039,
+            "width": 127.43921,
+            "height": 45.69641
+          }
+        },
+        {
+          "text": "Was",
+          "confidence": 0.48,
+          "bounds": {
+            "x": 286.01892,
+            "y": 1066.3871,
+            "width": 76.04721,
+            "height": 34.716675
+          }
+        },
+        {
+          "text": "evident",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 383.24606,
+            "y": 1046.7537,
+            "width": 152.04831,
+            "height": 43.670288
+          }
+        },
+        {
+          "text": "throughout",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 554.32355,
+            "y": 1023.2528,
+            "width": 216.16486,
+            "height": 52.67932
+          }
+        },
+        {
+          "text": ".",
+          "confidence": 0.61,
+          "bounds": {
+            "x": 787.3345,
+            "y": 1043.4589,
+            "width": 4.850708,
+            "height": 11.279907
+          }
+        },
+        {
+          "text": "fe)",
+          "confidence": 0.37,
+          "bounds": {
+            "x": 899.0446,
+            "y": 1020.04083,
+            "width": 40.416626,
+            "height": 47.76422
+          }
+        },
+        {
+          "text": "enthousiasm",
+          "confidence": 0.79,
+          "bounds": {
+            "x": 143.2381,
+            "y": 1112.7484,
+            "width": 241.9278,
+            "height": 52.72534
+          }
+        },
+        {
+          "text": "and",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 406.42432,
+            "y": 1105.844,
+            "width": 66.234924,
+            "height": 35.92578
+          }
+        },
+        {
+          "text": "a",
+          "confidence": 0.55,
+          "bounds": {
+            "x": 690.7811,
+            "y": 1086.6309,
+            "width": 63.691895,
+            "height": 28.790527
+          }
+        },
+        {
+          "text": "Que",
+          "confidence": 0.8,
+          "bounds": {
+            "x": 826.04803,
+            "y": 1070.9528,
+            "width": 77.20099,
+            "height": 36.78894
+          }
+        },
+        {
+          "text": "Qudience",
+          "confidence": 0.84,
+          "bounds": {
+            "x": 916.97986,
+            "y": 1046.7041,
+            "width": 167.78662,
+            "height": 54.816162
+          }
+        },
+        {
+          "text": "We",
+          "confidence": 0.6,
+          "bounds": {
+            "x": 145.77185,
+            "y": 1170.3986,
+            "width": 81.21176,
+            "height": 49.98413
+          }
+        },
+        {
+          "text": "deeply",
+          "confidence": 0.74,
+          "bounds": {
+            "x": 249.60818,
+            "y": 1161.2512,
+            "width": 120.82071,
+            "height": 74.897705
+          }
+        },
+        {
+          "text": "appreci",
+          "confidence": 0.68,
+          "bounds": {
+            "x": 392.11194,
+            "y": 1158.9346,
+            "width": 158.81439,
+            "height": 54.11023
+          }
+        },
+        {
+          "text": "ded",
+          "confidence": 0.15,
+          "bounds": {
+            "x": 740.853,
+            "y": 1123.503,
+            "width": 69.01337,
+            "height": 46.05188
+          }
+        },
+        {
+          "text": "cakinn",
+          "confidence": 0.15,
+          "bounds": {
+            "x": 820.00183,
+            "y": 1119.2295,
+            "width": 107.500854,
+            "height": 44.127197
+          }
+        },
+        {
+          "text": "of",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 942.77954,
+            "y": 1116.9866,
+            "width": 39.419678,
+            "height": 47.68579
+          }
+        },
+        {
+          "text": "lime",
+          "confidence": 0.58,
+          "bounds": {
+            "x": 142.66101,
+            "y": 1232.0505,
+            "width": 90.710144,
+            "height": 44.78723
+          }
+        },
+        {
+          "text": ",",
+          "confidence": 0.89,
+          "bounds": {
+            "x": 246.30801,
+            "y": 1255.4827,
+            "width": 6.0830383,
+            "height": 14.349121
+          }
+        },
+        {
+          "text": "and",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 471.8006,
+            "y": 1209.722,
+            "width": 70.065735,
+            "height": 34.245728
+          }
+        },
+        {
+          "text": "inv",
+          "confidence": 0.8,
+          "bounds": {
+            "x": 555.5417,
+            "y": 1204.5437,
+            "width": 52.042725,
+            "height": 31.83667
+          }
+        },
+        {
+          "text": "on",
+          "confidence": 0.36,
+          "bounds": {
+            "x": 603.45844,
+            "y": 1144.0273,
+            "width": 139.5498,
+            "height": 86.2793
+          }
+        },
+        {
+          "text": "contri",
+          "confidence": 0.23,
+          "bounds": {
+            "x": 757.52356,
+            "y": 1179.3167,
+            "width": 107.10858,
+            "height": 39.14258
+          }
+        },
+        {
+          "text": "lbudtor.",
+          "confidence": 0,
+          "bounds": {
+            "x": 869.62604,
+            "y": 1161.354,
+            "width": 134.73145,
+            "height": 50.233276
+          }
+        },
+        {
+          "text": "enRiched",
+          "confidence": 0.33,
+          "bounds": {
+            "x": 134.71313,
+            "y": 1326.0471,
+            "width": 204.20184,
+            "height": 51.73767
+          }
+        },
+        {
+          "text": "OW",
+          "confidence": 0.63,
+          "bounds": {
+            "x": 368.22717,
+            "y": 1320.1719,
+            "width": 82.86871,
+            "height": 33.271973
+          }
+        },
+        {
+          "text": "to",
+          "confidence": 0.78,
+          "bounds": {
+            "x": 144.59012,
+            "y": 1285.584,
+            "width": 45.535034,
+            "height": 37.2688
+          }
+        },
+        {
+          "text": "the",
+          "confidence": 0.93,
+          "bounds": {
+            "x": 200.5744,
+            "y": 1279.6533,
+            "width": 90.23941,
+            "height": 38.80591
+          }
+        },
+        {
+          "text": "BL-",
+          "confidence": 0.62,
+          "bounds": {
+            "x": 328.6275,
+            "y": 1264.6721,
+            "width": 63.636475,
+            "height": 40.67505
+          }
+        },
+        {
+          "text": "program.",
+          "confidence": 0.84,
+          "bounds": {
+            "x": 405.93936,
+            "y": 1254.8604,
+            "width": 201.62643,
+            "height": 69.36841
+          }
+        },
+        {
+          "text": "Youk",
+          "confidence": 0.85,
+          "bounds": {
+            "x": 624.39813,
+            "y": 1233.3807,
+            "width": 116.440735,
+            "height": 69.59924
+          }
+        },
+        {
+          "text": "presence",
+          "confidence": 0.87,
+          "bounds": {
+            "x": 768.89575,
+            "y": 1227.7688,
+            "width": 194.54645,
+            "height": 54.940918
+          }
+        },
+        {
+          "text": "hos",
+          "confidence": 0.94,
+          "bounds": {
+            "x": 972.9269,
+            "y": 1204.2307,
+            "width": 73.39331,
+            "height": 51.35034
+          }
+        },
+        {
+          "text": "x",
+          "confidence": 0.51,
+          "bounds": {
+            "x": 974.6344,
+            "y": 1305.93,
+            "width": 27.668945,
+            "height": 36.853516
+          }
+        },
+        {
+          "text": "+",
+          "confidence": 0.52,
+          "bounds": {
+            "x": 1032.2987,
+            "y": 1300.2485,
+            "width": 15.682861,
+            "height": 23.030762
+          }
+        },
+        {
+          "text": "Kind",
+          "confidence": 0.96,
+          "bounds": {
+            "x": 139.9238,
+            "y": 1375.6296,
+            "width": 92.020935,
+            "height": 48.853394
+          }
+        },
+        {
+          "text": "Regards,",
+          "confidence": 0.57,
+          "bounds": {
+            "x": 256.11542,
+            "y": 1368.1716,
+            "width": 161.3805,
+            "height": 74.12695
+          }
+        },
+        {
+          "text": "Erik",
+          "confidence": 0.91,
+          "bounds": {
+            "x": 441.14972,
+            "y": 1353.301,
+            "width": 99.91785,
+            "height": 48.484253
+          }
+        },
+        {
+          "text": "Tronel",
+          "confidence": 0.85,
+          "bounds": {
+            "x": 543.5184,
+            "y": 1339.1138,
+            "width": 126.834595,
+            "height": 50.60254
+          }
+        },
+        {
+          "text": "&",
+          "confidence": 0.92,
+          "bounds": {
+            "x": 682.95294,
+            "y": 1347.02,
+            "width": 26.279785,
+            "height": 31.790527
+          }
+        },
+        {
+          "text": "Sanita",
+          "confidence": 0.89,
+          "bounds": {
+            "x": 722.72815,
+            "y": 1321.1373,
+            "width": 137.72217,
+            "height": 50.468628
+          }
+        },
+        {
+          "text": "x",
+          "confidence": 0.86,
+          "bounds": {
+            "x": 1008.62177,
+            "y": 1354.8667,
+            "width": 35.82428,
+            "height": 52.356567
+          }
+        }
+      ],
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.07971898218829516,
+        "y0": 0.4962127226463104,
+        "x1": 0.9554697031382526,
+        "y1": 0.9387315839694655
+      },
+      "bounds": {
+        "x": 93.98868,
+        "y": 780.0464,
+        "width": 1032.5101,
+        "height": 695.63965
+      }
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "width": 1179,
+      "height": 1572
+    }
+  ],
+  "totalPages": 1,
+  "processedPages": 1,
+  "config": {
+    "engine": "ICR"
+  },
+  "code": "import glob\nimport json\nimport os\nimport re\nimport tempfile\n\nfrom nutrient_sdk import (Document, ImageExportFormat, Vision,\n                          VisionEngine, VisionFeatures)\n\n# Handwriting recognition reads page images, so render each PDF page to\n# a JPEG first. export_as_image() does the whole document in one call,\n# and an image input passes straight through.\n# The pages go to a private temporary directory, so the glob below can\n# only ever match this run's own output.\nwith tempfile.TemporaryDirectory() as pages_dir:\n    base = os.path.join(pages_dir, \"page.jpg\")\n    with Document.open(\"handwritten-cursive-dear-magnus-thank-you-note.jpg\") as document:\n        images = document.get_settings().get_image_settings()\n        images.set_export_format(ImageExportFormat.JPEG)\n        document.export_as_image(base)\n\n    # Multi-page writes page-1.jpg, page-2.jpg, \u2026; a single-page\n    # document is written to page.jpg itself, which is why the glob\n    # needs the `base` fallback. Sort numerically so 10 follows 9.\n    paths = sorted(glob.glob(os.path.join(pages_dir, \"page-*.jpg\")),\n                   key=lambda p: int(re.search(r\"-(\\d+)\\.jpg$\", p).group(1)))\n    paths = paths or [base]\n\n    # Still inside the with: the JPEGs are deleted when it exits, so\n    # every page has to be read before then.\n    raws = []\n    for path in paths:\n        with Document.open(path) as page:\n            settings = page.get_settings()\n            vision = settings.get_vision_settings()\n            vision.set_engine(VisionEngine.ICR)\n            vision.set_features(VisionFeatures.ALL.value)\n            raws.append(Vision.set(page).extract_content())\n\nelements, next_order = [], 0\nfor page_idx, raw in enumerate(raws, start=1):\n    payload = json.loads(raw)\n    page_elements = payload.get(\"elements\", [])\n    page_elements.sort(key=lambda e: e.get(\"readingOrder\", 0))\n    for element in page_elements:\n        # Each per-page call reports pageNumber=1 and restarts\n        # readingOrder at 0 \u2014 rewrite both or the pages interleave.\n        element[\"pageNumber\"] = page_idx\n        element[\"readingOrder\"] = next_order\n        next_order += 1\n        elements.append(element)\n\nprint(json.dumps(elements, indent=2))\n",
+  "timingMs": 1336
+}

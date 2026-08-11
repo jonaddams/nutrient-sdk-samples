@@ -1,0 +1,109 @@
+{
+  "engine": "VLM",
+  "filename": "handwritten-cursive-dear-magnus-thank-you-note.jpg",
+  "statistics": {
+    "totalElements": 5,
+    "textElements": 4,
+    "averageConfidence": 0.71,
+    "lowConfidenceElements": 1
+  },
+  "fullText": "[0] Dear Magnus,\n[1] NOTES\n[2] The International Business law Team at Tilburg University wishes to express our gratitude fer your recent guest lectures on Web 3.0 and the Metaverse. Your insights were not only theoretically enriching but also immensely practical. Offering our students a crucial perspective on these technologies.\n[3] Your ability to blend theoretical knowledge with real- world experience made the concepts accessible to our students. Your passion for the subject matter was evident throughout, igniting enthusiasm and curiosity among our audience. We deeply appreciate your dedication of time, expertise and invaluable contribution to the IBL-program. Your presence has enriched our academic community! Kind Regards, Erik, Trone! & Sanita",
+  "textElements": [
+    {
+      "readingOrder": 0,
+      "type": "handwriting",
+      "text": "Dear Magnus,",
+      "confidence": 0.48,
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.0,
+        "y0": 0.0,
+        "x1": 1.0,
+        "y1": 0.9980144910941476
+      },
+      "bounds": {
+        "x": -32.90741,
+        "y": -56.18152,
+        "width": 1327.5513,
+        "height": 1625.0603
+      }
+    },
+    {
+      "readingOrder": 1,
+      "type": "paragraph",
+      "role": "Text",
+      "text": "NOTES",
+      "confidence": 0.66,
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.36122016115351996,
+        "y0": 0.19875629770992367,
+        "x1": 0.48024474978795595,
+        "y1": 0.22254440012722648
+      },
+      "bounds": {
+        "x": 425.87857,
+        "y": 312.4449,
+        "width": 140.32999,
+        "height": 37.394897
+      }
+    },
+    {
+      "readingOrder": 2,
+      "type": "handwriting",
+      "text": "The International Business law Team at Tilburg University wishes to express our gratitude fer your recent guest lectures on Web 3.0 and the Metaverse. Your insights were not only theoretically enriching but also immensely practical. Offering our students a crucial perspective on these technologies.",
+      "confidence": 0.77,
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.3096233248515691,
+        "y0": 0.21890083969465648,
+        "x1": 0.5788436556403732,
+        "y1": 0.2847917875318066
+      },
+      "bounds": {
+        "x": 365.0459,
+        "y": 344.11212,
+        "width": 317.41077,
+        "height": 103.58057
+      }
+    },
+    {
+      "readingOrder": 3,
+      "type": "handwriting",
+      "text": "Your ability to blend theoretical knowledge with real- world experience made the concepts accessible to our students. Your passion for the subject matter was evident throughout, igniting enthusiasm and curiosity among our audience. We deeply appreciate your dedication of time, expertise and invaluable contribution to the IBL-program. Your presence has enriched our academic community! Kind Regards, Erik, Trone! & Sanita",
+      "confidence": 0.86,
+      "page": 0,
+      "citation": {
+        "page": 0,
+        "x0": 0.08682077523324852,
+        "y0": 0.266243155216285,
+        "x1": 0.8662035826972011,
+        "y1": 0.5498105852417303
+      },
+      "bounds": {
+        "x": 102.361694,
+        "y": 418.53424,
+        "width": 918.89233,
+        "height": 445.768
+      }
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "width": 1179,
+      "height": 1572
+    }
+  ],
+  "totalPages": 1,
+  "processedPages": 1,
+  "config": {
+    "engine": "VLM",
+    "provider": "openai"
+  },
+  "code": "import glob\nimport json\nimport os\nimport re\nimport tempfile\n\nfrom nutrient_sdk import (Document, ImageExportFormat, Vision,\n                          VisionEngine, VisionFeatures)\nfrom nutrient_sdk.vlmprovider import VlmProvider\n\n# Handwriting recognition reads page images, so render each PDF page to\n# a JPEG first. export_as_image() does the whole document in one call,\n# and an image input passes straight through.\n# The pages go to a private temporary directory, so the glob below can\n# only ever match this run's own output.\nwith tempfile.TemporaryDirectory() as pages_dir:\n    base = os.path.join(pages_dir, \"page.jpg\")\n    with Document.open(\"handwritten-cursive-dear-magnus-thank-you-note.jpg\") as document:\n        images = document.get_settings().get_image_settings()\n        images.set_export_format(ImageExportFormat.JPEG)\n        document.export_as_image(base)\n\n    # Multi-page writes page-1.jpg, page-2.jpg, \u2026; a single-page\n    # document is written to page.jpg itself, which is why the glob\n    # needs the `base` fallback. Sort numerically so 10 follows 9.\n    paths = sorted(glob.glob(os.path.join(pages_dir, \"page-*.jpg\")),\n                   key=lambda p: int(re.search(r\"-(\\d+)\\.jpg$\", p).group(1)))\n    paths = paths or [base]\n\n    # Still inside the with: the JPEGs are deleted when it exits, so\n    # every page has to be read before then.\n    raws = []\n    for path in paths:\n        with Document.open(path) as page:\n            settings = page.get_settings()\n            vision = settings.get_vision_settings()\n            vision.set_engine(VisionEngine.VLM_ENHANCED_ICR)\n            vision.set_features(VisionFeatures.ALL.value)\n            vision.set_provider(VlmProvider.OPEN_AI)\n            settings.get_open_ai_api_endpoint_settings().set_api_key(\n                os.environ[\"OPENAI_API_KEY\"])\n            raws.append(Vision.set(page).extract_content())\n\nelements, next_order = [], 0\nfor page_idx, raw in enumerate(raws, start=1):\n    payload = json.loads(raw)\n    page_elements = payload.get(\"elements\", [])\n    page_elements.sort(key=lambda e: e.get(\"readingOrder\", 0))\n    for element in page_elements:\n        # Each per-page call reports pageNumber=1 and restarts\n        # readingOrder at 0 \u2014 rewrite both or the pages interleave.\n        element[\"pageNumber\"] = page_idx\n        element[\"readingOrder\"] = next_order\n        next_order += 1\n        elements.append(element)\n\nprint(json.dumps(elements, indent=2))\n",
+  "timingMs": 6454
+}
