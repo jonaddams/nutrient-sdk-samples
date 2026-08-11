@@ -132,3 +132,43 @@ describe("presets and documents agree", () => {
     }
   });
 });
+
+// Why an allowlist and not a count: PRESETS.handwriting shipped `writtenDate`
+// and `primaryName` on 2026-08-11, both guessed — no document carries a
+// document-authorship date, and only the employment application names one
+// person. Nothing in this suite caught it, because the only thing checking
+// handwriting's rows was the generic cross-category loop above (key format,
+// type, non-empty description), which a guessed field satisfies just as
+// easily as a grounded one. A count assertion would not have caught it
+// either: it passes the moment someone adds a field and updates the number,
+// which is bookkeeping, not a guard.
+//
+// Pairing each field name with the source quote that grounds it means adding
+// a field here requires writing down a quote that does not exist — the
+// review step that was missing the first time. See categories.ts's
+// `handwriting` preset comment for the full per-document grounding; this map
+// only needs enough of the quote to make a reviewer go check.
+const GROUNDED_HANDWRITING_FIELDS: Record<string, string> = {
+  documentTitle:
+    'headed by content on three of four ("Apricot Cake." / "Heavenly Hamburgers" / "Employment Application"); the fourth ("NOTES") is only the stationery\'s pre-printed header, not a title written for that note',
+};
+
+describe("the handwriting preset is grounded, not guessed", () => {
+  test("every field in the preset has a grounding entry", () => {
+    const keys = presetFor("handwriting").map((r) => r.key);
+    for (const key of keys) {
+      expect(Object.keys(GROUNDED_HANDWRITING_FIELDS)).toContain(key);
+    }
+  });
+
+  test("every grounding entry is for a field the preset actually has", () => {
+    // The reverse direction: a stale entry left behind after a field is
+    // removed would let the map claim more grounding than the preset ships,
+    // silently. Keeping the map exactly in sync means it is honest evidence
+    // about what's live, not an append-only log.
+    const keys = new Set(presetFor("handwriting").map((r) => r.key));
+    for (const groundedKey of Object.keys(GROUNDED_HANDWRITING_FIELDS)) {
+      expect(keys.has(groundedKey)).toBe(true);
+    }
+  });
+});

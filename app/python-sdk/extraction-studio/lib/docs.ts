@@ -136,6 +136,50 @@ export const DOCUMENTS: DocSummary[] = [
     hasTextLayer: true,
     category: "claims",
   },
+  // Added 2026-08-11. All ten documents above are printed business PDFs, so
+  // the Describe feature's "Transcribe" preset had nothing to actually prove —
+  // transcribing print is not a demonstration. These four are images (no PDF
+  // wrapper, hence `hasTextLayer: false` like the other scans above) and range
+  // from cursive to print on a form, which is what makes Transcribe interesting
+  // again. Deliberately NOT thematically coherent like the other categories —
+  // a recipe, a note and a form share nothing except being handwriting-adjacent
+  // source material, which is the point of this category.
+  //
+  // The viewer opens these the same way it opens a PDF: NutrientViewer.load()
+  // takes JPEG/JPG/PNG/TIFF natively in standalone mode, so DocViewer needed no
+  // branch (https://www.nutrient.io/guides/web/viewer/images/).
+  {
+    docId: "apricot-cake-recipe",
+    label: "Apricot cake recipe",
+    path: "/documents/handwritten-cursive-apricot-cake-recipe.jpg",
+    filename: "handwritten-cursive-apricot-cake-recipe.jpg",
+    hasTextLayer: false,
+    category: "handwriting",
+  },
+  {
+    docId: "dear-magnus-thank-you-note",
+    label: "Thank-you note",
+    path: "/documents/handwritten-cursive-dear-magnus-thank-you-note.jpg",
+    filename: "handwritten-cursive-dear-magnus-thank-you-note.jpg",
+    hasTextLayer: false,
+    category: "handwriting",
+  },
+  {
+    docId: "heavenly-hamburgers-recipe",
+    label: "Hamburger recipe card",
+    path: "/documents/heavenly-hamburgers-recipe.jpeg",
+    filename: "heavenly-hamburgers-recipe.jpeg",
+    hasTextLayer: false,
+    category: "handwriting",
+  },
+  {
+    docId: "employment-application",
+    label: "Employment application",
+    path: "/documents/handwritten-employment-application.jpg",
+    filename: "handwritten-employment-application.jpg",
+    hasTextLayer: false,
+    category: "handwriting",
+  },
 ];
 
 export function findDoc(docId: string): DocSummary | undefined {

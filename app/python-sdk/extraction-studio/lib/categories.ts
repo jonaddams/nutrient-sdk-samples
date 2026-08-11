@@ -6,7 +6,8 @@ export type CategoryId =
   | "construction"
   | "logistics"
   | "healthcare"
-  | "claims";
+  | "claims"
+  | "handwriting";
 
 export const CATEGORY_ORDER: CategoryId[] = [
   "invoices",
@@ -15,6 +16,7 @@ export const CATEGORY_ORDER: CategoryId[] = [
   "logistics",
   "healthcare",
   "claims",
+  "handwriting",
 ];
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
@@ -24,6 +26,7 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   logistics: "Logistics",
   healthcare: "Healthcare",
   claims: "Claims",
+  handwriting: "Handwriting",
 };
 
 /** A preset row before it is given an id. */
@@ -257,6 +260,54 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       type: "number",
       description: "The total estimated damage amount, digits only",
       optional: true,
+    },
+  ],
+  // Unlike every other category, `handwriting` groups by MEDIUM (four images,
+  // no PDF wrapper) rather than by document type — invoices are all invoices,
+  // claims are all claims, but this category is a recipe, a thank-you note, a
+  // recipe card and an employment application. Read all four images directly
+  // (2026-08-11 review) before trusting anything here, because that mismatch
+  // means most candidate fields turn out grounded on one document and blank or
+  // wrong on the other three:
+  //
+  //   - A "written date" field was dropped. None of the four carry one. The
+  //     recipe ("Apricot Cake."), the note ("Dear Magnus,") and the recipe
+  //     card ("Heavenly Hamburgers") have no date anywhere. The application
+  //     has dates, but only inside "Previous Employment History" (start/end
+  //     dates of past jobs, e.g. "1/15/2009" / "6/30/2011") — extracting one
+  //     of those as "the document's date" would be an arbitrary, wrong pick,
+  //     not a grounded field.
+  //   - A "primary name" field was dropped too. It resolves on exactly one
+  //     document (the application's "Full Name: Jane Doe") and is either
+  //     absent or ambiguous on the rest: the recipe names no one at all; the
+  //     note is addressed "Dear Magnus," but signed by three people ("Kind
+  //     Regards, Erik, Tronel & Sanita"); the card credits "Aunt Lola" as
+  //     origin and then lists a four-person chain ("from Lola to Grandmommy
+  //     to Mom to Ruth"). There is no single person to call "primary" on
+  //     three of the four, and `SchemaProp.type` has no array/list option
+  //     (StructuredConfig's type <select> only offers string/number/boolean,
+  //     enforced by categories.test.ts) — a comma-joined names string would
+  //     be contorting a list into a scalar field rather than an honest one,
+  //     so this was dropped instead of forced in.
+  //
+  // `documentTitle` is the one field the set actually shares: "Apricot Cake."
+  // heads the recipe, "Heavenly Hamburgers" heads the card, and "Employment
+  // Application" heads the form — all three describe that document's actual
+  // content. The note is weaker: it prints "NOTES" above "Dear Magnus,", but
+  // "NOTES" is the pre-printed stationery's own header, not a title anyone
+  // wrote for this note — the same word would appear at the top of any sheet
+  // torn off that pad. It still extracts a non-empty value, which is why
+  // `required` stays defensible, but say so plainly rather than imply all
+  // four are titled equally: three are grounded on content, one only on
+  // paper stock. Required, not optional, all the same — unlike the two
+  // fields above, this one is genuinely on every document, so there's no
+  // document to soften it for.
+  handwriting: [
+    {
+      key: "documentTitle",
+      type: "string",
+      description: "The document's title or heading, as written or printed",
+      optional: false,
     },
   ],
 };

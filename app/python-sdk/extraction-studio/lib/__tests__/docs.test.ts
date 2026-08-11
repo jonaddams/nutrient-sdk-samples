@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { DOCUMENTS, findDoc } from "../docs";
 
@@ -6,7 +8,10 @@ describe("the document manifest", () => {
     for (const d of DOCUMENTS) {
       expect(d.docId).toBeTruthy();
       expect(d.label).toBeTruthy();
-      expect(d.filename).toMatch(/\.pdf$/);
+      // Was `/\.pdf$/` until the handwriting category added four plain images
+      // (no PDF wrapper) — the manifest was never actually PDF-only, that was
+      // just true of every document until 2026-08-11.
+      expect(d.filename).toMatch(/\.(pdf|jpe?g)$/);
       expect(typeof d.hasTextLayer).toBe("boolean");
     }
   });
@@ -74,5 +79,53 @@ describe("the document manifest", () => {
   test("findDoc resolves a known id and returns undefined otherwise", () => {
     expect(findDoc("bill-of-lading")?.filename).toBe("bill-of-lading.pdf");
     expect(findDoc("nope")).toBeUndefined();
+  });
+});
+
+describe("the handwriting category", () => {
+  // Added 2026-08-11 alongside the four handwriting documents themselves. All
+  // ten prior documents are printed business PDFs, so Describe's "Transcribe"
+  // preset had nothing to prove; these four images are what makes it
+  // demonstrate something.
+  const handwriting = DOCUMENTS.filter((d) => d.category === "handwriting");
+
+  test("has exactly four documents", () => {
+    expect(handwriting).toHaveLength(4);
+  });
+
+  test("none of the four have a text layer — they are plain images", () => {
+    for (const d of handwriting) {
+      expect(d.hasTextLayer).toBe(false);
+    }
+  });
+
+  test("every path resolves to a file that actually exists under public/", () => {
+    // vitest runs from the repo root (confirmed: process.cwd() here is the
+    // project root, not this test file's directory), so `public` + d.path is
+    // the real on-disk location Next serves the file from. This test only
+    // covers the four handwriting documents, not the whole manifest, in case
+    // fixtures for the other categories are ever moved without this file's
+    // notice — that risk isn't new here.
+    for (const d of handwriting) {
+      expect(existsSync(join(process.cwd(), "public", d.path))).toBe(true);
+    }
+  });
+
+  test("the four documents are exactly the expected files", () => {
+    const filenames = handwriting.map((d) => d.filename).sort();
+    expect(filenames).toEqual(
+      [
+        "handwritten-cursive-apricot-cake-recipe.jpg",
+        "handwritten-cursive-dear-magnus-thank-you-note.jpg",
+        "handwritten-employment-application.jpg",
+        "heavenly-hamburgers-recipe.jpeg",
+      ].sort(),
+    );
+  });
+
+  test("DOCUMENTS[0] is unchanged — the default demo document did not move", () => {
+    // Appending handwriting at the end must not disturb the document the
+    // studio loads by default.
+    expect(DOCUMENTS[0].docId).toBe("invoice-ac20251047");
   });
 });
