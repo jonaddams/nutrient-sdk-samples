@@ -373,7 +373,7 @@ export function TablesResults({
             // position surviving a smaller/reshaped `result` was the round-3 bug.
             const roving = resolveRoving(grid, rovingByTable[tableIndex]);
             return (
-              // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key, same precedent as app/python-sdk/table-extraction/page.tsx
+              // biome-ignore lint/suspicious/noArrayIndexKey: table index is a stable positional key here — the grid never reorders, nothing is inserted mid-list, and no per-row state is keyed off it.
               <div className="studio-table-block" key={tableIndex}>
                 <span className="eyebrow">
                   Table {tableIndex + 1} of {result.tables.length} ·{" "}

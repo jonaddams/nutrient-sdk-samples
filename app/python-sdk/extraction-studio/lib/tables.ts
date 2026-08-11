@@ -83,10 +83,12 @@ export type TablesResult = {
  * row/col span are set to null so the renderer skips them. Out-of-range
  * cells are ignored rather than throwing.
  *
- * Copied from app/python-sdk/table-extraction/buildGrid.ts rather than
- * imported. That sample stays listed until it is retired, and coupling a
- * sample we intend to delete to the studio's lib is worse than a bounded
- * duplicate that leaves with it.
+ * This is now the sole home for this logic. It started as a copy of the
+ * equivalent helper in the standalone tables sample that predated this
+ * studio, kept separate rather than imported so that sample could be deleted
+ * without touching the studio — which is exactly what happened once the
+ * studio's Tables rail feature superseded it: the sample was deleted
+ * outright, and this copy stayed behind as the only implementation.
  */
 export function buildGrid(
   cells: TableCell[],
