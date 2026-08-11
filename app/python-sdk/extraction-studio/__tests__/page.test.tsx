@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { samples } from "../../samples";
 import { FEATURES } from "../_components/FeatureRail";
+import handwritingLocalFixture from "../lib/__tests__/fixtures/handwriting-local.json";
 import type { IndexedCitation } from "../lib/citations";
 import ExtractionStudio from "../page";
 
@@ -804,6 +805,10 @@ test("every enabled rail feature renders its OWN configuration panel", async () 
 });
 
 test("Handwriting recognition is selectable and swaps in its own panel", async () => {
+  // HandwritingConfig fetches providers on mount regardless of engine — stub
+  // it with the file's existing convention rather than leaving `fetch`
+  // unstubbed, which would otherwise issue a real request out of the suite.
+  stubProvidersFetch([]);
   render(<ExtractionStudio />);
   fireEvent.click(
     screen.getByRole("button", { name: /Handwriting recognition/ }),
@@ -832,22 +837,81 @@ test("Run is enabled for Local ICR even with no providers configured", async () 
   );
 });
 
-test("switching away from a populated handwriting run clears its overlay", async () => {
-  // Same class as the OCR→Image description test above: a stale overlay drawn
-  // over a different feature's document is the bug this guards. The mocked
-  // DocViewer at the top of this file has no element with testid
-  // "citation-count" — it exposes the count as `data-citation-count` on
-  // "doc-viewer", the same attribute every other switch-clears-overlay test
-  // in this file asserts on.
+/** Stubs the two fetches Local ICR's Run makes — the document itself from
+ *  public/, then the /icr endpoint — with a real captured response
+ *  (handwriting-local.json) that carries citations, plus the providers fetch
+ *  HandwritingConfig always issues on mount. Mirrors stubOcrFetch()'s shape;
+ *  a real fixture rather than an inline stub is what proves the run actually
+ *  populates the overlay, not just that Run was clicked. */
+function stubHandwritingFetch() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/icr")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => handwritingLocalFixture,
+        };
+      }
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+// Fix round 1: the brief's original version of this test (and my first pass
+// at it) never stubbed a fetch and never clicked Run, so `handwritingResult`
+// stayed null for the test's whole life and the overlay was already "0"
+// before the switch — vacuous even with BOTH `setHandwritingResult(null)`
+// calls deleted from page.tsx. It also switched to a different FEATURE, which
+// is safe by construction: `panels[feature].citations` swaps the whole array
+// on a feature change, independent of whether any clearing effect runs. The
+// path that constraint in the brief actually names is `selectDoc` — picking a
+// NEW DOCUMENT while a handwriting result is on screen — which is what this
+// now exercises, mirroring "switching from a populated OCR run to Image
+// description never paints a stale overlay" above: run first to populate a
+// nonzero count (proving there is something to clear), reset the render log,
+// then switch and require every render from that point on to read zero, not
+// just the settled last one — `act()` flushes selectDoc's clearing state
+// updates before `fireEvent.click` returns, so a bare post-click assertion
+// cannot tell a stale one-frame paint from a clean switch.
+test("switching documents mid-handwriting-run clears the previous document's overlay", async () => {
+  stubHandwritingFetch();
   render(<ExtractionStudio />);
+
   fireEvent.click(
     screen.getByRole("button", { name: /Handwriting recognition/ }),
   );
-  fireEvent.click(screen.getByRole("button", { name: /Adaptive OCR/ }));
+  // Local ICR needs no provider and reports ready on mount, but that still
+  // happens in a passive effect — wait for it rather than assuming Run is
+  // already enabled the instant the rail click's act() batch settles.
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /Run extraction/ }),
+    ).not.toBeDisabled(),
+  );
+  fireEvent.click(screen.getByRole("button", { name: /Run extraction/ }));
+  await waitFor(() => {
+    const count = Number(
+      screen.getByTestId("doc-viewer").getAttribute("data-citation-count"),
+    );
+    expect(count).toBeGreaterThan(0);
+  });
+
+  // Only renders from this point on are relevant to the switch under test.
+  citationRenders.length = 0;
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+
   await waitFor(() =>
     expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
       "data-citation-count",
       "0",
     ),
   );
+  expect(citationRenders.every((count) => count === 0)).toBe(true);
+  expect(citationRenders.length).toBeGreaterThan(0);
 });
