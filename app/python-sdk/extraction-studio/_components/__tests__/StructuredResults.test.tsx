@@ -440,9 +440,20 @@ test("the run summary counts only verified fields", () => {
 });
 
 test("the accuracy segment shows the benchmark for the current document with its caveats", () => {
+  // "bill-of-lading" on purpose, not the flagship invoice: all 14 documents
+  // in lib/benchmark.ts share the same three model ids, and several also
+  // share their matched/verified numbers (e.g. every one of gpt-5.4,
+  // claude-sonnet-5 and the Bedrock model scores 3 of 3 on more than one
+  // doc). A test that only checks row count and model-id text would still
+  // pass if the component filtered to the wrong document — a prior version
+  // of this test did exactly that, undetected, because it happened to use
+  // two documents (invoice-ac20251047 and lumen-invoice) that both score
+  // "3 of 3" on two of their three rows. bill-of-lading's triple — 6 of 6,
+  // 6 of 6, 3 of 6 — is not shared by any other document, so asserting the
+  // exact fraction alongside each model actually proves the filter.
   const { container } = render(
     <StructuredResults
-      docId="invoice-ac20251047"
+      docId="bill-of-lading"
       data={{ extraction: {}, fields: [] } as unknown as StructuredData}
       code=""
       onSelectField={vi.fn()}
@@ -455,15 +466,19 @@ test("the accuracy segment shows the benchmark for the current document with its
   );
   fireEvent.click(screen.getByRole("button", { name: "Accuracy" }));
 
-  // Exactly the rows benchmarked for THIS document, never the other 39 —
-  // every provider shares the same three model ids across every document,
-  // so the count (not a model name) is what actually proves the filter.
-  const rows = BENCHMARK.rows.filter((r) => r.docId === "invoice-ac20251047");
+  const rows = BENCHMARK.rows.filter((r) => r.docId === "bill-of-lading");
   expect(rows.length).toBeGreaterThan(0);
-  const renderedRows = container.querySelectorAll(".benchmark-table tbody tr");
+  const renderedRows = Array.from(
+    container.querySelectorAll(".benchmark-table tbody tr"),
+  );
   expect(renderedRows.length).toBe(rows.length);
   for (const r of rows) {
-    expect(screen.getByText(new RegExp(r.model))).toBeDefined();
+    // Look up the row by model, then assert ITS OWN fraction — not just
+    // that the model string and some row count are both present, which is
+    // exactly the pairing the prior test skipped.
+    const row = renderedRows.find((tr) => tr.textContent?.includes(r.model));
+    expect(row).toBeDefined();
+    expect(row?.textContent).toContain(`${r.matched} of ${r.verified}`);
   }
 
   // The four caveats the brief requires, plus the two the human ruling and

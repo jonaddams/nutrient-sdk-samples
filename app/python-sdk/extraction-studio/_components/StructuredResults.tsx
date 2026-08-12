@@ -223,11 +223,11 @@ export function StructuredResults({
             measurements, not steady rates: they range from a few seconds to
             well over a minute here, and the slowest pairs are also the least
             reliable. Guidance changes results materially — try a preset and run
-            it again — and any row can be reproduced live by picking that model
-            and pressing Run, though these models are not deterministic, so a
-            live run can score differently than the row shown: a real
-            operational consideration for anyone putting one in a pipeline, not
-            a flaw in this table.
+            it again. Any row can be reproduced live by picking that model and
+            pressing Run. These models are not deterministic, so a live run can
+            easily score differently than the row shown — a real operational
+            consideration for anyone putting one in a pipeline, not a flaw in
+            this table.
           </p>
         </div>
       ) : (
