@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
+import { BENCHMARK } from "../lib/benchmark";
 import { copyText, downloadText } from "../lib/download";
 import { providerLabel } from "../lib/provenance";
 import { verifiedFor } from "../lib/verified";
@@ -148,6 +149,7 @@ export function StructuredResults({
             { label: "Fields", value: "fields" },
             { label: "JSON", value: "raw" },
             { label: "Code", value: "code" },
+            { label: "Accuracy", value: "accuracy" },
           ]}
           value={view}
           onChange={setView}
@@ -175,6 +177,59 @@ export function StructuredResults({
         </pre>
       ) : view === "raw" ? (
         <pre className="mono">{JSON.stringify(data.extraction, null, 2)}</pre>
+      ) : view === "accuracy" ? (
+        <div className="studio-table-block">
+          {/* A plain <table>, not the .field-table-head/.field-row grid the
+              Fields view uses: this is genuinely tabular (one row per model,
+              no per-row selection or citation), so it gets .field-table for
+              the same outer border/background TablesResults already uses,
+              plus .studio-table for width/border-collapse — see the CSS
+              comment on why .studio-table-block (not .field-table) is what
+              scrolls. */}
+          <table className="field-table studio-table benchmark-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Fields correct</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {BENCHMARK.rows
+                .filter((r) => r.docId === docId)
+                .map((r) => (
+                  <tr key={`${r.provider}-${r.model}`}>
+                    <td>
+                      {providerLabel(r.provider)} · {r.model}
+                    </td>
+                    <td>
+                      {r.matched} of {r.verified}
+                    </td>
+                    <td>{(r.timingMs / 1000).toFixed(1)}s</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          {/* The point of this task: an undisclosed benchmark is a marketing
+              claim, and a disclosed one is a demonstration. Every clause
+              below exists because leaving it out would let this table be
+              misread. */}
+          <p className="muted hint-em">
+            Measured {BENCHMARK.measuredOn} on these sample documents, with no
+            extraction guidance applied; scores here describe this corpus, not a
+            prospect's own, and will drift as model versions change. A verified
+            field the model left blank counts as not correct, not as unscored —
+            every row is scored out of the same denominator. Timings are single
+            measurements, not steady rates: they range from a few seconds to
+            well over a minute here, and the slowest pairs are also the least
+            reliable. Guidance changes results materially — try a preset and run
+            it again — and any row can be reproduced live by picking that model
+            and pressing Run, though these models are not deterministic, so a
+            live run can score differently than the row shown: a real
+            operational consideration for anyone putting one in a pipeline, not
+            a flaw in this table.
+          </p>
+        </div>
       ) : (
         <div className="field-table">
           {/* Shares .field-row's grid so the labels land over their columns.

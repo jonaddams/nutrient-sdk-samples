@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { StructuredData } from "../../lib/api";
+import { BENCHMARK } from "../../lib/benchmark";
 import { confidencePct, StructuredResults } from "../StructuredResults";
 
 afterEach(() => {
@@ -306,7 +307,46 @@ test("marks a wrong value against the answer key", () => {
       onCitationHexChange={vi.fn()}
     />,
   );
-  expect(screen.getByText(/expected 345,015/)).toBeDefined();
+  const verdict = screen.getByText(/expected 345,015/);
+  expect(verdict).toBeDefined();
+  // Styling regression guard: the mismatch verdict must keep its own class —
+  // it is the one the CSS gives distinct colour/weight so a non-technical
+  // presenter notices it, unlike the other two verdict states.
+  expect(verdict.className).toContain("mismatch");
+});
+
+test("marks a correct value with its own class, distinct from mismatch/unverified", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { invoiceNumber: "AC-2025-1047" },
+          fields: [
+            {
+              name: "invoiceNumber",
+              type: "string",
+              value: "AC-2025-1047",
+              page: 0,
+              confidence: 0.95,
+              match: "exact",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  const verdict = screen.getByText("✓");
+  expect(verdict.className).toContain("match");
+  expect(verdict.className).not.toContain("mismatch");
 });
 
 test("shows a field with no answer key as not verified, never as wrong", () => {
@@ -338,7 +378,9 @@ test("shows a field with no answer key as not verified, never as wrong", () => {
       onCitationHexChange={vi.fn()}
     />,
   );
-  expect(screen.getByText(/not verified/)).toBeDefined();
+  const verdict = screen.getByText(/not verified/);
+  expect(verdict).toBeDefined();
+  expect(verdict.className).toContain("unverified");
   expect(screen.queryByText(/expected/)).toBeNull();
 });
 
@@ -395,4 +437,43 @@ test("the run summary counts only verified fields", () => {
     />,
   );
   expect(screen.getByText("2 of 3 verified fields match")).toBeDefined();
+});
+
+test("the accuracy segment shows the benchmark for the current document with its caveats", () => {
+  const { container } = render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={{ extraction: {}, fields: [] } as unknown as StructuredData}
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Accuracy" }));
+
+  // Exactly the rows benchmarked for THIS document, never the other 39 —
+  // every provider shares the same three model ids across every document,
+  // so the count (not a model name) is what actually proves the filter.
+  const rows = BENCHMARK.rows.filter((r) => r.docId === "invoice-ac20251047");
+  expect(rows.length).toBeGreaterThan(0);
+  const renderedRows = container.querySelectorAll(".benchmark-table tbody tr");
+  expect(renderedRows.length).toBe(rows.length);
+  for (const r of rows) {
+    expect(screen.getByText(new RegExp(r.model))).toBeDefined();
+  }
+
+  // The four caveats the brief requires, plus the two the human ruling and
+  // the latency data added: sample-corpus scope, the scoring rule for a
+  // blank verified field, latency variance, and the non-determinism caveat
+  // on "reproduce it live".
+  expect(screen.getByText(/measured/i)).toBeDefined();
+  expect(screen.getByText(/these sample documents/i)).toBeDefined();
+  expect(screen.getByText(/not correct, not as unscored/i)).toBeDefined();
+  expect(screen.getByText(/not steady rates/i)).toBeDefined();
+  expect(screen.getByText(/pressing Run/)).toBeDefined();
+  expect(screen.getByText(/not deterministic/i)).toBeDefined();
 });

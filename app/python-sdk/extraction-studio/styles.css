@@ -1432,6 +1432,68 @@
   color: var(--ink);
 }
 
+/* Three verdict states for .field-row-verified (Fields view). The glyph
+   (✓ / ✗ expected … / — not verified) already carries the meaning, so colour
+   here is reinforcement, not the only signal — a colour-blind reader still
+   gets the right answer from the text alone.
+   Same fixed hues .match-dot already uses for grounding strength, not new
+   ones: this is the same kind of claim (a correctness signal that must read
+   the same in every theme/palette, not the app's decorative accent), so it
+   reuses the existing tone rather than inventing a second colour system.
+   `mismatch` also carries weight: it is the one state built to be NOTICED by
+   a non-technical presenter mid-demo, so it must not have to compete with
+   `match` or `unverified` for attention. */
+.studio-shell .field-row-verified.match {
+  color: #4a9d6a;
+}
+
+.studio-shell .field-row-verified.mismatch {
+  color: #c8553c;
+  font-weight: 600;
+}
+
+.studio-shell .field-row-verified.unverified {
+  color: var(--ink-4);
+}
+
+/* The Accuracy segment's per-model benchmark: a plain <table>/<thead>/<tbody>
+   rather than the .field-table-head/.field-row grid above, because this data
+   has no per-row selection or citation behaviour — it is genuinely tabular.
+   .field-table + .studio-table (the same combination TablesResults already
+   uses for extracted tables) supplies the outer border/background and the
+   collapsed-border grid; only the header and column alignment are new here. */
+.studio-shell .benchmark-table th {
+  padding: 7px var(--space-3);
+  border: 1px solid var(--line);
+  border-top: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  background: var(--surface);
+  text-align: left;
+  font-weight: 400;
+}
+
+.studio-shell .benchmark-table td {
+  padding: 7px var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.studio-shell .benchmark-table th:nth-child(2),
+.studio-shell .benchmark-table th:nth-child(3),
+.studio-shell .benchmark-table td:nth-child(2),
+.studio-shell .benchmark-table td:nth-child(3) {
+  text-align: right;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.studio-shell .benchmark-table td:first-child {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}
+
 @media (max-width: 1024px) {
   .studio-shell .rail-tip {
     left: 0;
