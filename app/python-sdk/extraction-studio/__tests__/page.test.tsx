@@ -3,14 +3,16 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { samples } from "../../samples";
 import { FEATURES } from "../_components/FeatureRail";
+import handwritingLocalFixture from "../lib/__tests__/fixtures/handwriting-local.json";
 import type { IndexedCitation } from "../lib/citations";
 import ExtractionStudio from "../page";
 
 // DocViewer needs a real SDK global (window.NutrientViewer) to load anything,
 // which jsdom never provides, so every other test here has simply never
 // looked at what DocViewer receives. Recording the `citations` prop is the
-// only way to prove page.tsx's viewerCitations ternary picks the right
-// branch — see the tests below that assert on `data-citation-count`.
+// only way to prove page.tsx hands DocViewer the citations belonging to the
+// SELECTED feature — `panels[feature].citations` — see the tests below that
+// assert on `data-citation-count`.
 //
 // `citationRenders` also captures EVERY render the mock sees, not just the
 // settled one `screen` can query after an interaction. That distinction
@@ -22,8 +24,8 @@ import ExtractionStudio from "../page";
 // cannot distinguish "computed 0 citations immediately" from "briefly
 // recomputed the previous feature's citations, then got cleared a beat
 // later". Only a spy on every render call can see that intermediate frame,
-// and that frame is exactly what `feature === "describe" ? NO_CITATIONS :`
-// exists to keep from ever being nonzero.
+// and that frame is exactly what the `describe` panel entry's
+// `citations: NO_CITATIONS` exists to keep from ever being nonzero.
 const { citationRenders } = vi.hoisted(() => ({
   citationRenders: [] as number[],
 }));
@@ -217,10 +219,10 @@ test("draws no citation overlay for Image description", async () => {
   // The controls-absence checks above are NOT proof of this: Show
   // regions/Show citations live in the results panels, which never mount
   // here (tab is "config", no result). This is the actual guarantee — what
-  // page.tsx hands DocViewer's `citations` prop for the "describe" branch.
-  // Without the `feature === "describe" ? NO_CITATIONS :` branch,
-  // viewerCitations's final `else` is `ocrCitations`, which would still be
-  // whatever a PREVIOUS OCR run left behind.
+  // page.tsx hands DocViewer's `citations` prop for the "describe" feature.
+  // Were that entry's `citations: NO_CITATIONS` to name another feature's
+  // memo — `ocrCitations`, say — it would still be whatever a PREVIOUS OCR
+  // run left behind.
   expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
     "data-citation-count",
     "0",
@@ -255,11 +257,12 @@ test("switching from a populated OCR run to Image description never paints a sta
   citationRenders.length = 0;
   fireEvent.click(screen.getByRole("button", { name: /Image description/ }));
 
-  // Without `feature === "describe" ? NO_CITATIONS :`, the render that fires
-  // the instant `feature` becomes "describe" (before the clearing effect
-  // runs) still computes `viewerCitations` as `ocrCitations` — the previous
-  // OCR run's box, painted on the document for one commit. Every recorded
-  // render across the whole switch must be 0, not just the settled last one.
+  // Were the `describe` entry's `citations: NO_CITATIONS` replaced by
+  // `ocrCitations`, the render that fires the instant `feature` becomes
+  // "describe" (before the clearing effect runs) would still hand DocViewer
+  // the previous OCR run's box — painted on the document for one commit.
+  // Every recorded render across the whole switch must be 0, not just the
+  // settled last one.
   expect(citationRenders.every((count) => count === 0)).toBe(true);
   expect(citationRenders.length).toBeGreaterThan(0);
 });
@@ -744,6 +747,11 @@ test("the page header and the registry card agree on the studio's name", () => {
 //
 //   structured   -> "Schema builder" is StructuredConfig's own PanelSection
 //                    (StructuredConfig.tsx); nothing else renders it.
+//   handwriting  -> "Engine" is HandwritingConfig's own Segmented group
+//                    (HandwritingConfig.tsx); confirmed by grep to be the
+//                    only `label="Engine"`/group named "Engine" anywhere
+//                    under _components — no other config offers an engine
+//                    toggle.
 //   adaptive_ocr -> "Languages" is OcrConfig's language-chip group
 //                    (OcrConfig.tsx); OCR is the only feature offering
 //                    languages at all.
@@ -762,6 +770,8 @@ const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
     expect(
       screen.getByRole("group", { name: "Schema builder" }),
     ).toBeInTheDocument(),
+  handwriting: () =>
+    expect(screen.getByRole("group", { name: "Engine" })).toBeInTheDocument(),
   adaptive_ocr: () =>
     expect(
       screen.getByRole("group", { name: "Languages" }),
@@ -794,4 +804,148 @@ test("every enabled rail feature renders its OWN configuration panel", async () 
     assertOwnPanel();
     unmount();
   }
+});
+
+test("Handwriting recognition is selectable and swaps in its own panel", async () => {
+  // HandwritingConfig fetches providers on mount regardless of engine — stub
+  // it with the file's existing convention rather than leaving `fetch`
+  // unstubbed, which would otherwise issue a real request out of the suite.
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("group", { name: "Engine" })).toBeTruthy(),
+  );
+});
+
+test("Run is enabled for Local ICR even with no providers configured", async () => {
+  // The on-prem engine must be usable on a deployment with no API keys at all.
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({ ok: true, json: async () => ({ providers: [] }) })),
+  );
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(
+      screen
+        .getByRole("button", { name: /Run extraction/ })
+        .hasAttribute("disabled"),
+    ).toBe(false),
+  );
+});
+
+// The ordering guard for `selectFeature`. Local ICR needs no credentials, so
+// HandwritingConfig reports ready from a MOUNT effect rather than waiting on
+// /providers — and React flushes a child's passive effects BEFORE the
+// parent's. While page.tsx cleared `providersReady` inside its `useEffect`
+// keyed on `[feature]`, that clear landed AFTER the freshly-mounted panel had
+// already reported `true`, silently undoing it. Run then re-enabled only when
+// the unrelated /providers fetch settled — so the one engine that needs no
+// backend credentials was the SLOWEST control on the page to become
+// clickable, and on a hanging or proxied backend it never became clickable.
+//
+// Neither test above can observe that: their fetches resolve, and the gate
+// self-heals the instant they do, either way. Leaving /providers hanging
+// forever is what makes the ordering the only thing under test — with the
+// reset back in the `[feature]` effect, Run stays disabled for this test's
+// whole life.
+test("Local ICR's Run is enabled even while the providers fetch hangs", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => new Promise(() => {})),
+  );
+  render(<ExtractionStudio />);
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /Run extraction/ }),
+    ).not.toBeDisabled(),
+  );
+});
+
+/** Stubs the two fetches Local ICR's Run makes — the document itself from
+ *  public/, then the /icr endpoint — with a real captured response
+ *  (handwriting-local.json) that carries citations, plus the providers fetch
+ *  HandwritingConfig always issues on mount. Mirrors stubOcrFetch()'s shape;
+ *  a real fixture rather than an inline stub is what proves the run actually
+ *  populates the overlay, not just that Run was clicked. */
+function stubHandwritingFetch() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/icr")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => handwritingLocalFixture,
+        };
+      }
+      return { ok: true, status: 200, blob: async () => new Blob(["pdf"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+// Fix round 1: the brief's original version of this test (and my first pass
+// at it) never stubbed a fetch and never clicked Run, so `handwritingResult`
+// stayed null for the test's whole life and the overlay was already "0"
+// before the switch — vacuous even with BOTH `setHandwritingResult(null)`
+// calls deleted from page.tsx. It also switched to a different FEATURE, which
+// is safe by construction: `panels[feature].citations` swaps the whole array
+// on a feature change, independent of whether any clearing effect runs. The
+// path that constraint in the brief actually names is `selectDoc` — picking a
+// NEW DOCUMENT while a handwriting result is on screen — which is what this
+// now exercises, mirroring "switching from a populated OCR run to Image
+// description never paints a stale overlay" above: run first to populate a
+// nonzero count (proving there is something to clear), reset the render log,
+// then switch and require every render from that point on to read zero, not
+// just the settled last one — `act()` flushes selectDoc's clearing state
+// updates before `fireEvent.click` returns, so a bare post-click assertion
+// cannot tell a stale one-frame paint from a clean switch.
+test("switching documents mid-handwriting-run clears the previous document's overlay", async () => {
+  stubHandwritingFetch();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  // Local ICR needs no provider and reports ready on mount, but that still
+  // happens in a passive effect — wait for it rather than assuming Run is
+  // already enabled the instant the rail click's act() batch settles.
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /Run extraction/ }),
+    ).not.toBeDisabled(),
+  );
+  fireEvent.click(screen.getByRole("button", { name: /Run extraction/ }));
+  await waitFor(() => {
+    const count = Number(
+      screen.getByTestId("doc-viewer").getAttribute("data-citation-count"),
+    );
+    expect(count).toBeGreaterThan(0);
+  });
+
+  // Only renders from this point on are relevant to the switch under test.
+  citationRenders.length = 0;
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+
+  await waitFor(() =>
+    expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
+      "data-citation-count",
+      "0",
+    ),
+  );
+  expect(citationRenders.every((count) => count === 0)).toBe(true);
+  expect(citationRenders.length).toBeGreaterThan(0);
 });

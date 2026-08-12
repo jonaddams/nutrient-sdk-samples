@@ -9,6 +9,8 @@ import { DescribeResults } from "./_components/DescribeResults";
 import { DocStrip } from "./_components/DocStrip";
 import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
+import { HandwritingConfig } from "./_components/HandwritingConfig";
+import { HandwritingResults } from "./_components/HandwritingResults";
 import { OcrConfig } from "./_components/OcrConfig";
 import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
@@ -36,6 +38,12 @@ import {
 } from "./lib/describe";
 import { DOCUMENTS, findDoc } from "./lib/docs";
 import {
+  extractHandwriting,
+  type HandwritingRequest,
+  type HandwritingResult,
+  handwritingCitationsFor,
+} from "./lib/handwriting";
+import {
   extractOcr,
   type OcrColorMode,
   type OcrRequest,
@@ -51,13 +59,14 @@ import {
 } from "./lib/tables";
 
 // Image description carries no citations — its output is prose with no
-// coordinates. A literal `[]` inline in viewerCitations below would be a
-// FRESH array every render, while the three sibling branches are all
-// useMemo'd; see the identity rule at the `citations` useMemo above
-// (page.tsx:136-142) — DocViewer's annotation-sync effect keys on `citations`
-// identity, and a new array every render would thrash it exactly the way that
-// comment warns against. Module-level keeps the identity stable across every
-// render without needing its own useMemo.
+// coordinates. A literal `[]` inline in the `describe` entry of the `panels`
+// map below would be a FRESH array every render, while every sibling entry's
+// `citations` is a useMemo'd value; see the identity rule on the `citations`
+// useMemo further down — DocViewer's annotation-sync effect keys on the
+// `citations` prop's identity, and a new array every render would thrash it
+// exactly the way that comment warns against. `panels` is itself rebuilt on
+// every render, so module-level is what keeps this one value's identity
+// stable without giving it its own useMemo.
 const NO_CITATIONS: IndexedCitation[] = [];
 
 export default function ExtractionStudio() {
@@ -95,6 +104,12 @@ export default function ExtractionStudio() {
   const [describeResult, setDescribeResult] = useState<DescribeResult | null>(
     null,
   );
+  const [handwritingResult, setHandwritingResult] =
+    useState<HandwritingResult | null>(null);
+  // Its own mode, sharing citationHex with the other features — one studio-wide
+  // highlight colour that survives a rail switch.
+  const [handwritingColorMode, setHandwritingColorMode] =
+    useState<OcrColorMode>("confidence");
 
   // Read inside a request's continuation to detect a feature/document switch
   // that happened while the request was in flight — a plain closure over
@@ -130,9 +145,37 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setHandwritingResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
+  };
+
+  // Switching feature closes the Run gate as part of the SWITCH ITSELF, rather
+  // than in the `[feature]` effect below.
+  //
+  // WHY it must close at all is unchanged: only one config panel is mounted at
+  // a time, so `providersReady` is left `true` by whichever mounted last, and
+  // going Structured (already ready) -> Tables would otherwise leave Run
+  // enabled before TablesConfig's own provider fetch resolved — the exact
+  // early click the gate exists to prevent.
+  //
+  // WHY it moved is ordering. React flushes a child's passive effects BEFORE
+  // the parent's, so with the reset living in the `[feature]` effect, a newly
+  // mounted panel's `onProvidersReady(true)` was immediately overwritten by
+  // the parent's `setProvidersReady(false)`. That is invisible for the panels
+  // that genuinely wait on a fetch — they report `true` later anyway — but
+  // HandwritingConfig reports ready ON MOUNT in Local ICR mode, which needs no
+  // credentials at all. The clear undid the one signal that was already
+  // correct, so Run re-enabled only once an unrelated `/providers` fetch
+  // settled: on a slow or proxied backend the credential-free engine became
+  // the slowest control on the page to become clickable, and on a hanging
+  // fetch it never became clickable at all. Clearing here — before the new
+  // panel mounts and reports — keeps the gate closed across the switch
+  // without racing the child.
+  const selectFeature = (next: string) => {
+    setFeature(next);
+    setProvidersReady(false);
   };
 
   // Auto-selecting the category's first document keeps the viewer from showing
@@ -162,14 +205,13 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setHandwritingResult(null);
     setError(null);
     setActiveIndex(null);
-    // Only one config panel is mounted at a time, so `providersReady` is left
-    // `true` by whichever mounted last. Without this reset, running
-    // Structured (ready -> true) then switching to Tables would leave Run
-    // enabled before TablesConfig's own provider fetch has resolved — the
-    // exact early click the gate exists to prevent.
-    setProvidersReady(false);
+    // The Run gate is deliberately NOT reset here — it is cleared in
+    // `selectFeature` instead, so it happens when the user switches rather
+    // than after the incoming panel's mount effects have already reported
+    // readiness. See that function's comment.
   }, [feature]);
 
   const ocrCitations = useMemo(
@@ -180,6 +222,11 @@ export default function ExtractionStudio() {
   const tableCitations = useMemo(
     () => tableCitationsFor(tablesResult?.tables ?? [], tableColorMode),
     [tablesResult, tableColorMode],
+  );
+
+  const handwritingCitations = useMemo(
+    () => handwritingCitationsFor(handwritingResult, handwritingColorMode),
+    [handwritingResult, handwritingColorMode],
   );
 
   const currentFeature = FEATURES.find((f) => f.id === feature);
@@ -249,6 +296,14 @@ export default function ExtractionStudio() {
       extractDescription,
       setDescribeResult,
       "Description failed",
+    );
+
+  const handleHandwritingRun = (req: HandwritingRequest) =>
+    runFeature(
+      req,
+      extractHandwriting,
+      setHandwritingResult,
+      "Handwriting recognition failed",
     );
 
   /** Everything that varies per rail feature, in one place.
@@ -375,6 +430,40 @@ export default function ExtractionStudio() {
         <DescribeResults result={describeResult} />
       ) : null,
     },
+    handwriting: {
+      // True because VLM-enhanced needs one. This flag is per FEATURE, not per
+      // engine, and the gate is real in both modes — it closes on every switch
+      // into handwriting (see `selectFeature`) and is reopened by whatever
+      // HandwritingConfig reports. Local ICR needs no provider and so reports
+      // ready from its mount effect without waiting on `/providers`, which
+      // makes the closed window a frame or two rather than a fetch long. It is
+      // NOT "a gate that never closes here".
+      needsProviders: true,
+      citations: handwritingCitations,
+      show: showRegions,
+      config: (
+        <HandwritingConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleHandwritingRun}
+          runSignal={runSignal}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: handwritingResult ? (
+        <HandwritingResults
+          result={handwritingResult}
+          activeIndex={activeIndex}
+          onSelectElement={setActiveIndex}
+          showRegions={showRegions}
+          onShowRegionsChange={setShowRegions}
+          colorMode={handwritingColorMode}
+          onColorModeChange={setHandwritingColorMode}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+        />
+      ) : null,
+    },
   };
 
   // The rail only enables features that have an entry here, and
@@ -411,7 +500,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, lift every table off the page, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, or describe what's on it in plain language."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
@@ -425,7 +514,7 @@ export default function ExtractionStudio() {
           <FeatureRail
             features={FEATURES}
             value={feature}
-            onSelect={setFeature}
+            onSelect={selectFeature}
           />
           <CategorySelect
             docs={DOCUMENTS}

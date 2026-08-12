@@ -32,20 +32,14 @@ export const FEATURES: Feature[] = [
       "Pulls out the specific fields you ask for — invoice number, date, total — as clean data, and shows you where on the page each value came from. An AI model does the reading: OpenAI, Claude, AWS Bedrock, or a model running on your own machine so documents never leave it.",
   },
   {
-    id: "icr",
+    id: "handwriting",
     group: "Recognition",
-    label: "Local ICR",
-    enabled: false,
+    label: "Handwriting recognition",
+    enabled: true,
+    blurb:
+      "Read handwriting and awkward print, on this machine or with a vision model.",
     description:
-      "Reads handwriting and awkward print entirely on this machine, with nothing sent to an outside service. For documents that aren't allowed to leave your network.",
-  },
-  {
-    id: "vlm_icr",
-    group: "Recognition",
-    label: "VLM-enhanced ICR",
-    enabled: false,
-    description:
-      "The same handwriting reading, with a vision AI model checking the parts it finds hardest. Slower than local ICR, but more accurate on messy or poor-quality scans.",
+      "Reads handwritten and awkwardly printed documents. Runs entirely on this machine so nothing leaves your network — or hands the page to a vision AI model, which reads cursive the local engine cannot.",
   },
   {
     id: "adaptive_ocr",
