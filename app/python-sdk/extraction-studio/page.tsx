@@ -343,6 +343,7 @@ export default function ExtractionStudio() {
           onRun={handleRun}
           runSignal={runSignal}
           schemaPreset={schemaPreset}
+          category={category}
           onProvidersReady={setProvidersReady}
         />
       ),

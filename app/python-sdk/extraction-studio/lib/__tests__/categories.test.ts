@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
+  guidanceFor,
   labelFor,
   presetFor,
 } from "../categories";
@@ -152,6 +153,23 @@ const GROUNDED_HANDWRITING_FIELDS: Record<string, string> = {
   documentTitle:
     'headed by content on three of four ("Apricot Cake." / "Heavenly Hamburgers" / "Employment Application"); the fourth ("NOTES") is only the stationery\'s pre-printed header, not a title written for that note',
 };
+
+describe("guidance presets", () => {
+  test("the invoices guidance preset carries the verified string", () => {
+    // Verified over nineteen hosted runs on 2026-08-12: without it, Bedrock
+    // Qwen3-VL returns 1,910,500 (Revised Contract) instead of 345,015 on
+    // Invoice AC-2025-1047. OpenAI and Claude are correct either way, and the
+    // other studio invoices are unchanged by it. Rewording invalidates all of it.
+    const [preset] = guidanceFor("invoices");
+    expect(preset.text).toContain("Amount Due");
+    expect(preset.text).toContain("retainage");
+  });
+
+  test("a category with no guidance gets an empty list", () => {
+    expect(guidanceFor("logistics")).toEqual([]);
+    expect(guidanceFor("uncategorized")).toEqual([]);
+  });
+});
 
 describe("the handwriting preset is grounded, not guessed", () => {
   test("every field in the preset has a grounding entry", () => {

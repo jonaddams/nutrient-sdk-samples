@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { StructuredRequest } from "../lib/api";
+import { guidanceFor } from "../lib/categories";
 import { fetchProviders, type ProviderInfo } from "../lib/providers";
 import { buildSchema, newSchemaProp, type SchemaProp } from "../lib/schema";
 import { Field } from "./Field";
@@ -14,6 +15,7 @@ export function StructuredConfig({
   onRun,
   runSignal,
   schemaPreset,
+  category,
   onProvidersReady,
 }: {
   docPath: string;
@@ -22,6 +24,8 @@ export function StructuredConfig({
   runSignal: number;
   /** MUST be referentially stable per category — see the effect below. */
   schemaPreset: SchemaProp[];
+  /** Which category's guidance presets to offer beside the Instructions box. */
+  category: string;
   /** Called whenever provider-load readiness changes: `false` while the
    *  providers fetch is in flight or after it has failed, `true` once a
    *  provider list has been received. The parent uses this to gate its Run
@@ -274,6 +278,25 @@ export function StructuredConfig({
             placeholder="e.g. Amounts are plain numbers without currency symbols."
           />
         </Field>
+        {guidanceFor(category).length > 0 && (
+          // Ordinary buttons, NOT a Segmented — same reasoning as
+          // DescribeConfig's prompt presets. Segmented renders aria-pressed,
+          // which asserts a mode that goes false the instant the textarea is
+          // edited after a click. These are load-this-text actions and hold no
+          // state of their own.
+          <div className="prompt-presets">
+            {guidanceFor(category).map((g) => (
+              <button
+                key={g.label}
+                type="button"
+                className="btn ghost sm"
+                onClick={() => setInstructions(g.text)}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+        )}
         <Field
           label="Provider"
           htmlFor="cfg-provider"
