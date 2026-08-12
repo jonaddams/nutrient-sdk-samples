@@ -49,8 +49,11 @@ export function HandwritingConfig({
   // Deliberately mount-only, mirroring TablesConfig: `provider` is read for its
   // value AT THE TIME THE FETCH RESOLVES, not as a reactive dependency — adding
   // it here would refetch on every selection change. Fetched even in local
-  // mode, so switching to VLM-enhanced finds the list already there.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional mount-only fetch; `provider` is read fresh inside the callback.
+  // mode, so switching to VLM-enhanced finds the list already there. This
+  // effect carries no suppression, unlike TablesConfig's otherwise-identical
+  // one: `provider` is reconciled through a functional setState below rather
+  // than read from the closure, so the body names no reactive value and
+  // useExhaustiveDependencies has nothing left to report here.
   useEffect(() => {
     let cancelled = false;
     fetchProviders()

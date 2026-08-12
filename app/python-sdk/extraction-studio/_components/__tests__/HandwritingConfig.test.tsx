@@ -63,6 +63,10 @@ test("switching to VLM-enhanced re-gates Run until providers resolve", async () 
 });
 
 test("a run signal emits the local engine with no provider round trip", async () => {
+  // Despite the name, this does NOT pin the skip-on-mount contract: a fire on
+  // mount would also carry `engine: "local"`, so `mock.calls[0]` looks
+  // identical whether or not runSignal 0 is skipped. The VLM sibling below is
+  // what actually pins it.
   stubProviders();
   const { onRun, view } = setup();
   view.rerender(
@@ -83,6 +87,12 @@ test("a run signal emits the local engine with no provider round trip", async ()
 
 test("a VLM run sends the wire name, not the studio's provider id", async () => {
   // The studio says "anthropic"; this endpoint only knows "claude".
+  //
+  // This is also the real guard for the skip-on-mount contract the local test
+  // above is NAMED for: the engine and provider are changed BEFORE runSignal
+  // is bumped, so a fire on mount would land as `mock.calls[0]` carrying the
+  // initial `engine: "local"` / `provider: "openai"` and this assertion would
+  // go red.
   stubProviders();
   const onRun = vi.fn();
   const onProvidersReady = vi.fn();
