@@ -837,6 +837,38 @@ test("Run is enabled for Local ICR even with no providers configured", async () 
   );
 });
 
+// The ordering guard for `selectFeature`. Local ICR needs no credentials, so
+// HandwritingConfig reports ready from a MOUNT effect rather than waiting on
+// /providers — and React flushes a child's passive effects BEFORE the
+// parent's. While page.tsx cleared `providersReady` inside its `useEffect`
+// keyed on `[feature]`, that clear landed AFTER the freshly-mounted panel had
+// already reported `true`, silently undoing it. Run then re-enabled only when
+// the unrelated /providers fetch settled — so the one engine that needs no
+// backend credentials was the SLOWEST control on the page to become
+// clickable, and on a hanging or proxied backend it never became clickable.
+//
+// Neither test above can observe that: their fetches resolve, and the gate
+// self-heals the instant they do, either way. Leaving /providers hanging
+// forever is what makes the ordering the only thing under test — with the
+// reset back in the `[feature]` effect, Run stays disabled for this test's
+// whole life.
+test("Local ICR's Run is enabled even while the providers fetch hangs", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => new Promise(() => {})),
+  );
+  render(<ExtractionStudio />);
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: /Run extraction/ }),
+    ).not.toBeDisabled(),
+  );
+});
+
 /** Stubs the two fetches Local ICR's Run makes — the document itself from
  *  public/, then the /icr endpoint — with a real captured response
  *  (handwriting-local.json) that carries citations, plus the providers fetch

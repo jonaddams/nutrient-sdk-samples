@@ -150,6 +150,33 @@ export default function ExtractionStudio() {
     setTab("config");
   };
 
+  // Switching feature closes the Run gate as part of the SWITCH ITSELF, rather
+  // than in the `[feature]` effect below.
+  //
+  // WHY it must close at all is unchanged: only one config panel is mounted at
+  // a time, so `providersReady` is left `true` by whichever mounted last, and
+  // going Structured (already ready) -> Tables would otherwise leave Run
+  // enabled before TablesConfig's own provider fetch resolved — the exact
+  // early click the gate exists to prevent.
+  //
+  // WHY it moved is ordering. React flushes a child's passive effects BEFORE
+  // the parent's, so with the reset living in the `[feature]` effect, a newly
+  // mounted panel's `onProvidersReady(true)` was immediately overwritten by
+  // the parent's `setProvidersReady(false)`. That is invisible for the panels
+  // that genuinely wait on a fetch — they report `true` later anyway — but
+  // HandwritingConfig reports ready ON MOUNT in Local ICR mode, which needs no
+  // credentials at all. The clear undid the one signal that was already
+  // correct, so Run re-enabled only once an unrelated `/providers` fetch
+  // settled: on a slow or proxied backend the credential-free engine became
+  // the slowest control on the page to become clickable, and on a hanging
+  // fetch it never became clickable at all. Clearing here — before the new
+  // panel mounts and reports — keeps the gate closed across the switch
+  // without racing the child.
+  const selectFeature = (next: string) => {
+    setFeature(next);
+    setProvidersReady(false);
+  };
+
   // Auto-selecting the category's first document keeps the viewer from showing
   // a document from a different category than the active tab. Routing through
   // selectDoc also clears result/ocrResult/activeIndex/error, so citations
@@ -180,12 +207,10 @@ export default function ExtractionStudio() {
     setHandwritingResult(null);
     setError(null);
     setActiveIndex(null);
-    // Only one config panel is mounted at a time, so `providersReady` is left
-    // `true` by whichever mounted last. Without this reset, running
-    // Structured (ready -> true) then switching to Tables would leave Run
-    // enabled before TablesConfig's own provider fetch has resolved — the
-    // exact early click the gate exists to prevent.
-    setProvidersReady(false);
+    // The Run gate is deliberately NOT reset here — it is cleared in
+    // `selectFeature` instead, so it happens when the user switches rather
+    // than after the incoming panel's mount effects have already reported
+    // readiness. See that function's comment.
   }, [feature]);
 
   const ocrCitations = useMemo(
@@ -405,8 +430,13 @@ export default function ExtractionStudio() {
       ) : null,
     },
     handwriting: {
-      // True even though Local ICR needs no provider: HandwritingConfig reports
-      // ready on mount in that mode, so the gate simply never closes there.
+      // True because VLM-enhanced needs one. This flag is per FEATURE, not per
+      // engine, and the gate is real in both modes — it closes on every switch
+      // into handwriting (see `selectFeature`) and is reopened by whatever
+      // HandwritingConfig reports. Local ICR needs no provider and so reports
+      // ready from its mount effect without waiting on `/providers`, which
+      // makes the closed window a frame or two rather than a fetch long. It is
+      // NOT "a gate that never closes here".
       needsProviders: true,
       citations: handwritingCitations,
       show: showRegions,
@@ -483,7 +513,7 @@ export default function ExtractionStudio() {
           <FeatureRail
             features={FEATURES}
             value={feature}
-            onSelect={setFeature}
+            onSelect={selectFeature}
           />
           <CategorySelect
             docs={DOCUMENTS}
