@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { copyText, downloadText } from "../lib/download";
 import { confidenceTone, type OcrColorMode, type OcrResult } from "../lib/ocr";
+import { languagesLabel } from "../lib/provenance";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -97,6 +98,15 @@ export function OcrResults({
             so it stays. Show regions is gated here too: it controls an
             overlay derived from textElements, which is always [] on this
             branch, so the toggle would paint nothing on either setting. */}
+        {/* Outside the !isMarkdown gate: the languages are what the reader
+            chose and they shape both branches' output, unlike the element and
+            confidence figures below, which are structurally zero in markdown
+            mode. Naming them here is what makes a screenshot or a scroll-back
+            interpretable — Run lives in the panel head, so a re-run from this
+            tab happens with the language chips out of sight. */}
+        <span className="mono muted">
+          {languagesLabel(result.config?.languages)}
+        </span>
         {!isMarkdown && (
           <>
             <span className="mono muted">

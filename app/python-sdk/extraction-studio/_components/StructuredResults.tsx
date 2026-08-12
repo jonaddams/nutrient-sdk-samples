@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
 import { copyText, downloadText } from "../lib/download";
+import { providerLabel } from "../lib/provenance";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -29,6 +30,7 @@ export function StructuredResults({
   data,
   code,
   timingMs,
+  config,
   activeIndex,
   onSelectField,
   showCitations,
@@ -39,6 +41,10 @@ export function StructuredResults({
   data: StructuredData;
   code?: string;
   timingMs?: number;
+  /** The backend's echo of the run. `Record<string, unknown>` because that is
+   *  what the Envelope declares — the shape is the backend's to change, and a
+   *  narrower type here would be a claim this component cannot enforce. */
+  config?: Record<string, unknown>;
   activeIndex: number | null;
   onSelectField: (i: number) => void;
   showCitations: boolean;
@@ -76,6 +82,17 @@ export function StructuredResults({
       <div className="results-meta">
         {timingMs != null && (
           <span className="mono muted">{(timingMs / 1000).toFixed(1)}s</span>
+        )}
+        {/* Which model produced these fields. This panel is the one where the
+            omission bit hardest: the studio offers four providers and a model
+            list per provider, so "the extraction got it wrong" is unanswerable
+            without knowing which model ran — and the demo trap on the flagship
+            invoice (the retainage figure) is model-specific. */}
+        {providerLabel(config?.provider as string | undefined) && (
+          <span className="mono muted">
+            {providerLabel(config?.provider as string | undefined)}
+            {typeof config?.model === "string" ? ` · ${config.model}` : ""}
+          </span>
         )}
         <Toggle
           checked={showCitations}

@@ -2,6 +2,7 @@
 import { type KeyboardEvent, useRef, useState } from "react";
 import { copyText, downloadText } from "../lib/download";
 import { confidenceTone } from "../lib/ocr";
+import { providerLabel } from "../lib/provenance";
 import {
   buildGrid,
   type TableCell,
@@ -243,6 +244,11 @@ export function TablesResults({
         <span className="mono muted">
           {result.tableCount} {result.tableCount === 1 ? "table" : "tables"}
         </span>
+        {/* Which vision model read the page. Run lives in the panel head, so a
+            re-run from this tab happens with the provider select out of sight,
+            and a table of figures with no record of what produced them is the
+            one artefact a prospect is most likely to screenshot. */}
+        <span className="mono muted">{providerLabel(result.provider)}</span>
         {/* Only when it actually happened. Production stops at
             MAX_PRERENDER_PAGES = 10, and a silent truncation reads as "this
             document has no tables past page 10". */}

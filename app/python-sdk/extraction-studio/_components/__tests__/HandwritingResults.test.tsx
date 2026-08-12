@@ -128,3 +128,21 @@ test("an empty run still offers the actions row and the Code view", async () => 
   await userEvent.click(screen.getByRole("button", { name: "JSON" }));
   expect(screen.getByText(/"engine": "ICR"/)).toBeTruthy();
 });
+
+test("the meta row names the engine that produced the result", () => {
+  // `Run extraction` lives in the panel head, so it is reachable from this tab
+  // with the engine toggle hidden. For this feature the answer is the demo's
+  // central claim rather than a detail — "nothing left this machine" should be
+  // visible on the result, not asserted out loud over it.
+  renderResults(LOCAL);
+  expect(screen.getByText("Local ICR")).toBeTruthy();
+});
+
+test("a VLM run names the engine AND the provider that corrected it", () => {
+  // Local needs no provider, so naming one there would be noise; VLM sent the
+  // page somewhere, and which somewhere is the question a security-minded
+  // prospect asks next.
+  renderResults(VLM);
+  expect(screen.getByText(/VLM-enhanced/)).toBeTruthy();
+  expect(screen.getByText(/OpenAI|Claude/)).toBeTruthy();
+});
