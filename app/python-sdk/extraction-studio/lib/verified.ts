@@ -142,27 +142,27 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
   "westbridge-engineering-submittal-form": {
     projectName: {
       value: "Riverside Office Plaza",
-      source: "Project | Riverside Office Plaza",
+      source: "Project Riverside Office Plaza",
     },
     projectNumber: {
       value: "WBR-2024-0071",
-      source: "Project No. | WBR-2024-0071",
+      source: "Project No. WBR-2024-0071",
     },
     submittalNumber: {
       value: "SUB-2024-0041",
-      source: "Submittal No. | SUB-2024-0041",
+      source: "Submittal No. SUB-2024-0041",
     },
     specSection: {
       value: "08 51 13 — Aluminum Windows",
-      source: "Spec Section | 08 51 13 — Aluminum Windows",
+      source: "Spec Section 08 51 13 — Aluminum Windows",
     },
     submittedBy: {
       value: "Keystone Construction Group, LLC",
-      source: "Submitted By | Keystone Construction Group, LLC",
+      source: "Submitted By Keystone Construction Group, LLC",
     },
     dateRequired: {
       value: "06/07/2024",
-      source: "Date Required | 06/07/2024",
+      source: "Date Required 06/07/2024",
     },
   },
 
@@ -226,7 +226,7 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
     outOfPocketMaximum: {
       value: 1250,
       source:
-        "the absolute net out-of-pocket maximum financial exposure ... is capped at exactly $1,250.00",
+        "The absolute net out-of-pocket maximum financial exposure for the primary named insured party during this isolated episode of acute emergency care is capped at exactly $1,250.00",
     },
   },
 
@@ -234,19 +234,19 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
   "northgate-auto-claim-fnol": {
     claimNumber: {
       value: "CLM-2026-004417",
-      source: "Claim Number | CLM-2026-004417",
+      source: "Claim Number CLM-2026-004417",
     },
     policyNumber: {
       value: "MAP-7781204-03",
-      source: "Policy Number | MAP-7781204-03",
+      source: "Policy Number MAP-7781204-03",
     },
     insuredName: {
       value: "Daniel R. Whitfield",
-      source: "Insured Name | Daniel R. Whitfield",
+      source: "Insured Name Daniel R. Whitfield",
     },
     dateOfLoss: {
       value: "March 14, 2026",
-      source: "Date of Loss | March 14, 2026",
+      source: "Date of Loss March 14, 2026",
     },
     estimatedDamage: {
       value: 8450,
@@ -273,7 +273,7 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
   "heavenly-hamburgers-recipe": {
     documentTitle: {
       value: "Heavenly Hamburgers",
-      source: "Heavenly ... Here's what's cookin': Hamburgers",
+      source: "Heavenly Here's what's cookin': Hamburgers",
     },
   },
   "employment-application": {
