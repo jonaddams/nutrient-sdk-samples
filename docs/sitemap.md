@@ -181,7 +181,6 @@ Filter chips: All, Conversion, Editor, Signatures, Forms, Templates.
 
 ### Templates
 - `/python-sdk/word-template` — **Word Template Generation** — PDFs from Word templates populated with JSON data
-- `/python-sdk/vlm-extraction` — **VLM Extraction** *(in repo, may not appear on index)*
 
 ---
 

@@ -64,32 +64,11 @@ export const samples: Sample[] = [
     path: "/python-sdk/form-fill",
   },
   {
-    name: "VLM Transcription",
-    category: "Extraction",
-    description:
-      "Transcribe handwriting via Vision.describe() with a custom prompt — works on cursive where ICR doesn't",
-    path: "/python-sdk/vlm-transcription",
-  },
-  {
     name: "OCR Extraction",
     category: "Extraction",
     description:
       "Extract printed text from images with Adaptive OCR — high-throughput, optimized for purely printed content",
     path: "/python-sdk/ocr-extraction",
-  },
-  {
-    name: "ICR Extraction",
-    category: "Extraction",
-    description:
-      "Extract structured document data from images using the Nutrient SDK's ICR engine — printed pages and hand-printed forms",
-    path: "/python-sdk/icr-extraction",
-  },
-  {
-    name: "VLM Extraction",
-    category: "Extraction",
-    description:
-      "Extract structured content from documents without native form fields (e.g. invoices) via VLM-enhanced ICR with Claude",
-    path: "/python-sdk/vlm-extraction",
   },
   {
     name: "Document to Markdown",
@@ -115,13 +94,6 @@ export const samples: Sample[] = [
     description:
       "Four extraction techniques in one shell — schema-driven fields with clickable citations, Adaptive OCR, table extraction, and image description",
     path: "/python-sdk/extraction-studio",
-  },
-  {
-    name: "Image Alt Text",
-    category: "Extraction",
-    description:
-      "Generate WCAG-style accessibility descriptions for images at standard or detailed level",
-    path: "/python-sdk/alt-text",
   },
   {
     name: "Word Template Generation",
