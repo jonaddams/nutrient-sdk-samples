@@ -140,7 +140,55 @@ export function HandwritingResults({
         </div>
       )}
 
-      {empty ? (
+      {/* Outside the empty branch on purpose, matching TablesResults and
+          DescribeResults. This panel is otherwise modelled on OcrResults,
+          which keeps its actions row INSIDE the non-empty branch — so a run
+          that finds nothing offers neither the Code view nor the raw
+          response. That is precisely the moment they are wanted: a faint or
+          heavily-cursive page comes back with zero elements mid-demo, and the
+          two things a solutions engineer reaches for are the Python call that
+          ran and what the backend actually returned. Only the element table
+          is genuinely empty, so only the element table is replaced. */}
+      <div className="panel-row-h panel-row results-actions">
+        <Segmented
+          label="View"
+          options={[
+            { label: "Elements", value: "elements" },
+            { label: "Text", value: "text" },
+            { label: "JSON", value: "raw" },
+            { label: "Code", value: "code" },
+          ]}
+          value={view}
+          onChange={setView}
+        />
+        <div className="results-actions-btns">
+          <button
+            type="button"
+            className="btn ghost sm"
+            onClick={() => copyText(payload())}
+          >
+            Copy
+          </button>
+          <button type="button" className="btn ghost sm" onClick={download}>
+            Download
+          </button>
+        </div>
+      </div>
+
+      {view === "code" ? (
+        <pre className="ocr-text mono">
+          {/* `code` is optional so this can merge before the backend
+              deploys, and in that window the reader has JUST run. Telling
+              them to run again reads as a broken control. */}
+          {code ?? "# code snippet unavailable from this backend"}
+        </pre>
+      ) : view === "raw" ? (
+        <pre className="ocr-text mono">
+          {JSON.stringify(resultJson, null, 2)}
+        </pre>
+      ) : view === "text" ? (
+        <pre className="ocr-text mono">{result.fullText ?? ""}</pre>
+      ) : empty ? (
         // Named, never a blank table.
         <div className="callout" role="status">
           <span className="callout-label">No text found</span>
@@ -150,94 +198,51 @@ export function HandwritingResults({
           </p>
         </div>
       ) : (
-        <>
-          <div className="panel-row-h panel-row results-actions">
-            <Segmented
-              label="View"
-              options={[
-                { label: "Elements", value: "elements" },
-                { label: "Text", value: "text" },
-                { label: "JSON", value: "raw" },
-                { label: "Code", value: "code" },
-              ]}
-              value={view}
-              onChange={setView}
-            />
-            <div className="results-actions-btns">
-              <button
-                type="button"
-                className="btn ghost sm"
-                onClick={() => copyText(payload())}
+        <table className="field-table ocr-elements">
+          <tbody>
+            {textElements.map((el, index) => (
+              <tr
+                key={`${el.readingOrder}-${el.text.slice(0, 12)}`}
+                data-selected={index === activeIndex}
+                onClick={() => onSelectElement(index)}
               >
-                Copy
-              </button>
-              <button type="button" className="btn ghost sm" onClick={download}>
-                Download
-              </button>
-            </div>
-          </div>
-
-          {view === "code" ? (
-            <pre className="ocr-text mono">
-              {/* `code` is optional so this can merge before the backend
-                  deploys, and in that window the reader has JUST run. Telling
-                  them to run again reads as a broken control. */}
-              {code ?? "# code snippet unavailable from this backend"}
-            </pre>
-          ) : view === "raw" ? (
-            <pre className="ocr-text mono">
-              {JSON.stringify(resultJson, null, 2)}
-            </pre>
-          ) : view === "text" ? (
-            <pre className="ocr-text mono">{result.fullText ?? ""}</pre>
-          ) : (
-            <table className="field-table ocr-elements">
-              <tbody>
-                {textElements.map((el, index) => (
-                  <tr
-                    key={`${el.readingOrder}-${el.text.slice(0, 12)}`}
-                    data-selected={index === activeIndex}
-                    onClick={() => onSelectElement(index)}
-                  >
-                    <td className="mono muted">
-                      {/* A real <button>, not tabIndex+onKeyDown on the <tr>:
+                <td className="mono muted">
+                  {/* A real <button>, not tabIndex+onKeyDown on the <tr>:
                           keyboard-activatable for free, and a <button> cannot
                           legally wrap sibling <td>s so it lives in the first
                           cell. stopPropagation only prevents the row handler
                           firing twice for a click on the button itself. */}
-                      <button
-                        type="button"
-                        className="row-select"
-                        aria-label={`Select element ${el.readingOrder}: ${el.text.slice(0, 40)}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectElement(index);
-                        }}
-                      >
-                        {el.readingOrder}
-                      </button>
-                    </td>
-                    <td className="mono muted">{el.type}</td>
-                    <td>{el.text}</td>
-                    {/* Omitted for a VLM run for the same reason as the meta
+                  <button
+                    type="button"
+                    className="row-select"
+                    aria-label={`Select element ${el.readingOrder}: ${el.text.slice(0, 40)}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectElement(index);
+                    }}
+                  >
+                    {el.readingOrder}
+                  </button>
+                </td>
+                <td className="mono muted">{el.type}</td>
+                <td>{el.text}</td>
+                {/* Omitted for a VLM run for the same reason as the meta
                         figure: these are the local pass's scores against text
                         the model rewrote. */}
-                    {!isVlm && (
-                      <td className="mono">
-                        <span
-                          className={`match-dot ${confidenceTone(el.confidence)}`}
-                          role="img"
-                          aria-label={`confidence ${Math.round(el.confidence * 100)}%`}
-                        />
-                        {Math.round(el.confidence * 100)}%
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </>
+                {!isVlm && (
+                  <td className="mono">
+                    <span
+                      className={`match-dot ${confidenceTone(el.confidence)}`}
+                      role="img"
+                      aria-label={`confidence ${Math.round(el.confidence * 100)}%`}
+                    />
+                    {Math.round(el.confidence * 100)}%
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

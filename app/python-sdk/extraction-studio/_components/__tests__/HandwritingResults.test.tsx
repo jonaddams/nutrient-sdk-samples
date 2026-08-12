@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import local from "../../lib/__tests__/fixtures/handwriting-local.json";
 import vlm from "../../lib/__tests__/fixtures/handwriting-vlm.json";
@@ -90,9 +91,40 @@ test("no text found is a named state, never a blank table", () => {
   expect(screen.getByText(/No text found/)).toBeTruthy();
 });
 
-test("a backend without the code key still renders the Code view", () => {
+test("a backend without the code key still renders the Code view", async () => {
   // `code` is optional so the frontend can deploy before the backend does. A
   // segment that vanishes based on state is the worse failure.
+  //
+  // The click-through is the whole test. Asserting only that the Code BUTTON
+  // exists proves nothing about the fallback: the segment is rendered
+  // unconditionally, so reducing `code ?? "# code snippet unavailable from
+  // this backend"` to a bare `code` would ship green. Rendering the view is
+  // what pins the fallback string.
   renderResults({ ...LOCAL, code: undefined });
-  expect(screen.getByRole("button", { name: "Code" })).toBeTruthy();
+  await userEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(
+    screen.getByText("# code snippet unavailable from this backend"),
+  ).toBeTruthy();
+});
+
+test("an empty run still offers the actions row and the Code view", async () => {
+  // A faint or heavily-cursive page returning zero elements is exactly when a
+  // solutions engineer reaches for the Python call that ran and the raw
+  // response. OcrResults — which this panel was otherwise modelled on — keeps
+  // its actions row inside the non-empty branch and so removes both at that
+  // moment; TablesResults and DescribeResults deliberately do not, and neither
+  // does this. Only the element table is replaced by the callout.
+  renderResults({ ...LOCAL, textElements: [], fullText: "" });
+  expect(screen.getByText(/No text found/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Copy" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Download" })).toBeTruthy();
+
+  await userEvent.click(screen.getByRole("button", { name: "Code" }));
+  expect(screen.getByText(/VisionEngine\.ICR/)).toBeTruthy();
+
+  // And the raw response, the other thing that used to vanish. `textElements`
+  // is empty but the envelope around it — engine, statistics, config — is
+  // what says which call ran and what it answered.
+  await userEvent.click(screen.getByRole("button", { name: "JSON" }));
+  expect(screen.getByText(/"engine": "ICR"/)).toBeTruthy();
 });
