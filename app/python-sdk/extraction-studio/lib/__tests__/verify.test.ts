@@ -20,18 +20,38 @@ describe("unverified beats mismatch", () => {
 
 describe("numbers", () => {
   // Every one of these formats was returned by a real provider on 2026-08-12.
-  test.each([345015, 345015.0, "345015", "345,015", "$345,015.00", " 345015 "])(
-    "%s matches 345015",
-    (extracted) => {
-      expect(compareField(extracted, v(345015), "number")).toBe("match");
-    },
-  );
+  test.each([
+    345015,
+    345015.0,
+    "345015",
+    "345,015",
+    "$345,015.00",
+    " 345015 ",
+  ])("%s matches 345015", (extracted) => {
+    expect(compareField(extracted, v(345015), "number")).toBe("match");
+  });
   test("the retainage miss is a mismatch", () => {
     expect(compareField(1910500, v(345015), "number")).toBe("mismatch");
   });
   test("tolerance absorbs float noise but not a real difference", () => {
     expect(compareField(88.061, v(88.06), "number")).toBe("match");
     expect(compareField(88.5, v(88.06), "number")).toBe("mismatch");
+  });
+});
+
+describe("booleans", () => {
+  // VerifiedValue.value is typed string | number, never boolean, so a real
+  // boolean answer key is stored as the strings "true"/"false" — the
+  // string-form case below is the one that actually occurs in the corpus.
+  test("boolean values that agree are a match", () => {
+    expect(compareField(true, v("true"), "boolean")).toBe("match");
+  });
+  test("boolean values that disagree are a mismatch", () => {
+    expect(compareField(true, v("false"), "boolean")).toBe("mismatch");
+  });
+  test("string-form booleans compare the same way", () => {
+    expect(compareField("true", v("true"), "boolean")).toBe("match");
+    expect(compareField("false", v("true"), "boolean")).toBe("mismatch");
   });
 });
 
