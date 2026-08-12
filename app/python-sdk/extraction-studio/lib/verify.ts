@@ -48,8 +48,19 @@ function toDate(input: string): number | null {
  *
  * Biased toward "unverified" by design: every "mismatch" is a public claim that
  * the SDK got something wrong, shown to a prospect. When the comparison cannot
- * be made confidently — no key, nothing extracted, unparseable input — say
- * nothing rather than accuse.
+ * be made confidently — no key, or an unparseable input where a key exists —
+ * say nothing rather than accuse. That bias stops at genuine AMBIGUITY, though:
+ * it does not cover a field that HAS a verified answer and simply got no value.
+ *
+ * Jon's ruling, 2026-08-12: a verified field with nothing extracted is a
+ * "mismatch", not "unverified". The two situations "unverified" used to
+ * conflate — "no answer key exists" and "an answer key exists but the model
+ * said nothing" — are not the same thing for a scoreboard. Scoring the second
+ * one as "unverified" made declining to answer improve a provider's score,
+ * which is backwards: to a buyer, "didn't answer" and "answered wrong" both
+ * mean a human still has to go check. Do not extend this to the ambiguous
+ * cases below (unparseable number, etc.) — the unverified bias still governs
+ * there, unweakened.
  */
 export function compareField(
   extracted: unknown,
@@ -57,7 +68,7 @@ export function compareField(
   type: string,
 ): Verdict {
   if (verified == null) return "unverified";
-  if (extracted == null || extracted === "") return "unverified";
+  if (extracted == null || extracted === "") return "mismatch";
 
   if (type === "number") {
     const a = toNumber(extracted);

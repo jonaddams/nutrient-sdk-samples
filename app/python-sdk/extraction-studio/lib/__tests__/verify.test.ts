@@ -10,11 +10,27 @@ describe("unverified beats mismatch", () => {
   test("no key at all", () => {
     expect(compareField(345015, null, "number")).toBe("unverified");
   });
-  test("nothing extracted", () => {
-    expect(compareField(null, v(345015), "number")).toBe("unverified");
+  test("no key at all, and nothing extracted either — the bias still protects this", () => {
+    // The case "unverified" exists for: there is no answer to be wrong about,
+    // regardless of whether anything was extracted.
+    expect(compareField(null, null, "number")).toBe("unverified");
   });
   test("a number field whose extracted value will not parse", () => {
     expect(compareField("n/a", v(345015), "number")).toBe("unverified");
+  });
+});
+
+describe("a verified field with nothing extracted is a mismatch", () => {
+  // Jon's ruling, 2026-08-12: this used to be "unverified" (see git history),
+  // which meant declining to answer a field that DOES have a verified answer
+  // scored BETTER than answering it wrong — backwards for a scoreboard. Do
+  // not revert this to "unverified": the case that bias still protects is the
+  // one directly above (no key at all), not this one.
+  test("nothing extracted, but a verified answer exists", () => {
+    expect(compareField(null, v(345015), "number")).toBe("mismatch");
+  });
+  test("an empty string counts the same as nothing extracted", () => {
+    expect(compareField("", v(345015), "number")).toBe("mismatch");
   });
 });
 
