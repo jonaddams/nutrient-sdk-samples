@@ -1,16 +1,15 @@
 """
 Generate a realistic AIA-style "Application and Certificate for Payment"
-(G702-style certificate + G703-style continuation sheet on one page) for a
-fictional construction project.
+(G702-style certificate only -- no G703 continuation sheet) for a fictional
+construction project.
 
 This replaces westbridge-engineering-submittal-form.pdf in the Extraction
 Studio corpus. Westbridge was retired for being a *demo hazard*: at
 1700x2338pt (architectural D-size) its rasterized payload is ~8x a Letter
 page, driving 33-36s extraction times and roughly 50% failure rate against
-the hosted backend. Its content-level difficulty (retainage math,
-multi-line-item continuation sheet, derived totals) is exactly what makes
-it a good accuracy test, so this document keeps that content and fixes the
-geometry:
+the hosted backend. Its content-level difficulty (retainage math, derived
+totals) is exactly what makes it a good accuracy test, so this document
+keeps that content and fixes the geometry:
 
   - Letter page (612 x 792 pt) instead of D-size.
 
@@ -23,10 +22,50 @@ this generator emits the form as ordinary vector/text content directly --
 no rasterize-to-image step. The result has a real, searchable text layer
 and embedded fonts; verify with page.get_text() and page.get_fonts().
 
-Every derived figure on the form (retainage, total earned less retainage,
-current payment due, balance to finish, continuation-sheet totals) is
-computed from the line items below, not hand-typed, so the arithmetic is
-guaranteed internally consistent.
+Iteration 2 (this version) dropped the G703-style continuation sheet
+entirely, on measurement, not guesswork: a text-layer version of this
+document WITH the continuation sheet still failed the hosted-backend
+acceptance bar for Claude (one 500 -- finishReason=length truncation --
+and one HTTP 200 with zero fields, out of three runs; the one clean run
+took 22.8s, still over the 20s cap) even though it has a real text layer.
+The control that motivated the text-layer fix (meridian-balance-sheet.pdf,
+5/5 success at 8 fields) is a plain statement with no line-item table, so
+the actual trigger is not rasterization alone -- it's how many distinct
+regions the grounding stage has to locate, which includeSourceLocations
+makes roughly proportional to page content. The continuation sheet was
+the single largest contributor to that region count. Separately, all
+three providers (not just Claude) repeatedly returned the Change Order
+Summary box's figures (150,900 / 35,500 / 186,400) instead of the
+certificate's own line values for retainage/contractSumToDate/
+currentPaymentDue -- three providers failing identically points at the
+form's layout, not three independent model errors. So this version:
+
+  - Removes the continuation sheet's line-item table (and its rendering
+    code) entirely. A standalone G702 certificate is completely realistic
+    -- it is routinely issued on its own -- so this is not a compromise
+    away from authenticity.
+  - Keeps the Change Order Summary box (it is genuinely part of a real
+    G702), but redraws it as its own bordered, half-width box set off
+    from the numbered certificate lines, rather than flowing directly
+    beneath them in the same unbounded right-aligned money column. On the
+    previous layout the box's three dollar figures sat immediately under
+    Line 9 in visually identical formatting to Lines 1-9, which is a
+    plausible reason a model would pick a Change Order Summary figure
+    when asked for a certificate-line figure. A distinct bordered box is
+    both more realistic (real G702s box this section) and more visually
+    separated from the numbered lines above it.
+
+The certificate's own line items (1: original contract sum, 2: change
+orders, 3: contract sum to date, 4: total completed & stored, 5:
+retainage, 6: total earned less retainage, 7: less previous certificates,
+8: current payment due, 9: balance to finish) are all still DERIVED --
+computed from the same underlying facts as before (the original contract
+sum, the two change-order figures, and the two completed-and-stored
+totals below) -- not hand-typed, so the arithmetic is guaranteed
+internally consistent, exactly as before. What changed is that the
+per-line-item breakdown feeding "total completed & stored to date" (what
+would live on a G703, if one were attached) is no longer rendered on the
+page.
 
 Usage: python3 scripts/generate-construction-payapp.py
 Output: public/documents/construction-pay-application.pdf
@@ -45,8 +84,8 @@ LIGHT = (0.55, 0.55, 0.55)
 HEAD_FILL = (0.90, 0.90, 0.88)
 
 # ---------------------------------------------------------------------------
-# Project facts (fictional) and continuation-sheet line items. All summary
-# figures below are DERIVED from these, not independently authored.
+# Project facts (fictional). All summary figures below are DERIVED from
+# these, not independently authored.
 # ---------------------------------------------------------------------------
 
 PROJECT = {
@@ -68,25 +107,15 @@ CHANGE_ORDERS_PREVIOUS = 150_900.00
 CHANGE_ORDERS_THIS_MONTH = 35_500.00
 RETAINAGE_RATE = 0.05
 
-# (item no, description, scheduled value, from previous application,
-#  this period, materials presently stored)
-#
-# Iteration 3: consolidated further, from a 10-row CSI-division breakdown to
-# 3 cost-code groups. Each group's four input columns are the exact sums of
-# the finer-grained rows it replaces (see git history for the 10- and 5-row
-# versions), so every derived total/percentage/balance -- and every
-# summary-section figure on the G702 above, computed from these same
-# columns -- is unchanged across all three iterations. This is a *density*
-# fix, not a difficulty fix: a busier table was empirically correlated with
-# anthropic truncating its response (finishReason=length) before emitting
-# the JSON payload; the 5 fields under test are summary-section fields, not
-# table cells, so thinning the table doesn't touch what's being measured
-# for accuracy.
-LINE_ITEMS = [
-    ("1", "General Requirements & Sitework", 1_396_400.00, 1_356_400.00, 40_000.00, 0.00),
-    ("2", "Structural, Mechanical & Electrical", 3_175_000.00, 2_112_000.00, 279_000.00, 77_000.00),
-    ("3", "Finishes (Drywall/Paint/Flooring)", 465_000.00, 0.00, 84_700.00, 0.00),
-]
+# Completed-and-stored totals. These used to be the summed columns of a
+# 3-row continuation-sheet line-item table (see git history prior to this
+# iteration for that table); the per-line-item breakdown is no longer
+# rendered on the page (there is no G703 attached to this document), but
+# the two totals below are exactly the sums that table produced, so the
+# certificate's own figures are unchanged from the previous iteration --
+# only the visible breakdown is gone.
+TOTAL_COMPLETED_STORED_TO_DATE = 3_949_100.00
+PREV_TOTAL_COMPLETED_STORED = 3_468_400.00
 
 
 def money(v):
@@ -94,37 +123,18 @@ def money(v):
 
 
 def compute():
-    rows = []
-    sum_sv = sum_prev = sum_this = sum_stored = sum_total = 0.0
-    for no, desc, sv, prev, this, stored in LINE_ITEMS:
-        total = prev + this + stored
-        pct = (total / sv * 100.0) if sv else 0.0
-        balance = sv - total
-        rows.append({
-            "no": no, "desc": desc, "sv": sv, "prev": prev, "this": this,
-            "stored": stored, "total": total, "pct": pct, "balance": balance,
-        })
-        sum_sv += sv
-        sum_prev += prev
-        sum_this += this
-        sum_stored += stored
-        sum_total += total
-
     change_orders = CHANGE_ORDERS_PREVIOUS + CHANGE_ORDERS_THIS_MONTH
     contract_sum_to_date = ORIGINAL_CONTRACT_SUM + change_orders
-    # The continuation sheet's scheduled-value column is built to foot
-    # exactly to contract-sum-to-date -- assert rather than silently drift.
-    assert abs(sum_sv - contract_sum_to_date) < 0.005, (sum_sv, contract_sum_to_date)
 
-    total_completed_stored = sum_total
+    total_completed_stored = TOTAL_COMPLETED_STORED_TO_DATE
     retainage = round(total_completed_stored * RETAINAGE_RATE, 2)
     total_earned_less_retainage = total_completed_stored - retainage
 
     # "Previous certificates for payment" = last application's total
     # completed-and-stored (approximated here as this period's cumulative
-    # "previous applications" column, i.e. no materials were left stored
+    # "previous applications" total, i.e. no materials were left stored
     # at the prior application) less that application's own retainage.
-    prev_total_completed_stored = sum_prev
+    prev_total_completed_stored = PREV_TOTAL_COMPLETED_STORED
     prev_retainage = round(prev_total_completed_stored * RETAINAGE_RATE, 2)
     less_previous_certificates = prev_total_completed_stored - prev_retainage
 
@@ -132,7 +142,6 @@ def compute():
     balance_to_finish = contract_sum_to_date - total_earned_less_retainage
 
     return {
-        "rows": rows,
         "change_orders": change_orders,
         "contract_sum_to_date": contract_sum_to_date,
         "total_completed_stored": total_completed_stored,
@@ -141,10 +150,6 @@ def compute():
         "less_previous_certificates": less_previous_certificates,
         "current_payment_due": current_payment_due,
         "balance_to_finish": balance_to_finish,
-        "sum_sv": sum_sv,
-        "sum_prev": sum_prev,
-        "sum_this": sum_this,
-        "sum_stored": sum_stored,
     }
 
 
@@ -156,7 +161,7 @@ def draw_source_page(page, calc):
     # --- Title block ---
     page.insert_text(fitz.Point(x0, y + 14), "APPLICATION AND CERTIFICATE FOR PAYMENT",
                       fontsize=13, fontname="hebo", color=INK)
-    page.insert_text(fitz.Point(x0, y + 27), "AIA-style Document G702/G703 (adapted format)",
+    page.insert_text(fitz.Point(x0, y + 27), "AIA-style Document G702 (adapted format)",
                       fontsize=8, fontname="helv", color=LIGHT)
     y += 38
     shape.draw_line(fitz.Point(x0, y), fitz.Point(x1, y))
@@ -173,8 +178,13 @@ def draw_source_page(page, calc):
     def field(px, py, label, value, value_size=8.5, wrap_w=None):
         page.insert_text(fitz.Point(px, py), label, fontsize=6.7, fontname="helv", color=LIGHT)
         if wrap_w:
-            page.insert_textbox(fitz.Rect(px, py + 3, px + wrap_w, py + 3 + 22),
-                                 value, fontsize=value_size, fontname="helv", color=INK)
+            # See the certification-statement comment below: insert_textbox
+            # silently renders nothing if the box is too short. Assert the
+            # non-negative return value rather than trusting the drawing
+            # code fit by inspection.
+            rc = page.insert_textbox(fitz.Rect(px, py + 3, px + wrap_w, py + 3 + 22),
+                                      value, fontsize=value_size, fontname="helv", color=INK)
+            assert rc >= 0, f"field value did not fit its box (rc={rc}): {value!r}"
         else:
             page.insert_text(fitz.Point(px, py + 11), value, fontsize=value_size, fontname="helv", color=INK)
 
@@ -215,38 +225,73 @@ def draw_source_page(page, calc):
     y = line("1", "ORIGINAL CONTRACT SUM", ORIGINAL_CONTRACT_SUM, y)
     y = line("2", "Net change by Change Orders", calc["change_orders"], y)
     y = line("3", "CONTRACT SUM TO DATE (Line 1 +/- 2)", calc["contract_sum_to_date"], y, bold=True, rule_after=True)
-    y = line("4", "TOTAL COMPLETED & STORED TO DATE (Column G on G703)", calc["total_completed_stored"], y)
+    y = line("4", "TOTAL COMPLETED & STORED TO DATE", calc["total_completed_stored"], y)
     y = line("5a", f"RETAINAGE: {RETAINAGE_RATE*100:.1f}% of Completed Work & Stored Materials", calc["retainage"], y, indent=6)
     y = line("5", "Total Retainage", calc["retainage"], y, rule_after=True)
     y = line("6", "TOTAL EARNED LESS RETAINAGE (Line 4 less Line 5 Total)", calc["total_earned_less_retainage"], y, bold=True)
     y = line("7", "LESS PREVIOUS CERTIFICATES FOR PAYMENT", calc["less_previous_certificates"], y, rule_after=True)
     y = line("8", "CURRENT PAYMENT DUE", calc["current_payment_due"], y, bold=True, rule_after=True)
     y = line("9", "BALANCE TO FINISH, INCLUDING RETAINAGE (Line 3 less Line 6)", calc["balance_to_finish"], y)
-    y += 8
-
-    # --- Change order summary (small table) ---
-    page.insert_text(fitz.Point(x0, y + 8), "CHANGE ORDER SUMMARY", fontsize=8.5, fontname="hebo", color=INK)
     y += 14
+
+    # --- Change order summary: a genuinely part-of-the-form section, but
+    # drawn as its own bordered, half-width box rather than flowing beneath
+    # the numbered lines in the same unbounded right-aligned money column.
+    # (See the module docstring: on the previous layout, its three dollar
+    # figures sat directly under Line 9 in identical formatting to Lines
+    # 1-9, and all three providers repeatedly returned one of THESE figures
+    # -- 150,900 / 35,500 / 186,400 -- when asked for a certificate-line
+    # field. A bordered box is both more realistic (real G702s box this
+    # section) and visually distinct from the numbered lines above it.)
     co_rows = [
         ("Total changes approved in previous months", CHANGE_ORDERS_PREVIOUS),
         ("Total approved this month", CHANGE_ORDERS_THIS_MONTH),
         ("TOTAL", calc["change_orders"]),
     ]
+    box_w = 260
+    box_x0 = x0
+    box_y0 = y
+    head_h = 14
+    row_h = 12
+    box_h = head_h + row_h * len(co_rows) + 5
+
+    shape.draw_rect(fitz.Rect(box_x0, box_y0, box_x0 + box_w, box_y0 + head_h))
+    shape.finish(color=RULE, fill=HEAD_FILL, width=0.7)
+    shape.commit()
+    page.insert_text(fitz.Point(box_x0 + 5, box_y0 + head_h - 4),
+                      "CHANGE ORDER SUMMARY", fontsize=7.3, fontname="hebo", color=INK)
+
+    shape.draw_rect(fitz.Rect(box_x0, box_y0 + head_h, box_x0 + box_w, box_y0 + box_h))
+    shape.finish(color=RULE, width=0.7)
+    shape.commit()
+
+    ry = box_y0 + head_h + 9
     for label, val in co_rows:
-        page.insert_text(fitz.Point(x0 + 10, y), label, fontsize=7.5, fontname="helv", color=INK)
+        page.insert_text(fitz.Point(box_x0 + 6, ry), label, fontsize=6.8, fontname="helv", color=INK)
         val_s = money(val)
-        vw = fitz.get_text_length(val_s, fontname="helv", fontsize=7.5)
-        page.insert_text(fitz.Point(x1 - vw, y), val_s, fontsize=7.5, fontname="helv", color=INK)
-        y += 11
-    y += 6
+        vw = fitz.get_text_length(val_s, fontname="helv", fontsize=6.8)
+        page.insert_text(fitz.Point(box_x0 + box_w - 6 - vw, ry), val_s, fontsize=6.8, fontname="helv", color=INK)
+        ry += row_h
+    y = box_y0 + box_h + 16
 
     # --- Certification statement ---
+    # NOTE: insert_textbox() silently draws NOTHING -- no exception, no
+    # partial text -- if the box is even slightly too short for the text at
+    # this fontsize/width (it returns a negative "unused space" value in
+    # that case; verify with the return value, not just "did it raise").
+    # This box was previously 28pt tall and this paragraph rendered
+    # invisibly (zero characters, confirmed via get_text()) on every prior
+    # iteration of this document, including before the G703 removal --
+    # discovered here via a visual pixmap render and an extracted-text
+    # check, not by inspection of the drawing code alone. 42pt fits this
+    # paragraph at 6.8pt/three lines with margin.
     cert = ("The undersigned Contractor certifies that to the best of the Contractor's knowledge, the Work "
             "covered by this Application for Payment has been completed in accordance with the Contract "
             "Documents, that all amounts have been paid for Work for which previous Certificates for Payment "
             "were issued, and that the current payment shown herein is now due.")
-    page.insert_textbox(fitz.Rect(x0, y, x1, y + 28), cert, fontsize=6.8, fontname="helv", color=LIGHT)
-    y += 30
+    cert_rc = page.insert_textbox(fitz.Rect(x0, y, x1, y + 42), cert, fontsize=6.8, fontname="helv", color=LIGHT)
+    assert cert_rc >= 0, f"certification statement did not fit its box (rc={cert_rc})"
+    y += 44
 
     sig_y = y + 22
     page.insert_text(fitz.Point(x0, sig_y - 4), "CONTRACTOR:", fontsize=7, fontname="helv", color=LIGHT)
@@ -269,74 +314,6 @@ def draw_source_page(page, calc):
     shape.draw_line(fitz.Point(x0, y), fitz.Point(x1, y))
     shape.finish(color=RULE, width=1.2)
     shape.commit()
-    y += 10
-
-    # --- Continuation sheet (G703-style) ---
-    page.insert_text(fitz.Point(x0, y + 8), "CONTINUATION SHEET - APPLICATION NO. " + PROJECT["application_no"],
-                      fontsize=9.5, fontname="hebo", color=INK)
-    y += 16
-
-    # Column widths sized so every header label (incl. "BALANCE TO / FINISH")
-    # fits at the header fontsize; widths sum to exactly (x1 - x0).
-    col_widths = [24, 128, 62, 58, 52, 52, 58, 22, 76]
-    col_labels = ["ITEM", "DESCRIPTION OF WORK", "SCHEDULED\nVALUE", "PREVIOUS\nAPPLICATIONS",
-                  "THIS\nPERIOD", "MATERIALS\nSTORED", "TOTAL\nCOMPLETED", "%", "BALANCE TO\nFINISH"]
-    assert sum(col_widths) == x1 - x0
-    col_x = [x0]
-    for w in col_widths[:-1]:
-        col_x.append(col_x[-1] + w)
-    cols = list(zip(col_labels, col_x, col_widths))
-    SV_X, PREV_X, THIS_X, STORED_X, TOTAL_X, PCT_X, BAL_X = col_x[2:9]
-
-    header_h = 22
-    shape.draw_rect(fitz.Rect(x0, y, x1, y + header_h))
-    shape.finish(color=RULE, fill=HEAD_FILL, width=0.7)
-    shape.commit()
-    for label, cx, cw in cols:
-        page.insert_textbox(fitz.Rect(cx + 2, y + 2, cx + cw - 2, y + header_h - 1),
-                             label, fontsize=6.0, fontname="hebo", color=INK, align=1)
-    y += header_h
-
-    row_h = 13.2
-    for r in calc["rows"]:
-        shape.draw_rect(fitz.Rect(x0, y, x1, y + row_h))
-        shape.finish(color=RULE, width=0.4)
-        shape.commit()
-        page.insert_text(fitz.Point(x0 + 4, y + row_h - 3.5), r["no"], fontsize=6.6, fontname="helv", color=INK)
-        page.insert_text(fitz.Point(x0 + 28, y + row_h - 3.5), r["desc"], fontsize=6.6, fontname="helv", color=INK)
-
-        def rtxt(cx, cw, text, size=6.6):
-            tw = fitz.get_text_length(text, fontname="helv", fontsize=size)
-            page.insert_text(fitz.Point(cx + cw - 4 - tw, y + row_h - 3.5), text, fontsize=size, fontname="helv", color=INK)
-
-        rtxt(SV_X, col_widths[2], f"{r['sv']:,.0f}")
-        rtxt(PREV_X, col_widths[3], f"{r['prev']:,.0f}")
-        rtxt(THIS_X, col_widths[4], f"{r['this']:,.0f}")
-        rtxt(STORED_X, col_widths[5], f"{r['stored']:,.0f}")
-        rtxt(TOTAL_X, col_widths[6], f"{r['total']:,.0f}")
-        rtxt(PCT_X, col_widths[7], f"{r['pct']:,.0f}")
-        rtxt(BAL_X, col_widths[8], f"{r['balance']:,.0f}")
-        y += row_h
-
-    # Totals row
-    shape.draw_rect(fitz.Rect(x0, y, x1, y + row_h + 1))
-    shape.finish(color=RULE, fill=HEAD_FILL, width=0.7)
-    shape.commit()
-    page.insert_text(fitz.Point(x0 + 4, y + row_h - 3), "TOTAL", fontsize=6.8, fontname="hebo", color=INK)
-
-    def rtxt_total(cx, cw, text):
-        tw = fitz.get_text_length(text, fontname="hebo", fontsize=6.8)
-        page.insert_text(fitz.Point(cx + cw - 4 - tw, y + row_h - 3), text, fontsize=6.8, fontname="hebo", color=INK)
-
-    rtxt_total(SV_X, col_widths[2], f"{calc['sum_sv']:,.0f}")
-    rtxt_total(PREV_X, col_widths[3], f"{calc['sum_prev']:,.0f}")
-    rtxt_total(THIS_X, col_widths[4], f"{calc['sum_this']:,.0f}")
-    rtxt_total(STORED_X, col_widths[5], f"{calc['sum_stored']:,.0f}")
-    rtxt_total(TOTAL_X, col_widths[6], f"{calc['total_completed_stored']:,.0f}")
-    rtxt_total(BAL_X, col_widths[8], f"{calc['balance_to_finish'] - calc['retainage']:,.0f}")
-    y += row_h + 1
-
-    shape.commit()
 
     page.insert_text(fitz.Point(x0, PAGE_H - 20),
                       f"Meridian Builders, LLC   |   Application No. {PROJECT['application_no']}   |   Period ending {PROJECT['period_to']}",
@@ -354,7 +331,7 @@ def build():
     out_doc.set_metadata({
         "title": "Application and Certificate for Payment",
         "author": "Nutrient SDK Samples",
-        "subject": "Construction pay application demo document (text-layer PDF)",
+        "subject": "Construction pay application demo document (text-layer PDF, G702 certificate only)",
     })
     out_page = out_doc.new_page(width=PAGE_W, height=PAGE_H)
     draw_source_page(out_page, calc)
@@ -366,14 +343,18 @@ def build():
     print(f"Generated: {out_path}")
     print(f"Page size: {PAGE_W} x {PAGE_H} pt (US Letter)")
 
-    # Verify: has extractable text and embedded fonts.
+    # Verify: has extractable text and embedded fonts, and no embedded
+    # raster image anywhere on the page (i.e. this really is a text-layer
+    # document, not an image with a thin text veneer).
     check = fitz.open(out_path)
     cp = check[0]
     text = cp.get_text()
     fonts = cp.get_fonts()
-    print(f"Verify -- extractable text length: {len(text)}, embedded fonts: {len(fonts)}")
+    images = cp.get_images()
+    print(f"Verify -- extractable text length: {len(text)}, embedded fonts: {len(fonts)}, embedded images: {len(images)}")
     assert text != "", "Output PDF has no extractable text!"
     assert fonts != [], "Output PDF has no embedded fonts!"
+    assert images == [], "Output PDF has an embedded raster image -- not a true text-layer document!"
     check.close()
 
     return calc
@@ -383,7 +364,5 @@ if __name__ == "__main__":
     c = compute()
     print("--- computed figures (sanity check) ---")
     for k, v in c.items():
-        if k == "rows":
-            continue
         print(f"  {k}: {v}")
     build()

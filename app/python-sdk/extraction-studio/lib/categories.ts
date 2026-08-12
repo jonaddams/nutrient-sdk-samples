@@ -112,9 +112,13 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       optional: true,
     },
   ],
-  // Read off the Westbridge submittal transmittal. NOTE: no contractAmount or
-  // percentComplete — that document is a submittal transmittal form and carries
-  // no dollar figures at all, so both would always return null.
+  // Read off the Cedar Hollow AIA G702-style application and certificate for
+  // payment (construction-pay-application.pdf), which replaced the Westbridge
+  // submittal transmittal on 2026-08-12 (see docs/internal/sdk-defects/
+  // SDK-051 — Westbridge was a demo hazard: 33-36s extractions and ~50%
+  // hosted-backend failure rate). All six fields are required: the G702
+  // certificate prints every one of them as a labelled line, with no
+  // conditional/optional case the way finance's two statement types have.
   construction: [
     {
       key: "projectName",
@@ -129,28 +133,28 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       optional: false,
     },
     {
-      key: "submittalNumber",
+      key: "applicationNumber",
       type: "string",
-      description: "The submittal number",
+      description: "The application number",
       optional: false,
     },
     {
-      key: "specSection",
-      type: "string",
-      description: "The specification section and its title",
-      optional: true,
+      key: "contractSumToDate",
+      type: "number",
+      description: "The contract sum to date, digits only",
+      optional: false,
     },
     {
-      key: "submittedBy",
-      type: "string",
-      description: "The contractor or firm submitting",
-      optional: true,
+      key: "retainage",
+      type: "number",
+      description: "The total retainage withheld, digits only",
+      optional: false,
     },
     {
-      key: "dateRequired",
-      type: "string",
-      description: "The date the response is required by, as printed",
-      optional: true,
+      key: "currentPaymentDue",
+      type: "number",
+      description: "The current payment due, digits only",
+      optional: false,
     },
   ],
   logistics: [
