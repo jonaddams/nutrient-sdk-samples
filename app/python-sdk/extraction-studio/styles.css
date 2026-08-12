@@ -1178,7 +1178,7 @@
 .studio-shell .field-table-head,
 .studio-shell .field-row {
   display: grid;
-  grid-template-columns: minmax(72px, 0.85fr) minmax(0, 1.6fr) 26px 52px;
+  grid-template-columns: minmax(72px, 0.85fr) minmax(0, 1.3fr) minmax(0, 1fr) 26px 52px;
   gap: var(--space-2);
   align-items: baseline;
   width: 100%;
@@ -1202,8 +1202,8 @@
   background: var(--surface);
 }
 
-.studio-shell .field-table-head span:nth-child(3),
-.studio-shell .field-table-head span:nth-child(4) {
+.studio-shell .field-table-head span:nth-child(4),
+.studio-shell .field-table-head span:nth-child(5) {
   text-align: right;
 }
 

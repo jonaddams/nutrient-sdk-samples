@@ -42,6 +42,7 @@ test("renders field cards and reports selection", () => {
   const onSelect = vi.fn();
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as any}
       activeIndex={null}
       onSelectField={onSelect}
@@ -75,6 +76,7 @@ test("shows timing, the citations switch and a Download button", () => {
   const onShowCitationsChange = vi.fn();
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       timingMs={7800}
       activeIndex={null}
@@ -127,6 +129,7 @@ test("Download builds a JSON blob for Fields/Raw JSON view and a .py blob for Co
 
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       code={code}
       activeIndex={null}
@@ -193,6 +196,7 @@ test("scrolls the active field card into view", () => {
   };
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       activeIndex={1}
       onSelectField={() => {}}
@@ -213,6 +217,7 @@ test("degrades to a Python-commented placeholder when code is absent", () => {
   // already run an extraction — so it must not tell them to run one.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       activeIndex={null}
       onSelectField={() => {}}
@@ -238,6 +243,7 @@ test("the meta row names the provider and model that produced the fields", () =>
   // the flagship invoice (the retainage figure) is model-specific.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as unknown as StructuredData}
       config={{ provider: "anthropic", model: "claude-sonnet-5" }}
       activeIndex={null}
@@ -258,6 +264,7 @@ test("no config means no provenance line rather than an empty one", () => {
   // that predates the echo. A bare separator would look like a rendering bug.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as unknown as StructuredData}
       activeIndex={null}
       onSelectField={vi.fn()}
@@ -268,4 +275,124 @@ test("no config means no provenance line rather than an empty one", () => {
     />,
   );
   expect(screen.queryByText(/·/)).toBeNull();
+});
+
+test("marks a wrong value against the answer key", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { totalAmount: 1910500 },
+          fields: [
+            {
+              name: "totalAmount",
+              type: "number",
+              value: 1910500,
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  expect(screen.getByText(/expected 345,015/)).toBeDefined();
+});
+
+test("shows a field with no answer key as not verified, never as wrong", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { somethingElse: "x" },
+          fields: [
+            {
+              name: "somethingElse",
+              type: "string",
+              value: "x",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  expect(screen.getByText(/not verified/)).toBeDefined();
+  expect(screen.queryByText(/expected/)).toBeNull();
+});
+
+test("the run summary counts only verified fields", () => {
+  // Lumen fixture, confirmed answer key: totalAmount matches, issueDate is
+  // the payment-due date (the key holds the printed Invoice Date instead)
+  // and does not, invoiceNumber matches. So 2 of 3 verified fields match —
+  // asserted as the exact string, not a shape that would pass regardless of
+  // the numbers.
+  render(
+    <StructuredResults
+      docId="lumen-invoice"
+      data={
+        {
+          extraction: {},
+          fields: [
+            {
+              name: "totalAmount",
+              type: "number",
+              value: 88.06,
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+            {
+              name: "issueDate",
+              type: "string",
+              value: "December 16, 2022",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+            {
+              name: "invoiceNumber",
+              type: "string",
+              value: "616770524",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  expect(screen.getByText("2 of 3 verified fields match")).toBeDefined();
 });

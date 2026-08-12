@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
 import { copyText, downloadText } from "../lib/download";
 import { providerLabel } from "../lib/provenance";
+import { verifiedFor } from "../lib/verified";
+import { compareField, summarise } from "../lib/verify";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -26,7 +28,16 @@ export function matchDotTone(match: string | null): string {
   return "partial";
 }
 
+/** The answer key stores raw numbers ("Amount Due $345,015.00" becomes
+ *  345015), but showing that back without separators reads as a different,
+ *  smaller number than the one on the document. Format the way the source
+ *  document prints it; strings pass through unchanged. */
+function formatVerifiedValue(value: string | number): string {
+  return typeof value === "number" ? value.toLocaleString("en-US") : value;
+}
+
 export function StructuredResults({
+  docId,
   data,
   code,
   timingMs,
@@ -38,6 +49,10 @@ export function StructuredResults({
   citationHex,
   onCitationHexChange,
 }: {
+  /** The document these fields were extracted from — the key into the
+   *  verified-answer lookup, so this panel can say whether each field is
+   *  actually right rather than merely grounded. */
+  docId: string;
   data: StructuredData;
   code?: string;
   timingMs?: number;
@@ -64,6 +79,16 @@ export function StructuredResults({
       behavior: "smooth",
     });
   }, [activeIndex]);
+
+  // One verdict per field, in field order. compareField owns every rule; this
+  // component only renders what it decides. verifiedValues is kept alongside
+  // so the "expected ..." text below can show what the key says without a
+  // second lookup.
+  const verifiedValues = data.fields.map((f) => verifiedFor(docId, f.name));
+  const verdicts = data.fields.map((f, i) =>
+    compareField(f.value, verifiedValues[i], f.type),
+  );
+  const score = summarise(verdicts);
 
   const payload = () =>
     view === "code" ? (code ?? "") : JSON.stringify(data.extraction, null, 2);
@@ -99,6 +124,11 @@ export function StructuredResults({
           onChange={onShowCitationsChange}
           label="Show citations"
         />
+        {score.verified > 0 && (
+          <span className="muted">
+            {score.matched} of {score.verified} verified fields match
+          </span>
+        )}
       </div>
 
       {/* Colour lives next to the visibility toggle: same concern, and it is
@@ -154,6 +184,7 @@ export function StructuredResults({
           <div className="field-table-head eyebrow" aria-hidden="true">
             <span>Field</span>
             <span>Value</span>
+            <span>Verified</span>
             <span>Page</span>
             <span>Parse</span>
           </div>
@@ -177,6 +208,18 @@ export function StructuredResults({
               </span>
               <span className="field-row-value">
                 {f.value == null ? "—" : String(f.value)}
+              </span>
+              {/* Words, not a dot: the Parse column's dot means the SDK LOCATED
+                  the value (grounding), and this means the value is RIGHT. On
+                  the retainage case the pair is grounded true / correct
+                  false, so two similar-looking marks would actively
+                  mislead. */}
+              <span className={`field-row-verified ${verdicts[i]}`}>
+                {verdicts[i] === "match"
+                  ? "✓"
+                  : verdicts[i] === "mismatch"
+                    ? `✗ expected ${formatVerifiedValue(verifiedValues[i]?.value ?? "")}`
+                    : "— not verified"}
               </span>
               <span className="field-row-page">
                 {f.page != null ? `p${f.page + 1}` : "—"}

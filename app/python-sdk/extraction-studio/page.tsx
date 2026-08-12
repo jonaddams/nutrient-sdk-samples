@@ -348,6 +348,7 @@ export default function ExtractionStudio() {
       ),
       results: result ? (
         <StructuredResults
+          docId={current.docId}
           data={result.data as StructuredData}
           code={result.code}
           timingMs={result.timingMs}
