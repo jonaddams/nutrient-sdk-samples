@@ -21,7 +21,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 7697,
+      timingMs: 7978,
     },
     {
       docId: "invoice-ac20251047",
@@ -29,15 +29,15 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 12806,
+      timingMs: 11570,
     },
     {
       docId: "invoice-ac20251047",
       provider: "bedrock",
       model: "qwen.qwen3-vl-235b-a22b-instruct",
-      matched: 2,
+      matched: 3,
       verified: 3,
-      timingMs: 8607,
+      timingMs: 7874,
     },
     {
       docId: "lumen-invoice",
@@ -45,7 +45,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 7190,
+      timingMs: 6662,
     },
     {
       docId: "lumen-invoice",
@@ -53,7 +53,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 2,
       verified: 3,
-      timingMs: 9588,
+      timingMs: 10598,
     },
     {
       docId: "lumen-invoice",
@@ -61,7 +61,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
       verified: 3,
-      timingMs: 8186,
+      timingMs: 11616,
     },
     {
       docId: "scanned-invoice",
@@ -69,7 +69,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 2,
       verified: 2,
-      timingMs: 8283,
+      timingMs: 9194,
     },
     {
       docId: "scanned-invoice",
@@ -77,7 +77,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 2,
       verified: 2,
-      timingMs: 10371,
+      timingMs: 10382,
     },
     {
       docId: "scanned-invoice",
@@ -85,7 +85,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
       verified: 2,
-      timingMs: 8642,
+      timingMs: 8827,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -93,7 +93,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 3451,
+      timingMs: 6038,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -101,7 +101,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 5703,
+      timingMs: 6197,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -109,7 +109,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 3,
-      timingMs: 6120,
+      timingMs: 6079,
     },
     {
       docId: "westbridge-engineering-submittal-form",
@@ -117,15 +117,15 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 2,
       verified: 6,
-      timingMs: 34020,
+      timingMs: 33521,
     },
     {
       docId: "westbridge-engineering-submittal-form",
       provider: "anthropic",
       model: "claude-sonnet-5",
-      matched: 4,
+      matched: 5,
       verified: 6,
-      timingMs: 61714,
+      timingMs: 36444,
     },
     {
       docId: "westbridge-engineering-submittal-form",
@@ -133,7 +133,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
       verified: 6,
-      timingMs: 36953,
+      timingMs: 36539,
     },
     {
       docId: "bill-of-lading",
@@ -141,7 +141,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 6,
       verified: 6,
-      timingMs: 14028,
+      timingMs: 14055,
     },
     {
       docId: "bill-of-lading",
@@ -149,7 +149,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 6,
       verified: 6,
-      timingMs: 16591,
+      timingMs: 16631,
     },
     {
       docId: "bill-of-lading",
@@ -157,15 +157,15 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 6,
-      timingMs: 17394,
+      timingMs: 17042,
     },
     {
       docId: "emergency-dept-billing-worksheet",
       provider: "openai",
       model: "gpt-5.4",
-      matched: 1,
+      matched: 3,
       verified: 4,
-      timingMs: 3623,
+      timingMs: 3404,
     },
     {
       docId: "emergency-dept-billing-worksheet",
@@ -173,7 +173,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 4,
-      timingMs: 8441,
+      timingMs: 11287,
     },
     {
       docId: "emergency-dept-billing-worksheet",
@@ -181,7 +181,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 4,
-      timingMs: 5433,
+      timingMs: 5332,
     },
     {
       docId: "meridian-income-statement",
@@ -189,7 +189,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 3638,
+      timingMs: 3434,
     },
     {
       docId: "meridian-income-statement",
@@ -197,7 +197,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 7838,
+      timingMs: 8747,
     },
     {
       docId: "meridian-income-statement",
@@ -205,7 +205,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 3,
-      timingMs: 5990,
+      timingMs: 6923,
     },
     {
       docId: "meridian-balance-sheet",
@@ -213,7 +213,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 4,
       verified: 4,
-      timingMs: 8466,
+      timingMs: 4740,
     },
     {
       docId: "meridian-balance-sheet",
@@ -221,7 +221,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 4,
       verified: 4,
-      timingMs: 8580,
+      timingMs: 6409,
     },
     {
       docId: "meridian-balance-sheet",
@@ -229,7 +229,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 4,
       verified: 4,
-      timingMs: 5692,
+      timingMs: 5413,
     },
     {
       docId: "northgate-auto-claim-fnol",
@@ -237,7 +237,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 5,
       verified: 5,
-      timingMs: 4530,
+      timingMs: 8139,
     },
     {
       docId: "northgate-auto-claim-fnol",
@@ -245,7 +245,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 5,
       verified: 5,
-      timingMs: 7591,
+      timingMs: 6337,
     },
     {
       docId: "northgate-auto-claim-fnol",
@@ -253,7 +253,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 5,
       verified: 5,
-      timingMs: 5154,
+      timingMs: 7044,
     },
     {
       docId: "apricot-cake-recipe",
@@ -261,7 +261,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 2941,
+      timingMs: 3749,
     },
     {
       docId: "apricot-cake-recipe",
@@ -269,7 +269,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 5718,
+      timingMs: 5090,
     },
     {
       docId: "apricot-cake-recipe",
@@ -277,7 +277,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 2891,
+      timingMs: 2702,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -285,7 +285,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 4165,
+      timingMs: 4340,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -293,7 +293,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 6508,
+      timingMs: 6176,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -301,7 +301,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 1,
       verified: 1,
-      timingMs: 6971,
+      timingMs: 4222,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -309,7 +309,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 7499,
+      timingMs: 6259,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -317,7 +317,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 10696,
+      timingMs: 10061,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -325,7 +325,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 6602,
+      timingMs: 6797,
     },
     {
       docId: "employment-application",
@@ -333,7 +333,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 1,
       verified: 1,
-      timingMs: 4636,
+      timingMs: 4184,
     },
     {
       docId: "employment-application",
@@ -341,7 +341,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 1,
       verified: 1,
-      timingMs: 8679,
+      timingMs: 6217,
     },
     {
       docId: "employment-application",
@@ -349,7 +349,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 5154,
+      timingMs: 4871,
     },
   ],
 };
