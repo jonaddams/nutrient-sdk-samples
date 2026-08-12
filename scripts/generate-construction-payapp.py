@@ -4,23 +4,24 @@ Generate a realistic AIA-style "Application and Certificate for Payment"
 fictional construction project.
 
 This replaces westbridge-engineering-submittal-form.pdf in the Extraction
-Studio corpus. Westbridge was retired for being a *demo hazard*, not for
-being inaccurate: at 1700x2338pt (architectural D-size) its rasterized
-payload is ~8x a Letter page, driving 33-36s extraction times and
-intermittent hosted-backend failures. Its content-level difficulty
-(retainage math, multi-line-item continuation sheet, derived totals) is
-exactly what makes it a good accuracy test, so this document keeps that
-content and fixes only the geometry:
+Studio corpus. Westbridge was retired for being a *demo hazard*: at
+1700x2338pt (architectural D-size) its rasterized payload is ~8x a Letter
+page, driving 33-36s extraction times and roughly 50% failure rate against
+the hosted backend. Its content-level difficulty (retainage math,
+multi-line-item continuation sheet, derived totals) is exactly what makes
+it a good accuracy test, so this document keeps that content and fixes the
+geometry:
 
   - Letter page (612 x 792 pt) instead of D-size.
-  - Image-only (no text layer) at 200 DPI => 1700 x 2200 px raster
-    (~3.74 MP), comfortably under scanned-invoice.pdf's 8.7 MP at ~9s.
 
-Process: draw the form as ordinary vector/text content on a Letter-size
-fitz page (this "source" page is never saved), rasterize that page to a
-PNG at TARGET_DPI, then build a brand-new one-page PDF whose only content
-is that PNG placed at Letter size. The result has zero extractable text
-and zero embedded fonts -- verify with page.get_text() and page.get_fonts().
+SDK-051 (see docs/internal/sdk-defects/) measured that it is *rasterized
+pages*, not page density, that drive the slowness and failures: a
+rasterized version of this same document degraded sharply past 4-6 fields
+(1/4 to 1/6 success, 42-51s before failing) while a text-layer control
+document stayed fast and reliable (5/5 success, 5.4-13.7s) at 8 fields. So
+this generator emits the form as ordinary vector/text content directly --
+no rasterize-to-image step. The result has a real, searchable text layer
+and embedded fonts; verify with page.get_text() and page.get_fonts().
 
 Every derived figure on the form (retainage, total earned less retainage,
 current payment due, balance to finish, continuation-sheet totals) is
@@ -37,7 +38,6 @@ import fitz  # PyMuPDF
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "public", "documents")
 PAGE_W, PAGE_H = fitz.paper_size("letter")  # 612 x 792
 MARGIN = 40
-TARGET_DPI = 150
 
 INK = (0.12, 0.12, 0.12)
 RULE = (0.35, 0.35, 0.35)
@@ -346,51 +346,34 @@ def draw_source_page(page, calc):
 def build():
     calc = compute()
 
-    # 1. Draw the form on a normal (text-bearing) source page.
-    src_doc = fitz.open()
-    src_page = src_doc.new_page(width=PAGE_W, height=PAGE_H)
-    draw_source_page(src_page, calc)
-
-    # 2. Rasterize that page at TARGET_DPI, saved as JPEG so the embedded
-    #    image XObject is actually compressed (a raw/PNG insert_image
-    #    stream can land uncompressed in the PDF unless deflated -- JPEG
-    #    keeps the file a realistic "scanned page" size, like
-    #    scanned-invoice.pdf).
-    zoom = TARGET_DPI / 72.0
-    pix = src_page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), colorspace=fitz.csGRAY)
+    # Draw the form as ordinary vector/text content directly onto the
+    # output page -- no rasterize-to-image step, so the PDF keeps a real
+    # text layer and embedded fonts (see SDK-051 in the module docstring).
     os.makedirs(OUT_DIR, exist_ok=True)
-    jpg_path = os.path.join(OUT_DIR, "_construction-payapp-raster.jpg")
-    pix.save(jpg_path, jpg_quality=90)
-    print(f"Rasterized at {TARGET_DPI} DPI: {pix.width}x{pix.height}px ({pix.width*pix.height/1e6:.2f} MP)")
-    src_doc.close()
-
-    # 3. Build the final image-only PDF: one Letter page, one full-page
-    #    image, zero text objects, zero embedded fonts.
     out_doc = fitz.open()
     out_doc.set_metadata({
         "title": "Application and Certificate for Payment",
         "author": "Nutrient SDK Samples",
-        "subject": "Construction pay application demo document (image-only scan)",
+        "subject": "Construction pay application demo document (text-layer PDF)",
     })
     out_page = out_doc.new_page(width=PAGE_W, height=PAGE_H)
-    out_page.insert_image(out_page.rect, filename=jpg_path)
+    draw_source_page(out_page, calc)
 
     out_path = os.path.join(OUT_DIR, "construction-pay-application.pdf")
     out_doc.save(out_path, garbage=4, deflate=True)
     out_doc.close()
-    os.remove(jpg_path)
 
     print(f"Generated: {out_path}")
     print(f"Page size: {PAGE_W} x {PAGE_H} pt (US Letter)")
 
-    # 4. Verify: no extractable text, no embedded fonts.
+    # Verify: has extractable text and embedded fonts.
     check = fitz.open(out_path)
     cp = check[0]
     text = cp.get_text()
     fonts = cp.get_fonts()
-    print(f"Verify -- extractable text length: {len(text)!r}, embedded fonts: {fonts}")
-    assert text == "", "Output PDF still has extractable text!"
-    assert fonts == [], "Output PDF still has embedded fonts!"
+    print(f"Verify -- extractable text length: {len(text)}, embedded fonts: {len(fonts)}")
+    assert text != "", "Output PDF has no extractable text!"
+    assert fonts != [], "Output PDF has no embedded fonts!"
     check.close()
 
     return calc
