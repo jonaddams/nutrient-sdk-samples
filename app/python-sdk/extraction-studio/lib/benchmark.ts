@@ -11,11 +11,9 @@ export type BenchmarkRow = {
 
 export const BENCHMARK: {
   measuredOn: string;
-  instructionApplied: boolean;
   rows: BenchmarkRow[];
 } = {
   measuredOn: "2026-08-12",
-  instructionApplied: false,
   rows: [
     {
       docId: "invoice-ac20251047",

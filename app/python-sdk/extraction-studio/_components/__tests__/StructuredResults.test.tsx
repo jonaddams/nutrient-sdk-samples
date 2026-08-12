@@ -481,14 +481,49 @@ test("the accuracy segment shows the benchmark for the current document with its
     expect(row?.textContent).toContain(`${r.matched} of ${r.verified}`);
   }
 
-  // The four caveats the brief requires, plus the two the human ruling and
-  // the latency data added: sample-corpus scope, the scoring rule for a
-  // blank verified field, latency variance, and the non-determinism caveat
-  // on "reproduce it live".
+  // The caveats the tightened block carries: sample-corpus scope, n=1 for
+  // both scores and timings, the scoring rule for a blank verified field,
+  // the denominator disclosure (ambiguous fields shrink it), and the
+  // "reproduce it live" call to action.
   expect(screen.getByText(/measured/i)).toBeDefined();
-  expect(screen.getByText(/these sample documents/i)).toBeDefined();
+  expect(screen.getByText(/this sample corpus/i)).toBeDefined();
+  expect(screen.getByText(/n=1/)).toBeDefined();
   expect(screen.getByText(/not correct, not as unscored/i)).toBeDefined();
-  expect(screen.getByText(/not steady rates/i)).toBeDefined();
+  expect(
+    screen.getByText(/denominator can be smaller than the number of fields/i),
+  ).toBeDefined();
   expect(screen.getByText(/pressing Run/)).toBeDefined();
-  expect(screen.getByText(/not deterministic/i)).toBeDefined();
+});
+
+test("Copy/Download in the Accuracy segment emit the benchmark rows, not the live run", () => {
+  // Before this fix, Copy/Download always emitted `data.extraction` — the
+  // live run's own result — no matter which segment was showing, so the
+  // Accuracy segment's button downloaded fields unrelated to the table on
+  // screen. They must now emit the rows actually shown in that table.
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const clickSpy = vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(() => {});
+
+  render(
+    <StructuredResults
+      docId="bill-of-lading"
+      data={{ extraction: { unrelated: "field" }, fields: [] } as never}
+      activeIndex={null}
+      onSelectField={vi.fn()}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Accuracy" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  expect(clickSpy).toHaveBeenCalledTimes(1);
+  const rows = BENCHMARK.rows.filter((r) => r.docId === "bill-of-lading");
+  expect(createObjectURL).toHaveBeenCalledTimes(1);
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  return expect(blob.text()).resolves.toBe(JSON.stringify(rows, null, 2));
 });

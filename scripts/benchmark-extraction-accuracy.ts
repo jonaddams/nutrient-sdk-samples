@@ -279,8 +279,8 @@ async function main() {
       `  docId: string;\n  provider: string;\n  model: string;\n` +
       `  matched: number;\n  verified: number;\n  timingMs: number;\n};\n\n` +
       `export const BENCHMARK: {\n` +
-      `  measuredOn: string;\n  instructionApplied: boolean;\n  rows: BenchmarkRow[];\n` +
-      `} = ${JSON.stringify({ measuredOn, instructionApplied: false, rows }, null, 2)};\n`,
+      `  measuredOn: string;\n  rows: BenchmarkRow[];\n` +
+      `} = ${JSON.stringify({ measuredOn, rows }, null, 2)};\n`,
   );
 
   // JSON.stringify quotes every key ("docId": ...) and omits trailing commas,

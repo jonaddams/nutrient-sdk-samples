@@ -9,6 +9,21 @@ const NUMBER_TOLERANCE = 0.01;
 function toNumber(input: unknown): number | null {
   if (typeof input === "number") return Number.isFinite(input) ? input : null;
   if (typeof input !== "string") return null;
+
+  // "1.165,10" (dot as thousands separator, comma as decimal — the European
+  // convention) and "1,165.10" (the reverse, US convention) are both real
+  // formats, and this parser cannot tell which one a given string means. The
+  // wrong guess is confidently wrong, not absent: stripping the comma from
+  // "1.165,10" below yields the finite number 1.1651, which is not "unparseable"
+  // to the caller — it is a fabricated wrong answer. When a comma follows a
+  // dot, the string is ambiguous by construction, so refuse to parse it rather
+  // than pick a convention. (A dot following a comma, e.g. "1,165.10", is the
+  // unambiguous US form already handled correctly below — that one is not
+  // ambiguous and must keep parsing.)
+  const lastDot = input.lastIndexOf(".");
+  const lastComma = input.lastIndexOf(",");
+  if (lastDot !== -1 && lastComma !== -1 && lastComma > lastDot) return null;
+
   const cleaned = input.replace(/[^0-9.-]/g, "");
   if (cleaned === "" || cleaned === "-" || cleaned === ".") return null;
   const n = Number(cleaned);
@@ -16,7 +31,25 @@ function toNumber(input: unknown): number | null {
 }
 
 function normaliseText(input: string): string {
-  return input.trim().replace(/\s+/g, " ").toLowerCase();
+  return (
+    input
+      .trim()
+      .replace(/\s+/g, " ")
+      // Unify dash forms (hyphen, non-breaking hyphen, figure dash, en dash, em
+      // dash, minus sign) to a plain hyphen: "08 51 13 - Aluminum Windows" and
+      // "08 51 13 — Aluminum Windows" are the same spec section typed two ways,
+      // and typography must not decide the verdict.
+      .replace(/[‐‑‒–—−]/g, "-")
+      // Periods and commas are typography in this corpus, not content: a
+      // trailing sentence period ("Apricot Cake."), a suffix comma ("Group,
+      // LLC"), and a middle initial's period ("R.") are all the same answer as
+      // the form without it. Every case this fixes is a punctuation-only
+      // difference, so removing them can only move a verdict toward "match".
+      .replace(/[.,]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase()
+  );
 }
 
 /** An instant, only when the text is date-shaped enough to be unambiguous. */
@@ -32,7 +65,15 @@ function toDate(input: string): number | null {
   // UTC those two instants differ by the zone offset, so the *same calendar
   // day* would wrongly compare as a mismatch. Build the ISO case as a local
   // date explicitly so both forms land on the same instant.
-  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  //
+  // The trailing (?:[T ].*)? also swallows an RFC3339 time-and-zone suffix
+  // ("2022-11-16T00:00:00Z"), which a provider that normalises dates to ISO
+  // will routinely emit. Falling through to Date.parse for that string would
+  // honour the "Z" as a UTC instant and compare it against this function's
+  // *local*-midnight reading of the same calendar day, reporting a mismatch
+  // for a date that is actually correct. The time portion is discarded on
+  // purpose: this function answers "same calendar day", not "same instant".
+  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ].*)?$/);
   if (iso) {
     const [, y, m, d] = iso;
     const t = new Date(Number(y), Number(m) - 1, Number(d)).getTime();

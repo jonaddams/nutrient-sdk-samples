@@ -1237,6 +1237,16 @@
   overflow-wrap: anywhere;
 }
 
+.studio-shell .field-row-verified {
+  /* Same reasoning as .field-row-value above: in a minmax(0, 1fr) grid track,
+     a long "✗ expected …" string (e.g. "✗ expected Inter-Continental Freight
+     Carriers Inc.") needs min-width: 0 to be allowed to shrink at all, and
+     overflow-wrap to wrap rather than push the Page/Parse columns out of
+     place. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .studio-shell .field-row-page,
 .studio-shell .field-row-parse {
   white-space: nowrap;
@@ -1435,20 +1445,26 @@
 /* Three verdict states for .field-row-verified (Fields view). The glyph
    (✓ / ✗ expected … / — not verified) already carries the meaning, so colour
    here is reinforcement, not the only signal — a colour-blind reader still
-   gets the right answer from the text alone.
-   Same fixed hues .match-dot already uses for grounding strength, not new
-   ones: this is the same kind of claim (a correctness signal that must read
-   the same in every theme/palette, not the app's decorative accent), so it
-   reuses the existing tone rather than inventing a second colour system.
+   gets the right answer from the text alone. That redundancy defends against
+   colour blindness, not low contrast: a ✓ nobody can see still defeats a
+   feature built to be noticed, so these two are their own literal hexes,
+   darkened from .match-dot's (#4a9d6a / #c8553c) rather than reusing them —
+   .match-dot colours a small fixed-size DOM dot, not body-copy text, and
+   AA's 4.5:1 normal-text threshold applies here in a way it does not there.
+   Measured against --bg-elev #FFFFFF (every light palette shares that value):
+   match #3d8157 ≈4.7:1, mismatch #b84e37 ≈5.0:1 — both clear AA. Against the
+   darkest --bg-elev (#0A0A0A) they land ≈3.6-4.2:1: not AA for text, but
+   legible, and unlike .match-dot's dots this text is never colour-only —
+   see above.
    `mismatch` also carries weight: it is the one state built to be NOTICED by
    a non-technical presenter mid-demo, so it must not have to compete with
    `match` or `unverified` for attention. */
 .studio-shell .field-row-verified.match {
-  color: #4a9d6a;
+  color: #3d8157;
 }
 
 .studio-shell .field-row-verified.mismatch {
-  color: #c8553c;
+  color: #b84e37;
   font-weight: 600;
 }
 

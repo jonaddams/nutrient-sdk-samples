@@ -91,16 +91,31 @@ export function StructuredResults({
   );
   const score = summarise(verdicts);
 
-  const payload = () =>
-    view === "code" ? (code ?? "") : JSON.stringify(data.extraction, null, 2);
+  // Shared by the Accuracy table below and by Copy/Download in that segment —
+  // see the comment on `payload` for why the latter needs it too.
+  const benchmarkRowsForDoc = BENCHMARK.rows.filter((r) => r.docId === docId);
+
+  const payload = () => {
+    if (view === "code") return code ?? "";
+    // Copy/Download must emit what the visible table actually shows. In every
+    // other segment that is `data.extraction` (this run's own result), but
+    // the Accuracy segment shows the pre-computed cross-provider benchmark
+    // instead — emitting the live run's JSON here would put fields the user
+    // never asked to copy behind a button captioned for the table beside it.
+    if (view === "accuracy")
+      return JSON.stringify(benchmarkRowsForDoc, null, 2);
+    return JSON.stringify(data.extraction, null, 2);
+  };
 
   const download = () => {
-    const isCode = view === "code";
-    downloadText(
-      payload(),
-      isCode ? "extraction.py" : "extraction.json",
-      isCode ? "text/x-python" : "application/json",
-    );
+    const filename =
+      view === "code"
+        ? "extraction.py"
+        : view === "accuracy"
+          ? "benchmark.json"
+          : "extraction.json";
+    const mime = view === "code" ? "text/x-python" : "application/json";
+    downloadText(payload(), filename, mime);
   };
 
   return (
@@ -195,39 +210,40 @@ export function StructuredResults({
               </tr>
             </thead>
             <tbody>
-              {BENCHMARK.rows
-                .filter((r) => r.docId === docId)
-                .map((r) => (
-                  <tr key={`${r.provider}-${r.model}`}>
-                    <td>
-                      {providerLabel(r.provider)} · {r.model}
-                    </td>
-                    <td>
-                      {r.matched} of {r.verified}
-                    </td>
-                    <td>{(r.timingMs / 1000).toFixed(1)}s</td>
-                  </tr>
-                ))}
+              {benchmarkRowsForDoc.map((r) => (
+                <tr key={`${r.provider}-${r.model}`}>
+                  <td>
+                    {providerLabel(r.provider)} · {r.model}
+                  </td>
+                  <td>
+                    {r.matched} of {r.verified}
+                  </td>
+                  <td>{(r.timingMs / 1000).toFixed(1)}s</td>
+                </tr>
+              ))}
             </tbody>
           </table>
           {/* The point of this task: an undisclosed benchmark is a marketing
               claim, and a disclosed one is a demonstration. Every clause
               below exists because leaving it out would let this table be
-              misread. */}
+              misread. Kept to one measurement-context sentence, one n=1
+              sentence, one scoring-rules sentence and two short calls to
+              action, rather than growing every time a new caveat is found —
+              a caveat an account executive cannot hold in their head mid-call
+              protects no one. */}
           <p className="muted hint-em">
-            Measured {BENCHMARK.measuredOn} on these sample documents, with no
-            extraction guidance applied; scores here describe this corpus, not a
-            prospect's own, and will drift as model versions change. A verified
-            field the model left blank counts as not correct, not as unscored —
-            every row is scored out of the same denominator. Timings are single
-            measurements, not steady rates: they range from a few seconds to
-            well over a minute here, and the slowest pairs are also the least
-            reliable. Guidance changes results materially — try a preset and run
-            it again. Any row can be reproduced live by picking that model and
-            pressing Run. These models are not deterministic, so a live run can
-            easily score differently than the row shown — a real operational
-            consideration for anyone putting one in a pipeline, not a flaw in
-            this table.
+            Measured {BENCHMARK.measuredOn} on this sample corpus with no
+            extraction guidance applied — not a prospect's own documents, and it
+            will drift as model versions change. Each row is a single run:
+            scores and timings are one measurement each (n=1), not an average,
+            so a re-run of the same model can score or time differently. A
+            verified field the model left blank counts as not correct, not as
+            unscored; every row for a document shares that document's own
+            denominator, though fields with no defensible correct answer are
+            excluded from scoring, so the denominator can be smaller than the
+            number of fields extracted. Adding extraction guidance changes
+            results materially. Any row can be reproduced live by picking that
+            model and pressing Run.
           </p>
         </div>
       ) : (
@@ -269,7 +285,18 @@ export function StructuredResults({
                   the retainage case the pair is grounded true / correct
                   false, so two similar-looking marks would actively
                   mislead. */}
-              <span className={`field-row-verified ${verdicts[i]}`}>
+              {/* Only the "match" state's content is a bare glyph with no
+                  descriptive text — "mismatch" and "unverified" already read
+                  fine to a screen reader because their text says what
+                  happened. role="img" + aria-label fills that one gap, the
+                  same pattern .match-dot already uses below for the same
+                  reason. */}
+              <span
+                className={`field-row-verified ${verdicts[i]}`}
+                {...(verdicts[i] === "match"
+                  ? { role: "img", "aria-label": "match: verified" }
+                  : {})}
+              >
                 {verdicts[i] === "match"
                   ? "✓"
                   : verdicts[i] === "mismatch"
