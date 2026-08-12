@@ -10,8 +10,9 @@ import ExtractionStudio from "../page";
 // DocViewer needs a real SDK global (window.NutrientViewer) to load anything,
 // which jsdom never provides, so every other test here has simply never
 // looked at what DocViewer receives. Recording the `citations` prop is the
-// only way to prove page.tsx's viewerCitations ternary picks the right
-// branch — see the tests below that assert on `data-citation-count`.
+// only way to prove page.tsx hands DocViewer the citations belonging to the
+// SELECTED feature — `panels[feature].citations` — see the tests below that
+// assert on `data-citation-count`.
 //
 // `citationRenders` also captures EVERY render the mock sees, not just the
 // settled one `screen` can query after an interaction. That distinction
@@ -23,8 +24,8 @@ import ExtractionStudio from "../page";
 // cannot distinguish "computed 0 citations immediately" from "briefly
 // recomputed the previous feature's citations, then got cleared a beat
 // later". Only a spy on every render call can see that intermediate frame,
-// and that frame is exactly what `feature === "describe" ? NO_CITATIONS :`
-// exists to keep from ever being nonzero.
+// and that frame is exactly what the `describe` panel entry's
+// `citations: NO_CITATIONS` exists to keep from ever being nonzero.
 const { citationRenders } = vi.hoisted(() => ({
   citationRenders: [] as number[],
 }));
@@ -218,10 +219,10 @@ test("draws no citation overlay for Image description", async () => {
   // The controls-absence checks above are NOT proof of this: Show
   // regions/Show citations live in the results panels, which never mount
   // here (tab is "config", no result). This is the actual guarantee — what
-  // page.tsx hands DocViewer's `citations` prop for the "describe" branch.
-  // Without the `feature === "describe" ? NO_CITATIONS :` branch,
-  // viewerCitations's final `else` is `ocrCitations`, which would still be
-  // whatever a PREVIOUS OCR run left behind.
+  // page.tsx hands DocViewer's `citations` prop for the "describe" feature.
+  // Were that entry's `citations: NO_CITATIONS` to name another feature's
+  // memo — `ocrCitations`, say — it would still be whatever a PREVIOUS OCR
+  // run left behind.
   expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
     "data-citation-count",
     "0",
@@ -256,11 +257,12 @@ test("switching from a populated OCR run to Image description never paints a sta
   citationRenders.length = 0;
   fireEvent.click(screen.getByRole("button", { name: /Image description/ }));
 
-  // Without `feature === "describe" ? NO_CITATIONS :`, the render that fires
-  // the instant `feature` becomes "describe" (before the clearing effect
-  // runs) still computes `viewerCitations` as `ocrCitations` — the previous
-  // OCR run's box, painted on the document for one commit. Every recorded
-  // render across the whole switch must be 0, not just the settled last one.
+  // Were the `describe` entry's `citations: NO_CITATIONS` replaced by
+  // `ocrCitations`, the render that fires the instant `feature` becomes
+  // "describe" (before the clearing effect runs) would still hand DocViewer
+  // the previous OCR run's box — painted on the document for one commit.
+  // Every recorded render across the whole switch must be 0, not just the
+  // settled last one.
   expect(citationRenders.every((count) => count === 0)).toBe(true);
   expect(citationRenders.length).toBeGreaterThan(0);
 });

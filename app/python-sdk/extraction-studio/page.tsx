@@ -59,13 +59,14 @@ import {
 } from "./lib/tables";
 
 // Image description carries no citations — its output is prose with no
-// coordinates. A literal `[]` inline in viewerCitations below would be a
-// FRESH array every render, while the three sibling branches are all
-// useMemo'd; see the identity rule at the `citations` useMemo above
-// (page.tsx:136-142) — DocViewer's annotation-sync effect keys on `citations`
-// identity, and a new array every render would thrash it exactly the way that
-// comment warns against. Module-level keeps the identity stable across every
-// render without needing its own useMemo.
+// coordinates. A literal `[]` inline in the `describe` entry of the `panels`
+// map below would be a FRESH array every render, while every sibling entry's
+// `citations` is a useMemo'd value; see the identity rule on the `citations`
+// useMemo further down — DocViewer's annotation-sync effect keys on the
+// `citations` prop's identity, and a new array every render would thrash it
+// exactly the way that comment warns against. `panels` is itself rebuilt on
+// every render, so module-level is what keeps this one value's identity
+// stable without giving it its own useMemo.
 const NO_CITATIONS: IndexedCitation[] = [];
 
 export default function ExtractionStudio() {
