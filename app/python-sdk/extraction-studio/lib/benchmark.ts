@@ -123,6 +123,14 @@ export const BENCHMARK: {
     },
     {
       docId: "westbridge-engineering-submittal-form",
+      provider: "anthropic",
+      model: "claude-sonnet-5",
+      matched: 4,
+      verified: 6,
+      timingMs: 61714,
+    },
+    {
+      docId: "westbridge-engineering-submittal-form",
       provider: "bedrock",
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
