@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { DescribeResult } from "../lib/describe";
 import { copyText, downloadText } from "../lib/download";
+import { providerLabel } from "../lib/provenance";
 import { Segmented } from "./Segmented";
 
 type DescribeView = "text" | "json" | "code";
@@ -46,6 +47,10 @@ export function DescribeResults({ result }: { result: DescribeResult }) {
             Elapsed time: {(result.timingMs / 1000).toFixed(1)}s
           </span>
         )}
+        {/* First of the option echoes, because it is the one the reader cannot
+            recover from the output itself: two providers describing the same
+            page produce prose that reads equally plausible. */}
+        <span className="mono muted">{providerLabel(result.provider)}</span>
         <span className="mono muted">{result.level} detail</span>
         <span className="mono muted">
           {result.promptUsed === "(default)" ? "SDK prompt" : "custom prompt"}

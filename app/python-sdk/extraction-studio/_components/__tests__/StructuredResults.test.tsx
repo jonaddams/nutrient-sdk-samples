@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
+import type { StructuredData } from "../../lib/api";
 import { confidencePct, StructuredResults } from "../StructuredResults";
 
 afterEach(() => {
@@ -228,4 +229,43 @@ test("degrades to a Python-commented placeholder when code is absent", () => {
   expect(
     screen.queryByText(/run an extraction to see/),
   ).not.toBeInTheDocument();
+});
+
+test("the meta row names the provider and model that produced the fields", () => {
+  // The worst of the provenance gaps before this: the studio offers four
+  // providers and a model list per provider, so "the extraction got that
+  // wrong" was unanswerable from the panel alone — and the known demo trap on
+  // the flagship invoice (the retainage figure) is model-specific.
+  render(
+    <StructuredResults
+      data={data as unknown as StructuredData}
+      config={{ provider: "anthropic", model: "claude-sonnet-5" }}
+      activeIndex={null}
+      onSelectField={vi.fn()}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#4a6cf7"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  // "Claude", not "anthropic": the studio's own id is an implementation
+  // detail three sibling endpoints spell differently.
+  expect(screen.getByText(/Claude · claude-sonnet-5/)).toBeTruthy();
+});
+
+test("no config means no provenance line rather than an empty one", () => {
+  // The prop is optional so this component can render a result from a backend
+  // that predates the echo. A bare separator would look like a rendering bug.
+  render(
+    <StructuredResults
+      data={data as unknown as StructuredData}
+      activeIndex={null}
+      onSelectField={vi.fn()}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#4a6cf7"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  expect(screen.queryByText(/·/)).toBeNull();
 });

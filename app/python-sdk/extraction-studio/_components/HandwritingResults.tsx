@@ -3,6 +3,7 @@ import { useState } from "react";
 import { copyText, downloadText } from "../lib/download";
 import { type HandwritingResult, isVlmRun } from "../lib/handwriting";
 import { confidenceTone, type OcrColorMode } from "../lib/ocr";
+import { engineLabel, providerLabel } from "../lib/provenance";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -77,6 +78,16 @@ export function HandwritingResults({
         </span>
         <span className="mono muted">
           {result.statistics?.textElements ?? 0} elements
+        </span>
+        {/* Which engine ran, read off the RESULT. `Run extraction` lives in the
+            panel head, so it is reachable from this tab with the engine toggle
+            hidden — and for this feature the answer is the demo's central
+            claim, not a detail: Local ICR means nothing left the machine. */}
+        <span className="mono muted">
+          {engineLabel(result.config?.engine)}
+          {isVlm && providerLabel(result.config?.provider)
+            ? ` · ${providerLabel(result.config?.provider)}`
+            : ""}
         </span>
         {/* The VLM engine returns the LOCAL pass's confidence scores unchanged
             while rewriting the text — measured byte-identical across both

@@ -351,6 +351,7 @@ export default function ExtractionStudio() {
           data={result.data as StructuredData}
           code={result.code}
           timingMs={result.timingMs}
+          config={result.config}
           activeIndex={activeIndex}
           onSelectField={setActiveIndex}
           showCitations={showCitations}
