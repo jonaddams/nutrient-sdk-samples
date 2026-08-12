@@ -21,9 +21,13 @@
  *   and only the (document, provider) pairs MISSING from it are fetched; the
  *   result is merged with the existing rows and rewritten. This exists because
  *   one flaky pair should not force re-paying for the other 41 successful
- *   extractions every time — measured 2026-08-12, when
- *   westbridge-engineering-submittal-form/anthropic intermittently failed and
- *   the fix was to resume-fill just that one pair, not re-run all 42.
+ *   extractions every time — any (document, provider) pair against this
+ *   hosted backend can be slow or intermittently fail, and resume-filling just
+ *   that one pair is cheaper than re-running the whole set. The historical
+ *   case that motivated this: westbridge-engineering-submittal-form/anthropic
+ *   intermittently failed on 2026-08-12 (that document has since been
+ *   retired from the corpus), and the fix was to resume-fill just that one
+ *   pair, not re-run all 42.
  *
  * - FULL. Pass `--full` or set `BENCHMARK_FULL_RERUN=1` to ignore any existing
  *   lib/benchmark.ts and regenerate every row from scratch (e.g. after a model
@@ -53,11 +57,13 @@ const PROVIDERS = ["openai", "anthropic", "bedrock"];
 const OUT_PATH = "app/python-sdk/extraction-studio/lib/benchmark.ts";
 
 // Up to 3 attempts per (document, provider), with a generous per-request
-// timeout. 82018ms is a MEASURED real duration for
-// westbridge-engineering-submittal-form/anthropic (2026-08-12) — this pair is
-// pathologically slow, not reliably broken, and its true ceiling is unknown.
-// 180s gives a slow-but-real response room to land rather than being treated
-// as a failure identical to an actual server error.
+// timeout. Some (document, provider) pairs against this hosted backend are
+// pathologically slow rather than reliably broken, and their true ceiling is
+// unknown — 82018ms was a MEASURED real duration for
+// westbridge-engineering-submittal-form/anthropic (2026-08-12, before that
+// document was retired from the corpus). 180s gives a slow-but-real response
+// room to land rather than being treated as a failure identical to an actual
+// server error.
 const MAX_ATTEMPTS = 3;
 const REQUEST_TIMEOUT_MS = 180_000;
 const RETRY_DELAYS_MS = [2_000, 5_000];
