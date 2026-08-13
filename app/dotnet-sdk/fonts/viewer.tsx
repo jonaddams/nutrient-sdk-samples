@@ -16,7 +16,9 @@ export default function FontsViewer({ blob, supplyFonts }: FontsViewerProps) {
 
   // NutrientViewer must be load()-ed exactly once per document: it snapshots
   // its Standalone configuration on the first load() call and asserts if a
-  // later load() on the same container passes a different one.
+  // later load() on the same page passes a different one — which is why
+  // this sample gives each pane its own iframe/page rather than mounting
+  // two <FontsViewer> instances side by side.
   // useAppTheme() can settle to a different value shortly after mount, so
   // capture it once here rather than react to it — live theme re-sync for
   // an already-loaded viewer is intentionally out of scope.

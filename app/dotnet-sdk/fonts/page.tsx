@@ -46,7 +46,6 @@ const cardStyle: React.CSSProperties = {
 export default function FontsPage() {
   const [selectedSampleId, setSelectedSampleId] = useState(SAMPLES[0].id);
   const [isRunning, setIsRunning] = useState(false);
-  const [blob, setBlob] = useState<Blob | null>(null);
   const [result, setResult] = useState<FontsResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,10 +53,10 @@ export default function FontsPage() {
     setIsRunning(true);
     setError(null);
     setResult(null);
-    setBlob(null);
 
     try {
-      const sample = SAMPLES.find((s) => s.id === selectedSampleId)!;
+      const sample =
+        SAMPLES.find((s) => s.id === selectedSampleId) ?? SAMPLES[0];
       const sourceResponse = await fetch(sample.url);
       if (!sourceResponse.ok) throw new Error("Failed to load sample document");
       const sourceBlob = await sourceResponse.blob();
@@ -78,7 +77,6 @@ export default function FontsPage() {
       }
 
       setResult((await res.json()) as FontsResult);
-      setBlob(sourceBlob);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Font listing failed");
     } finally {
@@ -147,7 +145,6 @@ export default function FontsPage() {
                   onSelect={(id) => {
                     setSelectedSampleId(id);
                     setResult(null);
-                    setBlob(null);
                     setError(null);
                   }}
                   disabled={isRunning}
@@ -228,9 +225,17 @@ export default function FontsPage() {
                             <td
                               className="px-3 py-2 text-right font-medium"
                               style={{
-                                color: font.available
-                                  ? "var(--data-green)"
-                                  : "var(--code-coral)",
+                                // Colour on detail, not availability: "embedded"
+                                // is a guarantee the browser will render this
+                                // font, since the program travels inside the
+                                // file. "installed" is only a server-side
+                                // finding (this host has the family) and says
+                                // nothing about the browser, which may still
+                                // substitute — so it does not earn green.
+                                color:
+                                  font.detail === "embedded"
+                                    ? "var(--data-green)"
+                                    : "var(--code-coral)",
                               }}
                             >
                               {font.detail}
@@ -252,7 +257,7 @@ export default function FontsPage() {
             </div>
 
             <div className="flex-1 min-w-0 flex h-[calc(100vh-12rem)]">
-              {blob ? (
+              {result ? (
                 <>
                   <ViewerPane title="Without fonts">
                     <iframe

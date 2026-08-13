@@ -184,9 +184,12 @@ Filter chips: All, Conversion, Editor, Signatures, Forms, Templates.
 
 ---
 
-## .NET SDK (`/dotnet-sdk`) — 3 samples
+## .NET SDK (`/dotnet-sdk`) — 4 samples
 
-Filter chips: All, File Optimization, Text Extraction.
+Filter chips: All, Document Analysis, File Optimization, Text Extraction.
+
+### Document Analysis
+- `/dotnet-sdk/fonts` — **Document Fonts** — List every font a PDF or Word document requires, then load it in the viewer with those fonts supplied so it renders as authored.
 
 ### File Optimization
 - `/dotnet-sdk/linearize` — **Linearize** — Optimize PDFs for fast web view (first page renders before full download)
@@ -210,7 +213,7 @@ These are server endpoints called by the sample pages above; design does not nee
 
 - `/ai-document-processing/invoices/api/invoices`
 - `/ai-document-processing/invoices/api/process-invoices`
-- `/api/dotnet-sdk/{linearize,ocr,optimize}`
+- `/api/dotnet-sdk/{fonts,linearize,ocr,optimize}`
 - `/api/html-comparison/api/convert`
 - `/api/markdown-comparison/api/convert`
 - `/api/sign-document-dws/api/{certificates,sign}`

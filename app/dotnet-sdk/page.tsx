@@ -1,15 +1,12 @@
 import { SamplesIndex } from "@/app/_components/SamplesIndex";
 import { samples } from "./samples";
 
-const categories = ["All", "File Optimization", "Text Extraction"];
-
 export default function DotNetSDKPage() {
   return (
     <SamplesIndex
       title=".NET SDK"
       description="File optimization, linearization, and OCR for .NET workloads."
       samples={samples}
-      categories={categories}
       productHomeUrl="https://www.nutrient.io/guides/dotnet/"
       guidesUrl="https://www.nutrient.io/guides/dotnet/"
       intro={
