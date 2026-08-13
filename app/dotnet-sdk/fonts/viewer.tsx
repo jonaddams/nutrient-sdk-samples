@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useAppTheme } from "@/app/web-sdk/_components/useAppTheme";
-import { fontFileFor } from "./fontFiles";
+import { buildCustomFonts } from "./fontFiles";
 
 interface FontsViewerProps {
   blob: Blob;
@@ -13,6 +13,14 @@ interface FontsViewerProps {
 export default function FontsViewer({ blob, supplyFonts }: FontsViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appTheme = useAppTheme();
+
+  // NutrientViewer must be load()-ed exactly once per document: it snapshots
+  // its Standalone configuration on the first load() call and asserts if a
+  // later load() on the same container passes a different one.
+  // useAppTheme() can settle to a different value shortly after mount, so
+  // capture it once here rather than react to it — live theme re-sync for
+  // an already-loaded viewer is intentionally out of scope.
+  const initialThemeRef = useRef(appTheme);
 
   const objectUrl = useMemo(() => URL.createObjectURL(blob), [blob]);
   useEffect(() => () => URL.revokeObjectURL(objectUrl), [objectUrl]);
@@ -25,18 +33,8 @@ export default function FontsViewer({ blob, supplyFonts }: FontsViewerProps) {
     const NutrientViewer = (window as any).NutrientViewer;
     if (!container || !NutrientViewer) return;
 
-    const customFonts = fontKey
-      .split("|")
-      .filter(Boolean)
-      .map((name) => ({ name, file: fontFileFor(name) }))
-      .filter((f) => f.file)
-      .map(
-        (f) =>
-          new NutrientViewer.Font({
-            name: f.name,
-            callback: () => fetch(f.file as string).then((r) => r.blob()),
-          }),
-      );
+    const names = fontKey.split("|").filter(Boolean);
+    const customFonts = buildCustomFonts(NutrientViewer, names);
 
     NutrientViewer.load({
       container,
@@ -46,7 +44,7 @@ export default function FontsViewer({ blob, supplyFonts }: FontsViewerProps) {
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       ...(customFonts.length > 0 ? { customFonts } : {}),
       theme:
-        appTheme === "dark"
+        initialThemeRef.current === "dark"
           ? NutrientViewer.Theme.DARK
           : NutrientViewer.Theme.LIGHT,
     }).catch((err: Error) => {
@@ -56,7 +54,7 @@ export default function FontsViewer({ blob, supplyFonts }: FontsViewerProps) {
     return () => {
       NutrientViewer.unload(container);
     };
-  }, [objectUrl, appTheme, fontKey]);
+  }, [objectUrl, fontKey]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }
