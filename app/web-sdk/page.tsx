@@ -1,20 +1,6 @@
 import { SamplesIndex } from "@/app/_components/SamplesIndex";
 import { samples } from "./samples";
 
-const categories = [
-  "All",
-  "User Interface",
-  "Annotations",
-  "Forms",
-  "Signatures",
-  "Document Editor",
-  "Content Editor",
-  "Redaction",
-  "Document Comparison",
-  "Document Conversion",
-  "Content",
-];
-
 const intro = (
   <div className="callout">
     <span className="callout-label">AI assistants</span>
@@ -62,7 +48,6 @@ export default function WebSDKPage() {
       title="Web SDK"
       description="In-browser PDF viewing, annotations, forms, signatures, and redaction. 37 samples spanning every major UI surface."
       samples={samples}
-      categories={categories}
       productHomeUrl="https://www.nutrient.io/sdk/web/"
       guidesUrl="https://www.nutrient.io/guides/web/"
       intro={intro}

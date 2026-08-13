@@ -16,7 +16,7 @@
  * Currently just the fonts sample's pane route
  * (app/dotnet-sdk/fonts/pane/page.tsx).
  */
-const CHROMELESS_PREFIXES = ["/dotnet-sdk/fonts/pane"];
+const CHROMELESS_PREFIXES = ["/dotnet-sdk/fonts/pane", "/web-sdk/fonts/pane"];
 
 export function isChromelessRoute(pathname: string | null): boolean {
   return CHROMELESS_PREFIXES.some((prefix) => pathname?.startsWith(prefix));
