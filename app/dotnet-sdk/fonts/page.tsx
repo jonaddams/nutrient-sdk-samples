@@ -12,6 +12,12 @@ const SAMPLES: SampleOption[] = [
     subtitle: "Requests two fonts this machine does not have installed.",
     url: "/documents/dotnet-sdk/acme-sow.docx",
   },
+  {
+    id: "acme-sow-pdf",
+    label: "Acme statement of work (PDF)",
+    subtitle: "Same document as a PDF, with fonts referenced but not embedded.",
+    url: "/documents/dotnet-sdk/acme-sow.pdf",
+  },
 ];
 
 interface FontInfo {
