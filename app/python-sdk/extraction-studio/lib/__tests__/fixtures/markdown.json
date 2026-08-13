@@ -1,0 +1,9 @@
+{
+  "engine": "VLM_MARKDOWN",
+  "filename": "usenix-example-paper.pdf",
+  "provider": "claude",
+  "markdown": "# Towards Verifiable Extraction\n\n**Abstract.** We present a method.\n\n<table><thead><tr><th>Method</th><th>F1</th></tr></thead><tbody><tr><td>Ours</td><td>0.91</td></tr></tbody></table>\n\n---\n\n## 2 Background\n\nPrior work is extensive.\n",
+  "charCount": 232,
+  "totalPages": 3,
+  "processedPages": 3
+}
