@@ -7,7 +7,8 @@ export type CategoryId =
   | "logistics"
   | "healthcare"
   | "claims"
-  | "handwriting";
+  | "handwriting"
+  | "research";
 
 export const CATEGORY_ORDER: CategoryId[] = [
   "invoices",
@@ -17,6 +18,7 @@ export const CATEGORY_ORDER: CategoryId[] = [
   "healthcare",
   "claims",
   "handwriting",
+  "research",
 ];
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
@@ -27,6 +29,7 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   healthcare: "Healthcare",
   claims: "Claims",
   handwriting: "Handwriting",
+  research: "Research",
 };
 
 /** A preset row before it is given an id. */
@@ -319,6 +322,32 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       type: "string",
       description: "The document's title or heading, as written or printed",
       optional: false,
+    },
+  ],
+  research: [
+    {
+      key: "title",
+      type: "string",
+      description: "The full title of the paper, as printed",
+      optional: false,
+    },
+    {
+      key: "authors",
+      type: "string",
+      description: "The author names, comma separated, in printed order",
+      optional: false,
+    },
+    {
+      key: "abstract",
+      type: "string",
+      description: "The abstract text, verbatim",
+      optional: true,
+    },
+    {
+      key: "sectionCount",
+      type: "number",
+      description: "How many numbered top-level sections the paper has",
+      optional: true,
     },
   ],
 };

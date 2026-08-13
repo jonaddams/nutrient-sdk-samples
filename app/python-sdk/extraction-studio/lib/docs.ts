@@ -192,6 +192,17 @@ export const DOCUMENTS: DocSummary[] = [
     hasTextLayer: false,
     category: "handwriting",
   },
+  {
+    docId: "usenix-example-paper",
+    label: "USENIX example paper",
+    // Already in this repo and already referenced by
+    // app/python-sdk/markdown-extraction. Referenced from its existing path
+    // rather than duplicated, like the three invoices above.
+    path: "/documents/usenix-example-paper.pdf",
+    filename: "usenix-example-paper.pdf",
+    hasTextLayer: true,
+    category: "research",
+  },
 ];
 
 export function findDoc(docId: string): DocSummary | undefined {

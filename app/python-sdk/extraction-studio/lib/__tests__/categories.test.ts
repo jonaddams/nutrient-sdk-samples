@@ -126,6 +126,19 @@ describe("presets", () => {
   });
 });
 
+describe("the research category", () => {
+  test("research is a first-class category with its own preset", () => {
+    expect(CATEGORY_ORDER).toContain("research");
+    expect(CATEGORY_LABELS.research).toBe("Research");
+    // Not the invoices fallback: presetFor warns and returns invoice fields for
+    // an unknown category, which would ask an academic paper for an invoice
+    // number.
+    const keys = presetFor("research").map((r) => r.key);
+    expect(keys).not.toContain("invoiceNumber");
+    expect(keys.length).toBeGreaterThan(0);
+  });
+});
+
 describe("presets and documents agree", () => {
   test("every category in the order has at least one document", () => {
     // A tab with a preset but no document is a dead end; a document whose
