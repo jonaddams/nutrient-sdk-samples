@@ -52,6 +52,15 @@ const fontInstanceCache = new Map<string, unknown>();
  * the same family more than once (e.g. Regular and Bold both reporting
  * "EB Garamond"), and passing more than one Font record for the same file
  * is redundant.
+ *
+ * `Font({ name })` must be the font FILE's own basename (e.g.
+ * "AlfaSlabOne-Regular.ttf"), not the family name the document requests
+ * (e.g. "Alfa Slab One") — the SDK rejects a `name` with no file extension
+ * ("The font name for font ... must have a file extension") and reads the
+ * family to match from the file's own internal metadata. `names` (the
+ * incoming parameter) are still family names, exactly as the API/inventory
+ * reports them — only what gets handed to `new NutrientViewer.Font(...)`
+ * changes.
  */
 export function buildCustomFonts(
   NutrientViewer: {
@@ -75,8 +84,9 @@ export function buildCustomFonts(
 
     let font = fontInstanceCache.get(key);
     if (!font) {
+      const fileName = file.split("/").pop() ?? file;
       font = new NutrientViewer.Font({
-        name,
+        name: fileName,
         callback: () => fetch(file).then((r) => r.blob()),
       });
       fontInstanceCache.set(key, font);
