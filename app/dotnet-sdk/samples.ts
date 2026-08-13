@@ -14,6 +14,13 @@ import type { Sample } from "@/app/_components/SamplesIndex";
  */
 export const samples: Sample[] = [
   {
+    name: "Document Fonts",
+    category: "Document Analysis",
+    description:
+      "List every font a PDF or Word document requires, then load it in the viewer with those fonts supplied so it renders as authored.",
+    path: "/dotnet-sdk/fonts",
+  },
+  {
     name: "Linearize",
     category: "File Optimization",
     description:
