@@ -1,7 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { isChromelessRoute } from "./chromelessRoutes";
 import { Tweaks } from "./Tweaks";
 
 export function TopBar() {
+  const pathname = usePathname();
+  if (isChromelessRoute(pathname)) return null;
+
   return (
     <header className="topbar">
       <div className="topbar-inner">

@@ -1,22 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState } from "react";
 import { DotNetSampleHeader } from "../_components/DotNetSampleHeader";
 import { type SampleOption, SamplePicker } from "../_components/SamplePicker";
 import { fontFileFor } from "./fontFiles";
-
-const Viewer = dynamic(() => import("./viewer"), {
-  ssr: false,
-  loading: () => (
-    <div
-      className="flex items-center justify-center h-full text-sm"
-      style={{ color: "var(--ink-4)" }}
-    >
-      Loading viewer...
-    </div>
-  ),
-});
 
 const SAMPLES: SampleOption[] = [
   {
@@ -96,6 +83,20 @@ export default function FontsPage() {
   // Only fonts we actually ship a file for can be supplied to the viewer.
   const suppliableFonts =
     result?.fonts.map((f) => f.name).filter((n) => fontFileFor(n)) ?? [];
+
+  // Each pane is rendered in its own <iframe>, navigated to the pane route
+  // below, rather than as two <Viewer> instances on this page. NutrientViewer
+  // snapshots its Standalone configuration (including customFonts) on first
+  // load and asserts if a later load() on the SAME page passes a different
+  // one — so two same-page instances cannot be given different customFonts.
+  // A separate document per pane sidesteps that entirely.
+  const selectedSample =
+    SAMPLES.find((s) => s.id === selectedSampleId) ?? SAMPLES[0];
+  const paneUrl = (fonts: string[]) => {
+    const params = new URLSearchParams({ doc: selectedSample.url });
+    if (fonts.length > 0) params.set("fonts", fonts.join(","));
+    return `/dotnet-sdk/fonts/pane?${params.toString()}`;
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
@@ -248,10 +249,18 @@ export default function FontsPage() {
               {blob ? (
                 <>
                   <ViewerPane title="Without fonts">
-                    <Viewer blob={blob} supplyFonts={[]} />
+                    <iframe
+                      src={paneUrl([])}
+                      title="Document rendered without fonts supplied"
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                    />
                   </ViewerPane>
                   <ViewerPane title="With fonts supplied" bordered>
-                    <Viewer blob={blob} supplyFonts={suppliableFonts} />
+                    <iframe
+                      src={paneUrl(suppliableFonts)}
+                      title="Document rendered with fonts supplied"
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                    />
                   </ViewerPane>
                 </>
               ) : (
