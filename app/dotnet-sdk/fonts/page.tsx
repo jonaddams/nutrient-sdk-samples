@@ -117,12 +117,20 @@ export default function FontsPage() {
           maxWidth: 1800,
         }}
       >
-        <p
-          className="text-sm"
-          style={{ marginBottom: "var(--space-4)", color: "var(--ink-3)" }}
-        >
-          <a href="#sdk-calls-behind-this">
-            How this works — the SDK calls behind this sample
+        {/* globals.css resets every anchor to `color: inherit` and no
+            underline, and only re-styles links inside `.callout`. This one
+            sits outside one, so it has to carry the same treatment itself or
+            it reads as plain grey text. */}
+        <p className="text-sm" style={{ marginBottom: "var(--space-4)" }}>
+          <a
+            href="#sdk-calls-behind-this"
+            style={{
+              color: "var(--accent)",
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
+          >
+            How this works — the SDK calls behind this sample ↓
           </a>
         </p>
 
