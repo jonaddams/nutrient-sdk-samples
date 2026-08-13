@@ -4,7 +4,9 @@
  * Why this exists: an open-weight model is cheaper and less accurate than a
  * frontier one, and which trade a customer accepts is theirs to make. The
  * studio can only present that choice honestly if it can say what the right
- * answer was. Verified 2026-08-12; confirmed by Jon before shipping.
+ * answer was. Verified 2026-08-12 (the construction entries were read and
+ * confirmed on 2026-08-13, after the corpus swap); confirmed by Jon before
+ * shipping.
  *
  * `source` is the line each value was read from. It is not decoration — it is
  * the evidence behind the word "verified", and it saves the next session
@@ -21,7 +23,12 @@
  *
  * Two fields were deliberately left out of the key rather than guessed — see
  * the comments at scanned-invoice and emergency-dept-billing-worksheet below.
- * Both still extract and display in the UI; they are just not graded.
+ * They are excluded for different reasons, not the same one. scanned-invoice's
+ * invoiceNumber still extracts and displays in the UI, just ungraded, because
+ * the document supports two equally defensible readings of the same printed
+ * string. emergency-dept-billing-worksheet's recordId does not extract at
+ * all: the value was genuinely redacted out of the document (see the comment
+ * below), so there is nothing left to display, let alone grade.
  *
  * Keyed by docId, the stable identifier in lib/docs.ts. Labels and paths have
  * both changed before; docIds have not.
@@ -216,7 +223,7 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
     // /api/redaction/apply, backed by nutrient_sdk annotations.add_redact +
     // PdfSavePreferences.APPLY_REDACTIONS), so "#9920-A" is genuinely gone
     // from the text layer, not just covered by a cosmetic black bar. That
-    // means there is no correct answer to grade against anymore -- the
+    // means there is no correct answer to grade against anymore — the
     // field simply isn't in the document. Kept excluded for that reason,
     // not because visual and text layers disagree (they no longer do).
     admissionDate: {

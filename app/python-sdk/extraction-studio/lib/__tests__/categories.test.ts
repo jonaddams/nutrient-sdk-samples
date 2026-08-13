@@ -164,9 +164,11 @@ const GROUNDED_HANDWRITING_FIELDS: Record<string, string> = {
 };
 
 // Same guard, for the construction preset that replaced the westbridge
-// submittal-form fields on 2026-08-12 (SDK-051). Quotes are the printed lines
-// from construction-pay-application.pdf's own text layer — see lib/verified.ts
-// for the full `source` strings this is only a shorthand of.
+// submittal-form fields on 2026-08-12 (SDK-051). Quotes are shorthand for the
+// full `source` strings in lib/verified.ts — for projectName, projectNumber
+// and applicationNumber those are a field box's printed label and its value
+// (e.g. "PROJECT" above "Cedar Hollow…"), read together and joined with a
+// space, not literally one line straight off the page.
 const GROUNDED_CONSTRUCTION_FIELDS: Record<string, string> = {
   projectName: '"PROJECT Cedar Hollow Family Health Center..."',
   projectNumber: '"PROJECT NO. 24-118"',

@@ -206,10 +206,17 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       optional: false,
     },
     {
+      // Optional, not required: emergency-dept-billing-worksheet.pdf's RECORD
+      // ID was genuinely redacted out of the document (see lib/verified.ts,
+      // and lib/docs.ts:120-126 — this is the corpus's only healthcare
+      // document, so there's no second sample to fall back on). A null here
+      // reads as "not present in this document," per this file's own rule
+      // above, rather than as a failed extraction with nothing to check it
+      // against.
       key: "recordId",
       type: "string",
       description: "The patient record identifier",
-      optional: false,
+      optional: true,
     },
     {
       key: "admissionDate",

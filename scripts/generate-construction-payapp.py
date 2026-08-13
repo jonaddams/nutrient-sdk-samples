@@ -19,8 +19,12 @@ rasterized version of this same document degraded sharply past 4-6 fields
 (1/4 to 1/6 success, 42-51s before failing) while a text-layer control
 document stayed fast and reliable (5/5 success, 5.4-13.7s) at 8 fields. So
 this generator emits the form as ordinary vector/text content directly --
-no rasterize-to-image step. The result has a real, searchable text layer
-and embedded fonts; verify with page.get_text() and page.get_fonts().
+no rasterize-to-image step. The result has a real, searchable text layer,
+set in the PDF base-14 fonts Helvetica and Helvetica-Bold. Those are
+referenced, not embedded (`pdffonts` reports `emb no` for both) -- normal
+and expected for base-14 fonts, and irrelevant to extractability, since
+every PDF renderer carries them built in; verify the text layer with
+page.get_text().
 
 Iteration 2 (this version) dropped the G703-style continuation sheet
 entirely, on measurement, not guesswork: a text-layer version of this
@@ -325,7 +329,9 @@ def build():
 
     # Draw the form as ordinary vector/text content directly onto the
     # output page -- no rasterize-to-image step, so the PDF keeps a real
-    # text layer and embedded fonts (see SDK-051 in the module docstring).
+    # text layer (see SDK-051 in the module docstring). Its fonts are the
+    # base-14 Helvetica/Helvetica-Bold, referenced but not embedded -- that
+    # is normal for base-14 fonts and does not affect extractability.
     os.makedirs(OUT_DIR, exist_ok=True)
     out_doc = fitz.open()
     out_doc.set_metadata({
@@ -343,17 +349,22 @@ def build():
     print(f"Generated: {out_path}")
     print(f"Page size: {PAGE_W} x {PAGE_H} pt (US Letter)")
 
-    # Verify: has extractable text and embedded fonts, and no embedded
-    # raster image anywhere on the page (i.e. this really is a text-layer
-    # document, not an image with a thin text veneer).
+    # Verify: has extractable text (down to individual words, not just
+    # whitespace), and no embedded raster image anywhere on the page (i.e.
+    # this really is a text-layer document, not an image with a thin text
+    # veneer). `fonts` is reported for visibility only -- get_fonts() shows
+    # which fonts the page *references*, not whether they're embedded, so it
+    # is not a meaningful thing to assert on (see the module docstring: these
+    # are the non-embedded base-14 fonts, which is fine here).
     check = fitz.open(out_path)
     cp = check[0]
     text = cp.get_text()
+    words = cp.get_text("words")
     fonts = cp.get_fonts()
     images = cp.get_images()
-    print(f"Verify -- extractable text length: {len(text)}, embedded fonts: {len(fonts)}, embedded images: {len(images)}")
+    print(f"Verify -- extractable text length: {len(text)}, words: {len(words)}, fonts referenced: {len(fonts)}, embedded images: {len(images)}")
     assert text != "", "Output PDF has no extractable text!"
-    assert fonts != [], "Output PDF has no embedded fonts!"
+    assert words != [], "Output PDF's text layer has no extractable words!"
     assert images == [], "Output PDF has an embedded raster image -- not a true text-layer document!"
     check.close()
 
