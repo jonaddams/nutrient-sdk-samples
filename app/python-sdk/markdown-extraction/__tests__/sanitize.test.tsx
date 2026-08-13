@@ -51,4 +51,20 @@ describe("markdown rendering with rehype-raw + rehype-sanitize", () => {
     expect(out).toContain("Section Title");
     expect(out).toContain("<strong");
   });
+
+  it("strips an iframe, which only the sanitizer prevents", () => {
+    // Of the tests above, only the <script> case actually fails when
+    // rehypeSanitize is removed from the plugin chain: React itself drops a
+    // string onerror prop and blanks a javascript: href, so those two measure
+    // React's own defence rather than the sanitizer's. Measured 2026-08-13.
+    //
+    // An iframe is the vector React does NOT defend — it renders one happily,
+    // and only rehype-sanitize's default schema removes it. So this is the test
+    // that fails if someone deletes rehypeSanitize while leaving rehypeRaw.
+    // The studio carries the same case in
+    // app/python-sdk/extraction-studio/_components/__tests__/MarkdownResults.test.tsx
+    const out = renderMarkdown('<iframe src="https://evil.example"></iframe>');
+    expect(out).not.toContain("<iframe");
+    expect(out).not.toContain("evil.example");
+  });
 });

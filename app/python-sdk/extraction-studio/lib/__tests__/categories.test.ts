@@ -126,6 +126,25 @@ describe("presets", () => {
   });
 });
 
+describe("the research category", () => {
+  test("research is a first-class category with its own preset", () => {
+    expect(CATEGORY_ORDER).toContain("research");
+    expect(CATEGORY_LABELS.research).toBe("Research");
+    // Pin the actual field keys, in order. The weaker "non-empty and not
+    // invoiceNumber" check this replaced would have passed for ANY wrong preset
+    // — handing `research` a copy of claims' rows, say — and the missing-entry
+    // case it appeared to guard is already a tsc failure, because PRESETS is a
+    // total Record<CategoryId, PresetRow[]>. Update this list deliberately if
+    // the preset changes; that is the point of pinning it.
+    expect(presetFor("research").map((r) => r.key)).toEqual([
+      "title",
+      "authors",
+      "abstract",
+      "sectionCount",
+    ]);
+  });
+});
+
 describe("presets and documents agree", () => {
   test("every category in the order has at least one document", () => {
     // A tab with a preset but no document is a dead end; a document whose

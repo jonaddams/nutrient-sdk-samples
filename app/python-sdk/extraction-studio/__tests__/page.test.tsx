@@ -205,6 +205,19 @@ test("Image description is selectable and swaps in its own panel", async () => {
   );
 });
 
+test("mounts the markdown panel when the feature is selected", async () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  await userEvent.click(
+    screen.getByRole("button", { name: /Markdown export/ }),
+  );
+  // MarkdownConfig's own select id, not the shared "Provider" label. page.tsx
+  // resolves `panels[feature] ?? panels.structured`, so a missing panels.markdown
+  // silently renders StructuredConfig — which also has a "Provider" combobox and
+  // would satisfy a label-based assertion. This id is what distinguishes them.
+  expect(document.querySelector("#markdown-provider")).toBeTruthy();
+});
+
 test("draws no citation overlay for Image description", async () => {
   // Output is prose with no coordinates, so there is nothing to paint and no
   // Show regions control.
@@ -765,6 +778,14 @@ test("the page header and the registry card agree on the studio's name", () => {
 //   describe     -> "Detail" is DescribeConfig's own Segmented group
 //                    (DescribeConfig.tsx); no other config offers a detail
 //                    level.
+//   markdown     -> MarkdownConfig has no group/label of its own either — its
+//                    PanelSection is titled "Configuration" (shared with
+//                    TablesConfig and DescribeConfig) and its Field is
+//                    labelled "Provider" (shared with StructuredConfig,
+//                    TablesConfig and DescribeConfig too). The one thing
+//                    that is MarkdownConfig's alone is its own <select> id
+//                    (MarkdownConfig.tsx's `markdown-provider`), mirroring
+//                    how the `tables` marker below tells TablesConfig apart.
 const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
   structured: () =>
     expect(
@@ -779,6 +800,8 @@ const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
   tables: () => expect(document.querySelector("#tables-provider")).toBeTruthy(),
   describe: () =>
     expect(screen.getByRole("group", { name: "Detail" })).toBeInTheDocument(),
+  markdown: () =>
+    expect(document.querySelector("#markdown-provider")).toBeTruthy(),
 };
 
 test("every enabled rail feature renders its OWN configuration panel", async () => {

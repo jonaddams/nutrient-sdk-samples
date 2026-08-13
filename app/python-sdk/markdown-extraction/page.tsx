@@ -91,7 +91,11 @@ export default function MarkdownExtractionPage() {
       {/* rehype-raw parses the embedded HTML tables the SDK emits in its Markdown;
           rehype-sanitize (after raw) strips scripts and event-handler attributes so a
           malicious/uploaded document transcribed by the VLM cannot inject active HTML.
-          The default sanitize schema still permits table/thead/tr/td/th. */}
+          The default sanitize schema still permits table/thead/tr/td/th.
+
+          This same plugin chain is duplicated in
+          app/python-sdk/extraction-studio/_components/MarkdownResults.tsx's rendered
+          view — if you change the order or the plugins here, change it there too. */}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}

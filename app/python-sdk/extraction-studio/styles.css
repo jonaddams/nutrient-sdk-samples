@@ -1067,6 +1067,89 @@
   overflow-wrap: anywhere;
 }
 
+/* Rendered Markdown pane. Tailwind preflight zeroes margin/padding on every
+   element, sets list-style: none on ul/ol and border-collapse: collapse on
+   table, and app/globals.css's :where(p)/:where(h1..h6) also zero margin —
+   so with no rule reaching this class the SDK's real <h2>s, <table>s, <ul>s
+   and <blockquote>s presented as undifferentiated, run-together text (see
+   the FIX 1 finding's cascade trace). This block restores enough structure
+   that the Rendered view actually shows the structure the feature's rail
+   description claims to preserve.
+
+   Every value below is reused, not invented:
+   - td/th border is .studio-shell .studio-table td's `border: 1px solid
+     var(--line)`. That rule's own padding is 0 (moved onto its child
+     .cell-select button instead), so the padding reused below is that
+     button's `padding: var(--space-1) var(--space-2)` — the studio table's
+     actual visual cell padding.
+   - The 420px scroll cap matches .studio-shell .ocr-text (styles.css, the
+     "Extracted text and JSON" rule above), so this pane scrolls like every
+     sibling pane instead of growing the page indefinitely.
+   - list-style: revert and the padding-left/margin values are existing
+     tokens (var(--space-3), var(--space-4)), not new sizes. */
+.studio-shell .markdown-rendered {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--bg-elev);
+}
+
+.studio-shell .markdown-rendered h1,
+.studio-shell .markdown-rendered h2,
+.studio-shell .markdown-rendered h3 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.studio-shell .markdown-rendered h1 {
+  font-size: var(--text-h3);
+}
+
+.studio-shell .markdown-rendered h2 {
+  font-size: var(--text-lg);
+}
+
+.studio-shell .markdown-rendered h3 {
+  font-size: var(--text-base);
+}
+
+/* Space ABOVE a heading, so it groups with the text it introduces rather than
+   floating between two paragraphs. Skipped on the first child so the pane does
+   not open with a gap. */
+.studio-shell .markdown-rendered :is(h1, h2, h3):not(:first-child) {
+  margin-top: var(--space-4);
+}
+
+.studio-shell .markdown-rendered p,
+.studio-shell .markdown-rendered h1,
+.studio-shell .markdown-rendered h2,
+.studio-shell .markdown-rendered h3,
+.studio-shell .markdown-rendered ul,
+.studio-shell .markdown-rendered ol,
+.studio-shell .markdown-rendered table,
+.studio-shell .markdown-rendered blockquote {
+  margin: 0 0 var(--space-3) 0;
+}
+
+.studio-shell .markdown-rendered ul,
+.studio-shell .markdown-rendered ol {
+  list-style: revert;
+  padding-left: var(--space-4);
+}
+
+.studio-shell .markdown-rendered table {
+  border-collapse: collapse;
+}
+
+.studio-shell .markdown-rendered td,
+.studio-shell .markdown-rendered th {
+  border: 1px solid var(--line);
+  padding: var(--space-1) var(--space-2);
+}
+
 .studio-shell .ocr-elements tr {
   cursor: pointer;
 }

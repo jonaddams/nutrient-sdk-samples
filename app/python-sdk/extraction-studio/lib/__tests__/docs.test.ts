@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { DOCUMENTS, findDoc } from "../docs";
 
 describe("the document manifest", () => {
@@ -79,6 +79,16 @@ describe("the document manifest", () => {
   test("findDoc resolves a known id and returns undefined otherwise", () => {
     expect(findDoc("bill-of-lading")?.filename).toBe("bill-of-lading.pdf");
     expect(findDoc("nope")).toBeUndefined();
+  });
+
+  it("offers the research paper, the only document with real document structure", () => {
+    const paper = DOCUMENTS.find((d) => d.docId === "usenix-example-paper");
+    expect(paper).toBeDefined();
+    expect(paper?.category).toBe("research");
+    expect(paper?.hasTextLayer).toBe(true);
+    // Shared with app/python-sdk/markdown-extraction, which references this
+    // same path. Do not duplicate the file.
+    expect(paper?.path).toBe("/documents/usenix-example-paper.pdf");
   });
 });
 

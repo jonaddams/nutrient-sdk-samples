@@ -11,6 +11,8 @@ import { DocViewer } from "./_components/DocViewer";
 import { FEATURES, FeatureRail } from "./_components/FeatureRail";
 import { HandwritingConfig } from "./_components/HandwritingConfig";
 import { HandwritingResults } from "./_components/HandwritingResults";
+import { MarkdownConfig } from "./_components/MarkdownConfig";
+import { MarkdownResults } from "./_components/MarkdownResults";
 import { OcrConfig } from "./_components/OcrConfig";
 import { OcrResults } from "./_components/OcrResults";
 import { Segmented } from "./_components/Segmented";
@@ -43,6 +45,11 @@ import {
   type HandwritingResult,
   handwritingCitationsFor,
 } from "./lib/handwriting";
+import {
+  extractMarkdown,
+  type MarkdownRequest,
+  type MarkdownResult,
+} from "./lib/markdown";
 import {
   extractOcr,
   type OcrColorMode,
@@ -104,6 +111,9 @@ export default function ExtractionStudio() {
   const [describeResult, setDescribeResult] = useState<DescribeResult | null>(
     null,
   );
+  const [markdownResult, setMarkdownResult] = useState<MarkdownResult | null>(
+    null,
+  );
   const [handwritingResult, setHandwritingResult] =
     useState<HandwritingResult | null>(null);
   // Its own mode, sharing citationHex with the other features — one studio-wide
@@ -145,6 +155,7 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setMarkdownResult(null);
     setHandwritingResult(null);
     setActiveIndex(null);
     setError(null);
@@ -205,6 +216,7 @@ export default function ExtractionStudio() {
     setOcrResult(null);
     setTablesResult(null);
     setDescribeResult(null);
+    setMarkdownResult(null);
     setHandwritingResult(null);
     setError(null);
     setActiveIndex(null);
@@ -296,6 +308,14 @@ export default function ExtractionStudio() {
       extractDescription,
       setDescribeResult,
       "Description failed",
+    );
+
+  const handleMarkdownRun = (req: MarkdownRequest) =>
+    runFeature(
+      req,
+      extractMarkdown,
+      setMarkdownResult,
+      "Markdown export failed",
     );
 
   const handleHandwritingRun = (req: HandwritingRequest) =>
@@ -433,6 +453,25 @@ export default function ExtractionStudio() {
         <DescribeResults result={describeResult} />
       ) : null,
     },
+    markdown: {
+      needsProviders: true,
+      // No coordinates come back from this endpoint, so nothing is drawn on
+      // the document — same as `describe`.
+      citations: NO_CITATIONS,
+      show: showRegions,
+      config: (
+        <MarkdownConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleMarkdownRun}
+          runSignal={runSignal}
+          onProvidersReady={setProvidersReady}
+        />
+      ),
+      results: markdownResult ? (
+        <MarkdownResults result={markdownResult} />
+      ) : null,
+    },
     handwriting: {
       // True because VLM-enhanced needs one. This flag is per FEATURE, not per
       // engine, and the gate is real in both modes — it closes on every switch
@@ -503,7 +542,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, or describe what's on it in plain language."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
