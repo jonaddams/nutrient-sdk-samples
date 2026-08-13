@@ -211,9 +211,11 @@ test("mounts the markdown panel when the feature is selected", async () => {
   await userEvent.click(
     screen.getByRole("button", { name: /Markdown export/ }),
   );
-  expect(
-    screen.getByRole("combobox", { name: /Provider/ }),
-  ).toBeInTheDocument();
+  // MarkdownConfig's own select id, not the shared "Provider" label. page.tsx
+  // resolves `panels[feature] ?? panels.structured`, so a missing panels.markdown
+  // silently renders StructuredConfig — which also has a "Provider" combobox and
+  // would satisfy a label-based assertion. This id is what distinguishes them.
+  expect(document.querySelector("#markdown-provider")).toBeTruthy();
 });
 
 test("draws no citation overlay for Image description", async () => {

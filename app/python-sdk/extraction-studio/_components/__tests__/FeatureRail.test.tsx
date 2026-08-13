@@ -12,12 +12,13 @@ test("rail lists features and selects an enabled one", () => {
   expect(onSelect).toHaveBeenCalledWith("structured");
 });
 
-test("the five live features are enabled and the other SOON entries are not", () => {
+test("the six live features are enabled and the other SOON entries are not", () => {
   const byId = Object.fromEntries(FEATURES.map((f) => [f.id, f]));
   expect(byId.structured.enabled).toBe(true);
   expect(byId.handwriting.enabled).toBe(true);
   expect(byId.adaptive_ocr.enabled).toBe(true);
   expect(byId.tables.enabled).toBe(true);
+  expect(byId.markdown.enabled).toBe(true);
   expect(byId.describe.enabled).toBe(true);
   for (const id of ["multilingual", "fast_ocr", "text"]) {
     expect(byId[id].enabled).toBe(false);
