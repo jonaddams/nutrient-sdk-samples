@@ -130,12 +130,18 @@ describe("the research category", () => {
   test("research is a first-class category with its own preset", () => {
     expect(CATEGORY_ORDER).toContain("research");
     expect(CATEGORY_LABELS.research).toBe("Research");
-    // Not the invoices fallback: presetFor warns and returns invoice fields for
-    // an unknown category, which would ask an academic paper for an invoice
-    // number.
-    const keys = presetFor("research").map((r) => r.key);
-    expect(keys).not.toContain("invoiceNumber");
-    expect(keys.length).toBeGreaterThan(0);
+    // Pin the actual field keys, in order. The weaker "non-empty and not
+    // invoiceNumber" check this replaced would have passed for ANY wrong preset
+    // — handing `research` a copy of claims' rows, say — and the missing-entry
+    // case it appeared to guard is already a tsc failure, because PRESETS is a
+    // total Record<CategoryId, PresetRow[]>. Update this list deliberately if
+    // the preset changes; that is the point of pinning it.
+    expect(presetFor("research").map((r) => r.key)).toEqual([
+      "title",
+      "authors",
+      "abstract",
+      "sectionCount",
+    ]);
   });
 });
 

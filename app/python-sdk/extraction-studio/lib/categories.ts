@@ -344,6 +344,11 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       optional: true,
     },
     {
+      // Unlike the three fields above, this one is not printed anywhere on
+      // the page — it asks the model to count structure (numbered top-level
+      // sections) rather than read a value off the page. Deliberate: it's
+      // the one field in this preset that demonstrates the paper's structure
+      // rather than its text.
       key: "sectionCount",
       type: "number",
       description: "How many numbered top-level sections the paper has",
