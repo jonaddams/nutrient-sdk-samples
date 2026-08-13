@@ -163,6 +163,28 @@ describe("MarkdownResults rendered view", () => {
     expect(container.innerHTML).not.toContain("javascript:");
   });
 
+  it("strips an iframe, which only the sanitizer prevents", async () => {
+    // The other three sanitize tests above pass even with rehypeSanitize
+    // REMOVED from the plugin array: React itself drops a string onerror prop
+    // and blanks a javascript: href, so those two measure React's defence
+    // rather than the sanitizer's. Measured 2026-08-13 by rendering each case
+    // through this project's real pipeline with sanitize deleted.
+    //
+    // An iframe is the vector React does NOT defend — it renders one happily,
+    // and only rehype-sanitize's default schema removes it. So THIS is the test
+    // that fails if someone deletes rehypeSanitize while leaving rehypeRaw.
+    const { container } = render(
+      <MarkdownResults
+        result={result({
+          markdown: '<iframe src="https://evil.example"></iframe>',
+        })}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(container.innerHTML).not.toContain("evil.example");
+  });
+
   it("hands Copy the markdown SOURCE from the rendered view, not HTML", async () => {
     const writeText = vi.fn((_text: string) => Promise.resolve());
     vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
