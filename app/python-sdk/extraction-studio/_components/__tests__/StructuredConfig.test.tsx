@@ -45,6 +45,7 @@ test("populates the provider select from the backend", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() =>
@@ -60,6 +61,7 @@ test("shows no model select for a single-model provider", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
@@ -75,6 +77,7 @@ test("shows a model select once a multi-model provider is chosen", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
@@ -92,6 +95,7 @@ test("sends the selected model with the run request", async () => {
     filename: "doc-1.pdf",
     onRun,
     schemaPreset: invoices,
+    category: "invoices",
   };
   const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
   await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
@@ -118,6 +122,7 @@ test("switching provider drops the previous provider's model", async () => {
     filename: "doc-1.pdf",
     onRun,
     schemaPreset: invoices,
+    category: "invoices",
   };
   const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
   await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
@@ -146,6 +151,7 @@ test("shows a distinct loading state while the providers fetch is in flight", ()
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   const select = screen.getByLabelText("Provider") as HTMLSelectElement;
@@ -170,6 +176,7 @@ test("the loading placeholder keeps the controlled select's value matched", () =
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   const select = screen.getByLabelText("Provider") as HTMLSelectElement;
@@ -191,6 +198,7 @@ test("clears the loading state once providers resolve", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() => screen.getByRole("option", { name: "AWS Bedrock" }));
@@ -214,6 +222,7 @@ test("a failed fetch reports failure, not loading", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() =>
@@ -237,6 +246,7 @@ test("disables the provider select when the fetch fails", async () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   await waitFor(() =>
@@ -259,6 +269,7 @@ test("reports readiness only after the providers fetch resolves, never before", 
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
       onProvidersReady={onProvidersReady}
     />,
   );
@@ -277,6 +288,7 @@ test("reports not-ready, and never ready, after a failed providers fetch", async
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
       onProvidersReady={onProvidersReady}
     />,
   );
@@ -293,6 +305,7 @@ test("mounting with a given runSignal does not call onRun", () => {
       onRun={onRun}
       runSignal={3}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   expect(onRun).not.toHaveBeenCalled();
@@ -312,6 +325,7 @@ test("offers no Multimodal toggle, because the SDK ignores the flag", () => {
       onRun={vi.fn()}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   expect(screen.queryByLabelText("Multimodal")).toBeNull();
@@ -332,6 +346,7 @@ test("still sends includePageImages: false, so the wire request is unchanged", (
     filename: "doc-1.pdf",
     onRun,
     schemaPreset: invoices,
+    category: "invoices",
   };
   const { rerender } = render(<StructuredConfig {...props} runSignal={0} />);
   rerender(<StructuredConfig {...props} runSignal={1} />);
@@ -349,6 +364,7 @@ test("incrementing runSignal calls onRun exactly once with the current config", 
       onRun={onRun}
       runSignal={3}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   rerender(
@@ -358,6 +374,7 @@ test("incrementing runSignal calls onRun exactly once with the current config", 
       onRun={onRun}
       runSignal={4}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   expect(onRun).toHaveBeenCalledTimes(1);
@@ -387,6 +404,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       onRun={onRun}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   rerender(
@@ -396,6 +414,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       onRun={onRun}
       runSignal={1}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   rerender(
@@ -405,6 +424,7 @@ test("incrementing runSignal twice calls onRun twice", () => {
       onRun={onRun}
       runSignal={2}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   expect(onRun).toHaveBeenCalledTimes(2);
@@ -438,6 +458,7 @@ test("removing a middle row leaves the remaining rows' values intact and correct
       onRun={() => {}}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
 
@@ -484,6 +505,7 @@ test("two freshly added blank rows have pairwise-distinct accessible names acros
       onRun={() => {}}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
 
@@ -522,6 +544,7 @@ test("renders the rows it is given rather than a hardcoded default", () => {
       onRun={() => {}}
       runSignal={0}
       schemaPreset={presetFor("logistics")}
+      category="logistics"
     />,
   );
   expect(screen.getByRole("textbox", { name: "Property key 1" })).toHaveValue(
@@ -543,6 +566,7 @@ test("a new preset replaces the rows, discarding hand-edits", () => {
       onRun={() => {}}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   fireEvent.change(
@@ -556,6 +580,7 @@ test("a new preset replaces the rows, discarding hand-edits", () => {
       onRun={() => {}}
       runSignal={0}
       schemaPreset={claims}
+      category="claims"
     />,
   );
   expect(screen.getByRole("textbox", { name: "Property key 1" })).toHaveValue(
@@ -576,6 +601,7 @@ test("the run request carries the current preset's fields", () => {
       onRun={onRun}
       runSignal={0}
       schemaPreset={healthcare}
+      category="healthcare"
     />,
   );
   rerender(
@@ -585,6 +611,7 @@ test("the run request carries the current preset's fields", () => {
       onRun={onRun}
       runSignal={1}
       schemaPreset={healthcare}
+      category="healthcare"
     />,
   );
   const properties = JSON.parse(onRun.mock.calls[0][0].schema).schema
@@ -603,6 +630,7 @@ test("re-rendering with the same preset does not reset edited rows", () => {
       onRun={() => {}}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   fireEvent.change(
@@ -616,9 +644,48 @@ test("re-rendering with the same preset does not reset edited rows", () => {
       onRun={() => {}}
       runSignal={0}
       schemaPreset={invoices}
+      category="invoices"
     />,
   );
   expect(
     screen.getByRole("textbox", { name: "Description for invoiceNumber" }),
   ).toHaveValue("survives");
+});
+
+test("a guidance preset fills the instructions box on click", async () => {
+  render(
+    <StructuredConfig
+      docPath="/invoices/Invoice AC-2025-1047.pdf"
+      filename="Invoice AC-2025-1047.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+      category="invoices"
+    />,
+  );
+  const box = (await screen.findByLabelText(
+    /instructions/i,
+  )) as HTMLTextAreaElement;
+  expect(box.value).toBe("");
+  fireEvent.click(screen.getByRole("button", { name: /amount due/i }));
+  expect(box.value).toContain("retainage");
+});
+
+test("guidance presets assert no pressed state", async () => {
+  // Same reasoning as DescribeConfig's prompt presets: aria-pressed would claim
+  // a mode that goes false the moment the textarea is edited.
+  render(
+    <StructuredConfig
+      docPath="/invoices/Invoice AC-2025-1047.pdf"
+      filename="Invoice AC-2025-1047.pdf"
+      onRun={vi.fn()}
+      runSignal={0}
+      schemaPreset={invoices}
+      category="invoices"
+    />,
+  );
+  const btn = await screen.findByRole("button", { name: /amount due/i });
+  expect(btn.getAttribute("aria-pressed")).toBeNull();
+  fireEvent.click(btn);
+  expect(btn.getAttribute("aria-pressed")).toBeNull();
 });

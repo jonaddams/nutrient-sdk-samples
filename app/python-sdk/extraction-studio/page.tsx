@@ -343,11 +343,13 @@ export default function ExtractionStudio() {
           onRun={handleRun}
           runSignal={runSignal}
           schemaPreset={schemaPreset}
+          category={category}
           onProvidersReady={setProvidersReady}
         />
       ),
       results: result ? (
         <StructuredResults
+          docId={current.docId}
           data={result.data as StructuredData}
           code={result.code}
           timingMs={result.timingMs}

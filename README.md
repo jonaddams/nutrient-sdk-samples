@@ -152,6 +152,13 @@ DOTNET_SDK_API_KEY=<the X-API-Key value set in Railway env vars>
 calls go through the `/app/api/dotnet-sdk/*` proxy routes, which add the header
 before forwarding to the .NET API.
 
+**Fonts sample caveat:** the Document Fonts sample's font inventory is computed
+on the .NET API's server, while the substitution it warns about happens in the
+browser viewer. If Alfa Slab One or EB Garamond ever get installed on the
+machine you're demoing from, the inventory will report them "available" while
+the viewer still substitutes them — so the sample will visibly contradict
+itself mid-demo. Keep the demo machine free of those fonts.
+
 ## Deployment
 
 Deploys cleanly to Vercel (recommended): push to your Git host, import the

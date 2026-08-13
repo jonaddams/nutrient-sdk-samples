@@ -317,6 +317,37 @@ export function labelFor(category: string): string {
 }
 
 /**
+ * One-click extraction guidance, offered beside the Instructions box.
+ *
+ * Deliberately NOT pre-filled. A pre-filled instruction silently fixes the
+ * exact miss the verified column exists to reveal, so the presenter would never
+ * see the trade-off the studio is there to present. Applied live, it shows both
+ * halves: what a cheaper model costs, and that guidance closes part of the gap.
+ *
+ * The invoices string is load-bearing and MEASURED — nineteen runs against the
+ * hosted backend, 2026-08-12. It names only retainage yet also corrects a
+ * retainer-credit case, so the model is generalising from it; a more literally
+ * accurate rewording is untested, and rewording the field description instead
+ * was tried and did not work. Re-verify before changing a character.
+ */
+export const GUIDANCE_PRESETS: Partial<
+  Record<CategoryId, { label: string; text: string }[]>
+> = {
+  invoices: [
+    {
+      label: "Amount due, not contract value",
+      text: "For totalAmount use the final Amount Due payable now, after any retainage deduction — not the contract value.",
+    },
+  ],
+};
+
+export function guidanceFor(
+  category: string,
+): { label: string; text: string }[] {
+  return GUIDANCE_PRESETS[category as CategoryId] ?? [];
+}
+
+/**
  * Fresh rows with generated ids — never a shared literal. Two categories
  * returning rows with identical ids would hand React duplicate keys, and
  * callers edit these rows in place.

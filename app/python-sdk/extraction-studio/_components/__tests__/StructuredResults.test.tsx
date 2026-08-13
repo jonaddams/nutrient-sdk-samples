@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { StructuredData } from "../../lib/api";
+import { BENCHMARK } from "../../lib/benchmark";
 import { confidencePct, StructuredResults } from "../StructuredResults";
 
 afterEach(() => {
@@ -42,6 +43,7 @@ test("renders field cards and reports selection", () => {
   const onSelect = vi.fn();
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as any}
       activeIndex={null}
       onSelectField={onSelect}
@@ -75,6 +77,7 @@ test("shows timing, the citations switch and a Download button", () => {
   const onShowCitationsChange = vi.fn();
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       timingMs={7800}
       activeIndex={null}
@@ -127,6 +130,7 @@ test("Download builds a JSON blob for Fields/Raw JSON view and a .py blob for Co
 
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       code={code}
       activeIndex={null}
@@ -193,6 +197,7 @@ test("scrolls the active field card into view", () => {
   };
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       activeIndex={1}
       onSelectField={() => {}}
@@ -213,6 +218,7 @@ test("degrades to a Python-commented placeholder when code is absent", () => {
   // already run an extraction — so it must not tell them to run one.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as never}
       activeIndex={null}
       onSelectField={() => {}}
@@ -238,6 +244,7 @@ test("the meta row names the provider and model that produced the fields", () =>
   // the flagship invoice (the retainage figure) is model-specific.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as unknown as StructuredData}
       config={{ provider: "anthropic", model: "claude-sonnet-5" }}
       activeIndex={null}
@@ -258,6 +265,7 @@ test("no config means no provenance line rather than an empty one", () => {
   // that predates the echo. A bare separator would look like a rendering bug.
   render(
     <StructuredResults
+      docId="test-doc"
       data={data as unknown as StructuredData}
       activeIndex={null}
       onSelectField={vi.fn()}
@@ -268,4 +276,254 @@ test("no config means no provenance line rather than an empty one", () => {
     />,
   );
   expect(screen.queryByText(/·/)).toBeNull();
+});
+
+test("marks a wrong value against the answer key", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { totalAmount: 1910500 },
+          fields: [
+            {
+              name: "totalAmount",
+              type: "number",
+              value: 1910500,
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  const verdict = screen.getByText(/expected 345,015/);
+  expect(verdict).toBeDefined();
+  // Styling regression guard: the mismatch verdict must keep its own class —
+  // it is the one the CSS gives distinct colour/weight so a non-technical
+  // presenter notices it, unlike the other two verdict states.
+  expect(verdict.className).toContain("mismatch");
+});
+
+test("marks a correct value with its own class, distinct from mismatch/unverified", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { invoiceNumber: "AC-2025-1047" },
+          fields: [
+            {
+              name: "invoiceNumber",
+              type: "string",
+              value: "AC-2025-1047",
+              page: 0,
+              confidence: 0.95,
+              match: "exact",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  const verdict = screen.getByText("✓");
+  expect(verdict.className).toContain("match");
+  expect(verdict.className).not.toContain("mismatch");
+});
+
+test("shows a field with no answer key as not verified, never as wrong", () => {
+  render(
+    <StructuredResults
+      docId="invoice-ac20251047"
+      data={
+        {
+          extraction: { somethingElse: "x" },
+          fields: [
+            {
+              name: "somethingElse",
+              type: "string",
+              value: "x",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  const verdict = screen.getByText(/not verified/);
+  expect(verdict).toBeDefined();
+  expect(verdict.className).toContain("unverified");
+  expect(screen.queryByText(/expected/)).toBeNull();
+});
+
+test("the run summary counts only verified fields", () => {
+  // Lumen fixture, confirmed answer key: totalAmount matches, issueDate is
+  // the payment-due date (the key holds the printed Invoice Date instead)
+  // and does not, invoiceNumber matches. So 2 of 3 verified fields match —
+  // asserted as the exact string, not a shape that would pass regardless of
+  // the numbers.
+  render(
+    <StructuredResults
+      docId="lumen-invoice"
+      data={
+        {
+          extraction: {},
+          fields: [
+            {
+              name: "totalAmount",
+              type: "number",
+              value: 88.06,
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+            {
+              name: "issueDate",
+              type: "string",
+              value: "December 16, 2022",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+            {
+              name: "invoiceNumber",
+              type: "string",
+              value: "616770524",
+              page: 0,
+              confidence: 0.9,
+              match: "id_match",
+              citation: null,
+            },
+          ],
+        } as unknown as StructuredData
+      }
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  expect(screen.getByText("2 of 3 verified fields match")).toBeDefined();
+});
+
+test("the accuracy segment shows the benchmark for the current document with its caveats", () => {
+  // "bill-of-lading" on purpose, not the flagship invoice: all 14 documents
+  // in lib/benchmark.ts share the same three model ids, and several also
+  // share their matched/verified numbers (e.g. every one of gpt-5.4,
+  // claude-sonnet-5 and the Bedrock model scores 3 of 3 on more than one
+  // doc). A test that only checks row count and model-id text would still
+  // pass if the component filtered to the wrong document — a prior version
+  // of this test did exactly that, undetected, because it happened to use
+  // two documents (invoice-ac20251047 and lumen-invoice) that both score
+  // "3 of 3" on two of their three rows. bill-of-lading's triple — 6 of 6,
+  // 6 of 6, 3 of 6 — is not shared by any other document, so asserting the
+  // exact fraction alongside each model actually proves the filter.
+  const { container } = render(
+    <StructuredResults
+      docId="bill-of-lading"
+      data={{ extraction: {}, fields: [] } as unknown as StructuredData}
+      code=""
+      onSelectField={vi.fn()}
+      activeIndex={null}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Accuracy" }));
+
+  const rows = BENCHMARK.rows.filter((r) => r.docId === "bill-of-lading");
+  expect(rows.length).toBeGreaterThan(0);
+  const renderedRows = Array.from(
+    container.querySelectorAll(".benchmark-table tbody tr"),
+  );
+  expect(renderedRows.length).toBe(rows.length);
+  for (const r of rows) {
+    // Look up the row by model, then assert ITS OWN fraction — not just
+    // that the model string and some row count are both present, which is
+    // exactly the pairing the prior test skipped.
+    const row = renderedRows.find((tr) => tr.textContent?.includes(r.model));
+    expect(row).toBeDefined();
+    expect(row?.textContent).toContain(`${r.matched} of ${r.verified}`);
+  }
+
+  // The caveats the tightened block carries: sample-corpus scope, n=1 for
+  // both scores and timings, the scoring rule for a blank verified field,
+  // the denominator disclosure (ambiguous fields shrink it), and the
+  // "reproduce it live" call to action.
+  expect(screen.getByText(/measured/i)).toBeDefined();
+  expect(screen.getByText(/this sample corpus/i)).toBeDefined();
+  expect(screen.getByText(/n=1/)).toBeDefined();
+  expect(screen.getByText(/not correct, not as unscored/i)).toBeDefined();
+  expect(
+    screen.getByText(/denominator can be smaller than the number of fields/i),
+  ).toBeDefined();
+  expect(screen.getByText(/pressing Run/)).toBeDefined();
+});
+
+test("Copy/Download in the Accuracy segment emit the benchmark rows, not the live run", () => {
+  // Before this fix, Copy/Download always emitted `data.extraction` — the
+  // live run's own result — no matter which segment was showing, so the
+  // Accuracy segment's button downloaded fields unrelated to the table on
+  // screen. They must now emit the rows actually shown in that table.
+  const createObjectURL = vi.fn((_blob: Blob) => "blob:mock-url");
+  vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL: vi.fn() });
+  const clickSpy = vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(() => {});
+
+  render(
+    <StructuredResults
+      docId="bill-of-lading"
+      data={{ extraction: { unrelated: "field" }, fields: [] } as never}
+      activeIndex={null}
+      onSelectField={vi.fn()}
+      showCitations={true}
+      onShowCitationsChange={vi.fn()}
+      citationHex="#ffc107"
+      onCitationHexChange={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Accuracy" }));
+  fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+  expect(clickSpy).toHaveBeenCalledTimes(1);
+  const rows = BENCHMARK.rows.filter((r) => r.docId === "bill-of-lading");
+  expect(createObjectURL).toHaveBeenCalledTimes(1);
+  const blob = createObjectURL.mock.calls[0][0] as Blob;
+  return expect(blob.text()).resolves.toBe(JSON.stringify(rows, null, 2));
 });

@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FieldResult, StructuredData } from "../lib/api";
+import { BENCHMARK } from "../lib/benchmark";
 import { copyText, downloadText } from "../lib/download";
 import { providerLabel } from "../lib/provenance";
+import { verifiedFor } from "../lib/verified";
+import { compareField, summarise } from "../lib/verify";
 import { HighlightColor } from "./HighlightColor";
 import { Segmented } from "./Segmented";
 import { Toggle } from "./Toggle";
@@ -26,7 +29,16 @@ export function matchDotTone(match: string | null): string {
   return "partial";
 }
 
+/** The answer key stores raw numbers ("Amount Due $345,015.00" becomes
+ *  345015), but showing that back without separators reads as a different,
+ *  smaller number than the one on the document. Format the way the source
+ *  document prints it; strings pass through unchanged. */
+function formatVerifiedValue(value: string | number): string {
+  return typeof value === "number" ? value.toLocaleString("en-US") : value;
+}
+
 export function StructuredResults({
+  docId,
   data,
   code,
   timingMs,
@@ -38,6 +50,10 @@ export function StructuredResults({
   citationHex,
   onCitationHexChange,
 }: {
+  /** The document these fields were extracted from — the key into the
+   *  verified-answer lookup, so this panel can say whether each field is
+   *  actually right rather than merely grounded. */
+  docId: string;
   data: StructuredData;
   code?: string;
   timingMs?: number;
@@ -65,16 +81,41 @@ export function StructuredResults({
     });
   }, [activeIndex]);
 
-  const payload = () =>
-    view === "code" ? (code ?? "") : JSON.stringify(data.extraction, null, 2);
+  // One verdict per field, in field order. compareField owns every rule; this
+  // component only renders what it decides. verifiedValues is kept alongside
+  // so the "expected ..." text below can show what the key says without a
+  // second lookup.
+  const verifiedValues = data.fields.map((f) => verifiedFor(docId, f.name));
+  const verdicts = data.fields.map((f, i) =>
+    compareField(f.value, verifiedValues[i], f.type),
+  );
+  const score = summarise(verdicts);
+
+  // Shared by the Accuracy table below and by Copy/Download in that segment —
+  // see the comment on `payload` for why the latter needs it too.
+  const benchmarkRowsForDoc = BENCHMARK.rows.filter((r) => r.docId === docId);
+
+  const payload = () => {
+    if (view === "code") return code ?? "";
+    // Copy/Download must emit what the visible table actually shows. In every
+    // other segment that is `data.extraction` (this run's own result), but
+    // the Accuracy segment shows the pre-computed cross-provider benchmark
+    // instead — emitting the live run's JSON here would put fields the user
+    // never asked to copy behind a button captioned for the table beside it.
+    if (view === "accuracy")
+      return JSON.stringify(benchmarkRowsForDoc, null, 2);
+    return JSON.stringify(data.extraction, null, 2);
+  };
 
   const download = () => {
-    const isCode = view === "code";
-    downloadText(
-      payload(),
-      isCode ? "extraction.py" : "extraction.json",
-      isCode ? "text/x-python" : "application/json",
-    );
+    const filename =
+      view === "code"
+        ? "extraction.py"
+        : view === "accuracy"
+          ? "benchmark.json"
+          : "extraction.json";
+    const mime = view === "code" ? "text/x-python" : "application/json";
+    downloadText(payload(), filename, mime);
   };
 
   return (
@@ -99,6 +140,11 @@ export function StructuredResults({
           onChange={onShowCitationsChange}
           label="Show citations"
         />
+        {score.verified > 0 && (
+          <span className="muted">
+            {score.matched} of {score.verified} verified fields match
+          </span>
+        )}
       </div>
 
       {/* Colour lives next to the visibility toggle: same concern, and it is
@@ -118,6 +164,7 @@ export function StructuredResults({
             { label: "Fields", value: "fields" },
             { label: "JSON", value: "raw" },
             { label: "Code", value: "code" },
+            { label: "Accuracy", value: "accuracy" },
           ]}
           value={view}
           onChange={setView}
@@ -145,6 +192,60 @@ export function StructuredResults({
         </pre>
       ) : view === "raw" ? (
         <pre className="mono">{JSON.stringify(data.extraction, null, 2)}</pre>
+      ) : view === "accuracy" ? (
+        <div className="studio-table-block">
+          {/* A plain <table>, not the .field-table-head/.field-row grid the
+              Fields view uses: this is genuinely tabular (one row per model,
+              no per-row selection or citation), so it gets .field-table for
+              the same outer border/background TablesResults already uses,
+              plus .studio-table for width/border-collapse — see the CSS
+              comment on why .studio-table-block (not .field-table) is what
+              scrolls. */}
+          <table className="field-table studio-table benchmark-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Fields correct</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {benchmarkRowsForDoc.map((r) => (
+                <tr key={`${r.provider}-${r.model}`}>
+                  <td>
+                    {providerLabel(r.provider)} · {r.model}
+                  </td>
+                  <td>
+                    {r.matched} of {r.verified}
+                  </td>
+                  <td>{(r.timingMs / 1000).toFixed(1)}s</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* The point of this task: an undisclosed benchmark is a marketing
+              claim, and a disclosed one is a demonstration. Every clause
+              below exists because leaving it out would let this table be
+              misread. Kept to one measurement-context sentence, one n=1
+              sentence, one scoring-rules sentence and two short calls to
+              action, rather than growing every time a new caveat is found —
+              a caveat an account executive cannot hold in their head mid-call
+              protects no one. */}
+          <p className="muted hint-em">
+            Measured {BENCHMARK.measuredOn} on this sample corpus with no
+            extraction guidance applied — not a prospect's own documents, and it
+            will drift as model versions change. Each row is a single run:
+            scores and timings are one measurement each (n=1), not an average,
+            so a re-run of the same model can score or time differently. A
+            verified field the model left blank counts as not correct, not as
+            unscored; every row for a document shares that document's own
+            denominator, though fields with no defensible correct answer are
+            excluded from scoring, so the denominator can be smaller than the
+            number of fields extracted. Adding extraction guidance changes
+            results materially. Any row can be reproduced live by picking that
+            model and pressing Run.
+          </p>
+        </div>
       ) : (
         <div className="field-table">
           {/* Shares .field-row's grid so the labels land over their columns.
@@ -154,6 +255,7 @@ export function StructuredResults({
           <div className="field-table-head eyebrow" aria-hidden="true">
             <span>Field</span>
             <span>Value</span>
+            <span>Verified</span>
             <span>Page</span>
             <span>Parse</span>
           </div>
@@ -177,6 +279,29 @@ export function StructuredResults({
               </span>
               <span className="field-row-value">
                 {f.value == null ? "—" : String(f.value)}
+              </span>
+              {/* Words, not a dot: the Parse column's dot means the SDK LOCATED
+                  the value (grounding), and this means the value is RIGHT. On
+                  the retainage case the pair is grounded true / correct
+                  false, so two similar-looking marks would actively
+                  mislead. */}
+              {/* Only the "match" state's content is a bare glyph with no
+                  descriptive text — "mismatch" and "unverified" already read
+                  fine to a screen reader because their text says what
+                  happened. role="img" + aria-label fills that one gap, the
+                  same pattern .match-dot already uses below for the same
+                  reason. */}
+              <span
+                className={`field-row-verified ${verdicts[i]}`}
+                {...(verdicts[i] === "match"
+                  ? { role: "img", "aria-label": "match: verified" }
+                  : {})}
+              >
+                {verdicts[i] === "match"
+                  ? "✓"
+                  : verdicts[i] === "mismatch"
+                    ? `✗ expected ${formatVerifiedValue(verifiedValues[i]?.value ?? "")}`
+                    : "— not verified"}
               </span>
               <span className="field-row-page">
                 {f.page != null ? `p${f.page + 1}` : "—"}
