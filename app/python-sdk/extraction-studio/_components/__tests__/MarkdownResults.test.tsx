@@ -1,0 +1,100 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+import type { MarkdownResult } from "../../lib/markdown";
+import { MarkdownResults } from "../MarkdownResults";
+
+const result = (over: Partial<MarkdownResult> = {}): MarkdownResult => ({
+  engine: "VLM_MARKDOWN",
+  filename: "usenix-example-paper.pdf",
+  provider: "claude",
+  markdown: "# Heading\n\nBody text.\n",
+  charCount: 24,
+  totalPages: 3,
+  processedPages: 3,
+  ...over,
+});
+
+describe("MarkdownResults", () => {
+  it("shows Source first, because that is what the SDK actually returned", () => {
+    render(<MarkdownResults result={result()} />);
+    expect(screen.getByText("# Heading", { exact: false })).toBeInTheDocument();
+  });
+
+  it("offers Source, JSON and Code views", () => {
+    render(<MarkdownResults result={result()} />);
+    const group = screen.getByRole("group", { name: "View" });
+    for (const name of ["Source", "JSON", "Code"]) {
+      expect(group).toContainElement(screen.getByRole("button", { name }));
+    }
+  });
+
+  it("reports pages and characters", () => {
+    render(<MarkdownResults result={result()} />);
+    expect(screen.getByText("3 pages")).toBeInTheDocument();
+    expect(screen.getByText("24 chars")).toBeInTheDocument();
+  });
+
+  it("says one page without pluralising", () => {
+    render(
+      <MarkdownResults result={result({ totalPages: 1, processedPages: 1 })} />,
+    );
+    expect(screen.getByText("1 page")).toBeInTheDocument();
+  });
+
+  it("shows a partial result honestly when fail-fast stopped early", () => {
+    render(<MarkdownResults result={result({ processedPages: 2 })} />);
+    expect(screen.getByText("2 of 3 pages")).toBeInTheDocument();
+  });
+
+  it("prints NO duration when timingMs is absent", () => {
+    render(<MarkdownResults result={result()} />);
+    // Not "0.0s", not an em dash. The backend sends no timingMs for this
+    // endpoint yet, and inventing one would misreport performance.
+    expect(screen.queryByText(/Elapsed time/)).not.toBeInTheDocument();
+  });
+
+  it("prints the duration once the backend sends one", () => {
+    render(<MarkdownResults result={result({ timingMs: 12400 })} />);
+    expect(screen.getByText("Elapsed time: 12.4s")).toBeInTheDocument();
+  });
+
+  it("shows the placeholder in the Code view when the backend sent no snippet", async () => {
+    render(<MarkdownResults result={result()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Code" }));
+    expect(
+      screen.getByText("# code snippet unavailable from this backend"),
+    ).toBeInTheDocument();
+  });
+
+  it("hands Copy exactly what the Code pane shows, never an empty string", async () => {
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    render(<MarkdownResults result={result()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Code" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining("code snippet unavailable"),
+    );
+    vi.unstubAllGlobals();
+  });
+
+  it("drops code from the JSON view, since the snippet has its own segment", async () => {
+    render(<MarkdownResults result={result({ code: "print('hi')" })} />);
+    await userEvent.click(screen.getByRole("button", { name: "JSON" }));
+    expect(screen.getByText(/"engine": "VLM_MARKDOWN"/)).toBeInTheDocument();
+    expect(screen.queryByText(/print\('hi'\)/)).not.toBeInTheDocument();
+  });
+
+  it("names the empty case rather than showing a blank pane", () => {
+    render(<MarkdownResults result={result({ markdown: "", charCount: 0 })} />);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "No markdown returned",
+    );
+  });
+
+  it("still offers the Code view when the run returned nothing", () => {
+    render(<MarkdownResults result={result({ markdown: "", charCount: 0 })} />);
+    expect(screen.getByRole("button", { name: "Code" })).toBeInTheDocument();
+  });
+});
