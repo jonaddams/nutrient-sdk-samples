@@ -79,14 +79,22 @@ describe("presets", () => {
     ]);
   });
 
-  test("construction does not ask for fields its document lacks", () => {
-    // The construction document is a submittal transmittal form with no dollar
-    // figures at all. An earlier draft asked for contractAmount and
-    // percentComplete, which could only ever return null.
+  test("construction asks for the pay application's own fields, not the retired submittal form's", () => {
+    // construction-pay-application.pdf (an AIA G702-style certificate)
+    // replaced the westbridge submittal transmittal form on 2026-08-12 (see
+    // SDK-051 in docs/internal/sdk-defects/). The old fields describe a
+    // document that no longer exists in the corpus.
     const keys = presetFor("construction").map((r) => r.key);
-    expect(keys).not.toContain("contractAmount");
-    expect(keys).not.toContain("percentComplete");
+    for (const retired of [
+      "submittalNumber",
+      "specSection",
+      "submittedBy",
+      "dateRequired",
+    ]) {
+      expect(keys).not.toContain(retired);
+    }
     expect(keys).toContain("projectName");
+    expect(keys).toContain("contractSumToDate");
   });
 
   test("finance marks the statement-specific fields optional", () => {
@@ -107,6 +115,7 @@ describe("presets", () => {
     const numeric = [
       ["invoices", "totalAmount"],
       ["finance", "totalAssets"],
+      ["construction", "contractSumToDate"],
       ["logistics", "totalWeightKg"],
       ["healthcare", "facilitySubTotal"],
       ["claims", "estimatedDamage"],
@@ -154,6 +163,21 @@ const GROUNDED_HANDWRITING_FIELDS: Record<string, string> = {
     'headed by content on three of four ("Apricot Cake." / "Heavenly Hamburgers" / "Employment Application"); the fourth ("NOTES") is only the stationery\'s pre-printed header, not a title written for that note',
 };
 
+// Same guard, for the construction preset that replaced the westbridge
+// submittal-form fields on 2026-08-12 (SDK-051). Quotes are shorthand for the
+// full `source` strings in lib/verified.ts — for projectName, projectNumber
+// and applicationNumber those are a field box's printed label and its value
+// (e.g. "PROJECT" above "Cedar Hollow…"), read together and joined with a
+// space, not literally one line straight off the page.
+const GROUNDED_CONSTRUCTION_FIELDS: Record<string, string> = {
+  projectName: '"PROJECT Cedar Hollow Family Health Center..."',
+  projectNumber: '"PROJECT NO. 24-118"',
+  applicationNumber: '"APPLICATION NO. 14"',
+  contractSumToDate: '"CONTRACT SUM TO DATE (Line 1 +/- 2) $5,036,400.00"',
+  retainage: '"Total Retainage $197,455.00"',
+  currentPaymentDue: '"CURRENT PAYMENT DUE $456,665.00"',
+};
+
 describe("guidance presets", () => {
   test("the invoices guidance preset carries the verified string", () => {
     // Verified over nineteen hosted runs on 2026-08-12: without it, Bedrock
@@ -186,6 +210,22 @@ describe("the handwriting preset is grounded, not guessed", () => {
     // about what's live, not an append-only log.
     const keys = new Set(presetFor("handwriting").map((r) => r.key));
     for (const groundedKey of Object.keys(GROUNDED_HANDWRITING_FIELDS)) {
+      expect(keys.has(groundedKey)).toBe(true);
+    }
+  });
+});
+
+describe("the construction preset is grounded, not guessed", () => {
+  test("every field in the preset has a grounding entry", () => {
+    const keys = presetFor("construction").map((r) => r.key);
+    for (const key of keys) {
+      expect(Object.keys(GROUNDED_CONSTRUCTION_FIELDS)).toContain(key);
+    }
+  });
+
+  test("every grounding entry is for a field the preset actually has", () => {
+    const keys = new Set(presetFor("construction").map((r) => r.key));
+    for (const groundedKey of Object.keys(GROUNDED_CONSTRUCTION_FIELDS)) {
       expect(keys.has(groundedKey)).toBe(true);
     }
   });

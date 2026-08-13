@@ -13,7 +13,7 @@ export const BENCHMARK: {
   measuredOn: string;
   rows: BenchmarkRow[];
 } = {
-  measuredOn: "2026-08-12",
+  measuredOn: "2026-08-13",
   rows: [
     {
       docId: "invoice-ac20251047",
@@ -21,7 +21,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 7978,
+      timingMs: 8183,
     },
     {
       docId: "invoice-ac20251047",
@@ -29,15 +29,15 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 11570,
+      timingMs: 12525,
     },
     {
       docId: "invoice-ac20251047",
       provider: "bedrock",
       model: "qwen.qwen3-vl-235b-a22b-instruct",
-      matched: 3,
+      matched: 2,
       verified: 3,
-      timingMs: 7874,
+      timingMs: 9426,
     },
     {
       docId: "lumen-invoice",
@@ -45,7 +45,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 6662,
+      timingMs: 6894,
     },
     {
       docId: "lumen-invoice",
@@ -53,7 +53,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 2,
       verified: 3,
-      timingMs: 10598,
+      timingMs: 11025,
     },
     {
       docId: "lumen-invoice",
@@ -61,7 +61,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
       verified: 3,
-      timingMs: 11616,
+      timingMs: 7397,
     },
     {
       docId: "scanned-invoice",
@@ -69,7 +69,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 2,
       verified: 2,
-      timingMs: 9194,
+      timingMs: 8321,
     },
     {
       docId: "scanned-invoice",
@@ -77,7 +77,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 2,
       verified: 2,
-      timingMs: 10382,
+      timingMs: 12526,
     },
     {
       docId: "scanned-invoice",
@@ -85,7 +85,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 2,
       verified: 2,
-      timingMs: 8827,
+      timingMs: 11652,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -93,7 +93,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 6038,
+      timingMs: 4708,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -101,7 +101,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 6197,
+      timingMs: 6435,
     },
     {
       docId: "happy-tooth-invoice-excel",
@@ -109,31 +109,31 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 3,
-      timingMs: 6079,
+      timingMs: 4853,
     },
     {
-      docId: "westbridge-engineering-submittal-form",
+      docId: "construction-pay-application",
       provider: "openai",
       model: "gpt-5.4",
-      matched: 2,
+      matched: 6,
       verified: 6,
-      timingMs: 33521,
+      timingMs: 9046,
     },
     {
-      docId: "westbridge-engineering-submittal-form",
+      docId: "construction-pay-application",
       provider: "anthropic",
       model: "claude-sonnet-5",
-      matched: 5,
+      matched: 6,
       verified: 6,
-      timingMs: 36444,
+      timingMs: 9069,
     },
     {
-      docId: "westbridge-engineering-submittal-form",
+      docId: "construction-pay-application",
       provider: "bedrock",
       model: "qwen.qwen3-vl-235b-a22b-instruct",
-      matched: 2,
+      matched: 6,
       verified: 6,
-      timingMs: 36539,
+      timingMs: 5084,
     },
     {
       docId: "bill-of-lading",
@@ -141,7 +141,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 6,
       verified: 6,
-      timingMs: 14055,
+      timingMs: 13150,
     },
     {
       docId: "bill-of-lading",
@@ -149,7 +149,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 6,
       verified: 6,
-      timingMs: 16631,
+      timingMs: 17436,
     },
     {
       docId: "bill-of-lading",
@@ -157,7 +157,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 6,
-      timingMs: 17042,
+      timingMs: 15727,
     },
     {
       docId: "emergency-dept-billing-worksheet",
@@ -165,7 +165,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 4,
-      timingMs: 3404,
+      timingMs: 3361,
     },
     {
       docId: "emergency-dept-billing-worksheet",
@@ -173,7 +173,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 4,
-      timingMs: 11287,
+      timingMs: 13177,
     },
     {
       docId: "emergency-dept-billing-worksheet",
@@ -181,7 +181,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 4,
-      timingMs: 5332,
+      timingMs: 4929,
     },
     {
       docId: "meridian-income-statement",
@@ -189,7 +189,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 3,
       verified: 3,
-      timingMs: 3434,
+      timingMs: 3390,
     },
     {
       docId: "meridian-income-statement",
@@ -197,7 +197,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 3,
       verified: 3,
-      timingMs: 8747,
+      timingMs: 7222,
     },
     {
       docId: "meridian-income-statement",
@@ -205,7 +205,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 3,
       verified: 3,
-      timingMs: 6923,
+      timingMs: 5421,
     },
     {
       docId: "meridian-balance-sheet",
@@ -213,7 +213,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 4,
       verified: 4,
-      timingMs: 4740,
+      timingMs: 3560,
     },
     {
       docId: "meridian-balance-sheet",
@@ -221,7 +221,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 4,
       verified: 4,
-      timingMs: 6409,
+      timingMs: 7487,
     },
     {
       docId: "meridian-balance-sheet",
@@ -229,15 +229,15 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 4,
       verified: 4,
-      timingMs: 5413,
+      timingMs: 4911,
     },
     {
       docId: "northgate-auto-claim-fnol",
       provider: "openai",
       model: "gpt-5.4",
-      matched: 5,
+      matched: 4,
       verified: 5,
-      timingMs: 8139,
+      timingMs: 3745,
     },
     {
       docId: "northgate-auto-claim-fnol",
@@ -245,7 +245,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 5,
       verified: 5,
-      timingMs: 6337,
+      timingMs: 6650,
     },
     {
       docId: "northgate-auto-claim-fnol",
@@ -253,7 +253,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 5,
       verified: 5,
-      timingMs: 7044,
+      timingMs: 5168,
     },
     {
       docId: "apricot-cake-recipe",
@@ -261,7 +261,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 3749,
+      timingMs: 2989,
     },
     {
       docId: "apricot-cake-recipe",
@@ -269,7 +269,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 5090,
+      timingMs: 5290,
     },
     {
       docId: "apricot-cake-recipe",
@@ -277,7 +277,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 2702,
+      timingMs: 4652,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -285,7 +285,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 4340,
+      timingMs: 4148,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -293,7 +293,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 6176,
+      timingMs: 7875,
     },
     {
       docId: "dear-magnus-thank-you-note",
@@ -301,7 +301,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 1,
       verified: 1,
-      timingMs: 4222,
+      timingMs: 4380,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -309,7 +309,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 0,
       verified: 1,
-      timingMs: 6259,
+      timingMs: 6652,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -317,7 +317,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 0,
       verified: 1,
-      timingMs: 10061,
+      timingMs: 12174,
     },
     {
       docId: "heavenly-hamburgers-recipe",
@@ -325,7 +325,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 6797,
+      timingMs: 6960,
     },
     {
       docId: "employment-application",
@@ -333,7 +333,7 @@ export const BENCHMARK: {
       model: "gpt-5.4",
       matched: 1,
       verified: 1,
-      timingMs: 4184,
+      timingMs: 4057,
     },
     {
       docId: "employment-application",
@@ -341,7 +341,7 @@ export const BENCHMARK: {
       model: "claude-sonnet-5",
       matched: 1,
       verified: 1,
-      timingMs: 6217,
+      timingMs: 7444,
     },
     {
       docId: "employment-application",
@@ -349,7 +349,7 @@ export const BENCHMARK: {
       model: "qwen.qwen3-vl-235b-a22b-instruct",
       matched: 0,
       verified: 1,
-      timingMs: 4871,
+      timingMs: 4655,
     },
   ],
 };
