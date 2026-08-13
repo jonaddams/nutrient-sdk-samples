@@ -144,6 +144,13 @@ NutrientViewer.load({ container, document, customFonts });`}</code>
         cannot be given different <code>customFonts</code>; that is why the
         comparison below runs each pane in its own iframe.
       </p>
+      <p>
+        The font list here comes from a server-side SDK, not from the viewer —{" "}
+        <a href="#how-the-font-list-is-determined">
+          how the font list is determined
+        </a>{" "}
+        explains why the Web SDK cannot produce it.
+      </p>
     </div>
   );
 
@@ -297,12 +304,119 @@ NutrientViewer.load({ container, document, customFonts });`}</code>
     </div>
   );
 
+  const footer = (
+    <div className="callout" id="how-the-font-list-is-determined">
+      <span className="callout-label">How the font list is determined</span>
+      <p>
+        The list on the left does not come from the Web SDK. It comes from a{" "}
+        <a href="/dotnet-sdk/fonts">Nutrient .NET SDK endpoint</a> that opens
+        the document server-side and reports every font it references, along
+        with whether the font travels with the file.
+      </p>
+      <p>
+        That split is deliberate, because the Web SDK has no API that enumerates
+        a document&apos;s fonts. It is a renderer: it resolves each font as it
+        draws, and substitutes whatever it cannot resolve. Three font-related
+        APIs exist and none of them answers &quot;what does this document ask
+        for?&quot;:
+      </p>
+      {/* globals.css sets `ul { display: flex }`, which suppresses list
+          markers; this is the app's only <ul>, so restore normal list
+          rendering here rather than leave it looking like a broken list. */}
+      <ul style={{ display: "block", listStyle: "disc" }}>
+        <li>
+          <code>contentEditingFontMatcher</code> fires when the SDK picks a
+          substitute during content editing. Its <code>FontInfo</code> carries
+          the font name <em>as declared in the document</em> — the closest the
+          Web SDK gets — but reactively, one match at a time, and only while
+          content editing. Never as a list, and never before you render.
+        </li>
+        <li>
+          The content editor&apos;s <code>getAvailableFonts()</code> returns the
+          fonts available <em>to the editor</em>, which is the opposite
+          question.
+        </li>
+        <li>
+          <code>TextAnnotationFonts</code> describes the annotation font picker,
+          not the document.
+        </li>
+      </ul>
+      <p>
+        So if you need to know what a document requires <em>before</em> you
+        render it — to fetch the right fonts, or to warn that a file will not
+        render faithfully — that answer has to come from a server-side SDK. The
+        viewer can tell you what it substituted; it cannot tell you what was
+        asked for.
+      </p>
+      <div className="code-block" style={{ margin: 0 }}>
+        <figure>
+          <figcaption>
+            contentEditingFontMatcher — observing a substitution
+          </figcaption>
+          <pre>
+            <code>{`NutrientViewer.load({
+  container,
+  document,
+  contentEditingFontMatcher: (match, fontInfo, availableFonts) => {
+    // fontInfo.name          -> "AlfaSlabOne-Regular" (as declared)
+    // fontInfo.subsetInfo    -> { originalName: "ABCDEF+AlfaSlabOne-Regular",
+    //                             demangledName: "AlfaSlabOne-Regular" }
+    console.log("substituting", fontInfo.name, "->", match);
+    return undefined; // accept the SDK's choice
+  },
+});`}</code>
+          </pre>
+        </figure>
+      </div>
+      <p>
+        Worth noting: <code>subsetInfo.demangledName</code> strips the
+        six-letter subset prefix a PDF adds to embedded fonts. This sample does
+        the same normalisation when matching an inventory name to a font file,
+        so the two ends agree.
+      </p>
+      <p>
+        <a
+          href="https://www.nutrient.io/api/web/NutrientViewer.Font.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Font API reference
+        </a>
+        {" · "}
+        <a
+          href="https://www.nutrient.io/api/web/NutrientViewer.Configuration.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Configuration (customFonts, fontSubstitutions)
+        </a>
+        {" · "}
+        <a
+          href="https://www.nutrient.io/guides/web/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Web SDK guides
+        </a>
+        {" · "}
+        <a
+          href="https://www.nutrient.io/guides/dotnet/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          .NET SDK guides
+        </a>
+      </p>
+    </div>
+  );
+
   return (
     <SampleFrame
       title="Fonts in the Viewer"
       description="Why a document renders with the wrong type, and how customFonts fixes it — the same document rendered without its fonts and with them."
       intro={intro}
       sidebar={sidebar}
+      footer={footer}
       wide
     >
       {result ? (
