@@ -1067,6 +1067,10 @@
   overflow-wrap: anywhere;
 }
 
+.markdown-rendered {
+  overflow-x: auto;
+}
+
 .studio-shell .ocr-elements tr {
   cursor: pointer;
 }

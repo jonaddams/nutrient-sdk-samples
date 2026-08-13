@@ -93,8 +93,84 @@ describe("MarkdownResults", () => {
     );
   });
 
-  it("still offers the Code view when the run returned nothing", () => {
+  it("still offers the Code view when the run returned nothing", async () => {
     render(<MarkdownResults result={result({ markdown: "", charCount: 0 })} />);
-    expect(screen.getByRole("button", { name: "Code" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Code" }));
+    expect(
+      screen.getByText("# code snippet unavailable from this backend"),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("MarkdownResults rendered view", () => {
+  const renderedFor = async (markdown: string) => {
+    render(<MarkdownResults result={result({ markdown })} />);
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+  };
+
+  it("offers a Rendered view alongside the others", () => {
+    render(<MarkdownResults result={result()} />);
+    const group = screen.getByRole("group", { name: "View" });
+    expect(group).toContainElement(
+      screen.getByRole("button", { name: "Rendered" }),
+    );
+  });
+
+  it("renders headings as real headings", async () => {
+    await renderedFor("# Section Title\n\nSome **bold** text.");
+    expect(
+      screen.getByRole("heading", { name: "Section Title" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the embedded HTML tables the SDK emits", async () => {
+    await renderedFor(
+      "<table><thead><tr><th>Item</th></tr></thead><tbody><tr><td>Total</td></tr></tbody></table>",
+    );
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "Total" })).toBeInTheDocument();
+  });
+
+  it("strips <script> from embedded HTML", async () => {
+    const { container } = render(
+      <MarkdownResults
+        result={result({ markdown: "# Hi\n\n<script>alert('xss')</script>\n" })}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    expect(container.querySelector("script")).toBeNull();
+    expect(container.innerHTML).not.toContain("alert('xss')");
+  });
+
+  it("strips event-handler attributes", async () => {
+    const { container } = render(
+      <MarkdownResults
+        result={result({ markdown: '<img src="x" onerror="alert(1)">' })}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    expect(container.innerHTML).not.toContain("onerror");
+    expect(container.innerHTML).not.toContain("alert(1)");
+  });
+
+  it("neutralizes javascript: hrefs", async () => {
+    const { container } = render(
+      <MarkdownResults
+        result={result({ markdown: '<a href="javascript:alert(1)">click</a>' })}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    expect(container.innerHTML).not.toContain("javascript:");
+  });
+
+  it("hands Copy the markdown SOURCE from the rendered view, not HTML", async () => {
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    render(<MarkdownResults result={result()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+    // The markdown is the artefact worth taking away; serialised DOM is not.
+    expect(writeText).toHaveBeenCalledWith("# Heading\n\nBody text.\n");
+    vi.unstubAllGlobals();
   });
 });

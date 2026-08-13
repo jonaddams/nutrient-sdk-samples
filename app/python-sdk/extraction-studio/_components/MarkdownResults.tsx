@@ -1,11 +1,15 @@
 "use client";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
 import { copyText, downloadText } from "../lib/download";
 import type { MarkdownResult } from "../lib/markdown";
 import { providerLabel } from "../lib/provenance";
 import { Segmented } from "./Segmented";
 
-type MarkdownView = "source" | "json" | "code";
+type MarkdownView = "source" | "rendered" | "json" | "code";
 
 // Single source of truth for what the pane shows AND what Copy/Download hand
 // over. Two independent literals previously let DescribeResults' pane say
@@ -15,6 +19,9 @@ const CODE_UNAVAILABLE = "# code snippet unavailable from this backend";
 
 const FILE_FOR_VIEW: Record<MarkdownView, { type: string; name: string }> = {
   source: { type: "text/markdown", name: "document.md" },
+  // Rendered downloads the SOURCE: the markdown is the artefact worth keeping,
+  // and serialised DOM is neither markdown nor HTML anyone asked for.
+  rendered: { type: "text/markdown", name: "document.md" },
   json: { type: "application/json", name: "markdown.json" },
   code: { type: "text/x-python", name: "markdown.py" },
 };
@@ -66,6 +73,7 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
           label="View"
           options={[
             { label: "Source", value: "source" },
+            { label: "Rendered", value: "rendered" },
             { label: "JSON", value: "json" },
             { label: "Code", value: "code" },
           ]}
@@ -92,6 +100,22 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
         <pre className="ocr-text mono">
           {JSON.stringify(resultJson, null, 2)}
         </pre>
+      ) : view === "rendered" ? (
+        /* rehype-raw parses the embedded HTML tables the SDK emits inside its
+           Markdown; rehype-sanitize runs AFTER raw and strips scripts and
+           event-handler attributes, so a malicious document transcribed by the
+           VLM cannot inject active HTML. The order is the security property —
+           sanitize before raw would sanitize the text and then parse the HTML
+           unchecked. The default sanitize schema still permits
+           table/thead/tr/td/th, which this feature relies on. */
+        <div className="markdown-rendered">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeSanitize]}
+          >
+            {result.markdown}
+          </ReactMarkdown>
+        </div>
       ) : empty ? (
         <div className="callout" role="status">
           <span className="callout-label">No markdown returned</span>
