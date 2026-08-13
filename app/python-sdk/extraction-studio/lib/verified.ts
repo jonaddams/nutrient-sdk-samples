@@ -211,13 +211,14 @@ export const VERIFIED: Record<string, Record<string, VerifiedValue>> = {
       value: "John Doe",
       source: "PATIENT NAME: JOHN DOE",
     },
-    // recordId is deliberately NOT verified: the rendered page draws a solid
-    // black bar over the record-ID field, but the PDF's text layer was never
-    // actually redacted and still contains "#9920-A". Whether the "correct"
-    // answer is that visible-but-unredacted text or "unavailable" depends on
-    // which layer you treat as authoritative, and grading either way would
-    // be indefensible. Tracked separately as a document defect, not graded
-    // here. Jon's ruling, 2026-08-12.
+    // recordId is deliberately NOT verified: as of 2026-08-13 the document
+    // has been re-redacted with Nutrient's own redaction API (POST
+    // /api/redaction/apply, backed by nutrient_sdk annotations.add_redact +
+    // PdfSavePreferences.APPLY_REDACTIONS), so "#9920-A" is genuinely gone
+    // from the text layer, not just covered by a cosmetic black bar. That
+    // means there is no correct answer to grade against anymore -- the
+    // field simply isn't in the document. Kept excluded for that reason,
+    // not because visual and text layers disagree (they no longer do).
     admissionDate: {
       value: "12/04/2016",
       source: "Date of Admission: 12/04/2016",
