@@ -21,7 +21,7 @@ describe("MarkdownResults", () => {
     expect(screen.getByText("# Heading", { exact: false })).toBeInTheDocument();
   });
 
-  it("offers Source, JSON and Code views", () => {
+  it("offers Source, Rendered, JSON and Code views", () => {
     render(<MarkdownResults result={result()} />);
     const group = screen.getByRole("group", { name: "View" });
     for (const name of ["Source", "JSON", "Code"]) {
@@ -42,7 +42,7 @@ describe("MarkdownResults", () => {
     expect(screen.getByText("1 page")).toBeInTheDocument();
   });
 
-  it("shows a partial result honestly when fail-fast stopped early", () => {
+  it("shows a partial result honestly when the 10-page cap stopped it early", () => {
     render(<MarkdownResults result={result({ processedPages: 2 })} />);
     expect(screen.getByText("2 of 3 pages")).toBeInTheDocument();
   });
@@ -113,6 +113,14 @@ describe("MarkdownResults rendered view", () => {
     const group = screen.getByRole("group", { name: "View" });
     expect(group).toContainElement(
       screen.getByRole("button", { name: "Rendered" }),
+    );
+  });
+
+  it("shows the empty-result callout on Rendered too, never a blank pane", async () => {
+    render(<MarkdownResults result={result({ markdown: "", charCount: 0 })} />);
+    await userEvent.click(screen.getByRole("button", { name: "Rendered" }));
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "No markdown returned",
     );
   });
 

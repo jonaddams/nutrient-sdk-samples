@@ -542,7 +542,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, or describe what's on it in plain language."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents

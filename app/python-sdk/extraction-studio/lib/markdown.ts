@@ -8,11 +8,18 @@ import { API_BASE } from "./api";
  * another's. Sending it as a form field is silent — the backend just defaults
  * to claude.
  *
- * ALL PAGES, not page 1. extract_markdown passes no max_pages, so Vision runs
- * once per page, SEQUENTIALLY (NAPY-7 makes concurrent Vision calls in one
- * process unsafe) and FAIL-FAST. Multi-page output is joined with
- * "\n\n---\n\n", so a `---` in the markdown may be a page boundary rather than
- * a horizontal rule the document contained.
+ * NOT page 1 — but not literally all pages either. extract_markdown passes no
+ * max_pages, and passing none is exactly what selects the backend's default
+ * cap: `_prepared_pages` does `cap = MAX_PRERENDER_PAGES if max_pages is None
+ * else max_pages` with MAX_PRERENDER_PAGES = 10, so an 11+ page document is
+ * silently truncated to its first 10 pages (see TablesResults.tsx, which
+ * names the same constant for the same shared helper). Vision runs once per
+ * processed page, SEQUENTIALLY (NAPY-7 makes concurrent Vision calls in one
+ * process unsafe) and FAIL-FAST: a mid-document Vision failure raises rather
+ * than returning what succeeded so far, so a partial result you see here was
+ * never a fail-fast outcome — it is always the 10-page cap. Multi-page output
+ * is joined with "\n\n---\n\n", so a `---` in the markdown may be a page
+ * boundary rather than a horizontal rule the document contained.
  *
  * This is the VLM path (VisionOutputFormat.MARKDOWN), NOT export_as_markdown().
  * SDK-046's word loss does not apply and must not be mentioned in UI copy.

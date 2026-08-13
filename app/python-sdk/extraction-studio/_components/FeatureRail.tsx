@@ -82,7 +82,7 @@ export const FEATURES: Feature[] = [
     enabled: true,
     blurb: "Turn a page into Markdown — headings, paragraphs and tables.",
     description:
-      "A vision model reads each page and writes it back as Markdown: headings, paragraphs, lists and tables, with the tables emitted as HTML so their structure survives. Runs one call per page, so a long document costs more than a short one. Useful for feeding documents to search indexes, static sites or a model's context window.",
+      "A vision model reads each page and writes it back as Markdown: headings, paragraphs, lists and tables, with the tables emitted as HTML so their structure survives. Runs one call per page, so a long document costs more than a short one. Useful for feeding documents to search indexes, static sites or a model's context window. Stops at the first 10 pages of a document.",
   },
   {
     id: "text",

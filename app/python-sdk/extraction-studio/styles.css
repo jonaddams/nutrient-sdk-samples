@@ -1067,8 +1067,57 @@
   overflow-wrap: anywhere;
 }
 
-.markdown-rendered {
+/* Rendered Markdown pane. Tailwind preflight zeroes margin/padding on every
+   element, sets list-style: none on ul/ol and border-collapse: collapse on
+   table, and app/globals.css's :where(p)/:where(h1..h6) also zero margin —
+   so with no rule reaching this class the SDK's real <h2>s, <table>s, <ul>s
+   and <blockquote>s presented as undifferentiated, run-together text (see
+   the FIX 1 finding's cascade trace). This block restores enough structure
+   that the Rendered view actually shows the structure the feature's rail
+   description claims to preserve.
+
+   Every value below is reused, not invented:
+   - td/th border is .studio-shell .studio-table td's `border: 1px solid
+     var(--line)`. That rule's own padding is 0 (moved onto its child
+     .cell-select button instead), so the padding reused below is that
+     button's `padding: var(--space-1) var(--space-2)` — the studio table's
+     actual visual cell padding.
+   - The 420px scroll cap matches .studio-shell .ocr-text (styles.css, the
+     "Extracted text and JSON" rule above), so this pane scrolls like every
+     sibling pane instead of growing the page indefinitely.
+   - list-style: revert and the padding-left/margin values are existing
+     tokens (var(--space-3), var(--space-4)), not new sizes. */
+.studio-shell .markdown-rendered {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+}
+
+.studio-shell .markdown-rendered p,
+.studio-shell .markdown-rendered h1,
+.studio-shell .markdown-rendered h2,
+.studio-shell .markdown-rendered h3,
+.studio-shell .markdown-rendered ul,
+.studio-shell .markdown-rendered ol,
+.studio-shell .markdown-rendered table,
+.studio-shell .markdown-rendered blockquote {
+  margin: 0 0 var(--space-3) 0;
+}
+
+.studio-shell .markdown-rendered ul,
+.studio-shell .markdown-rendered ol {
+  list-style: revert;
+  padding-left: var(--space-4);
+}
+
+.studio-shell .markdown-rendered table {
+  border-collapse: collapse;
+}
+
+.studio-shell .markdown-rendered td,
+.studio-shell .markdown-rendered th {
+  border: 1px solid var(--line);
+  padding: var(--space-1) var(--space-2);
 }
 
 .studio-shell .ocr-elements tr {

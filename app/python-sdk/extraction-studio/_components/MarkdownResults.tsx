@@ -18,17 +18,21 @@ type MarkdownView = "source" | "rendered" | "json" | "code";
 const CODE_UNAVAILABLE = "# code snippet unavailable from this backend";
 
 const FILE_FOR_VIEW: Record<MarkdownView, { type: string; name: string }> = {
-  source: { type: "text/markdown", name: "document.md" },
+  // Named after the feature, like this panel's own siblings markdown.json and
+  // markdown.py, not "document.md".
+  source: { type: "text/markdown", name: "markdown.md" },
   // Rendered downloads the SOURCE: the markdown is the artefact worth keeping,
   // and serialised DOM is neither markdown nor HTML anyone asked for.
-  rendered: { type: "text/markdown", name: "document.md" },
+  rendered: { type: "text/markdown", name: "markdown.md" },
   json: { type: "application/json", name: "markdown.json" },
   code: { type: "text/x-python", name: "markdown.py" },
 };
 
 function pagesLabel(processed: number, total: number): string {
-  // Distinct numbers when they differ: pages run fail-fast, so a partial
-  // result is a real outcome and must not read as a complete one.
+  // Distinct numbers when they differ: the backend stops at
+  // MAX_PRERENDER_PAGES = 10 pages (see TablesResults.tsx and lib/markdown.ts),
+  // so a document longer than that is a real partial result and must not read
+  // as a complete one.
   if (processed !== total) return `${processed} of ${total} pages`;
   return `${total} page${total === 1 ? "" : "s"}`;
 }
@@ -63,7 +67,9 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
         <span className="mono muted">
           {pagesLabel(result.processedPages, result.totalPages)}
         </span>
-        <span className="mono muted">{result.charCount} chars</span>
+        <span className="mono muted">
+          {result.charCount.toLocaleString("en-US")} chars
+        </span>
       </div>
 
       {/* Outside the empty branch on purpose, so a run that returns no markdown
@@ -100,6 +106,18 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
         <pre className="ocr-text mono">
           {JSON.stringify(resultJson, null, 2)}
         </pre>
+      ) : empty ? (
+        // Checked before "rendered" so an empty result shows this callout
+        // regardless of which view is selected — Rendered included. Feeding
+        // an empty string to ReactMarkdown produces a blank div with no
+        // message, which is never an acceptable empty state.
+        <div className="callout" role="status">
+          <span className="callout-label">No markdown returned</span>
+          <p>
+            The model returned nothing for this document. Try the other
+            provider, or a document with more text on the page.
+          </p>
+        </div>
       ) : view === "rendered" ? (
         /* rehype-raw parses the embedded HTML tables the SDK emits inside its
            Markdown; rehype-sanitize runs AFTER raw and strips scripts and
@@ -107,7 +125,11 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
            VLM cannot inject active HTML. The order is the security property —
            sanitize before raw would sanitize the text and then parse the HTML
            unchecked. The default sanitize schema still permits
-           table/thead/tr/td/th, which this feature relies on. */
+           table/thead/tr/td/th, which this feature relies on.
+
+           The duplicate of this plugin chain is
+           app/python-sdk/markdown-extraction/page.tsx's renderFormatted — if
+           you change the order or the plugins here, change it there too. */
         <div className="markdown-rendered">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -115,14 +137,6 @@ export function MarkdownResults({ result }: { result: MarkdownResult }) {
           >
             {result.markdown}
           </ReactMarkdown>
-        </div>
-      ) : empty ? (
-        <div className="callout" role="status">
-          <span className="callout-label">No markdown returned</span>
-          <p>
-            The model returned nothing for this document. Try the other
-            provider, or a document with more text on the page.
-          </p>
         </div>
       ) : (
         <pre className="ocr-text mono">{result.markdown}</pre>
