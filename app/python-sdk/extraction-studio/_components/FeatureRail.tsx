@@ -76,6 +76,15 @@ export const FEATURES: Feature[] = [
       "Finds the tables in a document and gives you back their actual structure — every row, column and cell, including cells that span more than one of either. Each cell carries how confident the model was and where it sits on the page, so you can check a figure against the original.",
   },
   {
+    id: "markdown",
+    group: "Text",
+    label: "Markdown export",
+    enabled: true,
+    blurb: "Turn a page into Markdown — headings, paragraphs and tables.",
+    description:
+      "A vision model reads each page and writes it back as Markdown: headings, paragraphs, lists and tables, with the tables emitted as HTML so their structure survives. Runs one call per page, so a long document costs more than a short one. Useful for feeding documents to search indexes, static sites or a model's context window.",
+  },
+  {
     id: "text",
     group: "Text",
     label: "Text export",

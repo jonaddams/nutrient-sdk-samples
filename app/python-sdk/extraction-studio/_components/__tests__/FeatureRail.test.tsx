@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { expect, it, test, vi } from "vitest";
 import { FEATURES, FeatureRail } from "../FeatureRail";
 
 test("rail lists features and selects an enabled one", () => {
@@ -33,8 +33,25 @@ test("every enabled feature is one the studio can render", () => {
     "adaptive_ocr",
     "tables",
     "describe",
+    "markdown",
   ]);
   for (const f of FEATURES.filter((x) => x.enabled)) {
     expect(RENDERABLE.has(f.id)).toBe(true);
   }
+});
+
+it("offers Markdown export as a live feature", () => {
+  const entry = FEATURES.find((f) => f.id === "markdown");
+  expect(entry).toBeDefined();
+  expect(entry?.enabled).toBe(true);
+  expect(entry?.label).toBe("Markdown export");
+  // Blurbs are what a live entry shows on the rail; a disabled entry has
+  // only a description.
+  expect(entry?.blurb?.length ?? 0).toBeGreaterThan(0);
+});
+
+it("keeps Text export as a separate, still-unbuilt entry", () => {
+  // export_as_text is a different SDK call with different output; shipping
+  // Markdown export does not deliver it.
+  expect(FEATURES.find((f) => f.id === "text")?.enabled).toBe(false);
 });
