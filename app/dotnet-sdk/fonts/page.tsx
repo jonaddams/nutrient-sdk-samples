@@ -117,6 +117,23 @@ export default function FontsPage() {
           maxWidth: 1800,
         }}
       >
+        {/* globals.css resets every anchor to `color: inherit` and no
+            underline, and only re-styles links inside `.callout`. This one
+            sits outside one, so it has to carry the same treatment itself or
+            it reads as plain grey text. */}
+        <p className="text-sm" style={{ marginBottom: "var(--space-4)" }}>
+          <a
+            href="#sdk-calls-behind-this"
+            style={{
+              color: "var(--accent)",
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
+          >
+            How this works — the SDK calls behind this sample ↓
+          </a>
+        </p>
+
         <div style={cardStyle}>
           <div className="flex">
             <div
@@ -294,8 +311,113 @@ export default function FontsPage() {
             </div>
           </div>
         </div>
+
+        <div
+          className="callout"
+          id="sdk-calls-behind-this"
+          style={{ marginTop: "var(--space-5)" }}
+        >
+          <span className="callout-label">The SDK calls behind this</span>
+          <p>
+            The two formats share nothing. A PDF stores its fonts as numbered
+            resources, so the SDK walks them by index; a Word file declares font
+            names and the converter reports how each one resolved. Both
+            normalize into the single response the table above renders.
+          </p>
+
+          <p>
+            <strong>PDF</strong> — <ApiLink cls="GdPicturePDF" /> exposes a{" "}
+            <strong>1-based</strong> index. Read the count, then ask for each
+            font in turn:
+          </p>
+          <ul style={{ display: "block", listStyle: "disc" }}>
+            <li>
+              <ApiLink cls="GdPicturePDF" method="GetFontCount" /> — how many
+              fonts the document uses. The loop runs{" "}
+              <code>1..GetFontCount()</code>, not from zero.
+            </li>
+            <li>
+              <ApiLink cls="GdPicturePDF" method="GetFontName" /> — the
+              PostScript name. Subset-embedded fonts carry a six-letter prefix
+              such as <code>ABCDEE+</code>.
+            </li>
+            <li>
+              <ApiLink cls="GdPicturePDF" method="GetFontType" /> and{" "}
+              <ApiLink cls="GdPicturePDF" method="GetFontEncoding" /> — e.g.{" "}
+              <code>TrueType</code> and <code>WinAnsiEncoding</code>. These fill
+              the second line of each row above.
+            </li>
+            <li>
+              <ApiLink cls="GdPicturePDF" method="IsFontEmbedded" /> — whether
+              the font program travels with the file. This is the one that
+              decides whether a viewer can render the document faithfully on its
+              own.
+            </li>
+          </ul>
+
+          <p>
+            <strong>DOCX</strong> —{" "}
+            <ApiLink
+              cls="GdPictureDocumentConverter"
+              method="SaveDocumentFontsInfo"
+            />{" "}
+            writes a single XML report rather than exposing an index. It has
+            four buckets: <code>DocumentRequestedFonts</code> is the inventory,
+            and <code>EmbeddedFonts</code>, <code>SystemAvailableFonts</code>{" "}
+            and <code>MissingFonts</code> classify each entry. A stream overload
+            exists, so no temp file is needed.
+          </p>
+          <p>
+            That is why a DOCX row shows a style — &quot;Regular&quot;,
+            &quot;Bold&quot; — but no type or encoding. Those are PDF concepts,
+            and the XML does not report them.
+          </p>
+
+          <p>
+            <strong>Deliberately unused.</strong> Two more exist:{" "}
+            <ApiLink cls="GdPicturePDF" method="GetFontData" />, which extracts
+            an embedded font&apos;s bytes, and{" "}
+            <ApiLink cls="GdPicturePDF" method="UnembedFont" />, which strips
+            one. Both work, and neither is called here: this endpoint only
+            reads. Worth knowing they exist if you need to repair or repackage a
+            document rather than inspect it.
+          </p>
+
+          <p>
+            <ApiLink cls="GdPicturePDF" /> {" · "}
+            <ApiLink cls="GdPictureDocumentConverter" />
+            {" · "}
+            <a
+              href="https://www.nutrient.io/guides/dotnet/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              .NET SDK guides
+            </a>
+          </p>
+        </div>
       </main>
     </div>
+  );
+}
+
+/**
+ * Links a GdPicture class or method to its API reference page.
+ *
+ * The docs accept two equivalent path prefixes (`GdPicture.NET.14.API~` and
+ * `GdPicture.NET.14~`); this uses the first consistently. Every URL produced
+ * here was checked against the live docs — the site returns a real 404 for an
+ * unknown member, so a broken name would not pass silently.
+ */
+function ApiLink({ cls, method }: { cls: string; method?: string }) {
+  const base = "https://www.nutrient.io/api/gdpicture/GdPicture.NET.14.API~";
+  const href = method
+    ? `${base}GdPicture14.${cls}~${method}.html`
+    : `${base}GdPicture14.${cls}.html`;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      <code>{method ?? cls}</code>
+    </a>
   );
 }
 
