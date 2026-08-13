@@ -14,6 +14,13 @@ import type { Sample } from "@/app/_components/SamplesIndex";
  */
 export const samples: Sample[] = [
   {
+    name: "Fonts in the Viewer",
+    category: "Fonts",
+    description:
+      "Why a document renders with the wrong type, and how customFonts fixes it — the same document rendered without its fonts and with them, side by side",
+    path: "/web-sdk/fonts",
+  },
+  {
     name: "Annotation Permissions",
     category: "Annotations",
     description:
