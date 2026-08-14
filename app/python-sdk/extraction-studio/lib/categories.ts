@@ -23,6 +23,31 @@ export const CATEGORY_ORDER: CategoryId[] = [
   "multilingual",
 ];
 
+/**
+ * Categories that exist because a FEATURE needed a document, not because a
+ * prospect works in that industry.
+ *
+ * The taxonomy is mixed, and naming the mix is better than hiding it. Six
+ * categories are industry verticals, and that axis is what makes Structured
+ * extraction land — "here is a document from your industry" is the most
+ * persuasive thing in this studio. Three exist only so a capability has
+ * something to run on. Grouping them apart in the picker stops "Healthcare"
+ * and "Handwriting" reading as peers, which is a category error a prospect can
+ * see.
+ *
+ * It also explains the two thin schema presets: `handwriting` extracts one
+ * invented `documentTitle` field and `multilingual` extracts a book proof's
+ * French title and author. Nobody would run either. They exist because
+ * `PRESETS` is keyed by category and a test requires every category to appear
+ * there — a coupling worth revisiting separately, and NOT a reason to re-cut
+ * the industry axis.
+ */
+export const CAPABILITY_CATEGORIES: ReadonlySet<string> = new Set([
+  "handwriting",
+  "research",
+  "multilingual",
+]);
+
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
   invoices: "Invoices",
   finance: "Finance",
