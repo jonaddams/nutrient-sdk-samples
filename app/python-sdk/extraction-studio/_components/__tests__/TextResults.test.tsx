@@ -120,6 +120,34 @@ describe("TextResults", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the empty state on the flag even when text is non-empty", () => {
+    // The discriminating fixture. The whitespace case above cannot tell
+    // `!result.hasTextLayer` apart from `!result.text.trim()` — both are
+    // falsy for "   \n  ". Only non-whitespace text with the flag false
+    // separates them, and a trim-based implementation fails right here.
+    //
+    // The backend cannot actually produce this pairing today
+    // (`hasTextLayer = bool(text.strip())`), and that is deliberate: this
+    // test pins which value the PANEL treats as authoritative, not a
+    // reachable response. Do not "correct" the fixture to match the
+    // backend contract — doing so deletes the guard.
+    render(
+      <TextResults
+        result={result({
+          text: "leftover watermark text",
+          charCount: 23,
+          wordCount: 3,
+          hasTextLayer: false,
+        })}
+        onUseOcr={() => {}}
+      />,
+    );
+    expect(
+      screen.getByText("No text layer in this document"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("leftover watermark text")).toBeNull();
+  });
+
   it("hands Copy the view that is on screen", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal("navigator", { clipboard: { writeText } });
