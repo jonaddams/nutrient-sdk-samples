@@ -409,6 +409,38 @@ export default function ExtractionStudio() {
         />
       ) : null,
     },
+    // Shares ocrResult/ocrCitations/showRegions/ocrColorMode with adaptive_ocr
+    // rather than getting its own state: both hit the same /api/extraction/ocr
+    // endpoint and return the same shape, only one of the two is ever the
+    // active feature, and the `[feature]` effect above already clears
+    // `ocrResult` on every switch — including into or out of this one.
+    multilingual: {
+      needsProviders: false,
+      citations: ocrCitations,
+      show: showRegions,
+      config: (
+        <OcrConfig
+          docPath={current.path}
+          filename={current.filename}
+          runSignal={runSignal}
+          onRun={handleOcrRun}
+          initialLanguages={["eng", "fra"]}
+        />
+      ),
+      results: ocrResult ? (
+        <OcrResults
+          result={ocrResult}
+          activeIndex={activeIndex}
+          onSelectElement={setActiveIndex}
+          showRegions={showRegions}
+          onShowRegionsChange={setShowRegions}
+          colorMode={ocrColorMode}
+          onColorModeChange={setOcrColorMode}
+          citationHex={citationHex}
+          onCitationHexChange={setCitationHex}
+        />
+      ) : null,
+    },
     tables: {
       needsProviders: true,
       citations: tableCitations,

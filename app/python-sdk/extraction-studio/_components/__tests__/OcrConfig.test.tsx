@@ -78,6 +78,46 @@ test("table detection and output format are configurable", () => {
   );
 });
 
+test("initialLanguages seeds the chip selection", () => {
+  // Multilingual OCR passes ["eng", "fra"] so the bilingual document it exists
+  // for is already configured correctly on mount, without the user having to
+  // click a second chip first.
+  render(
+    <OcrConfig
+      {...props}
+      onRun={vi.fn()}
+      runSignal={0}
+      initialLanguages={["eng", "fra"]}
+    />,
+  );
+  expect(screen.getByRole("button", { name: "eng" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(screen.getByRole("button", { name: "fra" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(screen.getByRole("button", { name: "deu" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+});
+
+test("omitting initialLanguages still defaults to English only", () => {
+  // Adaptive OCR does not pass this prop at all — it depends on the default
+  // staying ["eng"], not on some caller always supplying it.
+  render(<OcrConfig {...props} onRun={vi.fn()} runSignal={0} />);
+  expect(screen.getByRole("button", { name: "eng" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(screen.getByRole("button", { name: "fra" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+});
+
 test("groups the language chips under an accessible name", () => {
   // Without this, a screen reader announces each chip only as "eng, button,
   // pressed", with no indication of what is being chosen — Field's own

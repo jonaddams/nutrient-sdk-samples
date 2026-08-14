@@ -10,8 +10,10 @@ describe("the document manifest", () => {
       expect(d.label).toBeTruthy();
       // Was `/\.pdf$/` until the handwriting category added four plain images
       // (no PDF wrapper) — the manifest was never actually PDF-only, that was
-      // just true of every document until 2026-08-11.
-      expect(d.filename).toMatch(/\.(pdf|jpe?g)$/);
+      // just true of every document until 2026-08-11. Widened again on
+      // 2026-08-13 for the multilingual category's PNG book-spread scan —
+      // same reasoning, a new legitimate image format, not a loosened check.
+      expect(d.filename).toMatch(/\.(pdf|jpe?g|png)$/);
       expect(typeof d.hasTextLayer).toBe("boolean");
     }
   });
@@ -89,6 +91,18 @@ describe("the document manifest", () => {
     // Shared with app/python-sdk/markdown-extraction, which references this
     // same path. Do not duplicate the file.
     expect(paper?.path).toBe("/documents/usenix-example-paper.pdf");
+  });
+
+  it("offers the bilingual book spread, the only document Multilingual OCR can demonstrate", () => {
+    const spread = DOCUMENTS.find((d) => d.docId === "ocr-multiple-languages");
+    expect(spread).toBeDefined();
+    expect(spread?.category).toBe("multilingual");
+    // A PNG with no text layer at all — Adaptive/Multilingual OCR is the only
+    // thing that can read it.
+    expect(spread?.hasTextLayer).toBe(false);
+    // Shared with app/python-sdk/ocr-extraction, which references this same
+    // path. Do not duplicate the file.
+    expect(spread?.path).toBe("/documents/input_ocr_multiple_languages.png");
   });
 });
 

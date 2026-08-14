@@ -203,6 +203,17 @@ export const DOCUMENTS: DocSummary[] = [
     hasTextLayer: true,
     category: "research",
   },
+  {
+    docId: "ocr-multiple-languages",
+    label: "Rousseau & Austen spread",
+    // Already in this repo and already referenced by
+    // app/python-sdk/ocr-extraction. Referenced from its existing path rather
+    // than duplicated, like usenix-example-paper and the three invoices above.
+    path: "/documents/input_ocr_multiple_languages.png",
+    filename: "input_ocr_multiple_languages.png",
+    hasTextLayer: false,
+    category: "multilingual",
+  },
 ];
 
 export function findDoc(docId: string): DocSummary | undefined {

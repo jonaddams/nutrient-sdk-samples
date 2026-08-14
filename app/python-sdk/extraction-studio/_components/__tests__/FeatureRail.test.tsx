@@ -1,6 +1,18 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, it, test, vi } from "vitest";
 import { FEATURES, FeatureRail } from "../FeatureRail";
+
+/** Counts `enabled: true` occurrences in FeatureRail.tsx's own source, the same
+ *  way a human would with `grep -c "enabled: true" FeatureRail.tsx` — so the
+ *  live-feature count below is derived, never hand-incremented. This repo has
+ *  a documented history of stale hardcoded counts drifting from reality (a
+ *  landing page once claimed 57 samples when there were 76). */
+function countEnabledTrueInSource(): number {
+  const source = readFileSync(join(__dirname, "..", "FeatureRail.tsx"), "utf8");
+  return (source.match(/enabled: true/g) ?? []).length;
+}
 
 test("rail lists features and selects an enabled one", () => {
   const onSelect = vi.fn();
@@ -12,17 +24,24 @@ test("rail lists features and selects an enabled one", () => {
   expect(onSelect).toHaveBeenCalledWith("structured");
 });
 
-test("the six live features are enabled and the other SOON entries are not", () => {
+test("the seven live features are enabled and the other SOON entries are not", () => {
   const byId = Object.fromEntries(FEATURES.map((f) => [f.id, f]));
   expect(byId.structured.enabled).toBe(true);
   expect(byId.handwriting.enabled).toBe(true);
   expect(byId.adaptive_ocr.enabled).toBe(true);
+  expect(byId.multilingual.enabled).toBe(true);
   expect(byId.tables.enabled).toBe(true);
   expect(byId.markdown.enabled).toBe(true);
   expect(byId.describe.enabled).toBe(true);
-  for (const id of ["multilingual", "fast_ocr", "text"]) {
+  for (const id of ["fast_ocr", "text"]) {
     expect(byId[id].enabled).toBe(false);
   }
+  // Derived from the source, not hand-incremented — see
+  // countEnabledTrueInSource's comment.
+  expect(FEATURES.filter((f) => f.enabled).length).toBe(
+    countEnabledTrueInSource(),
+  );
+  expect(countEnabledTrueInSource()).toBe(7);
 });
 
 test("every enabled feature is one the studio can render", () => {
@@ -32,6 +51,7 @@ test("every enabled feature is one the studio can render", () => {
     "structured",
     "handwriting",
     "adaptive_ocr",
+    "multilingual",
     "tables",
     "describe",
     "markdown",
@@ -39,6 +59,16 @@ test("every enabled feature is one the studio can render", () => {
   for (const f of FEATURES.filter((x) => x.enabled)) {
     expect(RENDERABLE.has(f.id)).toBe(true);
   }
+});
+
+it("offers Multilingual OCR as a live feature, sharing OCR's engine on a bilingual document", () => {
+  const entry = FEATURES.find((f) => f.id === "multilingual");
+  expect(entry).toBeDefined();
+  expect(entry?.enabled).toBe(true);
+  expect(entry?.label).toBe("Multilingual OCR");
+  // Blurbs are what a live entry shows on the rail; a disabled entry has only
+  // a description.
+  expect(entry?.blurb?.length ?? 0).toBeGreaterThan(0);
 });
 
 it("offers Markdown export as a live feature", () => {

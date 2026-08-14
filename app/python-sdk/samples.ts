@@ -92,9 +92,9 @@ export const samples: Sample[] = [
     name: "Extraction Studio",
     category: "Extraction",
     description:
-      // Number derived from `grep -c "enabled: true" FeatureRail.tsx` (6),
+      // Number derived from `grep -c "enabled: true" FeatureRail.tsx` (7),
       // never incremented by hand — this string went stale twice already.
-      "Six extraction techniques in one shell — schema-driven fields with clickable citations, Adaptive OCR, handwriting recognition, table extraction, Markdown export, and image description",
+      "Seven extraction techniques in one shell — schema-driven fields with clickable citations, Adaptive OCR, Multilingual OCR, handwriting recognition, table extraction, Markdown export, and image description",
     path: "/python-sdk/extraction-studio",
   },
   {
