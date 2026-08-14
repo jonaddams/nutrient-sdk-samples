@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { TextConfig } from "../TextConfig";
 
 const props = {
@@ -8,6 +8,10 @@ const props = {
 };
 
 describe("TextConfig", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("offers no controls, because export_as_text takes no options", () => {
     render(<TextConfig {...props} onRun={() => {}} runSignal={0} />);
     expect(screen.queryByRole("combobox")).toBeNull();
@@ -26,7 +30,7 @@ describe("TextConfig", () => {
 
   it("warns that a scan returns nothing, before the presenter hits it", () => {
     render(<TextConfig {...props} onRun={() => {}} runSignal={0} />);
-    expect(screen.getByText(/scanned/i)).toBeInTheDocument();
+    expect(screen.getByText(/comes back empty/i)).toBeInTheDocument();
   });
 
   it("issues no network request on mount", () => {

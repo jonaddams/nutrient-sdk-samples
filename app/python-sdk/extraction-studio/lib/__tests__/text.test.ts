@@ -51,6 +51,9 @@ describe("extractText", () => {
     expect(url).not.toContain("?");
     expect(url.endsWith("/api/extraction/text")).toBe(true);
     expect(fetchMock.mock.calls[1][1].method).toBe("POST");
+    const requestBody = fetchMock.mock.calls[1][1].body as FormData;
+    expect(requestBody.get("file")).toBeInstanceOf(File);
+    expect((requestBody.get("file") as File).name).toBe("a.pdf");
   });
 
   it("surfaces FastAPI's detail message rather than a bare status", async () => {

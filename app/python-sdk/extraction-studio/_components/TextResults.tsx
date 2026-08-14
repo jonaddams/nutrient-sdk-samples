@@ -51,7 +51,8 @@ export function TextResults({
           </span>
         )}
         <span className="mono muted">
-          {result.totalPages} page{result.totalPages === 1 ? "" : "s"}
+          {result.totalPages.toLocaleString("en-US")} page
+          {result.totalPages === 1 ? "" : "s"}
         </span>
         <span className="mono muted">
           {result.wordCount.toLocaleString("en-US")} words
@@ -101,16 +102,15 @@ export function TextResults({
         <div className="callout" role="status">
           <span className="callout-label">No text layer in this document</span>
           <p>
-            This page is an image, so its words exist only as pixels — there is
-            no embedded text to pull out. Adaptive OCR reads them instead, and
-            needs no API key either.
+            This document has no embedded text — its words exist only as pixels.
+            Adaptive OCR reads them instead, and needs no API key either.
           </p>
           <button type="button" className="btn sm" onClick={onUseOcr}>
             Switch to Adaptive OCR
           </button>
         </div>
       ) : (
-        <pre className="ocr-text mono">{result.text}</pre>
+        <pre className="ocr-text mono text-export-pre">{result.text}</pre>
       )}
     </div>
   );

@@ -1067,6 +1067,17 @@
   overflow-wrap: anywhere;
 }
 
+/* Text export's pane must NOT wrap. Its output is a fixed-width spatial
+   reconstruction — columns sit where they sit on the page — which is what the
+   rail copy and the config panel both promise. `.ocr-text`'s `pre-wrap` plus
+   `overflow-wrap: anywhere` reflows that into ~35-character ribbons at the
+   panel's 340px floor and makes the promise visibly false. With `pre`, the
+   existing `overflow: auto` gives the intended inner horizontal scroll. */
+.studio-shell .text-export-pre {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
 /* Rendered Markdown pane. Tailwind preflight zeroes margin/padding on every
    element, sets list-style: none on ul/ol and border-collapse: collapse on
    table, and app/globals.css's :where(p)/:where(h1..h6) also zero margin —

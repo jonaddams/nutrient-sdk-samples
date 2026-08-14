@@ -518,7 +518,7 @@ export default function ExtractionStudio() {
     // here. Same shape as `describe`.
     text: {
       needsProviders: false,
-      citations: [],
+      citations: NO_CITATIONS,
       show: false,
       config: (
         <TextConfig
@@ -616,7 +616,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, describe what's on it in plain language, or pull its text layer out in milliseconds."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents
