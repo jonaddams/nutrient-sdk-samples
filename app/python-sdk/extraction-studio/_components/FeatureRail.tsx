@@ -60,14 +60,6 @@ export const FEATURES: Feature[] = [
       "The same Adaptive OCR engine, told which languages are actually on the page — here, a book spread with French on the left and English on the right. Naming French raises average confidence from 0.93 to 0.95 and recovers the accents the English-only setting drops or mangles (à→a, è→e, elisions like l' vanish), on the French half only — the English half reads identically either way, and English-only OCR still produces readable French, just with flattened diacritics. Deselect French and run again to watch the accents degrade.",
   },
   {
-    id: "fast_ocr",
-    group: "OCR",
-    label: "Fast OCR",
-    enabled: false,
-    description:
-      "Adds an invisible text layer to a scan so it becomes searchable and its text selectable, while looking exactly the same. Built for speed and high volume.",
-  },
-  {
     id: "tables",
     group: "Tables",
     label: "Table extraction",
