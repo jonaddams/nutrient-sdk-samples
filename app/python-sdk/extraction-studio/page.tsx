@@ -84,6 +84,14 @@ export default function ExtractionStudio() {
   const [doc, setDoc] = useState(DOCUMENTS[0].docId);
   const [category, setCategory] = useState(DOCUMENTS[0].category);
   const [tab, setTab] = useState("config");
+  /** A document a feature switch loaded on the presenter's behalf, and why, or
+   *  null. Cleared the moment they choose a document or category themselves —
+   *  the note explains a change they did not make, so it has nothing to say
+   *  about one they did. */
+  const [autoDocNote, setAutoDocNote] = useState<{
+    label: string;
+    reason: string;
+  } | null>(null);
   const [result, setResult] = useState<Envelope | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -192,6 +200,43 @@ export default function ExtractionStudio() {
   const selectFeature = (next: string) => {
     setFeature(next);
     setProvidersReady(false);
+
+    // Two features are useless on the wrong document — see `demoDocId` in
+    // FeatureRail.tsx — so selecting them loads the document that exercises
+    // them. Everything else leaves the document alone, because showing one
+    // page through several features is a real demo move.
+    //
+    const entry = FEATURES.find((f) => f.id === next);
+    const demoDocId = entry?.demoDocId;
+    if (!demoDocId) {
+      setAutoDocNote(null);
+      return;
+    }
+    const target = DOCUMENTS.find((d) => d.docId === demoDocId);
+    if (!target) return;
+
+    // Suitability is judged by CATEGORY, not by document identity. Guarding on
+    // `demoDocId === doc` looks equivalent and is not: a presenter who selected
+    // Handwriting, then deliberately opened the thank-you note to show cursive,
+    // then stepped away to Structured and back would be yanked off it
+    // mid-sentence and returned to the employment application. Any document in
+    // the feature's own category already exercises it, so leave the choice
+    // alone.
+    const current = DOCUMENTS.find((d) => d.docId === doc);
+    if (current?.category === target.category) {
+      setAutoDocNote(null);
+      return;
+    }
+    setCategory(target.category);
+    selectDoc(target.docId);
+    // Named, not silent. The audience includes AEs demoing unaccompanied, and
+    // a document that changes with no explanation is its own confusion. Kept
+    // to one short sentence: measured at 4 lines, the note pushed a feature
+    // button out of the rail's visible area, which is a poor trade for prose.
+    setAutoDocNote({
+      label: target.label,
+      reason: entry?.demoDocReason ?? "a document it can read",
+    });
   };
 
   // Auto-selecting the category's first document keeps the viewer from showing
@@ -199,9 +244,19 @@ export default function ExtractionStudio() {
   // selectDoc also clears result/ocrResult/activeIndex/error, so citations
   // from the previous document cannot survive a category change.
   const selectCategory = (next: string) => {
+    setAutoDocNote(null);
     setCategory(next);
     const first = DOCUMENTS.find((d) => d.category === next);
     if (first) selectDoc(first.docId);
+  };
+
+  /** The document strip's handler. `selectDoc` itself is shared with
+   *  `selectFeature`'s automatic switch, which sets the note immediately
+   *  after — so the clear lives here, on the deliberate choice, rather than
+   *  inside `selectDoc` where it would wipe the note it just set. */
+  const selectDocManually = (docId: string) => {
+    setAutoDocNote(null);
+    selectDoc(docId);
   };
 
   const fields = (result?.data?.fields as FieldResult[] | undefined) ?? [];
@@ -641,7 +696,7 @@ export default function ExtractionStudio() {
             docs={visibleDocs}
             value={doc}
             category={category}
-            onSelect={selectDoc}
+            onSelect={selectDocManually}
           />
         </div>
 
@@ -663,8 +718,32 @@ export default function ExtractionStudio() {
           <div className="studio-panel-head">
             <div className="feature-title">
               <strong>{currentFeature?.label ?? "Feature"}</strong>
+              {/* The routing note lives HERE, not under the document strip
+                  where it describes. Measured: in the rail it wrapped to two
+                  lines even at its shortest and pushed a feature button out of
+                  the list's visible area, which is a bad trade for a feature
+                  picker. This column is wide enough for one line, and it sits
+                  where the presenter is already looking after a rail click. */}
               {currentFeature?.blurb && (
                 <p className="muted">{currentFeature.blurb}</p>
+              )}
+              {/* Below the blurb, not instead of it: the blurb is what the
+                  presenter may be reading aloud at the moment they click, and
+                  swapping it out to announce the document would take away the
+                  sentence explaining the feature they just chose.
+
+                  NO <strong> in here, deliberately. `.studio-shell
+                  .feature-title strong` sets `font-size: var(--text-lg)` and
+                  `display: block` for the heading above, and that descendant
+                  selector matches at ANY depth — emphasising the document name
+                  turned it into an oversized block and orphaned the full stop
+                  onto a third line. Same shape as the `.citation-color`
+                  nesting bug: an element dropped into a block whose own rules
+                  match its children. The sentence reads fine unemphasised. */}
+              {autoDocNote && (
+                <p className="muted" role="status">
+                  Needs {autoDocNote.reason} — loaded {autoDocNote.label}.
+                </p>
               )}
             </div>
             <div className="studio-panel-actions">

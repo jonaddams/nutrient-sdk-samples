@@ -99,3 +99,68 @@ test("renders nothing when there are no documents at all", () => {
   );
   expect(container).toBeEmptyDOMElement();
 });
+
+test("separates industry verticals from feature showcases", () => {
+  // Two axes in one control. Before grouping, "Healthcare" and "Handwriting"
+  // sat as peers — a category error a prospect can see — and the capability
+  // documents could only be found by opening a dropdown nothing pointed at.
+  render(
+    <CategorySelect
+      docs={[
+        doc("a", "invoices"),
+        doc("b", "healthcare"),
+        doc("c", "handwriting"),
+      ]}
+      value="invoices"
+      onSelect={() => {}}
+    />,
+  );
+  const industry = screen.getByRole("group", { name: "By industry" });
+  const showcase = screen.getByRole("group", { name: "Feature showcases" });
+
+  // Asserted per-group, not just "both groups exist": a grouping that put
+  // every option in the first group would pass a presence-only check.
+  expect(industry).toContainElement(
+    screen.getByRole("option", { name: "Invoices" }),
+  );
+  expect(industry).toContainElement(
+    screen.getByRole("option", { name: "Healthcare" }),
+  );
+  expect(showcase).toContainElement(
+    screen.getByRole("option", { name: "Handwriting" }),
+  );
+  expect(industry).not.toContainElement(
+    screen.getByRole("option", { name: "Handwriting" }),
+  );
+});
+
+test("omits a group entirely rather than rendering it empty", () => {
+  render(
+    <CategorySelect
+      docs={[doc("a", "invoices")]}
+      value="invoices"
+      onSelect={() => {}}
+    />,
+  );
+  expect(
+    screen.getByRole("group", { name: "By industry" }),
+  ).toBeInTheDocument();
+  expect(screen.queryByRole("group", { name: "Feature showcases" })).toBeNull();
+});
+
+test("keeps an unknown category reachable, outside both groups", () => {
+  // The pre-existing guarantee: a document with no way to reach it is worse
+  // than an unlabelled option. Grouping must not have quietly dropped it.
+  render(
+    <CategorySelect
+      docs={[doc("a", "invoices"), doc("b", "mystery")]}
+      value="invoices"
+      onSelect={() => {}}
+    />,
+  );
+  const unknown = screen.getByRole("option", { name: "mystery" });
+  expect(unknown).toBeInTheDocument();
+  expect(
+    screen.getByRole("group", { name: "By industry" }),
+  ).not.toContainElement(unknown);
+});

@@ -1,5 +1,9 @@
 "use client";
-import { CATEGORY_ORDER, labelFor } from "../lib/categories";
+import {
+  CAPABILITY_CATEGORIES,
+  CATEGORY_ORDER,
+  labelFor,
+} from "../lib/categories";
 import type { DocSummary } from "../lib/docs";
 
 /**
@@ -37,6 +41,21 @@ export function CategorySelect({
   const shown = [...known, ...unknown];
   if (!shown.length) return null;
 
+  // Two axes in one control, so say which is which rather than listing
+  // "Healthcare" next to "Handwriting" as though they were the same kind of
+  // thing. Grouping also surfaces the capability documents, which previously
+  // could only be found by opening a dropdown nothing pointed you at.
+  // Unknown categories stay ungrouped: they have no preset and no axis, and an
+  // unlabelled option beats a document you cannot reach.
+  const industry = known.filter((id) => !CAPABILITY_CATEGORIES.has(id));
+  const capability = known.filter((id) => CAPABILITY_CATEGORIES.has(id));
+
+  const option = (category: string) => (
+    <option key={category} value={category}>
+      {labelFor(category)}
+    </option>
+  );
+
   return (
     <div className="category-select">
       {/* A real <label>, not an eyebrow div: it names the control for screen
@@ -49,11 +68,15 @@ export function CategorySelect({
         value={value}
         onChange={(e) => onSelect(e.target.value)}
       >
-        {shown.map((category) => (
-          <option key={category} value={category}>
-            {labelFor(category)}
-          </option>
-        ))}
+        {industry.length > 0 && (
+          <optgroup label="By industry">{industry.map(option)}</optgroup>
+        )}
+        {capability.length > 0 && (
+          <optgroup label="Feature showcases">
+            {capability.map(option)}
+          </optgroup>
+        )}
+        {unknown.map(option)}
       </select>
     </div>
   );

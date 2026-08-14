@@ -1003,7 +1003,10 @@ test("switching documents mid-handwriting-run clears the previous document's ove
 
   // Only renders from this point on are relevant to the switch under test.
   citationRenders.length = 0;
-  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+  // A handwriting document, not Lumen: selecting this feature now routes to
+  // its own category (see `demoDocId`), so the invoices are no longer in the
+  // strip. Any second visible document exercises the same clearing path.
+  fireEvent.click(screen.getByRole("button", { name: /thank-you note/i }));
 
   await waitFor(() =>
     expect(screen.getByTestId("doc-viewer")).toHaveAttribute(
@@ -1140,4 +1143,115 @@ test("switching documents clears Text export results", async () => {
   // taking the config view's silence as proof the result actually cleared.
   fireEvent.click(screen.getByRole("button", { name: "Results" }));
   expect(screen.queryByText("ATLAS-CONSTRUCTION-ONLY-TEXT")).toBeNull();
+});
+
+// Feature-to-document routing. Two rail entries are useless on the wrong
+// document and their documents live in categories a presenter would never
+// think to open, so selecting them loads the right document. Everything else
+// must leave the document alone — showing one page through several features is
+// a real demo move, and the Text export panel's own hand-off to Adaptive OCR
+// depends on the document surviving a feature switch.
+test("selecting Handwriting loads a handwritten document, not the invoice", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  // Starts on Atlas Construction, a printed invoice.
+  expect(
+    screen.getByRole("button", { name: /Atlas Construction/i }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+
+  // The PRINT document specifically. HandwritingConfig defaults to the `local`
+  // engine, and Local ICR reads the category's first document — cursive — as
+  // gibberish, so "some handwriting document" is not good enough here and an
+  // assertion that accepted any of the four would miss the whole point.
+  expect(
+    screen.getByRole("button", { name: /Employment application/i }),
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(
+    screen.queryByRole("button", { name: /Apricot cake/i }),
+  ).toHaveAttribute("aria-pressed", "false");
+});
+
+test("selecting Multilingual OCR loads the only bilingual document", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /Multilingual OCR/ }));
+  expect(
+    screen.getByRole("button", { name: /Rousseau & Austen/i }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
+test("routing explains itself instead of swapping the document silently", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  const note = screen.getByRole("status");
+  // The REASON and the document, not the boilerplate around them: a note that
+  // named the document without saying why would leave the presenter exactly as
+  // uninformed as a silent swap.
+  expect(note).toHaveTextContent(/a handwritten page/i);
+  expect(note).toHaveTextContent(/Employment application/i);
+});
+
+test("the note clears when the presenter picks a document themselves", () => {
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  expect(screen.getByRole("status")).toHaveTextContent(
+    /Employment application/i,
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /thank-you note/i }));
+  // The note explains a change the presenter did not make; it has nothing to
+  // say about one they did.
+  expect(screen.queryByRole("status")).toBeNull();
+});
+
+test("re-selecting Handwriting does NOT yank the presenter off the document they chose", () => {
+  // THE discriminating case. Asserting merely "a handwriting document is
+  // loaded" would pass even if this swapped the thank-you note back for the
+  // employment application — which is exactly the behaviour that would ruin a
+  // live demo mid-sentence. Assert the SPECIFIC document is untouched.
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: /thank-you note/i }));
+  expect(
+    screen.getByRole("button", { name: /thank-you note/i }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Structured extraction/ }),
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: /Handwriting recognition/ }),
+  );
+
+  expect(
+    screen.getByRole("button", { name: /thank-you note/i }),
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(screen.queryByRole("status")).toBeNull();
+});
+
+test("features without a demo document leave the loaded document alone", () => {
+  // The other six. Text export in particular: its empty-state hand-off to
+  // Adaptive OCR only works because a feature switch keeps the document.
+  stubProvidersFetch([]);
+  render(<ExtractionStudio />);
+  for (const feature of [/Text export/, /Adaptive OCR/, /Image description/]) {
+    fireEvent.click(screen.getByRole("button", { name: feature }));
+    expect(
+      screen.getByRole("button", { name: /Atlas Construction/i }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("status")).toBeNull();
+  }
 });

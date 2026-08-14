@@ -8,6 +8,30 @@ export type Feature = {
   /** Short line under the feature's title in the panel head. */
   blurb?: string;
   /**
+   * The document this feature needs in order to demo at all — selecting the
+   * feature loads it.
+   *
+   * Set on ONLY the two features that are useless on the wrong document, and
+   * deliberately left unset everywhere else so "same document, different
+   * feature" keeps working: showing a prospect structured extraction and then
+   * OCR on the *same* page is a real demo move, and it is why the Text export
+   * panel's own hand-off to Adaptive OCR keeps its document too.
+   *
+   * It names a DOCUMENT, not a category, and that is the whole point. Landing
+   * on `handwriting`'s first document would put an unaccompanied presenter on
+   * "Apricot cake recipe" — cursive — while HandwritingConfig defaults to the
+   * `local` engine, which reads cursive as gibberish (measured 2026-08-11).
+   * The print document is the one Local ICR wins on, so it is the one a rail
+   * click lands on; the cursive contrast is a deliberate second step, made by
+   * flipping the engine to VLM.
+   */
+  demoDocId?: string;
+  /** Why that document, in a few words, for the note the switch shows. Kept
+   *  short deliberately: the note lives in a 208px-usable rail column whose
+   *  vertical budget is already tight, and every line it takes is a feature
+   *  button pushed out of view. */
+  demoDocReason?: string;
+  /**
    * Fuller hover description for the rail. Written for someone who does not
    * know the SDK's vocabulary — several of these labels ("ICR", "VLM",
    * "adaptive") mean nothing without explanation. Says what the feature is
@@ -33,6 +57,10 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "handwriting",
+    // The PRINT document, not the category's first (cursive) one — see
+    // `demoDocId`'s comment. Local ICR reads this and fails on cursive.
+    demoDocId: "employment-application",
+    demoDocReason: "a handwritten page",
     group: "Recognition",
     label: "Handwriting recognition",
     enabled: true,
@@ -52,6 +80,11 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "multilingual",
+    // The ONLY document in the corpus with two languages on the page. Without
+    // it this panel shows `eng + fra` over an English-only document and
+    // silently implies French was found.
+    demoDocId: "ocr-multiple-languages",
+    demoDocReason: "two languages on one page",
     group: "OCR",
     label: "Multilingual OCR",
     enabled: true,
