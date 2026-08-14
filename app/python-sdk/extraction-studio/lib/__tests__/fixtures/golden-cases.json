@@ -25,6 +25,8 @@
     {"name": "an rfc3339 suffix is discarded, not honoured as an instant", "extracted": "2025-03-01T00:00:00Z", "verified": {"value": "March 1, 2025"}, "type": "string", "expected": "match"},
     {"name": "different calendar days mismatch", "extracted": "2025-03-02", "verified": {"value": "March 1, 2025"}, "type": "string", "expected": "mismatch"},
     {"name": "a bare number is not date-shaped and falls through to text", "extracted": "88.06", "verified": {"value": "88.06"}, "type": "string", "expected": "match"},
+    {"name": "a whole-number float against a string key is the same answer", "extracted": 345015.0, "verified": {"value": "345015"}, "type": "string", "expected": "match"},
+    {"name": "a non-whole float against a string key keeps its decimal", "extracted": 88.06, "verified": {"value": "88.06"}, "type": "string", "expected": "match"},
 
     {"name": "booleans match", "extracted": true, "verified": {"value": "true"}, "type": "boolean", "expected": "match"},
     {"name": "booleans mismatch", "extracted": false, "verified": {"value": "true"}, "type": "boolean", "expected": "mismatch"}
