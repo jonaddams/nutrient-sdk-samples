@@ -141,6 +141,13 @@ export const samples: Sample[] = [
     path: "/web-sdk/search",
   },
   {
+    name: "Search with Overlay Highlights",
+    category: "User Interface",
+    description:
+      "The same document search, but every match is highlighted with a CustomOverlayItem instead of a HighlightAnnotation — nothing is written to the document and teardown is one call per overlay",
+    path: "/web-sdk/search-overlay",
+  },
+  {
     name: "Form Data Pre-Fill",
     category: "Forms",
     description:
