@@ -20,6 +20,8 @@ import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
 import { TablesConfig } from "./_components/TablesConfig";
 import { TablesResults } from "./_components/TablesResults";
+import { TextConfig } from "./_components/TextConfig";
+import { TextResults } from "./_components/TextResults";
 import type {
   Envelope,
   FieldResult,
@@ -64,6 +66,7 @@ import {
   type TablesResult,
   tableCitationsFor,
 } from "./lib/tables";
+import { extractText, type TextRequest, type TextResult } from "./lib/text";
 
 // Image description carries no citations — its output is prose with no
 // coordinates. A literal `[]` inline in the `describe` entry of the `panels`
@@ -114,6 +117,7 @@ export default function ExtractionStudio() {
   const [markdownResult, setMarkdownResult] = useState<MarkdownResult | null>(
     null,
   );
+  const [textResult, setTextResult] = useState<TextResult | null>(null);
   const [handwritingResult, setHandwritingResult] =
     useState<HandwritingResult | null>(null);
   // Its own mode, sharing citationHex with the other features — one studio-wide
@@ -157,6 +161,7 @@ export default function ExtractionStudio() {
     setDescribeResult(null);
     setMarkdownResult(null);
     setHandwritingResult(null);
+    setTextResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -218,6 +223,7 @@ export default function ExtractionStudio() {
     setDescribeResult(null);
     setMarkdownResult(null);
     setHandwritingResult(null);
+    setTextResult(null);
     setError(null);
     setActiveIndex(null);
     // The Run gate is deliberately NOT reset here — it is cleared in
@@ -317,6 +323,9 @@ export default function ExtractionStudio() {
       setMarkdownResult,
       "Markdown export failed",
     );
+
+  const handleTextRun = (req: TextRequest) =>
+    runFeature(req, extractText, setTextResult, "Text export failed");
 
   const handleHandwritingRun = (req: HandwritingRequest) =>
     runFeature(
@@ -504,6 +513,39 @@ export default function ExtractionStudio() {
         <MarkdownResults result={markdownResult} />
       ) : null,
     },
+    // Draws nothing on the document — export_as_text returns no coordinates and
+    // no page delimiters, so there is no citation, region or colour plumbing
+    // here. Same shape as `describe`.
+    text: {
+      needsProviders: false,
+      citations: NO_CITATIONS,
+      show: false,
+      config: (
+        <TextConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleTextRun}
+          runSignal={runSignal}
+        />
+      ),
+      results: textResult ? (
+        <TextResults
+          result={textResult}
+          // Switch AND reopen Configuration. `selectFeature` deliberately
+          // never touches `tab` — a rail click should leave the presenter
+          // where they were — but this is not a rail click: the run just
+          // ended on the Results tab, so without this the handoff lands on
+          // an empty Results pane and the OCR panel it promised is hidden.
+          // `selectDoc` sets the same precedent for the same reason: a change
+          // of context reopens the controls. Still NOT a run — no runSignal
+          // bump; the presenter presses Run.
+          onUseOcr={() => {
+            selectFeature("adaptive_ocr");
+            setTab("config");
+          }}
+        />
+      ) : null,
+    },
     handwriting: {
       // True because VLM-enhanced needs one. This flag is per FEATURE, not per
       // engine, and the gate is real in both modes — it closes on every switch
@@ -574,7 +616,7 @@ export default function ExtractionStudio() {
     >
       <PythonSampleHeader
         title="Extraction Studio"
-        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, or describe what's on it in plain language."
+        description="One shell for the Python SDK's extraction techniques: pull a JSON schema's fields out of a document, read a scan into structured content with Adaptive OCR, read handwriting on this machine or with a vision model, lift every table off the page, turn a page into Markdown, describe what's on it in plain language, or pull its text layer out in milliseconds."
       />
       <div className="studio-shell">
         {/* Rail column: features, then the category control, then the documents

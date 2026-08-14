@@ -24,7 +24,7 @@ test("rail lists features and selects an enabled one", () => {
   expect(onSelect).toHaveBeenCalledWith("structured");
 });
 
-test("the seven live features are enabled and the other SOON entries are not", () => {
+test("the eight live features are enabled and the other SOON entry is not", () => {
   const byId = Object.fromEntries(FEATURES.map((f) => [f.id, f]));
   expect(byId.structured.enabled).toBe(true);
   expect(byId.handwriting.enabled).toBe(true);
@@ -33,7 +33,8 @@ test("the seven live features are enabled and the other SOON entries are not", (
   expect(byId.tables.enabled).toBe(true);
   expect(byId.markdown.enabled).toBe(true);
   expect(byId.describe.enabled).toBe(true);
-  for (const id of ["fast_ocr", "text"]) {
+  expect(byId.text.enabled).toBe(true);
+  for (const id of ["fast_ocr"]) {
     expect(byId[id].enabled).toBe(false);
   }
   // Derived from the source, not hand-incremented — see
@@ -41,7 +42,7 @@ test("the seven live features are enabled and the other SOON entries are not", (
   expect(FEATURES.filter((f) => f.enabled).length).toBe(
     countEnabledTrueInSource(),
   );
-  expect(countEnabledTrueInSource()).toBe(7);
+  expect(countEnabledTrueInSource()).toBe(8);
 });
 
 test("every enabled feature is one the studio can render", () => {
@@ -55,6 +56,7 @@ test("every enabled feature is one the studio can render", () => {
     "tables",
     "describe",
     "markdown",
+    "text",
   ]);
   for (const f of FEATURES.filter((x) => x.enabled)) {
     expect(RENDERABLE.has(f.id)).toBe(true);
@@ -81,8 +83,19 @@ it("offers Markdown export as a live feature", () => {
   expect(entry?.blurb?.length ?? 0).toBeGreaterThan(0);
 });
 
-it("keeps Text export as a separate, still-unbuilt entry", () => {
-  // export_as_text is a different SDK call with different output; shipping
-  // Markdown export does not deliver it.
-  expect(FEATURES.find((f) => f.id === "text")?.enabled).toBe(false);
+it("offers Text export as a live feature", () => {
+  const entry = FEATURES.find((f) => f.id === "text");
+  expect(entry).toBeDefined();
+  expect(entry?.enabled).toBe(true);
+  expect(entry?.label).toBe("Text export");
+  // Blurbs are what a live entry shows on the rail; a disabled entry has only
+  // a description.
+  expect(entry?.blurb?.length ?? 0).toBeGreaterThan(0);
+});
+
+it("keeps Fast OCR dark, because it has nothing to turn on", () => {
+  // OcrConfig.tsx's docstring records favor_accuracy, enable_preprocessing,
+  // enable_skew_detection and the words threshold as byte-identical across
+  // both values on two documents. Do not enable it.
+  expect(FEATURES.find((f) => f.id === "fast_ocr")?.enabled).toBe(false);
 });
