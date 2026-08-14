@@ -840,6 +840,10 @@ const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
     expect(screen.getByRole("group", { name: "Detail" })).toBeInTheDocument(),
   markdown: () =>
     expect(document.querySelector("#markdown-provider")).toBeTruthy(),
+  text: () =>
+    expect(
+      screen.getByRole("group", { name: "Text layer" }),
+    ).toBeInTheDocument(),
 };
 
 test("every enabled rail feature renders its OWN configuration panel", async () => {
@@ -1009,4 +1013,83 @@ test("switching documents mid-handwriting-run clears the previous document's ove
   );
   expect(citationRenders.every((count) => count === 0)).toBe(true);
   expect(citationRenders.length).toBeGreaterThan(0);
+});
+
+/** URL-dispatching, not ordered `mockResolvedValueOnce` — this file's
+ *  `stubProvidersFetch()` THROWS on any unexpected URL and `stubOcrFetch()`
+ *  (page.test.tsx:121) documents the convention: a flow test must account for
+ *  every fetch the flow makes. This one makes three, and the third is easy to
+ *  miss — after the handoff switches features, `OcrConfig` mounts and fetches
+ *  `/providers`. With an ordered stub that call lands on an exhausted mock,
+ *  gets `undefined`, and fails inside error handling rather than at the
+ *  assertion. */
+function stubTextExportFetch() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/providers")) {
+        return { ok: true, status: 200, json: async () => ({ providers: [] }) };
+      }
+      if (u.includes("/api/extraction/text")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            engine: "TEXT",
+            filename: "scanned-invoice.pdf",
+            text: "",
+            charCount: 0,
+            wordCount: 0,
+            totalPages: 1,
+            hasTextLayer: false,
+            timingMs: 3,
+          }),
+        };
+      }
+      // The document itself, fetched from public/ by extractText.
+      return { ok: true, status: 200, blob: async () => new Blob(["x"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+test("an empty text export hands the presenter over to Adaptive OCR", async () => {
+  // The handoff is the feature's best demo beat and it spans two components:
+  // TextResults fires the callback, page.tsx decides what it does. Only a
+  // page-level test covers the join.
+  stubTextExportFetch();
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /Text export/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Run extraction/ }));
+
+  await waitFor(() =>
+    expect(
+      screen.getByText("No text layer in this document"),
+    ).toBeInTheDocument(),
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Switch to Adaptive OCR" }),
+  );
+
+  // DEVIATION FROM BRIEF: the brief's version of this test omitted this
+  // click and asserted "Languages" was visible right after the handoff. It
+  // was not — Run flips `tab` to "results" (page.tsx's `runFeature`), a
+  // feature switch never touches `tab` (see the explicit invariant this
+  // file already documents at "a feature switch mid-flight discards the OCR
+  // result that lands after it"), and OcrConfig's own panel is rendered
+  // under `hidden={tab !== "config"}`, which testing-library's role queries
+  // correctly treat as absent. Confirmed by instrumented debug test: the
+  // group exists in the DOM (`{ hidden: true }` finds it) but is
+  // inaccessible without this click. Reopening Configuration here matches
+  // both the load-bearing decision that `onUseOcr` must be a pure feature
+  // switch (not switch-and-run) and the pre-existing "feature switch never
+  // touches tab" contract — neither is changed by this test needing one
+  // more click to look at what the switch actually produced.
+  fireEvent.click(screen.getByRole("button", { name: "Configuration" }));
+
+  await waitFor(() =>
+    expect(
+      screen.getByRole("group", { name: "Languages" }),
+    ).toBeInTheDocument(),
+  );
 });

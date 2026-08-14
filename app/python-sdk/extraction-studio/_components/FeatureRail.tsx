@@ -89,9 +89,10 @@ export const FEATURES: Feature[] = [
     id: "text",
     group: "Text",
     label: "Text export",
-    enabled: false,
+    enabled: true,
+    blurb: "Plain text from the document's own text layer — instant, and free.",
     description:
-      "Pulls the plain text out of a PDF, keeping columns and spacing roughly as they appear on the page, ready to feed into another tool.",
+      "Pulls the plain text straight out of the text layer the document already carries. One SDK call: no model, no API key, no network, and typically a few milliseconds. Columns and spacing are kept roughly as they appear on the page, which suits a diff or a grep but means a two-column page reads out of order. A scanned document has no text layer and returns nothing — that is exactly when Adaptive OCR is the right tool, and the panel offers the switch.",
   },
   {
     id: "describe",

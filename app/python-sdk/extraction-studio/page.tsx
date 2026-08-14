@@ -20,6 +20,8 @@ import { StructuredConfig } from "./_components/StructuredConfig";
 import { StructuredResults } from "./_components/StructuredResults";
 import { TablesConfig } from "./_components/TablesConfig";
 import { TablesResults } from "./_components/TablesResults";
+import { TextConfig } from "./_components/TextConfig";
+import { TextResults } from "./_components/TextResults";
 import type {
   Envelope,
   FieldResult,
@@ -64,6 +66,7 @@ import {
   type TablesResult,
   tableCitationsFor,
 } from "./lib/tables";
+import { extractText, type TextRequest, type TextResult } from "./lib/text";
 
 // Image description carries no citations — its output is prose with no
 // coordinates. A literal `[]` inline in the `describe` entry of the `panels`
@@ -114,6 +117,7 @@ export default function ExtractionStudio() {
   const [markdownResult, setMarkdownResult] = useState<MarkdownResult | null>(
     null,
   );
+  const [textResult, setTextResult] = useState<TextResult | null>(null);
   const [handwritingResult, setHandwritingResult] =
     useState<HandwritingResult | null>(null);
   // Its own mode, sharing citationHex with the other features — one studio-wide
@@ -218,6 +222,7 @@ export default function ExtractionStudio() {
     setDescribeResult(null);
     setMarkdownResult(null);
     setHandwritingResult(null);
+    setTextResult(null);
     setError(null);
     setActiveIndex(null);
     // The Run gate is deliberately NOT reset here — it is cleared in
@@ -317,6 +322,9 @@ export default function ExtractionStudio() {
       setMarkdownResult,
       "Markdown export failed",
     );
+
+  const handleTextRun = (req: TextRequest) =>
+    runFeature(req, extractText, setTextResult, "Text export failed");
 
   const handleHandwritingRun = (req: HandwritingRequest) =>
     runFeature(
@@ -502,6 +510,31 @@ export default function ExtractionStudio() {
       ),
       results: markdownResult ? (
         <MarkdownResults result={markdownResult} />
+      ) : null,
+    },
+    // Draws nothing on the document — export_as_text returns no coordinates and
+    // no page delimiters, so there is no citation, region or colour plumbing
+    // here. Same shape as `describe`.
+    text: {
+      needsProviders: false,
+      citations: [],
+      show: false,
+      config: (
+        <TextConfig
+          docPath={current.path}
+          filename={current.filename}
+          onRun={handleTextRun}
+          runSignal={runSignal}
+        />
+      ),
+      results: textResult ? (
+        <TextResults
+          result={textResult}
+          // Keeps the document loaded: selectFeature touches feature state
+          // only. Deliberately does NOT also run — bumping runSignal before
+          // the incoming OcrConfig has registered its own ref is a race.
+          onUseOcr={() => selectFeature("adaptive_ocr")}
+        />
       ) : null,
     },
     handwriting: {
