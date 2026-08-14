@@ -161,6 +161,7 @@ export default function ExtractionStudio() {
     setDescribeResult(null);
     setMarkdownResult(null);
     setHandwritingResult(null);
+    setTextResult(null);
     setActiveIndex(null);
     setError(null);
     setTab("config");
@@ -530,10 +531,18 @@ export default function ExtractionStudio() {
       results: textResult ? (
         <TextResults
           result={textResult}
-          // Keeps the document loaded: selectFeature touches feature state
-          // only. Deliberately does NOT also run — bumping runSignal before
-          // the incoming OcrConfig has registered its own ref is a race.
-          onUseOcr={() => selectFeature("adaptive_ocr")}
+          // Switch AND reopen Configuration. `selectFeature` deliberately
+          // never touches `tab` — a rail click should leave the presenter
+          // where they were — but this is not a rail click: the run just
+          // ended on the Results tab, so without this the handoff lands on
+          // an empty Results pane and the OCR panel it promised is hidden.
+          // `selectDoc` sets the same precedent for the same reason: a change
+          // of context reopens the controls. Still NOT a run — no runSignal
+          // bump; the presenter presses Run.
+          onUseOcr={() => {
+            selectFeature("adaptive_ocr");
+            setTab("config");
+          }}
         />
       ) : null,
     },

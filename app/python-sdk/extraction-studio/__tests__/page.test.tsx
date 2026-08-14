@@ -1071,25 +1071,73 @@ test("an empty text export hands the presenter over to Adaptive OCR", async () =
     screen.getByRole("button", { name: "Switch to Adaptive OCR" }),
   );
 
-  // DEVIATION FROM BRIEF: the brief's version of this test omitted this
-  // click and asserted "Languages" was visible right after the handoff. It
-  // was not — Run flips `tab` to "results" (page.tsx's `runFeature`), a
-  // feature switch never touches `tab` (see the explicit invariant this
-  // file already documents at "a feature switch mid-flight discards the OCR
-  // result that lands after it"), and OcrConfig's own panel is rendered
-  // under `hidden={tab !== "config"}`, which testing-library's role queries
-  // correctly treat as absent. Confirmed by instrumented debug test: the
-  // group exists in the DOM (`{ hidden: true }` finds it) but is
-  // inaccessible without this click. Reopening Configuration here matches
-  // both the load-bearing decision that `onUseOcr` must be a pure feature
-  // switch (not switch-and-run) and the pre-existing "feature switch never
-  // touches tab" contract — neither is changed by this test needing one
-  // more click to look at what the switch actually produced.
-  fireEvent.click(screen.getByRole("button", { name: "Configuration" }));
-
+  // No extra click to reveal Configuration: page.tsx's `onUseOcr` reopens
+  // it itself (`setTab("config")` alongside `selectFeature`), because a
+  // presenter landing on an empty Results pane one unexplained click from
+  // the payoff is exactly the defect this handoff exists to avoid. Fixed
+  // round 1: an earlier version of this test papered over a missing
+  // `setTab("config")` by clicking "Configuration" here instead of fixing
+  // page.tsx — confirmed by an instrumented debug test that the group
+  // existed in the DOM (`{ hidden: true }` found it) but was inaccessible,
+  // because `runFeature` leaves `tab` on "results" and a plain feature
+  // switch never touches it.
   await waitFor(() =>
     expect(
       screen.getByRole("group", { name: "Languages" }),
     ).toBeInTheDocument(),
   );
+});
+
+/** hasTextLayer: true and real text, unlike stubTextExportFetch's empty-result
+ *  stub above — this test needs text on screen so it can prove switching
+ *  documents removes it, mirroring stubOcrFetch's "Invoice" fixture. */
+function stubTextExportFetchWithText() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      if (u.includes("/api/extraction/text")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            engine: "TEXT",
+            filename: "invoice-ac20251047.pdf",
+            text: "ATLAS-CONSTRUCTION-ONLY-TEXT",
+            charCount: 29,
+            wordCount: 3,
+            totalPages: 1,
+            hasTextLayer: true,
+            timingMs: 4,
+          }),
+        };
+      }
+      // The document itself, fetched from public/ by extractText.
+      return { ok: true, status: 200, blob: async () => new Blob(["x"]) };
+    }) as unknown as typeof fetch,
+  );
+}
+
+// Fix round 1, finding 2: selectDoc (page.tsx:156-167) keeps its own explicit
+// list of result clears and `textResult` was missing from it — the same class
+// of bug "switching documents clears OCR results" above guards against, just
+// for the newest panel. Without the fix, Atlas's text stayed on screen next
+// to Vandelay's page after the switch.
+test("switching documents clears Text export results", async () => {
+  stubTextExportFetchWithText();
+  render(<ExtractionStudio />);
+
+  fireEvent.click(screen.getByRole("button", { name: /Text export/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Run extraction/ }));
+  await waitFor(() =>
+    expect(
+      screen.getByText("ATLAS-CONSTRUCTION-ONLY-TEXT"),
+    ).toBeInTheDocument(),
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /lumen/i }));
+  // selectDoc sends the tab back to "config" — reopen Results rather than
+  // taking the config view's silence as proof the result actually cleared.
+  fireEvent.click(screen.getByRole("button", { name: "Results" }));
+  expect(screen.queryByText("ATLAS-CONSTRUCTION-ONLY-TEXT")).toBeNull();
 });
