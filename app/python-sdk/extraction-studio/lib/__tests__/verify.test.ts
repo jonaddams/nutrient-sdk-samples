@@ -223,12 +223,18 @@ describe("summarise", () => {
   });
 });
 
-describe("golden cases (shared with the Python port)", () => {
-  // This fixture is the ONLY thing keeping the TypeScript comparator and the
-  // Python one in the extraction-cost tool from drifting apart. If you change a
-  // case here, change it in that repository's copy in the same change — the
-  // hash test on the other side exists to make forgetting loud.
+describe("golden cases (shared with a Python port of this comparator)", () => {
+  // This fixture is the ONLY thing keeping this TypeScript comparator and a
+  // Python port of it from drifting apart. If you change a case here, change
+  // it in that port's copy in the same change — a hash test on that side
+  // exists to make forgetting loud.
   it.each(goldenCases.cases)("$name", ({ extracted, verified, type, expected }) => {
-    expect(compareField(extracted, verified, type)).toBe(expected);
+    // The fixture's `verified` is `{value}`-only (also consumed by a Python
+    // port that never touches `.source`), while `VerifiedValue` requires
+    // `source`. compareField only reads `.value`, so this cast is runtime-inert
+    // and test-local — it does not weaken `VerifiedValue` anywhere else.
+    expect(
+      compareField(extracted, verified as VerifiedValue | null, type),
+    ).toBe(expected);
   });
 });

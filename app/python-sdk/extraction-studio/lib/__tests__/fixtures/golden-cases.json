@@ -1,5 +1,5 @@
 {
-  "note": "Shared contract between the TypeScript comparator in lib/verify.ts and the Python port in the extraction-cost tool. Both test suites run every case. Adding or changing a case REQUIRES updating both repositories in the same change, or one side goes red.",
+  "note": "Shared contract between the TypeScript comparator in lib/verify.ts and a Python port of this comparator. Both test suites run every case. Adding or changing a case REQUIRES updating both copies in the same change, or one side goes red.",
   "cases": [
     {"name": "no key at all is unverified", "extracted": "anything", "verified": null, "type": "string", "expected": "unverified"},
     {"name": "key exists but nothing extracted is a mismatch, not unverified", "extracted": null, "verified": {"value": "AC-2025-1047"}, "type": "string", "expected": "mismatch"},
