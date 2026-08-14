@@ -1,6 +1,7 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import type { VerifiedValue } from "../verified";
 import { compareField, summarise } from "../verify";
+import goldenCases from "./fixtures/golden-cases.json";
 
 const v = (value: string | number): VerifiedValue => ({ value, source: "x" });
 
@@ -219,5 +220,15 @@ describe("summarise", () => {
       matched: 0,
       verified: 0,
     });
+  });
+});
+
+describe("golden cases (shared with the Python port)", () => {
+  // This fixture is the ONLY thing keeping the TypeScript comparator and the
+  // Python one in the extraction-cost tool from drifting apart. If you change a
+  // case here, change it in that repository's copy in the same change — the
+  // hash test on the other side exists to make forgetting loud.
+  it.each(goldenCases.cases)("$name", ({ extracted, verified, type, expected }) => {
+    expect(compareField(extracted, verified, type)).toBe(expected);
   });
 });
