@@ -24,13 +24,18 @@ export function OcrConfig({
   filename,
   onRun,
   runSignal,
+  initialLanguages = ["eng"],
 }: {
   docPath: string;
   filename: string;
   onRun: (req: OcrRequest) => void;
   runSignal: number;
+  /** Seeds the chip selection. Adaptive OCR omits this and keeps its English-only
+   *  default; Multilingual OCR passes ["eng", "fra"] so the bilingual document it
+   *  exists for is already configured correctly on mount. */
+  initialLanguages?: string[];
 }) {
-  const [languages, setLanguages] = useState<string[]>(["eng"]);
+  const [languages, setLanguages] = useState<string[]>(initialLanguages);
   const [tableDetection, setTableDetection] = useState(true);
   const [outputFormat, setOutputFormat] = useState("json");
 

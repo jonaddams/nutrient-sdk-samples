@@ -54,9 +54,10 @@ export const FEATURES: Feature[] = [
     id: "multilingual",
     group: "OCR",
     label: "Multilingual OCR",
-    enabled: false,
+    enabled: true,
+    blurb: "Adaptive OCR told which languages are actually on the page.",
     description:
-      "Adaptive OCR set up to expect more than one language in the same document, for scans that mix scripts — English alongside Japanese, say.",
+      "The same Adaptive OCR engine, told which languages are actually on the page — here, a book spread with French on the left and English on the right. Naming French raises average confidence from 0.93 to 0.95 and recovers the accents the English-only setting drops or mangles (à→a, è→e, elisions like l' vanish), on the French half only — the English half reads identically either way, and English-only OCR still produces readable French, just with flattened diacritics. Deselect French and run again to watch the accents degrade.",
   },
   {
     id: "fast_ocr",

@@ -145,6 +145,23 @@ describe("the research category", () => {
   });
 });
 
+describe("the multilingual category", () => {
+  test("multilingual is a first-class category with its own preset", () => {
+    expect(CATEGORY_ORDER).toContain("multilingual");
+    expect(CATEGORY_LABELS.multilingual).toBe("Multilingual");
+    // Pin the actual field keys, in order — the same reasoning as research's
+    // pin above: a weaker "non-empty and not invoiceNumber" check would pass
+    // for any wrong preset, including one copied wholesale from another
+    // category. Update this list deliberately if the preset changes.
+    expect(presetFor("multilingual").map((r) => r.key)).toEqual([
+      "frenchTitle",
+      "frenchAuthor",
+      "englishTitle",
+      "englishAuthor",
+    ]);
+  });
+});
+
 describe("presets and documents agree", () => {
   test("every category in the order has at least one document", () => {
     // A tab with a preset but no document is a dead end; a document whose

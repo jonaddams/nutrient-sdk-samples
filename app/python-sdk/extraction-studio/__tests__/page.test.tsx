@@ -178,6 +178,32 @@ test("Adaptive OCR is selectable and swaps in its own panel", () => {
   expect(screen.queryByText("Schema builder")).toBeNull();
 });
 
+// Multilingual OCR mounts the exact same OcrConfig component as Adaptive
+// OCR — a bare "Languages" group query would pass for either, including for
+// the WRONG panel if `panels.multilingual` were ever missing and page.tsx's
+// `panels[feature] ?? panels.structured` fallback quietly rendered Structured
+// (which has no Languages group at all, so that particular failure mode
+// would already be caught — but a fallback to `panels.adaptive_ocr` would
+// not be). What is unique to this panel is the SEEDED selection:
+// initialLanguages={["eng", "fra"]} means "fra" starts pressed here and only
+// here.
+test("Multilingual OCR is selectable and starts with French preselected alongside English", () => {
+  stubOcrFetch();
+  render(<ExtractionStudio />);
+  fireEvent.click(screen.getByRole("button", { name: /multilingual ocr/i }));
+  expect(screen.getByText("Languages")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "eng" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  // The distinguishing fact: Adaptive OCR's identical control starts with
+  // "fra" unpressed.
+  expect(screen.getByRole("button", { name: "fra" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
 // Composed-page proof that the tables ternary branch is wired: the studio's
 // feature ternaries are binary (`feature === "structured" ? … : …`), so
 // anything not "structured" used to fall through to the OCR branch. This is
@@ -767,7 +793,14 @@ test("the page header and the registry card agree on the studio's name", () => {
 //                    toggle.
 //   adaptive_ocr -> "Languages" is OcrConfig's language-chip group
 //                    (OcrConfig.tsx); OCR is the only feature offering
-//                    languages at all.
+//                    languages at all. multilingual mounts the SAME
+//                    OcrConfig component, so this group alone cannot tell the
+//                    two apart — see multilingual's own marker below.
+//   multilingual -> Also OcrConfig's "Languages" group, but seeded with
+//                    initialLanguages={["eng", "fra"]} (page.tsx), so the
+//                    "fra" chip starts pressed here and does not on
+//                    adaptive_ocr. That chip state, not the group's presence,
+//                    is what distinguishes the two panels.
 //   tables       -> TablesConfig has no group/label of its own — its
 //                    PanelSection is titled "Configuration" (shared with
 //                    DescribeConfig) and its Field is labelled "Provider"
@@ -797,6 +830,11 @@ const CONFIG_PANEL_MARKERS: Record<string, () => void> = {
     expect(
       screen.getByRole("group", { name: "Languages" }),
     ).toBeInTheDocument(),
+  multilingual: () =>
+    expect(screen.getByRole("button", { name: "fra" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    ),
   tables: () => expect(document.querySelector("#tables-provider")).toBeTruthy(),
   describe: () =>
     expect(screen.getByRole("group", { name: "Detail" })).toBeInTheDocument(),

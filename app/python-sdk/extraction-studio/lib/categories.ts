@@ -8,7 +8,8 @@ export type CategoryId =
   | "healthcare"
   | "claims"
   | "handwriting"
-  | "research";
+  | "research"
+  | "multilingual";
 
 export const CATEGORY_ORDER: CategoryId[] = [
   "invoices",
@@ -19,6 +20,7 @@ export const CATEGORY_ORDER: CategoryId[] = [
   "claims",
   "handwriting",
   "research",
+  "multilingual",
 ];
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
@@ -30,6 +32,7 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   claims: "Claims",
   handwriting: "Handwriting",
   research: "Research",
+  multilingual: "Multilingual",
 };
 
 /** A preset row before it is given an id. */
@@ -353,6 +356,43 @@ const PRESETS: Record<CategoryId, PresetRow[]> = {
       type: "number",
       description: "How many numbered top-level sections the paper has",
       optional: true,
+    },
+  ],
+  // Like `handwriting` above, this category groups by an ATTRIBUTE — the page
+  // mixes two languages in the same scan — rather than by business domain the
+  // way every other category does. There is exactly one document here
+  // (input_ocr_multiple_languages.png, a two-column book spread) and it prints
+  // no invoice number or claim number or anything else a business category
+  // would name; it prints a publisher's page proof of two unrelated works,
+  // Rousseau's "Du Contrat Social" in French on the left and Austen's "Pride
+  // and Prejudice" in English on the right. Fields are named by language
+  // rather than by side (left/right) because language is the axis this
+  // category — and the Multilingual OCR feature it exists to demonstrate — is
+  // actually about.
+  multilingual: [
+    {
+      key: "frenchTitle",
+      type: "string",
+      description: "The title of the French-language work, as printed",
+      optional: false,
+    },
+    {
+      key: "frenchAuthor",
+      type: "string",
+      description: "The author of the French-language work, as printed",
+      optional: false,
+    },
+    {
+      key: "englishTitle",
+      type: "string",
+      description: "The title of the English-language work, as printed",
+      optional: false,
+    },
+    {
+      key: "englishAuthor",
+      type: "string",
+      description: "The author of the English-language work, as printed",
+      optional: false,
     },
   ],
 };
