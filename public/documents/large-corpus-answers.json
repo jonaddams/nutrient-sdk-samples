@@ -1,0 +1,85 @@
+{
+  "documents": {
+    "northgate-claim-file": {
+      "file": "documents/northgate-claim-file.pdf",
+      "category": "claims",
+      "pages": 12,
+      "fields": {
+        "claimNumber": {
+          "printed": "NG-2026-004417",
+          "value": "NG-2026-004417"
+        },
+        "policyNumber": {
+          "printed": "NAP-88213-06",
+          "value": "NAP-88213-06"
+        },
+        "dateOfLoss": {
+          "printed": "2026-01-19",
+          "value": "2026-01-19"
+        },
+        "insuredName": {
+          "printed": "Harriet Okonjo-Vale",
+          "value": "Harriet Okonjo-Vale"
+        },
+        "totalClaimed": {
+          "printed": "48,215.60",
+          "value": 48215.6
+        }
+      }
+    },
+    "meridian-annual-report": {
+      "file": "documents/meridian-annual-report.pdf",
+      "category": "finance",
+      "pages": 25,
+      "fields": {
+        "fiscalYearEnd": {
+          "printed": "2025-12-31",
+          "value": "2025-12-31"
+        },
+        "totalRevenue": {
+          "printed": "184,602,000",
+          "value": 184602000
+        },
+        "netIncome": {
+          "printed": "21,455,000",
+          "value": 21455000
+        },
+        "totalAssets": {
+          "printed": "402,118,000",
+          "value": 402118000
+        },
+        "sharesOutstanding": {
+          "printed": "48,300,000",
+          "value": 48300000
+        }
+      }
+    },
+    "regional-health-record": {
+      "file": "documents/regional-health-record.pdf",
+      "category": "healthcare",
+      "pages": 40,
+      "fields": {
+        "recordId": {
+          "printed": "RGH-77-401925",
+          "value": "RGH-77-401925"
+        },
+        "admissionDate": {
+          "printed": "2026-02-03",
+          "value": "2026-02-03"
+        },
+        "dischargeDate": {
+          "printed": "2026-02-11",
+          "value": "2026-02-11"
+        },
+        "primaryDiagnosis": {
+          "printed": "Community-acquired pneumonia",
+          "value": "Community-acquired pneumonia"
+        },
+        "totalCharges": {
+          "printed": "63,940.25",
+          "value": 63940.25
+        }
+      }
+    }
+  }
+}
