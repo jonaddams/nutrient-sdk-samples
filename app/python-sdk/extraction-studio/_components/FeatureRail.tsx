@@ -2,7 +2,6 @@
 
 export type Feature = {
   id: string;
-  group: string;
   label: string;
   enabled: boolean;
   /** Short line under the feature's title in the panel head. */
@@ -47,7 +46,6 @@ export type Feature = {
 export const FEATURES: Feature[] = [
   {
     id: "structured",
-    group: "Structured",
     label: "Structured extraction",
     enabled: true,
     blurb:
@@ -61,7 +59,6 @@ export const FEATURES: Feature[] = [
     // `demoDocId`'s comment. Local ICR reads this and fails on cursive.
     demoDocId: "employment-application",
     demoDocReason: "a handwritten page",
-    group: "Recognition",
     label: "Handwriting recognition",
     enabled: true,
     blurb:
@@ -71,7 +68,6 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "adaptive_ocr",
-    group: "OCR",
     label: "Adaptive OCR",
     enabled: true,
     blurb: "Reads a scan into structured content, entirely on this machine.",
@@ -85,7 +81,6 @@ export const FEATURES: Feature[] = [
     // silently implies French was found.
     demoDocId: "ocr-multiple-languages",
     demoDocReason: "two languages on one page",
-    group: "OCR",
     label: "Multilingual OCR",
     enabled: true,
     blurb: "Adaptive OCR told which languages are actually on the page.",
@@ -94,7 +89,6 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "tables",
-    group: "Tables",
     label: "Table extraction",
     enabled: true,
     blurb: "Pull every table off the page as rows, columns and cells.",
@@ -103,7 +97,6 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "markdown",
-    group: "Text",
     label: "Markdown export",
     enabled: true,
     blurb: "Turn a page into Markdown — headings, paragraphs and tables.",
@@ -112,7 +105,6 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "text",
-    group: "Text",
     label: "Text export",
     enabled: true,
     blurb: "Plain text from the document's own text layer — instant, and free.",
@@ -121,7 +113,6 @@ export const FEATURES: Feature[] = [
   },
   {
     id: "describe",
-    group: "Describe",
     label: "Image description",
     enabled: true,
     blurb: "Describe a page in plain language — alt text, or a quick summary.",
@@ -139,44 +130,36 @@ export function FeatureRail({
   value: string;
   onSelect: (id: string) => void;
 }) {
-  const groups = [...new Set(features.map((f) => f.group))];
+  // A FLAT list, deliberately. This was six `group` headings over eight
+  // features, four of those headings labelling a single item — 102px of
+  // eyebrows plus 80px of inter-group margins to organise eight buttons. The
+  // rail has no vertical space to spend on that: measured 2026-08-14, the
+  // features nav had 179px of room at a 1440x900 viewport and 79px at
+  // 1280x800, so a presenter on a laptop saw two of eight features, or none.
   return (
     <nav className="filter-bar sidebar" aria-label="Features">
-      {groups.map((g) => (
-        <div key={g}>
-          <div className="eyebrow">{g}</div>
-          {features
-            .filter((f) => f.group === g)
-            .map((f) => (
-              // The wrapper, not the button, drives the hover: a disabled
-              // button suppresses pointer events in some browsers, so
-              // hovering a "soon" item would never reveal its description.
-              <span className="rail-item" key={f.id}>
-                <button
-                  type="button"
-                  className={`chip${value === f.id ? " active" : ""}`}
-                  disabled={!f.enabled}
-                  aria-pressed={value === f.id}
-                  aria-describedby={
-                    f.description ? `rail-tip-${f.id}` : undefined
-                  }
-                  onClick={() => f.enabled && onSelect(f.id)}
-                >
-                  <span className="chip-label">{f.label}</span>
-                  {!f.enabled && <span className="tag wip">soon</span>}
-                </button>
-                {f.description && (
-                  <span
-                    className="rail-tip"
-                    id={`rail-tip-${f.id}`}
-                    role="tooltip"
-                  >
-                    {f.description}
-                  </span>
-                )}
-              </span>
-            ))}
-        </div>
+      {features.map((f) => (
+        // The wrapper, not the button, drives the hover: a disabled button
+        // suppresses pointer events in some browsers, so hovering a "soon"
+        // item would never reveal its description.
+        <span className="rail-item" key={f.id}>
+          <button
+            type="button"
+            className={`chip${value === f.id ? " active" : ""}`}
+            disabled={!f.enabled}
+            aria-pressed={value === f.id}
+            aria-describedby={f.description ? `rail-tip-${f.id}` : undefined}
+            onClick={() => f.enabled && onSelect(f.id)}
+          >
+            <span className="chip-label">{f.label}</span>
+            {!f.enabled && <span className="tag wip">soon</span>}
+          </button>
+          {f.description && (
+            <span className="rail-tip" id={`rail-tip-${f.id}`} role="tooltip">
+              {f.description}
+            </span>
+          )}
+        </span>
       ))}
     </nav>
   );
