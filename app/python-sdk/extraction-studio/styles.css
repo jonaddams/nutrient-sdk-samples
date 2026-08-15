@@ -752,17 +752,43 @@
  * overflow:hidden here, not auto: the rail itself must never scroll, or the
  * pinning is pointless. min-height:0 on the scrolling child is what lets its
  * overflow resolve inside a flex column. */
+/* ONE scroll container for the whole rail, and nothing inside it scrolls.
+   Measured 2026-08-14 at 1280x800: the rail has ~404px for a feature list
+   (329) plus the category select plus four document chips (217) — about
+   606px of content. Something has to scroll, so the question is only what.
+   Giving an inner element the overflow is what caused the original bug: the
+   feature nav scrolled internally, macOS overlay scrollbars are invisible at
+   rest, and it cut cleanly at a group boundary, so it read as complete rather
+   than scrollable. Making the document strip the inner scroller instead just
+   moved that (measured: 1 of 4 documents at 900px, 0 of 4 at 800px, and two
+   nested scrollbars). A sidebar that scrolls as a whole is conventional,
+   reachable in one gesture, and keeps the features at the top where they are
+   seen first.
+
+   Both axes are set explicitly — `overflow-y` alone against a `hidden` x-axis
+   is the trap the 1024px block below documents. */
 .studio-shell .studio-rail {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
+/* The feature list takes its NATURAL height and never scrolls inside itself.
+   It used to be `flex: 1 1 auto; min-height: 0; overflow-y: auto`, which made
+   it the only elastic element in this column — so every pixel the viewport
+   lost came out of it and nothing else. Measured 2026-08-14: its clientHeight
+   went 437 → 179 → 79 across 1158px, 900px and 800px viewports, showing 6, 2
+   and ZERO of eight features. The rail made its fixed-size, must-see element
+   the flexible one. The 1024px block below already worked this out for the
+   stacked layout — "left as-is it kept the desktop pinning behaviour and hid
+   two roadmap entries behind an inner scrollbar" — and the desktop layout
+   simply kept the bug. */
 .studio-shell .studio-rail .filter-bar.sidebar {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
+  flex: none;
+  min-height: auto;
+  overflow-y: visible;
 }
 
 /* One control instead of six rows. Six category labels need 506px laid out as
@@ -810,7 +836,6 @@
   padding: var(--space-2) var(--space-4) var(--space-5);
   flex-shrink: 0;
 }
-
 .studio-shell .doc-chip {
   display: flex;
   align-items: center;
