@@ -254,7 +254,12 @@ describe("golden cases (shared with a Python port of this comparator)", () => {
     );
   });
 
-  it.each(goldenCases.cases)("$name", ({ extracted, verified, type, expected }) => {
+  it.each(goldenCases.cases)("$name", ({
+    extracted,
+    verified,
+    type,
+    expected,
+  }) => {
     // The fixture's `verified` is `{value}`-only (also consumed by a Python
     // port that never touches `.source`), while `VerifiedValue` requires
     // `source`. compareField only reads `.value`, so this cast is runtime-inert

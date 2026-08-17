@@ -33,5 +33,13 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "app/python-sdk/extraction-studio/lib/__tests__/fixtures/golden-cases.json"
+      ],
+      "formatter": { "enabled": false }
+    }
+  ]
 }
