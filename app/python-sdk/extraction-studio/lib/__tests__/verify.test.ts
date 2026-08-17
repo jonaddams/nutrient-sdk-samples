@@ -1,6 +1,18 @@
-import { describe, expect, test } from "vitest";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it, test } from "vitest";
 import type { VerifiedValue } from "../verified";
 import { compareField, summarise } from "../verify";
+import goldenCases from "./fixtures/golden-cases.json";
+
+// Resolved from the repo root the same way docs.test.ts resolves the sample
+// documents. `import.meta.url` is not usable here: these tests run in the
+// happy-dom environment, where it is an http: URL rather than a file: one.
+const FIXTURE_PATH = join(
+  process.cwd(),
+  "app/python-sdk/extraction-studio/lib/__tests__/fixtures/golden-cases.json",
+);
 
 const v = (value: string | number): VerifiedValue => ({ value, source: "x" });
 
@@ -219,5 +231,41 @@ describe("summarise", () => {
       matched: 0,
       verified: 0,
     });
+  });
+});
+
+describe("golden cases (shared with a Python port of this comparator)", () => {
+  // This fixture is the ONLY thing keeping this TypeScript comparator and a
+  // Python port of it from drifting apart. If you change a case here, change
+  // it in that port's copy in the same change — both sides assert this hash,
+  // so forgetting either copy is loud.
+  //
+  // The pin used to be one-directional: only the port hashed the file, so
+  // editing THIS copy — the canonical one, since this is the original and the
+  // Python is the port — and running only this suite went unnoticed until
+  // somebody happened to run the other. Asserting the same digest here closes
+  // that direction.
+  test("this fixture is byte-identical to the copy the port ships", () => {
+    const digest = createHash("sha256")
+      .update(readFileSync(FIXTURE_PATH))
+      .digest("hex");
+    expect(digest).toBe(
+      "9a27801f510b1a4130777cef7a8652abe6f392ba8d09e2fb73ca31509ebfdab1",
+    );
+  });
+
+  it.each(goldenCases.cases)("$name", ({
+    extracted,
+    verified,
+    type,
+    expected,
+  }) => {
+    // The fixture's `verified` is `{value}`-only (also consumed by a Python
+    // port that never touches `.source`), while `VerifiedValue` requires
+    // `source`. compareField only reads `.value`, so this cast is runtime-inert
+    // and test-local — it does not weaken `VerifiedValue` anywhere else.
+    expect(
+      compareField(extracted, verified as VerifiedValue | null, type),
+    ).toBe(expected);
   });
 });

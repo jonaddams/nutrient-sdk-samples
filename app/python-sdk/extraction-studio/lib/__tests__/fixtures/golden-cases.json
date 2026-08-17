@@ -1,0 +1,34 @@
+{
+  "note": "Shared contract between the TypeScript comparator and the Python port of it. Both test suites run every case, and each side asserts this file's sha256 so an edit to one copy cannot go unnoticed by the other. Adding or changing a case REQUIRES updating both copies in the same change, or one side goes red.",
+  "cases": [
+    {"name": "no key at all is unverified", "extracted": "anything", "verified": null, "type": "string", "expected": "unverified"},
+    {"name": "key exists but nothing extracted is a mismatch, not unverified", "extracted": null, "verified": {"value": "AC-2025-1047"}, "type": "string", "expected": "mismatch"},
+    {"name": "key exists but empty string extracted is a mismatch", "extracted": "", "verified": {"value": "AC-2025-1047"}, "type": "string", "expected": "mismatch"},
+
+    {"name": "identical strings match", "extracted": "AC-2025-1047", "verified": {"value": "AC-2025-1047"}, "type": "string", "expected": "match"},
+    {"name": "case and surrounding whitespace are not content", "extracted": "  ac-2025-1047 ", "verified": {"value": "AC-2025-1047"}, "type": "string", "expected": "match"},
+    {"name": "collapsed inner whitespace matches", "extracted": "Harriet   Okonjo-Vale", "verified": {"value": "Harriet Okonjo-Vale"}, "type": "string", "expected": "match"},
+    {"name": "an em dash and a hyphen are the same section typed two ways", "extracted": "08 51 13 — Aluminum Windows", "verified": {"value": "08 51 13 - Aluminum Windows"}, "type": "string", "expected": "match"},
+    {"name": "a trailing period is typography, not content", "extracted": "Apricot Cake.", "verified": {"value": "Apricot Cake"}, "type": "string", "expected": "match"},
+    {"name": "a suffix comma is typography, not content", "extracted": "Westbridge Group, LLC", "verified": {"value": "Westbridge Group LLC"}, "type": "string", "expected": "match"},
+    {"name": "genuinely different strings mismatch", "extracted": "Harriet Okonjo-Vale", "verified": {"value": "Marcus Reed"}, "type": "string", "expected": "mismatch"},
+
+    {"name": "equal numbers match", "extracted": 48215.6, "verified": {"value": 48215.6}, "type": "number", "expected": "match"},
+    {"name": "currency symbols and thousands separators are stripped", "extracted": "$48,215.60", "verified": {"value": 48215.6}, "type": "number", "expected": "match"},
+    {"name": "a difference inside tolerance matches", "extracted": 48215.605, "verified": {"value": 48215.6}, "type": "number", "expected": "match"},
+    {"name": "a difference outside tolerance mismatches", "extracted": 48216.0, "verified": {"value": 48215.6}, "type": "number", "expected": "mismatch"},
+    {"name": "an ambiguous european decimal refuses to parse rather than fabricate", "extracted": "1.165,10", "verified": {"value": 1165.1}, "type": "number", "expected": "unverified"},
+    {"name": "the unambiguous US form still parses", "extracted": "1,165.10", "verified": {"value": 1165.1}, "type": "number", "expected": "match"},
+    {"name": "unparseable text against a numeric key is unverified, not a mismatch", "extracted": "not a number", "verified": {"value": 1165.1}, "type": "number", "expected": "unverified"},
+
+    {"name": "iso date and long-form date are the same calendar day", "extracted": "2025-03-01", "verified": {"value": "March 1, 2025"}, "type": "string", "expected": "match"},
+    {"name": "an rfc3339 suffix is discarded, not honoured as an instant", "extracted": "2025-03-01T00:00:00Z", "verified": {"value": "March 1, 2025"}, "type": "string", "expected": "match"},
+    {"name": "different calendar days mismatch", "extracted": "2025-03-02", "verified": {"value": "March 1, 2025"}, "type": "string", "expected": "mismatch"},
+    {"name": "a bare number is not date-shaped and falls through to text", "extracted": "88.06", "verified": {"value": "88.06"}, "type": "string", "expected": "match"},
+    {"name": "a whole-number float against a string key is the same answer", "extracted": 345015.0, "verified": {"value": "345015"}, "type": "string", "expected": "match"},
+    {"name": "a non-whole float against a string key keeps its decimal", "extracted": 88.06, "verified": {"value": "88.06"}, "type": "string", "expected": "match"},
+
+    {"name": "booleans match", "extracted": true, "verified": {"value": "true"}, "type": "boolean", "expected": "match"},
+    {"name": "booleans mismatch", "extracted": false, "verified": {"value": "true"}, "type": "boolean", "expected": "mismatch"}
+  ]
+}
