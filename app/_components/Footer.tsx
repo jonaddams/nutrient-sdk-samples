@@ -14,6 +14,9 @@ export function Footer() {
         <div className="footer-meta">
           <span>© {new Date().getFullYear()} SDK Samples</span>
           <Link href="/">Index</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/sms">SMS</Link>
           <a
             href="https://github.com/jonaddams/nutrient-sdk-samples"
             target="_blank"
