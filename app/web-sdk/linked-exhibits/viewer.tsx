@@ -118,6 +118,7 @@ export default function LinkedExhibitsViewer() {
     NutrientViewer.load({
       container,
       document: documentUrl(doc),
+      licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       useCDN: true,
       pageRendering: "next",
       // Second gate: URIAction's default is window.open. Returning false here

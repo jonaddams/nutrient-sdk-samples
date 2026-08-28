@@ -34,9 +34,12 @@ export default function LinkedExhibitsPage() {
             never fetched directly.
           </p>
           <p>
-            Two details worth knowing. <code>URIAction</code> would otherwise
-            open a browser tab, so the configuration also sets{" "}
-            <code>onOpenURI: () =&gt; false</code> as a second gate. And the PDF
+            Two details worth knowing. The SDK renders a link annotation as a
+            real <code>&lt;a target="_blank"&gt;</code> anchor, so without
+            interception a click would open the raw PDF in a new tab and leave
+            the viewer behind; <code>preventDefault()</code> is what suppresses
+            that, and the configuration sets{" "}
+            <code>onOpenURI: () =&gt; false</code> as a backstop. And the PDF
             action built for exactly this purpose, <code>GoToRemoteAction</code>
             , is documented by the SDK as “not implemented yet” — so a URI
             action plus interception is the working approach today.
