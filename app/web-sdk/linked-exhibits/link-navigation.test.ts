@@ -1,8 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
-import { DOCUMENTS, documentUrl, findDocument } from "./documents";
+import {
+  CROSS_REFERENCES,
+  DOCUMENTS,
+  documentUrl,
+  findDocument,
+} from "./documents";
 import {
   buildLinkAnnotation,
-  crossReferenceTargets,
+  crossReferencesFrom,
+  linkUri,
   resolveLinkTarget,
 } from "./link-navigation";
 
@@ -37,76 +43,172 @@ function fakeNV() {
   };
 }
 
-describe("crossReferenceTargets", () => {
-  it("returns every document except the one currently open", () => {
-    const targets = crossReferenceTargets("agreement");
-    expect(targets.map((d) => d.id)).toEqual([
-      "exhibit-a",
-      "exhibit-b",
-      "exhibit-c",
-    ]);
+describe("CROSS_REFERENCES invariants", () => {
+  // Guards the bug this prevents: searching "Exhibit A" would also match
+  // inside a longer phrase containing it, stacking two overlapping links on
+  // the same words with different target pages.
+  it("has no phrase that is a substring of another phrase", () => {
+    const offenders: string[] = [];
+    for (const a of CROSS_REFERENCES) {
+      for (const b of CROSS_REFERENCES) {
+        if (a === b) continue;
+        if (b.phrase.includes(a.phrase)) {
+          offenders.push(`"${a.phrase}" is inside "${b.phrase}"`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 
-  it("never includes the current document, so a title cannot self-link", () => {
-    for (const doc of DOCUMENTS) {
-      const ids = crossReferenceTargets(doc.id).map((d) => d.id);
-      expect(ids).not.toContain(doc.id);
+  it("targets a document that exists", () => {
+    for (const ref of CROSS_REFERENCES) {
+      expect(findDocument(ref.targetId), ref.phrase).toBeDefined();
     }
   });
 
-  it("returns all documents when the current id is unknown", () => {
-    expect(crossReferenceTargets("nope")).toHaveLength(DOCUMENTS.length);
+  it("never targets a page beyond the target document's page count", () => {
+    for (const ref of CROSS_REFERENCES) {
+      const doc = findDocument(ref.targetId);
+      expect(
+        ref.page,
+        `${ref.phrase} → ${ref.targetId}`,
+      ).toBeGreaterThanOrEqual(1);
+      expect(ref.page, `${ref.phrase} → ${ref.targetId}`).toBeLessThanOrEqual(
+        doc?.pageCount ?? 0,
+      );
+    }
+  });
+
+  it("includes at least one deep link past page 1, or the feature is untested by the demo", () => {
+    expect(CROSS_REFERENCES.some((r) => r.page > 1)).toBe(true);
+  });
+});
+
+describe("linkUri", () => {
+  it("puts the target page on the URI as a #page= fragment", () => {
+    const doc = findDocument("exhibit-b");
+    if (!doc) throw new Error("fixture missing");
+    expect(linkUri(doc, 2)).toBe(
+      "/documents/linked-exhibits/exhibit-b-fee-schedule.pdf#page=2",
+    );
+  });
+
+  it("uses a 1-based page number, matching the open-parameter convention", () => {
+    const doc = findDocument("agreement");
+    if (!doc) throw new Error("fixture missing");
+    expect(linkUri(doc, 1)).toMatch(/#page=1$/);
+  });
+});
+
+describe("crossReferencesFrom", () => {
+  it("excludes references pointing at the document currently open", () => {
+    const refs = crossReferencesFrom("exhibit-a");
+    expect(refs.map((r) => r.targetId)).not.toContain("exhibit-a");
+  });
+
+  it("drops every self-reference for every document, so a title cannot self-link", () => {
+    for (const doc of DOCUMENTS) {
+      const ids = crossReferencesFrom(doc.id).map((r) => r.targetId);
+      expect(ids, doc.id).not.toContain(doc.id);
+    }
+  });
+
+  it("keeps the deep links to other documents", () => {
+    const phrases = crossReferencesFrom("agreement").map((r) => r.phrase);
+    expect(phrases).toContain("Section A.2");
+    expect(phrases).toContain("Section B.1");
+    expect(phrases).toContain("Section C.4");
+    expect(phrases).not.toContain("Master Services Agreement");
+  });
+
+  it("returns everything when the current id is unknown", () => {
+    expect(crossReferencesFrom("nope")).toHaveLength(CROSS_REFERENCES.length);
   });
 });
 
 describe("resolveLinkTarget", () => {
-  it("resolves a URIAction pointing at a document in the set", () => {
-    const doc = DOCUMENTS[1];
-    const annotation = { action: { uri: documentUrl(doc) } };
-    expect(resolveLinkTarget(annotation)).toBe(doc.id);
+  it("resolves a document id and hands back the fragment for the SDK to parse", () => {
+    const doc = findDocument("exhibit-a");
+    if (!doc) throw new Error("fixture missing");
+    expect(resolveLinkTarget({ action: { uri: linkUri(doc, 2) } })).toEqual({
+      id: "exhibit-a",
+      hash: "#page=2",
+    });
   });
 
-  it("resolves an absolute URL by its final path segment", () => {
-    const doc = DOCUMENTS[2];
-    const annotation = {
-      action: { uri: `https://files.example.com/legal/${doc.fileName}` },
-    };
-    expect(resolveLinkTarget(annotation)).toBe(doc.id);
+  it("returns a null hash when the URI carries no fragment", () => {
+    const doc = findDocument("exhibit-c");
+    if (!doc) throw new Error("fixture missing");
+    expect(resolveLinkTarget({ action: { uri: documentUrl(doc) } })).toEqual({
+      id: "exhibit-c",
+      hash: null,
+    });
+  });
+
+  it("resolves an absolute URL by its final path segment, fragment included", () => {
+    expect(
+      resolveLinkTarget({
+        action: {
+          uri: "https://files.example.com/legal/exhibit-b-fee-schedule.pdf#page=2",
+        },
+      }),
+    ).toEqual({ id: "exhibit-b", hash: "#page=2" });
   });
 
   it("resolves a GoToRemoteAction relativePath, for PDFs that ship with /GoToR links", () => {
-    const doc = DOCUMENTS[3];
-    const annotation = { action: { relativePath: `./${doc.fileName}` } };
-    expect(resolveLinkTarget(annotation)).toBe(doc.id);
+    expect(
+      resolveLinkTarget({
+        action: { relativePath: "./exhibit-c-mutual-nda.pdf" },
+      }),
+    ).toEqual({ id: "exhibit-c", hash: null });
+  });
+
+  it("ignores a query string when matching the filename but keeps the fragment", () => {
+    expect(
+      resolveLinkTarget({
+        action: {
+          uri: "/documents/linked-exhibits/exhibit-a-statement-of-work.pdf?v=2#page=3",
+        },
+      }),
+    ).toEqual({ id: "exhibit-a", hash: "#page=3" });
   });
 
   it("returns null for a document that is not in the set", () => {
-    const annotation = { action: { uri: "/documents/somewhere-else.pdf" } };
-    expect(resolveLinkTarget(annotation)).toBeNull();
+    expect(
+      resolveLinkTarget({ action: { uri: "/documents/somewhere-else.pdf" } }),
+    ).toBeNull();
   });
 
   it("returns null for an ordinary web link, leaving it to the SDK", () => {
-    const annotation = { action: { uri: "https://nutrient.io/pricing" } };
-    expect(resolveLinkTarget(annotation)).toBeNull();
+    expect(
+      resolveLinkTarget({ action: { uri: "https://nutrient.io/pricing" } }),
+    ).toBeNull();
   });
 
   it("returns null for an annotation with no action at all", () => {
     expect(resolveLinkTarget({})).toBeNull();
   });
 
-  it("ignores a query string and fragment when matching the filename", () => {
-    const doc = DOCUMENTS[1];
-    const annotation = {
-      action: { uri: `${documentUrl(doc)}?v=2#page=3` },
-    };
-    expect(resolveLinkTarget(annotation)).toBe(doc.id);
+  it("does not match a filename that merely ends with a known filename", () => {
+    expect(
+      resolveLinkTarget({
+        action: { uri: "/documents/not-exhibit-a-statement-of-work.pdf" },
+      }),
+    ).toBeNull();
   });
 
-  it("does not match a filename that merely ends with a known filename", () => {
-    const annotation = {
-      action: { uri: "/documents/not-exhibit-a-statement-of-work.pdf" },
-    };
-    expect(resolveLinkTarget(annotation)).toBeNull();
+  it("round-trips every cross-reference: the URI it builds resolves back to the same target", () => {
+    for (const ref of CROSS_REFERENCES) {
+      const doc = findDocument(ref.targetId);
+      if (!doc) throw new Error(`no document for ${ref.targetId}`);
+      const resolved = resolveLinkTarget({
+        action: { uri: linkUri(doc, ref.page) },
+      });
+      expect(resolved, ref.phrase).toEqual({
+        id: ref.targetId,
+        hash: `#page=${ref.page}`,
+      });
+    }
   });
 });
 
@@ -116,12 +218,12 @@ describe("buildLinkAnnotation", () => {
     const built = buildLinkAnnotation(NV, {
       pageIndex: 2,
       rect: { left: 10, top: 20, width: 80, height: 12 },
-      uri: "/documents/linked-exhibits/exhibit-b-fee-schedule.pdf",
+      uri: "/documents/linked-exhibits/exhibit-b-fee-schedule.pdf#page=2",
     }) as { props: Record<string, unknown> };
 
     expect(built.props.pageIndex).toBe(2);
     expect((built.props.action as { uri: string }).uri).toBe(
-      "/documents/linked-exhibits/exhibit-b-fee-schedule.pdf",
+      "/documents/linked-exhibits/exhibit-b-fee-schedule.pdf#page=2",
     );
     expect((built.props.boundingBox as { args: unknown }).args).toEqual({
       left: 10,

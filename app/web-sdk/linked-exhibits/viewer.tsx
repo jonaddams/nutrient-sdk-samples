@@ -3,6 +3,7 @@
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  CROSS_REFERENCES,
   DOCUMENT_DIR,
   DOCUMENTS,
   documentUrl,
@@ -12,15 +13,16 @@ import {
 } from "./documents";
 import {
   buildLinkAnnotation,
-  crossReferenceTargets,
+  crossReferencesFrom,
+  linkUri,
   type NutrientViewerLike,
   resolveLinkTarget,
 } from "./link-navigation";
 import "./styles.css";
 
 /**
- * Search the open document for every OTHER document's reference phrase and
- * drop a LinkAnnotation over each match.
+ * Search the open document for every cross-reference phrase that points
+ * somewhere else, and drop a LinkAnnotation over each match.
  *
  * Runs after every load, because these annotations live in the viewer session
  * only — a fresh load() starts with none.
@@ -32,9 +34,13 @@ async function createCrossReferenceLinks(
 ): Promise<number> {
   const annotations: unknown[] = [];
 
-  for (const target of crossReferenceTargets(currentId)) {
-    const results = await instance.search(target.referencePhrase);
-    const uri = documentUrl(target);
+  for (const ref of crossReferencesFrom(currentId)) {
+    const target = findDocument(ref.targetId);
+    if (!target) continue;
+
+    const results = await instance.search(ref.phrase);
+    // The target page rides along as a #page= fragment on the link URI.
+    const uri = linkUri(target, ref.page);
 
     for (const result of results.toArray()) {
       const pageIndex = result.pageIndex;
@@ -63,34 +69,47 @@ async function createCrossReferenceLinks(
   return annotations.length;
 }
 
+/** How many links point at a given document from everywhere else. */
+function inboundReferenceCount(docId: string): number {
+  return CROSS_REFERENCES.filter((ref) => ref.targetId === docId).length;
+}
+
+type Destination = { id: string; hash: string | null };
+
 export default function LinkedExhibitsViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
   /** Incremented on every swap; a stale async load bails when it changes. */
   const loadGeneration = useRef(0);
 
-  const [currentId, setCurrentId] = useState(INITIAL_DOCUMENT_ID);
-  const [history, setHistory] = useState<string[]>([]);
+  const [destination, setDestination] = useState<Destination>({
+    id: INITIAL_DOCUMENT_ID,
+    hash: null,
+  });
+  const { id: destinationId, hash: destinationHash } = destination;
+  const [history, setHistory] = useState<Destination[]>([]);
   const [linkCount, setLinkCount] = useState<number | null>(null);
+  const [pageLabel, setPageLabel] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [warning, setWarning] = useState<string | null>(null);
 
-  /** Open a document and push the one being left onto the back stack. */
-  const navigate = useCallback((targetId: string) => {
+  /** Open a destination and push the one being left onto the back stack. */
+  const navigate = useCallback((next: Destination) => {
     setWarning(null);
-    setCurrentId((previous) => {
-      if (previous === targetId) return previous;
+    setDestination((previous) => {
+      if (previous.id === next.id && previous.hash === next.hash) {
+        return previous;
+      }
       setHistory((trail) => [...trail, previous]);
-      return targetId;
+      return next;
     });
   }, []);
 
   const goBack = useCallback(() => {
     setHistory((trail) => {
       if (trail.length === 0) return trail;
-      const target = trail[trail.length - 1];
       setWarning(null);
-      setCurrentId(target);
+      setDestination(trail[trail.length - 1]);
       return trail.slice(0, -1);
     });
   }, []);
@@ -101,19 +120,32 @@ export default function LinkedExhibitsViewer() {
 
     const { NutrientViewer } = window;
     const NV = NutrientViewer as unknown as NutrientViewerLike;
-    const doc = findDocument(currentId);
+    const doc = findDocument(destinationId);
     if (!doc) return;
 
     const generation = ++loadGeneration.current;
     let cancelled = false;
+    /** Set once listeners are attached, so cleanup can detach them. */
+    let detachListeners: (() => void) | null = null;
 
     setIsLoading(true);
     setLinkCount(null);
+    setPageLabel(null);
 
     // Unload any previous instance before mounting the next one. There is no
     // in-place document setter, so a swap is always unload() then load().
     NutrientViewer.unload(container);
     instanceRef.current = null;
+
+    // Turn "#page=2" into a view state, using the SDK's own open-parameter
+    // parser rather than re-implementing the format here. Only `page` is
+    // supported by it today, and an out-of-range page falls back to page 1.
+    const initialViewState = destinationHash
+      ? NutrientViewer.viewStateFromOpenParameters(
+          new NutrientViewer.ViewState({}),
+          destinationHash,
+        )
+      : undefined;
 
     NutrientViewer.load({
       container,
@@ -121,8 +153,9 @@ export default function LinkedExhibitsViewer() {
       licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
       useCDN: true,
       pageRendering: "next",
-      // Second gate: URIAction's default is window.open. Returning false here
-      // guarantees a missed press can never navigate away from the demo.
+      ...(initialViewState ? { initialViewState } : null),
+      // Second gate: the SDK renders a link annotation as an <a target="_blank">,
+      // so a press the first gate misses would open the raw PDF in a new tab.
       onOpenURI: () => false,
     })
       .then(async (instance) => {
@@ -132,15 +165,40 @@ export default function LinkedExhibitsViewer() {
         }
         instanceRef.current = instance;
 
-        instance.addEventListener("annotations.press", (event) => {
-          const action = (
-            event.annotation as unknown as { action?: { uri?: unknown } }
-          ).action;
-          const targetId = resolveLinkTarget({ action });
+        /**
+         * True only while this load is still the current one.
+         *
+         * Both listeners below need it. `unload()` does not guarantee that an
+         * outgoing instance stops emitting, so without this guard a superseded
+         * instance can still push a page label for the document it was showing,
+         * or act on a press, using a `doc` its closure captured. That produced a
+         * page label that reverted to the wrong value after a deep link.
+         */
+        const isCurrent = () =>
+          !cancelled && generation === loadGeneration.current;
 
-          if (targetId) {
+        const onPageChange = (pageIndex: number) => {
+          if (!isCurrent()) return;
+          setPageLabel(`page ${pageIndex + 1} of ${doc.pageCount}`);
+        };
+        onPageChange(instance.viewState.currentPageIndex);
+        instance.addEventListener(
+          "viewState.currentPageIndex.change",
+          onPageChange,
+        );
+
+        const onAnnotationPress = (event: {
+          annotation: unknown;
+          preventDefault?: () => void;
+        }) => {
+          if (!isCurrent()) return;
+          const action = (event.annotation as { action?: { uri?: unknown } })
+            .action;
+          const target = resolveLinkTarget({ action });
+
+          if (target) {
             event.preventDefault?.();
-            navigate(targetId);
+            navigate(target);
             return;
           }
 
@@ -153,12 +211,24 @@ export default function LinkedExhibitsViewer() {
               `That link points to ${uri}, which is not one of the four documents in this set.`,
             );
           }
-        });
+        };
+        instance.addEventListener("annotations.press", onAnnotationPress);
+
+        detachListeners = () => {
+          instance.removeEventListener(
+            "viewState.currentPageIndex.change",
+            onPageChange,
+          );
+          instance.removeEventListener(
+            "annotations.press",
+            onAnnotationPress as never,
+          );
+        };
 
         const created = await createCrossReferenceLinks(
           instance,
           NV,
-          currentId,
+          destinationId,
         );
         if (cancelled || generation !== loadGeneration.current) return;
         setLinkCount(created);
@@ -176,12 +246,16 @@ export default function LinkedExhibitsViewer() {
 
     return () => {
       cancelled = true;
+      detachListeners?.();
       NutrientViewer.unload(container);
       instanceRef.current = null;
     };
-  }, [currentId, navigate]);
+    // Depend on the primitives, not the destination object: an equal-but-new
+    // object (from goBack, or re-clicking a sidebar entry) would otherwise
+    // tear down and reload the viewer for no reason.
+  }, [destinationId, destinationHash, navigate]);
 
-  const current = findDocument(currentId);
+  const current = findDocument(destination.id);
 
   return (
     <div style={{ display: "flex", height: "100%" }}>
@@ -195,23 +269,39 @@ export default function LinkedExhibitsViewer() {
         }}
       >
         <div className="doc-list">
-          {DOCUMENTS.map((doc: LinkedDocument) => (
-            <button
-              key={doc.id}
-              type="button"
-              className="doc-item"
-              aria-current={doc.id === currentId}
-              disabled={doc.id === currentId}
-              onClick={() => navigate(doc.id)}
-            >
-              <span className="doc-item-title">{doc.title}</span>
-              <span className="doc-item-meta">
-                {doc.id === currentId
-                  ? "Open"
-                  : `Linked from “${doc.referencePhrase}”`}
-              </span>
-            </button>
-          ))}
+          {DOCUMENTS.map((doc: LinkedDocument) => {
+            const isOpen = doc.id === destination.id;
+            const inbound = inboundReferenceCount(doc.id);
+            return (
+              <button
+                key={doc.id}
+                type="button"
+                className="doc-item"
+                aria-current={isOpen}
+                disabled={isOpen}
+                onClick={() => navigate({ id: doc.id, hash: null })}
+              >
+                <span className="doc-item-title">{doc.title}</span>
+                <span className="doc-item-meta">
+                  {doc.pageCount} pages ·{" "}
+                  {isOpen
+                    ? "open"
+                    : `${inbound} inbound link${inbound === 1 ? "" : "s"}`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="doc-legend">
+          <span className="doc-legend-title">Deep links in this set</span>
+          <ul>
+            {CROSS_REFERENCES.filter((ref) => ref.page > 1).map((ref) => (
+              <li key={ref.phrase}>
+                <code>{ref.phrase}</code> → {ref.targetDescription}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <p className="doc-note">
@@ -239,6 +329,7 @@ export default function LinkedExhibitsViewer() {
             ← Back
           </button>
           <span>{current ? current.title : "—"}</span>
+          {pageLabel && <span>· {pageLabel}</span>}
           {isLoading && <span>· loading…</span>}
           {!isLoading && linkCount !== null && (
             <span>

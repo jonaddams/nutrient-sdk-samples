@@ -34,6 +34,26 @@ export default function LinkedExhibitsPage() {
             never fetched directly.
           </p>
           <p>
+            <strong>Links can target a specific page.</strong> Each link URI
+            carries a <code>#page=</code> fragment — the{" "}
+            <a
+              href="https://www.nutrient.io/guides/web/features/open-parameters/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              open parameter
+            </a>{" "}
+            the SDK defines for the URL of a page hosting the viewer. Rather
+            than re-implement that format, the sample hands the fragment to the
+            SDK's own <code>viewStateFromOpenParameters()</code> and passes the
+            result as <code>initialViewState</code>. So the citation to “Exhibit
+            B” opens the fee schedule at page 1, while “Section B.1” opens the
+            same document at the rate card on page 2. Note the numbering
+            difference: <code>#page=</code> is 1-based, while{" "}
+            <code>currentPageIndex</code> is 0-based, and an out-of-range page
+            falls back to page 1 rather than failing.
+          </p>
+          <p>
             Two details worth knowing. The SDK renders a link annotation as a
             real <code>&lt;a target="_blank"&gt;</code> anchor, so without
             interception a click would open the raw PDF in a new tab and leave

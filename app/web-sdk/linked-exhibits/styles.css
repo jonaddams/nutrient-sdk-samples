@@ -85,3 +85,32 @@
   line-height: 1.5;
   color: var(--fg-muted);
 }
+
+.doc-legend {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.doc-legend-title {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.doc-legend ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+.doc-legend code {
+  font-size: 10.5px;
+  color: var(--fg);
+}

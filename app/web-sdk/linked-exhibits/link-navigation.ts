@@ -1,5 +1,8 @@
 import {
+  CROSS_REFERENCES,
+  type CrossReference,
   DOCUMENTS,
+  documentUrl,
   findDocument as findById,
   type LinkedDocument,
 } from "./documents";
@@ -34,34 +37,61 @@ export type NutrientViewerLike = {
   };
 };
 
+/** Where a pressed link points: a document in the set, plus its raw fragment. */
+export type LinkTarget = {
+  /** Document id from the allow-list. */
+  id: string;
+  /**
+   * The URI fragment, e.g. `"#page=2"`, or null when there was none.
+   *
+   * Handed to the caller verbatim rather than parsed here, so the viewer can
+   * pass it to the SDK's own `viewStateFromOpenParameters()` instead of this
+   * module re-implementing the open-parameter format.
+   */
+  hash: string | null;
+};
+
 /** Blue border, wide enough to see on a projector without hiding the text. */
 export const LINK_BORDER_COLOR = "#2563eb";
 export const LINK_BORDER_WIDTH = 1;
 
 /**
- * Every document in the set except the one currently open.
+ * Build the URI for a link that opens `doc` at `page`.
  *
- * The exclusion is what stops a document's own title from becoming a link to
- * itself: Exhibit A's header contains the phrase "Exhibit A", and the
- * agreement's title contains "Master Services Agreement".
+ * `page` is 1-based and goes on as a `#page=` fragment — the same open
+ * parameter the SDK documents for the URL of a page hosting the viewer:
+ * https://www.nutrient.io/guides/web/features/open-parameters/
  */
-export function crossReferenceTargets(
-  currentId: string,
-  docs: readonly LinkedDocument[] = DOCUMENTS,
-): LinkedDocument[] {
-  return docs.filter((doc) => doc.id !== currentId);
-}
-
-/** The last path segment of a URI, with any query string or fragment removed. */
-function fileNameFromUri(uri: string): string {
-  const withoutHash = uri.split("#")[0];
-  const withoutQuery = withoutHash.split("?")[0];
-  const segments = withoutQuery.split("/");
-  return segments[segments.length - 1] ?? "";
+export function linkUri(doc: LinkedDocument, page: number): string {
+  return `${documentUrl(doc)}#page=${page}`;
 }
 
 /**
- * Resolve a pressed annotation to a document id in this set, or null.
+ * Every cross-reference that should become a link while `currentId` is open.
+ *
+ * Excluding references that target the open document is what stops a
+ * document's own title from linking to itself: Exhibit A's header contains
+ * the phrase "Exhibit A", and the agreement's title contains "Master Services
+ * Agreement".
+ */
+export function crossReferencesFrom(
+  currentId: string,
+  refs: readonly CrossReference[] = CROSS_REFERENCES,
+): CrossReference[] {
+  return refs.filter((ref) => ref.targetId !== currentId);
+}
+
+/** Split a URI into its filename and its fragment. */
+function splitUri(uri: string): { fileName: string; hash: string | null } {
+  const hashAt = uri.indexOf("#");
+  const hash = hashAt === -1 ? null : uri.slice(hashAt);
+  const path = (hashAt === -1 ? uri : uri.slice(0, hashAt)).split("?")[0];
+  const segments = path.split("/");
+  return { fileName: segments[segments.length - 1] ?? "", hash };
+}
+
+/**
+ * Resolve a pressed annotation to a document in this set, or null.
  *
  * Null means "not ours" — the caller must leave the SDK's default behavior
  * alone so ordinary web links keep working.
@@ -73,7 +103,7 @@ function fileNameFromUri(uri: string): string {
 export function resolveLinkTarget(
   annotation: PressedAnnotation,
   docs: readonly LinkedDocument[] = DOCUMENTS,
-): string | null {
+): LinkTarget | null {
   const action = annotation.action;
   if (!action) return null;
 
@@ -85,11 +115,11 @@ export function resolveLinkTarget(
         : null;
   if (!raw) return null;
 
-  const fileName = fileNameFromUri(raw);
+  const { fileName, hash } = splitUri(raw);
   if (!fileName) return null;
 
   const match = docs.find((doc) => doc.fileName === fileName);
-  return match ? match.id : null;
+  return match ? { id: match.id, hash } : null;
 }
 
 /**
