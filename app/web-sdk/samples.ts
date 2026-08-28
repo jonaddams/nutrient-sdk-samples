@@ -204,6 +204,13 @@ export const samples: Sample[] = [
     path: "/web-sdk/layer-management",
   },
   {
+    name: "Linked Exhibits",
+    category: "Annotations",
+    description:
+      "Cross-document navigation through link annotations — a contract and its exhibits, where every citation is a clickable link that swaps the document in the same viewer",
+    path: "/web-sdk/linked-exhibits",
+  },
+  {
     name: "Multi-Document Tabs",
     category: "User Interface",
     description:
