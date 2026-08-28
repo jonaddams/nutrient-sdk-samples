@@ -1,0 +1,116 @@
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.doc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-3);
+  text-align: left;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.doc-item:hover:not(:disabled) {
+  border-color: #2563eb;
+}
+
+.doc-item[aria-current="true"] {
+  border-color: #2563eb;
+  background: color-mix(in srgb, #2563eb 8%, var(--bg-elev));
+}
+
+.doc-item:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.doc-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.doc-item-meta {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.doc-trail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+.doc-trail button {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  cursor: pointer;
+}
+
+.doc-trail button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.doc-banner {
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: 12px;
+  color: #7f1d1d;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--r-2);
+}
+
+.doc-note {
+  margin-top: var(--space-4);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+.doc-legend {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.doc-legend-title {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.doc-legend ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+.doc-legend code {
+  font-size: 10.5px;
+  color: var(--fg);
+}
