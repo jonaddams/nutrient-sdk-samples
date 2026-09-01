@@ -8,9 +8,11 @@ export const LEGAL = {
   contactEmail: "support@jonaddams.com",
   appName: "Bindery",
   appDomain: "bindery.jonaddams.com",
-  // Twilio trial number. Replace when the account is upgraded — the number in
-  // the campaign registration and the number published here must match.
-  messagingNumber: "+1 737 258 3742",
+  // The number registered to the A2P 10DLC campaign. A carrier reviewer reads
+  // this page and compares it against the registration, so the two must not
+  // drift — publishing a number other than the registered one is a documented
+  // cause of rejection, and was one of the mismatches on the first submission.
+  messagingNumber: "+1 269 292-5337",
   effectiveDate: "August 26, 2026",
 } as const;
 
