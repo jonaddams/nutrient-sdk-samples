@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/app/_components/PageHeader";
 import {
@@ -17,15 +18,30 @@ const READING = { maxWidth: "var(--reading-max)" } as const;
 const SECTION = { marginTop: "var(--space-7)" } as const;
 
 // The opt-in screen sits behind Google sign-in, so it cannot be reached by
-// anyone without an account. This page documents the flow in the open and is
-// the reference the campaign registration points at.
+// anyone without an account. This page documents the flow in the open, carries a
+// screenshot of the screen itself, and is the reference the campaign
+// registration points at.
 const SCREENSHOT_SLOT = {
   marginTop: "var(--space-5)",
   padding: "var(--space-6)",
-  border: "1px dashed var(--line-strong)",
+  border: "1px solid var(--line-strong)",
   borderRadius: "var(--radius-lg)",
   background: "var(--bg-elev)",
   textAlign: "center",
+} as const;
+
+// The screenshot is a tall, narrow column, so it is capped rather than stretched
+// to the full reading width.
+const SCREENSHOT_IMAGE = {
+  width: "100%",
+  maxWidth: "420px",
+  height: "auto",
+  borderRadius: "var(--radius-lg)",
+} as const;
+
+const CAPTION = {
+  marginTop: "var(--space-5)",
+  textAlign: "left",
 } as const;
 
 export default function SmsPage() {
@@ -88,7 +104,17 @@ export default function SmsPage() {
           </p>
 
           <div style={SCREENSHOT_SLOT}>
-            <p>
+            <Image
+              src="/bindery-sms-optin.png"
+              alt={`The ${LEGAL.appName} Settings > Notifications opt-in screen: text notifications off by default, the program disclosures, links to the terms of service and privacy policy, a four-character single-use code, and ${LEGAL.messagingNumber} as the number to text it to`}
+              width={755}
+              height={797}
+              style={SCREENSHOT_IMAGE}
+            />
+            {/* The written description stays as a caption. It is what a
+                reviewer reads if the image fails to load, and it is the part
+                that has to keep matching the screen. */}
+            <p style={CAPTION}>
               <strong>What the opt-in screen shows.</strong> Under{" "}
               <strong>Settings &rarr; Notifications</strong>, {LEGAL.appName}{" "}
               states that text notifications are off and that it never texts a
