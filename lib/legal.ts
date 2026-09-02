@@ -23,3 +23,39 @@ export const CARRIER_NO_SHARING_CLAUSE =
 
 export const RATES_DISCLOSURE = "Message and data rates may apply.";
 export const FREQUENCY_DISCLOSURE = "Message frequency varies.";
+
+// The sample messages filed with the A2P 10DLC campaign, verbatim.
+//
+// These live here, as data, because the previous version of the /sms page
+// restated them as hand-typed JSX prose — and that is exactly how they drifted.
+// Twice. The second submission was rejected on its Call-to-Action check partly
+// because the page's mention example said "mentioned you in a comment on",
+// dropped the "Reply to add a comment." sentence, dropped the document link, and
+// rendered its quotes as &ldquo;/&rdquo; curly quotes, while the filing and the
+// application both said something else. Rendering strings instead of prose makes
+// that class of mistake impossible: React escapes a straight quote as a straight
+// quote.
+//
+// The other half of the match is manual and cannot be automated across repos:
+// these must stay byte-identical to the constants in `lib/sms-program.ts` of the
+// `dws-crud` repository, which is what the application actually sends. That file
+// says the same thing in the other direction. Change one, change both, and
+// re-file the campaign's samples in the same breath.
+export const SAMPLE_MESSAGES = [
+  {
+    label: "When a colleague mentions you",
+    text: `${LEGAL.appName}: Alice Example mentioned you on "Q3 Contract". Reply to add a comment. https://${LEGAL.appDomain}/documents/abc123 Reply STOP to opt out.`,
+  },
+  {
+    label: "Confirming your registration",
+    text: `${LEGAL.appName}: You're registered. Get a text when someone mentions you. Msg frequency varies. Msg&data rates may apply. Reply HELP for help, STOP to cancel.`,
+  },
+  {
+    label: "If you reply HELP",
+    text: `${LEGAL.appName}: Mention notifications for your documents. Reply to a notification to comment. Msg & data rates may apply. Reply STOP to opt out.`,
+  },
+  {
+    label: "If you text a code that is already used",
+    text: `${LEGAL.appName}: Your number is already registered. Reply HELP for help, STOP to cancel.`,
+  },
+] as const;

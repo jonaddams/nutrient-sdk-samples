@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/app/_components/PageHeader";
-import { FREQUENCY_DISCLOSURE, LEGAL, RATES_DISCLOSURE } from "@/lib/legal";
+import {
+  FREQUENCY_DISCLOSURE,
+  LEGAL,
+  RATES_DISCLOSURE,
+  SAMPLE_MESSAGES,
+} from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Text Message Notifications",
@@ -53,7 +58,14 @@ export default function SmsPage() {
             never send one to an unconfirmed number.
           </p>
           <ol>
-            <li>Sign in to {LEGAL.appDomain} with your Google account.</li>
+            <li>
+              Sign in to {LEGAL.appDomain}. {LEGAL.appName} is an internal
+              application, so sign-in is limited to <code>nutrient.io</code> and{" "}
+              <code>pspdfkit.com</code> accounts &mdash; a personal Google
+              account is refused. The opt-in screen is reproduced below, and{" "}
+              <a href={`mailto:${LEGAL.contactEmail}`}>{LEGAL.contactEmail}</a>{" "}
+              will walk anyone who needs to verify it through the flow directly.
+            </li>
             <li>
               Open <strong>Settings &rarr; Notifications</strong>. A short,
               single-use code is displayed there, along with the number to send
@@ -76,25 +88,36 @@ export default function SmsPage() {
           </p>
 
           <div style={SCREENSHOT_SLOT}>
-            <p className="muted">
-              [ Screenshot of the Settings &rarr; Notifications opt-in screen
-              goes here before the campaign is submitted. ]
+            <p>
+              <strong>What the opt-in screen shows.</strong> Under{" "}
+              <strong>Settings &rarr; Notifications</strong>, {LEGAL.appName}{" "}
+              states that text notifications are off and that it never texts a
+              number until that number has texted first. Alongside the opt-in
+              control it repeats every disclosure on this page &mdash; what the
+              messages are, how often they come, that message and data rates may
+              apply, that STOP opts out and HELP gets help, and that consent is
+              not a condition of use &mdash; and links the terms of service and
+              the privacy policy. Choosing <em>Set up text notifications</em>{" "}
+              then displays a four-character single-use code, valid for ten
+              minutes, above the number to text it to. There is no field to type
+              a phone number into.
             </p>
           </div>
 
           <h2 className="h2" style={SECTION}>
             Example messages
           </h2>
+          {/* Rendered from SAMPLE_MESSAGES rather than retyped here. These are
+              the exact strings filed with the campaign and sent by the
+              application; restating them as prose is what let them drift twice. */}
           <ul>
-            <li className="mono">
-              {LEGAL.appName}: Your number is registered. You&apos;ll get a text
-              when someone mentions you in a document comment. Reply HELP for
-              help, STOP to cancel.
-            </li>
-            <li className="mono">
-              {LEGAL.appName}: Jon mentioned you in a comment on &ldquo;Q3
-              Contract Review&rdquo;. Reply STOP to opt out.
-            </li>
+            {SAMPLE_MESSAGES.map((sample) => (
+              <li key={sample.label}>
+                {sample.label}:
+                <br />
+                <span className="mono">{sample.text}</span>
+              </li>
+            ))}
           </ul>
 
           <h2 className="h2" style={SECTION}>
