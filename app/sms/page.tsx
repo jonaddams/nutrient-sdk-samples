@@ -98,9 +98,9 @@ export default function SmsPage() {
               apply, that STOP opts out and HELP gets help, and that consent is
               not a condition of use &mdash; and links the terms of service and
               the privacy policy. Choosing <em>Set up text notifications</em>{" "}
-              then displays a four-character single-use code, valid for ten
-              minutes, above the number to text it to. There is no field to type
-              a phone number into.
+              then names the number to text and shows a four-character
+              single-use code beneath it, good for ten minutes and usable once.
+              There is no field to type a phone number into.
             </p>
           </div>
 
