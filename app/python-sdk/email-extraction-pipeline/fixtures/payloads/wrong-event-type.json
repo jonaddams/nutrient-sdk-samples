@@ -1,0 +1,4 @@
+{
+  "type": "email.delivered",
+  "data": { "email_id": "fixture-wrong-event-type" }
+}

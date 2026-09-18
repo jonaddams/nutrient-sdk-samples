@@ -59,3 +59,4 @@ docs/internal/
 Claude Design - Nutrient SDK Samples Website/
 
 .dev-server.log
+/.swc

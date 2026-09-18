@@ -104,4 +104,12 @@ export const samples: Sample[] = [
       "Generate PDF documents from Word templates populated with JSON data",
     path: "/python-sdk/word-template",
   },
+  {
+    name: "Email Extraction Pipeline",
+    category: "Extraction",
+    description:
+      "Inbound email to structured data: webhook, durable workflow, and grounded citations you can click through to the source page",
+    path: "/python-sdk/email-extraction-pipeline",
+    wip: true,
+  },
 ];

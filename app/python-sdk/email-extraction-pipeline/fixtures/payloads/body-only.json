@@ -1,0 +1,9 @@
+{
+  "type": "email.received",
+  "data": {
+    "email_id": "fixture-body-only",
+    "from": "ops@vendor.example",
+    "subject": "Amount due, no attachment",
+    "created_at": "2026-09-17T12:01:00.000Z"
+  }
+}
