@@ -39,6 +39,25 @@ interface AttachmentResult {
   sha256: string;
 }
 
+/**
+ * Attachment types this pipeline will store and extract from.
+ *
+ * Deliberately an allowlist. The obvious `type.startsWith("image/")` also admits
+ * `image/svg+xml`, which is not a scan format but a document that can carry
+ * script — and since attachments are served back from this app's own origin,
+ * storing one is stored XSS waiting for someone to open it.
+ */
+const INGESTIBLE_TYPES = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/tiff",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
+
 const MAX_ATTACHMENT_BYTES = Number(
   process.env.MAX_ATTACHMENT_BYTES ?? 20 * 1024 * 1024,
 );
@@ -125,8 +144,11 @@ async function fetchPrimaryAttachment(
 
   const all = data?.data ?? [];
   const qualifying = all.filter((a) => {
-    const type = (a.content_type ?? "").toLowerCase();
-    const isDocument = type === "application/pdf" || type.startsWith("image/");
+    const type = (a.content_type ?? "").toLowerCase().split(";")[0].trim();
+    // An ALLOWLIST, not `image/*`. `image/svg+xml` matches `image/` and is not a
+    // scan format — it is a document that can carry script, and serving one back
+    // from our own origin is stored XSS. Nothing here can execute.
+    const isDocument = INGESTIBLE_TYPES.has(type);
     // Inline parts are usually signature images, correlated by content_id.
     const isInline = (a.content_disposition ?? "").toLowerCase() === "inline";
     return isDocument && !isInline;

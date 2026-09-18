@@ -145,6 +145,20 @@ the row is still written (`hourly_cap_reached`) but no workflow starts, so nothi
 is lost and nothing is spent. Resend retains the mail, so it can be replayed after
 the window.
 
+### Attachments are untrusted files served from your own origin
+
+Two rules, and the second is the one that is easy to get wrong:
+
+**Only inert types are ingested.** An allowlist, not `image/*` — that also admits
+`image/svg+xml`, which is not a scan format but a document that can carry script.
+
+**The sender's declared content type is never echoed back.** It is untrusted
+input; serving a stored file as whatever its sender claimed is how stored files
+become stored XSS. Unrecognised types are served as `application/octet-stream`,
+alongside `nosniff`, `Content-Disposition: attachment`, and a
+`default-src 'none'; sandbox` CSP. The citation viewer is unaffected because it
+*fetches* the document rather than navigating to it.
+
 ### The privacy trade, stated plainly
 
 Every extraction lands in one table and the dashboard shows the table. With a
