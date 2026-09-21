@@ -1,0 +1,4 @@
+{
+  "type": "email.received",
+  "data": { "from": "someone@vendor.example", "subject": "malformed" }
+}

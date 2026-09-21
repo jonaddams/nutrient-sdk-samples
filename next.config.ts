@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+// Enables the "use workflow" / "use step" directives for the
+// python-sdk/email-extraction-pipeline sample. No effect on any other sample:
+// the plugin only transforms modules that carry those directives.
+import { withWorkflow } from "workflow/next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: false, // Disabled due to incompatibility with NutrientViewer SDK initialization
@@ -30,4 +34,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withWorkflow(nextConfig);

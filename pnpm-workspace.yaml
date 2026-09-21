@@ -1,3 +1,10 @@
 allowBuilds:
+  # Both arrived as transitive dependencies of `workflow` (the Vercel Workflow
+  # SDK used by python-sdk/email-extraction-pipeline). Allowed for the same
+  # reason esbuild and sharp are: they build or fetch native binaries, and
+  # leaving them unresolved makes every `pnpm <script>` invocation fail the
+  # deps-status check.
+  '@swc/core': true
+  cbor-extract: true
   esbuild: true
   sharp: true

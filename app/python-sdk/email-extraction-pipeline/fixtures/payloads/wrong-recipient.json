@@ -1,0 +1,10 @@
+{
+  "type": "email.received",
+  "data": {
+    "email_id": "fixture-wrong-recipient",
+    "from": "billing@nutrient.io",
+    "to": ["someone-elses-sample@your-subdomain.resend.app"],
+    "subject": "Meant for a different consumer on the same subdomain",
+    "created_at": "2026-09-18T12:00:00.000Z"
+  }
+}
