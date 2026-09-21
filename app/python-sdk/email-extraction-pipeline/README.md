@@ -11,19 +11,27 @@ page it was read from.
 
 ## Status
 
-Build steps 1–6 of 14. The webhook, the durable workflow and the read API are
-in; the extraction call is not.
+Build steps 1–10 and 12 of 14. The whole path runs: webhook → durable workflow →
+extraction → confidence rules → a dashboard that draws the rectangle each value
+was read from.
 
-| Done | Next |
+| In | Not yet |
 |---|---|
-| Schema, migration, dedicated pool | Extraction service (step 7) |
-| Svix verification + 14 tests | Extraction step + metadata walk (step 8) |
-| `POST /api/inbound` with the claim query | Confidence rules |
-| Durable workflow: fetch, hash, store | Citation overlay |
-| Sweeper, allowlist, replay UI | |
+| Schema, migration, dedicated pool | Durability demo (step 11) |
+| Svix verification, allowlist, replay UI | Final README pass (step 13) |
+| `POST /api/inbound` with the claim query | Confirmation reply (step 14, optional) |
+| Durable workflow: fetch, hash, store | |
+| Extraction call + recursive metadata walk | |
+| Confidence rules and status transitions | |
+| Dashboard detail view + citation overlay | |
+| Provider sweep and measurement pass | |
 
-Replayed rows currently park at `processing` — that is honest, not broken: the
-extraction step is build step 8.
+One caveat worth knowing before you copy any of this: **every run so far has been
+fixture replay against a locally running extraction service.** The code has not yet
+processed a real inbound message, so the `Authentication-Results` parser in
+`_lib/auth-results.ts` has never seen a live Resend header. It fails open on an
+undeterminable result — deliberately, and the reasoning is in
+[The allowlist is not authentication on its own](#the-allowlist-is-not-authentication-on-its-own).
 
 ## Setup
 
@@ -54,7 +62,7 @@ pnpm tsx scripts/email-extraction-pipeline/seed.ts
 | `INBOUND_RECIPIENT` | Claiming only this sample's mail | **Ingests every inbound message** — see below |
 | `INBOUND_SENDER_ALLOWLIST` | Restricting who can trigger work | Open inbox |
 | `DASHBOARD_TOKEN` | Auth on the read API | API is open |
-| `NUTRIENT_LICENSE_KEY` | Extraction (on the Python service) | Not needed until step 7 |
+| `NUTRIENT_LICENSE_KEY` | Extraction (on the Python service) | Rows reach `processing` and stop |
 | `EXTRACTION_SERVICE_URL` | The Python service | Defaults to `http://localhost:8080` |
 
 Vercel Blob is created **as a private store**. The access mode cannot be changed
