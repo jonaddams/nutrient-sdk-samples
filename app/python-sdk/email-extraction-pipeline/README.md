@@ -11,27 +11,18 @@ page it was read from.
 
 ## Status
 
-Build steps 1–10 and 12 of 14. The whole path runs: webhook → durable workflow →
-extraction → confidence rules → a dashboard that draws the rectangle each value
-was read from.
+Complete and running in production. The whole path works on live inbound email:
+webhook → durable workflow → extraction → confidence rules → a dashboard that draws
+the rectangle each value was read from.
 
-| In | Not yet |
-|---|---|
-| Schema, migration, dedicated pool | Durability demo (step 11) |
-| Svix verification, allowlist, replay UI | Final README pass (step 13) |
-| `POST /api/inbound` with the claim query | Confirmation reply (step 14, optional) |
-| Durable workflow: fetch, hash, store | |
-| Extraction call + recursive metadata walk | |
-| Confidence rules and status transitions | |
-| Dashboard detail view + citation overlay | |
-| Provider sweep and measurement pass | |
+Measured on a real message: a 36 KB invoice arrived, extracted in about 40 seconds,
+and landed `processed` with **17 grounded fields** — including a bounding box on
+`line_items[0].description`, a field nested inside an array — and both arithmetic
+cross-checks closing.
 
-One caveat worth knowing before you copy any of this: **every run so far has been
-fixture replay against a locally running extraction service.** The code has not yet
-processed a real inbound message, so the `Authentication-Results` parser in
-`_lib/auth-results.ts` has never seen a live Resend header. It fails open on an
-undeterminable result — deliberately, and the reasoning is in
-[The allowlist is not authentication on its own](#the-allowlist-is-not-authentication-on-its-own).
+The one thing deliberately left out is an emailed confirmation reply. It is a
+`resend.emails.send` call and it teaches nothing the rest of this does not, so it
+would be plumbing in front of the lesson.
 
 ## Setup
 
@@ -64,6 +55,22 @@ pnpm tsx scripts/email-extraction-pipeline/seed.ts
 | `DASHBOARD_TOKEN` | Auth on the read API | API is open |
 | `NUTRIENT_LICENSE_KEY` | Extraction (on the Python service) | Rows reach `processing` and stop |
 | `EXTRACTION_SERVICE_URL` | The Python service | Defaults to `http://localhost:8080` |
+| `EXTRACTION_SERVICE_TOKEN` | Shared secret sent to that service | Sent as no header — fine locally, **wrong for a deployed service** |
+| `MAX_ATTACHMENT_BYTES` | Rejecting oversized attachments early | Defaults to 20 MB, which is larger than a serverless request body can be — see below |
+
+**If you deploy the Python service, give it a token.** It holds your Nutrient
+licence and your model provider's API key and spends both on request, so an
+internet-reachable instance with no caller check is an uncapped bill for whoever
+finds the URL. The sample sends `Authorization: Bearer $EXTRACTION_SERVICE_TOKEN`
+when the variable is set; the service must be configured to require it. Verify with
+an unauthenticated request — it should come back **401**, not a validation error.
+
+**Set `MAX_ATTACHMENT_BYTES` below your platform's request-body limit.** On Vercel
+that is 4.5 MB, so this sample runs with 4 MB. The limit is checked against the
+attachment *metadata* before anything is downloaded, so an oversized file fails as
+`oversized` on the dashboard instead of dying partway through the workflow with an
+opaque platform 413. A 5 MB invoice arrived on the first day of real use, so this is
+not hypothetical.
 
 Vercel Blob is created **as a private store**. The access mode cannot be changed
 after creation, and these are invoices.
@@ -146,6 +153,20 @@ such a message is accepted and flagged `sender_unverified` rather than rejected,
 because a demo that silently stops working the first time a header shape changes is
 worse than one that over-accepts behind a cap. `fail` and `unknown` are different
 things, and only `fail` is refused.
+
+For reference, this is what Resend actually delivers — note the authserv-id is
+`amazonses.com`, not a Resend domain, because Resend receives on SES:
+
+```
+amazonses.com; spf=pass (spfCheck: domain of example.com designates
+  198.51.100.10 as permitted sender) client-ip=198.51.100.10;
+  envelope-from=someone@example.com; helo=mail-lf2-f12.google.com;
+  dkim=pass header.i=@example.com; dmarc=pass header.from=example.com;
+```
+
+`_lib/auth-results.ts` parses that correctly and returns `verified: true`, so a
+well-formed message does not pick up `sender_unverified`. If you adapt this for a
+different provider, that authserv-id token is the thing most likely to differ.
 
 **`MAX_EXTRACTIONS_PER_HOUR`.** The ceiling if something slips through — a spoof
 that fails open, or a mailing list pointed at the address by accident. Over the cap
@@ -256,3 +277,27 @@ human-verified key in `../extraction-studio/lib/verified.ts`):
   real accuracy signal.
 - ~8% of values span more than one text block, so draw every `source_bbox` rather
   than the single merged `bbox`.
+- **The values are stable across runs; the citations are not.** The same invoice
+  replayed minutes apart returned byte-identical numbers — same total, same nine
+  line items, sums matching — but a different number of grounded fields (25 or 26,
+  and on one run a field that could not be located at all). So the same document
+  can land `processed` on one run and `needs_review` with `ungrounded_field` on the
+  next. That is correct behaviour, not a bug, but expect it when demonstrating.
+  It is also why no accuracy claim here is stated as a single number.
+
+### The durable workflow earns its keep
+
+This is the part that is easy to take on faith, so it was measured. Six runs were
+started 25 seconds apart and a **new production deployment was shipped while three
+of them were mid-extraction** — one 54 seconds in, one 28, one 2.
+
+All six finished `processed`, with identical values and `attempt_count` of 1. The
+extraction service — the expensive, slow step — was called **exactly six times for
+six runs**. The three interrupted runs did not redo the work they had already
+completed; their recorded step output survived the deployment that replaced the
+code executing them, and each resumed after it.
+
+Interrupted and uninterrupted runs were indistinguishable in the output. That is
+the whole argument for putting a durable workflow behind a webhook rather than
+doing the work inline: a deploy in the middle of someone's invoice is a normal
+Tuesday, and nobody has to think about it.
