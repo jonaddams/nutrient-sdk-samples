@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
 import { ExtractionDetail } from "./_components/ExtractionDetail";
 import { StatusBadge } from "./_components/StatusBadge";
@@ -17,6 +17,15 @@ const FIXTURES = [
   { id: "fixture-untrusted-sender", label: "Sender outside the allowlist" },
 ];
 
+// "needs_review" -> "Needs review". The status values are snake_case in the
+// database and on the wire; only the chip label is humanised, so filtering
+// still compares the raw value.
+function statusLabel(status: string) {
+  if (status === "All") return "All";
+  const s = status.replace(/_/g, " ");
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export default function EmailExtractionPipelinePage() {
   const [items, setItems] = useState<ExtractionListItem[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -25,6 +34,27 @@ export default function EmailExtractionPipelinePage() {
   const [replaying, setReplaying] = useState<string | null>(null);
   const [replayError, setReplayError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  // Chips are driven by `counts` (the server's totals across ALL rows), not by
+  // what is currently loaded — so a count never changes just because a filter
+  // is applied. "All" is derived by summing rather than using items.length,
+  // which would only ever describe the current page.
+  const chips = useMemo(() => {
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const byStatus = Object.entries(counts)
+      .filter(([, n]) => n > 0)
+      .sort(([a], [b]) => a.localeCompare(b));
+    return [["All", total] as const, ...byStatus];
+  }, [counts]);
+
+  const visible = useMemo(
+    () =>
+      statusFilter === "All"
+        ? items
+        : items.filter((row) => row.status === statusFilter),
+    [items, statusFilter],
+  );
 
   const load = useCallback(async () => {
     try {
@@ -103,7 +133,7 @@ export default function EmailExtractionPipelinePage() {
                 type="button"
                 disabled={replaying !== null}
                 onClick={() => replay(f.id)}
-                className="rounded-full border border-[var(--line)] px-4 py-2 text-sm transition-opacity disabled:opacity-50"
+                className="chip disabled:opacity-50"
               >
                 {replaying === f.id ? "Replaying…" : f.label}
               </button>
@@ -116,14 +146,27 @@ export default function EmailExtractionPipelinePage() {
           )}
         </section>
 
-        <div className="mb-4 flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <h2 className="text-lg font-medium tracking-[-0.48px]">
             Extractions
           </h2>
-          {Object.entries(counts).map(([status, n]) => (
-            <span key={status} className="text-sm text-[var(--ink-3)]">
-              {status}: {n}
-            </span>
+        </div>
+
+        {/* Same .filter-bar/.chip/.count markup the Web SDK sample index uses,
+            so the two filters look and behave identically and this one inherits
+            the theme-aware chip styling for free. */}
+        <div className="filter-bar">
+          {chips.map(([status, n]) => (
+            <button
+              key={status}
+              type="button"
+              className="chip"
+              aria-pressed={statusFilter === status}
+              onClick={() => setStatusFilter(status)}
+            >
+              {statusLabel(status)}
+              <span className="count">{n}</span>
+            </button>
           ))}
         </div>
 
@@ -144,13 +187,27 @@ export default function EmailExtractionPipelinePage() {
           </div>
         )}
 
+        {!loading && !error && items.length > 0 && visible.length === 0 && (
+          <p className="text-sm text-[var(--ink-3)]">
+            No extractions with status “{statusLabel(statusFilter)}” on this
+            page.{" "}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => setStatusFilter("All")}
+            >
+              Show all
+            </button>
+          </p>
+        )}
+
         {!loading && !error && items.length === 0 && (
           <p className="text-sm text-[var(--ink-3)]">
             No extractions yet. Replay a sample email to see one appear.
           </p>
         )}
 
-        {items.length > 0 && (
+        {visible.length > 0 && (
           <table className="w-full text-sm">
             <thead>
               <tr className="font-semi-mono text-left text-xs uppercase tracking-[0.24px]">
@@ -161,7 +218,7 @@ export default function EmailExtractionPipelinePage() {
               </tr>
             </thead>
             <tbody>
-              {items.map((row) => (
+              {visible.map((row) => (
                 <tr
                   key={row.id}
                   onClick={() => setOpenId(openId === row.id ? null : row.id)}
