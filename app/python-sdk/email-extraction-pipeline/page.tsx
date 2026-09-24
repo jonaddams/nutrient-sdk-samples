@@ -77,7 +77,7 @@ export default function EmailExtractionPipelinePage() {
   }, [load]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-neutral-default-primary,#fff)]">
+    <div className="min-h-screen bg-[var(--bg-elev)]">
       <PythonSampleHeader
         title="Email Extraction Pipeline"
         description="Inbound email becomes a validated, structured row with a bounding box for every extracted field."
@@ -87,11 +87,11 @@ export default function EmailExtractionPipelinePage() {
           sample whose point is a document beside its extracted values needs the
           room — at 1024px the viewer was narrower than the field table. */}
       <main className="mx-auto max-w-[1800px] px-6 py-8">
-        <section className="mb-8 rounded-3xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-6">
+        <section className="mb-8 rounded-3xl border border-[var(--line)] p-6">
           <h2 className="font-semi-mono mb-1 text-xs uppercase tracking-[0.24px]">
             Replay a sample email
           </h2>
-          <p className="mb-4 text-sm text-[var(--text-neutral-secondary,#666)]">
+          <p className="mb-4 text-sm text-[var(--ink-3)]">
             The inbound address is restricted, so replay a stored{" "}
             <code>email.received</code> payload instead — signed exactly as
             Resend signs it, through the same webhook route.
@@ -103,14 +103,14 @@ export default function EmailExtractionPipelinePage() {
                 type="button"
                 disabled={replaying !== null}
                 onClick={() => replay(f.id)}
-                className="rounded-full border border-[var(--border-neutral-default-primary,#e5e5e5)] px-4 py-2 text-sm transition-opacity disabled:opacity-50"
+                className="rounded-full border border-[var(--line)] px-4 py-2 text-sm transition-opacity disabled:opacity-50"
               >
                 {replaying === f.id ? "Replaying…" : f.label}
               </button>
             ))}
           </div>
           {replayError && (
-            <p className="mt-3 font-mono text-xs text-[var(--text-state-error,#e5484d)]">
+            <p className="mt-3 font-mono text-xs text-[var(--danger, #e5484d)]">
               {replayError}
             </p>
           )}
@@ -121,10 +121,7 @@ export default function EmailExtractionPipelinePage() {
             Extractions
           </h2>
           {Object.entries(counts).map(([status, n]) => (
-            <span
-              key={status}
-              className="text-sm text-[var(--text-neutral-secondary,#666)]"
-            >
+            <span key={status} className="text-sm text-[var(--ink-3)]">
               {status}: {n}
             </span>
           ))}
@@ -133,12 +130,12 @@ export default function EmailExtractionPipelinePage() {
         {loading && <p className="text-sm">Loading…</p>}
 
         {error && (
-          <div className="rounded-2xl border border-[var(--border-state-error,#e5484d)] p-4 text-sm">
+          <div className="rounded-2xl border border-[var(--danger, #e5484d)] p-4 text-sm">
             <p className="mb-1 font-medium">
               Could not read the extractions table.
             </p>
             <p className="font-mono text-xs">{error}</p>
-            <p className="mt-2 text-[var(--text-neutral-secondary,#666)]">
+            <p className="mt-2 text-[var(--ink-3)]">
               This sample uses its own Neon database via{" "}
               <code>EXTRACTIONS_DATABASE_URL</code> — separate from{" "}
               <code>DATABASE_URL</code>, which is the search index. Run{" "}
@@ -148,7 +145,7 @@ export default function EmailExtractionPipelinePage() {
         )}
 
         {!loading && !error && items.length === 0 && (
-          <p className="text-sm text-[var(--text-neutral-secondary,#666)]">
+          <p className="text-sm text-[var(--ink-3)]">
             No extractions yet. Replay a sample email to see one appear.
           </p>
         )}
@@ -168,10 +165,8 @@ export default function EmailExtractionPipelinePage() {
                 <tr
                   key={row.id}
                   onClick={() => setOpenId(openId === row.id ? null : row.id)}
-                  className={`cursor-pointer border-t border-[var(--border-neutral-default-secondary,#f0f0f0)] ${
-                    openId === row.id
-                      ? "bg-[var(--bg-state-neutral,#f0f0f0)]"
-                      : ""
+                  className={`cursor-pointer border-t border-[var(--line)] ${
+                    openId === row.id ? "bg-[var(--accent-tint)]" : ""
                   }`}
                 >
                   <td className="py-3">{row.from_address ?? "—"}</td>
