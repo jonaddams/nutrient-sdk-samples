@@ -111,6 +111,29 @@ async function fetchEmail(emailId: string) {
 
   const { data, error } = await resend().emails.receiving.get(emailId);
   if (error) throw new Error(`receiving.get failed: ${error.message}`);
+
+  const auth = parseAuthResults(
+    (data as { headers?: unknown } | null)?.headers as never,
+  );
+
+  // `auth-results.ts` fails OPEN on an undeterminable result, deliberately:
+  // failing closed on an unverified guess about a header shape would reject
+  // every email the first time that shape changed. The cost is that a shape
+  // MISMATCH is indistinguishable from a genuinely absent header — both land
+  // `sender_unverified`, and neither tells you what arrived.
+  //
+  // So log the header itself, once, on the real-email path. This is the only
+  // way to learn the shape Resend actually sends; fixtures never reach here.
+  // Bounded to 500 characters because it is diagnostic, not an audit trail,
+  // and it carries sender domains and relay IPs that do not belong in a log
+  // line any longer than they have to be.
+  console.info(
+    "[inbound] Authentication-Results for %s: parsed=%o raw=%s",
+    emailId,
+    { dmarc: auth.dmarc, spf: auth.spf, dkim: auth.dkim },
+    auth.raw ? JSON.stringify(auth.raw).slice(0, 500) : "(absent)",
+  );
+
   return {
     subject: data?.subject ?? null,
     text: data?.text ?? null,
@@ -118,9 +141,7 @@ async function fetchEmail(emailId: string) {
     attachments: data?.attachments ?? [],
     // The sender allowlist matches on `From`, which is forgeable. These are what
     // make it mean something — see _lib/auth-results.ts.
-    auth: parseAuthResults(
-      (data as { headers?: unknown } | null)?.headers as never,
-    ),
+    auth,
   };
 }
 
