@@ -287,7 +287,7 @@ export function CitationViewer({
   return (
     <div
       ref={containerRef}
-      className="h-[70vh] w-full overflow-hidden rounded-2xl border border-[var(--border-neutral-default-primary,#e5e5e5)]"
+      className="h-[calc(100vh-12rem)] min-h-[560px] w-full overflow-hidden rounded-2xl border border-[var(--border-neutral-default-primary,#e5e5e5)]"
     />
   );
 }
