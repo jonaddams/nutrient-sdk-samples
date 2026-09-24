@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { put } from "@vercel/blob";
 import { Resend } from "resend";
+import { FatalError } from "workflow";
 import { extractionsPool } from "@/lib/extractions-db";
 import { parseAuthResults, senderIsAuthentic } from "../_lib/auth-results";
 import { fixtureAttachment, fixtureEmail, isFixture } from "../_lib/fixtures";
@@ -181,7 +182,10 @@ async function fetchPrimaryAttachment(
 
   const chosen = qualifying[0];
   if (typeof chosen.size === "number" && chosen.size > MAX_ATTACHMENT_BYTES) {
-    throw new Error(
+    // FatalError, not Error: the size will be the same on every attempt, so
+    // retrying burns two more attempts to reach the same conclusion and buries
+    // the real reason under "failed after 3 retries".
+    throw new FatalError(
       `attachment ${chosen.size} bytes exceeds MAX_ATTACHMENT_BYTES ${MAX_ATTACHMENT_BYTES}`,
     );
   }
@@ -190,8 +194,13 @@ async function fetchPrimaryAttachment(
   // step output: a workflow resuming after an interruption would find it dead.
   // Record the bytes instead.
   const res = await fetch(chosen.download_url);
-  if (!res.ok)
-    throw new Error(`attachment download failed: HTTP ${res.status}`);
+  if (!res.ok) {
+    // A 5xx or a 429 may well succeed on the next attempt; a 404 or a 403 on a
+    // signed url will not. Retrying the second kind only delays the failure.
+    const worthRetrying = res.status >= 500 || res.status === 429;
+    const message = `attachment download failed: HTTP ${res.status}`;
+    throw worthRetrying ? new Error(message) : new FatalError(message);
+  }
   const bytes = Buffer.from(await res.arrayBuffer());
 
   return {
@@ -339,9 +348,13 @@ async function runExtraction(
 
   if (!res.ok) {
     const detail = await res.text();
-    throw new Error(
-      `extraction service ${res.status}: ${detail.slice(0, 300)}`,
-    );
+    // Same split. A 401 means the shared secret is wrong and a 422 means the
+    // request is malformed — neither improves by being sent again, and both are
+    // configuration mistakes worth surfacing immediately rather than three
+    // attempts later.
+    const worthRetrying = res.status >= 500 || res.status === 429;
+    const message = `extraction service ${res.status}: ${detail.slice(0, 300)}`;
+    throw worthRetrying ? new Error(message) : new FatalError(message);
   }
 
   const envelope = (await res.json()) as {
