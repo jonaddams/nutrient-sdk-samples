@@ -83,7 +83,10 @@ export default function EmailExtractionPipelinePage() {
         description="Inbound email becomes a validated, structured row with a bounding box for every extracted field."
       />
 
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      {/* 1800px, matching web-sdk/indexed-search. The site shell is 1200px, but a
+          sample whose point is a document beside its extracted values needs the
+          room — at 1024px the viewer was narrower than the field table. */}
+      <main className="mx-auto max-w-[1800px] px-6 py-8">
         <section className="mb-8 rounded-3xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-6">
           <h2 className="font-semi-mono mb-1 text-xs uppercase tracking-[0.24px]">
             Replay a sample email

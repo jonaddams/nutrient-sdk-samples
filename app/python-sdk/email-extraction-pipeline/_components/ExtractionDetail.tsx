@@ -157,8 +157,12 @@ export function ExtractionDetail({
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div>
+      {/* Fields get a fixed column, the document gets the rest. A 50/50 split
+          gave half the width to a table that never needs it and starved the
+          thing the sample exists to show. Mirrors the design system's
+          .sample-shell.left and indexed-search's 420px rail. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <div className="min-w-0">
           <h4 className="font-semi-mono mb-2 text-xs uppercase tracking-[0.24px]">
             Extracted fields
           </h4>
@@ -248,7 +252,7 @@ export function ExtractionDetail({
               onCitationPress={setActivePath}
             />
           ) : (
-            <pre className="h-[70vh] overflow-auto rounded-2xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-4 text-xs whitespace-pre-wrap">
+            <pre className="h-[calc(100vh-12rem)] min-h-[560px] overflow-auto rounded-2xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-4 text-xs whitespace-pre-wrap">
               {detail.raw_body ?? "(no body)"}
             </pre>
           )}
