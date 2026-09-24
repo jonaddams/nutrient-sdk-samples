@@ -9,6 +9,12 @@ import type { ExtractionStatus } from "../_lib/types";
  * survives a redeploy mid-extraction.
  */
 
+// The --bg-state-* tokens below are NOT defined by this app's design system —
+// it ships a neutral scale (--ink/--line/--bg-elev) and no semantic status
+// colours. The var() form is kept so a future token would win, but the pale
+// fallbacks are what actually render, in both themes. That is deliberate: a
+// status chip should read the same in light and dark, which is also why the
+// label sets its own dark colour below instead of inheriting the page ink.
 const STYLES: Record<
   ExtractionStatus,
   { label: string; bg: string; spinner: boolean }
@@ -45,7 +51,9 @@ export function StatusBadge({ status }: { status: ExtractionStatus }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs"
-      style={{ background: style.bg }}
+      // The backgrounds are pale in BOTH themes, so the label cannot inherit
+      // the page ink — in dark mode that is near-white on near-white.
+      style={{ background: style.bg, color: "#1C1917" }}
     >
       {style.spinner && (
         <span

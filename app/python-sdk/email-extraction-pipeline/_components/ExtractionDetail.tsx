@@ -113,13 +113,13 @@ export function ExtractionDetail({
   const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
 
   return (
-    <div className="mt-4 rounded-3xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-6">
+    <div className="mt-4 rounded-3xl border border-[var(--line)] p-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg tracking-[-0.48px]">
             {detail.subject ?? "(no subject)"}
           </h3>
-          <p className="text-sm text-[var(--text-neutral-secondary,#666)]">
+          <p className="text-sm text-[var(--ink-3)]">
             {detail.from_address ?? "—"}
           </p>
         </div>
@@ -132,7 +132,7 @@ export function ExtractionDetail({
       </div>
 
       {detail.review_flags.length > 0 && (
-        <ul className="mb-3 space-y-1 rounded-2xl bg-[var(--bg-state-warning,#fff3bf)] p-3 text-sm">
+        <ul className="mb-3 space-y-1 rounded-2xl bg-[var(--bg-state-warning,#fff3bf)] p-3 text-sm text-[#1C1917]">
           {detail.review_flags.map((f) => (
             <li key={f}>{REVIEW_COPY[f] ?? f}</li>
           ))}
@@ -143,7 +143,7 @@ export function ExtractionDetail({
           input, not defects, and making them look like problems is exactly the
           confusion the two-tier split exists to avoid. */}
       {detail.context_flags.length > 0 && (
-        <ul className="mb-3 space-y-1 text-sm text-[var(--text-neutral-secondary,#666)]">
+        <ul className="mb-3 space-y-1 text-sm text-[var(--ink-3)]">
           {detail.context_flags.map((f) => (
             <li key={f}>{CONTEXT_COPY[f] ?? f}</li>
           ))}
@@ -177,19 +177,17 @@ export function ExtractionDetail({
                     onClick={() =>
                       citation && setActivePath(isActive ? null : key)
                     }
-                    className={`border-t border-[var(--border-neutral-default-secondary,#f0f0f0)] ${
+                    className={`border-t border-[var(--line)] ${
                       citation ? "cursor-pointer" : ""
-                    } ${isActive ? "bg-[var(--bg-state-neutral,#f0f0f0)]" : ""}`}
+                    } ${isActive ? "bg-[var(--accent-tint)]" : ""}`}
                   >
-                    <td className="py-2 pr-3 text-[var(--text-neutral-secondary,#666)]">
-                      {key}
-                    </td>
+                    <td className="py-2 pr-3 text-[var(--ink-3)]">{key}</td>
                     <td className="py-2 text-right font-mono">
                       {formatValue(key, value, data)}
                     </td>
                     <td className="w-16 py-2 pl-3 text-right text-xs">
                       {citation ? (
-                        <span className="text-[var(--text-neutral-secondary,#666)]">
+                        <span className="text-[var(--ink-3)]">
                           p.{citation.page + 1}
                         </span>
                       ) : (
@@ -223,9 +221,9 @@ export function ExtractionDetail({
                         onClick={() =>
                           citation && setActivePath(isActive ? null : path)
                         }
-                        className={`border-t border-[var(--border-neutral-default-secondary,#f0f0f0)] ${
+                        className={`border-t border-[var(--line)] ${
                           citation ? "cursor-pointer" : ""
-                        } ${isActive ? "bg-[var(--bg-state-neutral,#f0f0f0)]" : ""}`}
+                        } ${isActive ? "bg-[var(--accent-tint)]" : ""}`}
                       >
                         <td className="py-2 pr-3">{li.description}</td>
                         <td className="py-2 text-right font-mono">
@@ -252,7 +250,7 @@ export function ExtractionDetail({
               onCitationPress={setActivePath}
             />
           ) : (
-            <pre className="h-[calc(100vh-12rem)] min-h-[560px] overflow-auto rounded-2xl border border-[var(--border-neutral-default-primary,#e5e5e5)] p-4 text-xs whitespace-pre-wrap">
+            <pre className="h-[calc(100vh-12rem)] min-h-[560px] overflow-auto rounded-2xl border border-[var(--line)] p-4 text-xs whitespace-pre-wrap">
               {detail.raw_body ?? "(no body)"}
             </pre>
           )}
