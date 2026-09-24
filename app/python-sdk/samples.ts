@@ -110,6 +110,5 @@ export const samples: Sample[] = [
     description:
       "Inbound email to structured data: webhook, durable workflow, and grounded citations you can click through to the source page",
     path: "/python-sdk/email-extraction-pipeline",
-    wip: true,
   },
 ];

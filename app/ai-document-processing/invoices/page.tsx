@@ -35,6 +35,22 @@ export default function InvoiceManagement() {
             advanced technology automatically extracts and validates key
             information.
           </p>
+          <p
+            className="mt-4 max-w-3xl mx-auto text-sm sm:text-base text-center"
+            style={{ color: "var(--foreground)", opacity: 0.7 }}
+          >
+            Looking for the other direction? The{" "}
+            <Link
+              href="/python-sdk/email-extraction-pipeline"
+              className="underline"
+              style={{ opacity: 1 }}
+            >
+              Email Extraction Pipeline
+            </Link>{" "}
+            ingests invoices as email arrives and returns a bounding box for
+            every extracted value. This demo classifies and extracts from a
+            batch you upload, using XtractFlow template definitions.
+          </p>
         </div>
 
         <div className="mt-16 grid sm:grid-cols-2 md:grid-cols-3 gap-6">
