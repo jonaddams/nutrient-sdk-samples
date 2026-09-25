@@ -38,6 +38,26 @@ function formatValue(
   return String(value);
 }
 
+/** Readable sentences, not enum strings. A reviewer should not decode jargon. */
+const REVIEW_COPY: Record<string, string> = {
+  missing_required: "A required field could not be read.",
+  currency_unknown: "The currency is not stated on the document.",
+  subtotal_mismatch: "Line items do not sum to the subtotal.",
+  total_mismatch:
+    "Subtotal + tax + shipping − discount does not equal the total.",
+  date_unparseable: "The due date could not be parsed.",
+  ungrounded_field: "A value could not be located on the page.",
+  no_document_to_extract:
+    "No document was attached, so there was nothing to ground against.",
+};
+
+const CONTEXT_COPY: Record<string, string> = {
+  no_attachment: "Extracted from the email body — no attachment.",
+  multiple_attachments:
+    "More than one attachment; only the first was processed.",
+  extraction_reused: "Result reused from an earlier identical document.",
+};
+
 type Tab = "fields" | "lines" | "run" | "json";
 
 export function DetailWorkspace({ id }: { id: string }) {
@@ -117,11 +137,28 @@ export function DetailWorkspace({ id }: { id: string }) {
         </nav>
 
         <div className="ep-dhead-row">
-          <div>
-            <h1 className="ep-dtitle">
-              <Link href={BASE} className="ep-back" aria-label="Back to list">
-                ←
-              </Link>
+          <Link
+            href={BASE}
+            className="btn ghost icon"
+            title="All extractions (Esc)"
+            aria-label="Back to extractions"
+          >
+            <svg
+              aria-hidden="true"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5m6-6-6 6 6 6" />
+            </svg>
+          </Link>
+          <div className="ep-dtitle">
+            <h1>
               {isReplay && <span className="tag">Replay</span>}
               <span className="mono">{subject.replace("Replay: ", "")}</span>
             </h1>
@@ -231,17 +268,44 @@ export function DetailWorkspace({ id }: { id: string }) {
             )}
 
             {tab === "run" && (
-              <div className="ep-run mono">
-                <div>status: {detail.status}</div>
-                <div>attempts: {detail.attempt_count ?? "—"}</div>
-                <div>
-                  review_flags: {detail.review_flags.join(", ") || "none"}
-                </div>
-                <div>
-                  context_flags: {detail.context_flags.join(", ") || "none"}
-                </div>
-                <div>error: {detail.error_reason ?? "none"}</div>
-                <div>sha256: {detail.content_sha256 ?? "—"}</div>
+              <div className="ep-run">
+                {detail.review_flags.map((f) => (
+                  <p key={f} className="ep-notice review">
+                    {REVIEW_COPY[f] ?? f}
+                  </p>
+                ))}
+                {detail.context_flags.map((f) => (
+                  <p key={f} className="ep-notice">
+                    {CONTEXT_COPY[f] ?? f}
+                  </p>
+                ))}
+                {detail.error_reason && (
+                  <p className="ep-notice failed">{detail.error_reason}</p>
+                )}
+                {/* Raw values sit below the sentences: a reviewer reads the
+                    sentence, someone debugging wants the enum. */}
+                <dl className="mono">
+                  <div>
+                    <dt>status</dt>
+                    <dd>{detail.status}</dd>
+                  </div>
+                  <div>
+                    <dt>attempts</dt>
+                    <dd>{detail.attempt_count ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>review_flags</dt>
+                    <dd>{detail.review_flags.join(", ") || "none"}</dd>
+                  </div>
+                  <div>
+                    <dt>context_flags</dt>
+                    <dd>{detail.context_flags.join(", ") || "none"}</dd>
+                  </div>
+                  <div>
+                    <dt>sha256</dt>
+                    <dd>{detail.content_sha256 ?? "—"}</dd>
+                  </div>
+                </dl>
               </div>
             )}
 
