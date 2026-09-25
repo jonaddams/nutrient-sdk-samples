@@ -287,7 +287,10 @@ export function CitationViewer({
   return (
     <div
       ref={containerRef}
-      className="h-[calc(100vh-12rem)] min-h-[560px] w-full overflow-hidden rounded-2xl border border-[var(--line)]"
+      // Fills the container rather than setting its own height. The detail
+      // workspace sizes the cell (.ep-work clamps to the viewport), and a
+      // component that also picks a height fights whatever contains it.
+      className="h-full min-h-0 w-full overflow-hidden"
     />
   );
 }
