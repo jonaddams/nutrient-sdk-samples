@@ -179,7 +179,10 @@ export function DetailWorkspace({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="ep-work">
+      {/* `left` is load-bearing: .ep-work is a single column until it gets a
+          layout modifier, so without it the panel and viewer stack inside a
+          fixed-height grid and the document ends up a few hundred pixels tall. */}
+      <div className="ep-work left">
         <aside className="ep-panel">
           <div className="ep-tabs" role="tablist">
             {(
