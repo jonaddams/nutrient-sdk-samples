@@ -1,8 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
-import { ExtractionDetail } from "./_components/ExtractionDetail";
 import type { ExtractionListItem } from "./_lib/types";
 // Global CSS, deliberately scoped under .ep — see styles.css.
 import "./styles.css";
@@ -95,11 +95,9 @@ function statusLabel(status: string) {
 
 function ListRow({
   row,
-  open,
   onOpen,
 }: {
   row: ExtractionListItem;
-  open: boolean;
   onOpen: () => void;
 }) {
   const data = row.extracted_data ?? {};
@@ -130,7 +128,7 @@ function ListRow({
   return (
     // biome-ignore lint/a11y/useSemanticElements: CSS Grid layout
     <div
-      className={`ep-tr ep-row ${open ? "fresh" : ""}`}
+      className="ep-tr ep-row"
       role="row"
       tabIndex={0}
       onClick={onOpen}
@@ -186,13 +184,13 @@ function ListRow({
 }
 
 export default function EmailExtractionPipelinePage() {
+  const router = useRouter();
   const [items, setItems] = useState<ExtractionListItem[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [replaying, setReplaying] = useState<string | null>(null);
   const [replayError, setReplayError] = useState<string | null>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("All");
   const [query, setQuery] = useState("");
 
@@ -460,17 +458,16 @@ export default function EmailExtractionPipelinePage() {
                   <ListRow
                     key={row.id}
                     row={row}
-                    open={openId === row.id}
-                    onOpen={() => setOpenId(openId === row.id ? null : row.id)}
+                    onOpen={() =>
+                      router.push(
+                        `/python-sdk/email-extraction-pipeline/${row.id}`,
+                      )
+                    }
                   />
                 ))}
               </Fragment>
             ))}
           </div>
-        )}
-
-        {openId && (
-          <ExtractionDetail id={openId} onClose={() => setOpenId(null)} />
         )}
       </main>
     </div>
