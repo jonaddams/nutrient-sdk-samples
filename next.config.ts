@@ -9,6 +9,18 @@ const nextConfig: NextConfig = {
   env: {
     WEB_SDK_VERSION: process.env.NEXT_PUBLIC_WEB_SDK_VERSION,
   },
+  // jonaddams.com is the canonical host: the Web SDK licence is bound to it.
+  // Matching the exact production alias leaves preview deployments alone.
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "nutrient-sdk-samples.vercel.app" }],
+        destination: "https://jonaddams.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   // Configure externals for Turbopack (development) - now stable
   turbopack: {
     root: __dirname,
