@@ -1,6 +1,6 @@
 # Email Extraction Pipeline
 
-Inbound email → validated structured data, with a bounding box for every
+Inbound email → validated structured data, with a citation for every
 extracted field.
 
 Not the same as the [AI Document Processing → Invoices](../../ai-document-processing/invoices)
@@ -16,7 +16,7 @@ webhook → durable workflow → extraction → confidence rules → a dashboard
 the rectangle each value was read from.
 
 Measured on a real message: a 36 KB invoice arrived, extracted in about 40 seconds,
-and landed `processed` with **17 grounded fields** — including a bounding box on
+and landed `processed` with **17 grounded fields** — including a citation on
 `line_items[0].description`, a field nested inside an array — and both arithmetic
 cross-checks closing.
 

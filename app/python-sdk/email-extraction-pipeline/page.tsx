@@ -324,7 +324,7 @@ export default function EmailExtractionPipelinePage({
     <div className="min-h-screen bg-[var(--bg-elev)]">
       <PythonSampleHeader
         title="Email Extraction Pipeline"
-        description="Inbound email becomes a validated, structured row with a bounding box for every extracted field."
+        description="Inbound email becomes a validated, structured row with a citation for every extracted field."
       />
 
       {/* 1800px, matching web-sdk/indexed-search. The site shell is 1200px, but a

@@ -47,9 +47,9 @@ export default function InvoiceManagement() {
             >
               Email Extraction Pipeline
             </Link>{" "}
-            ingests invoices as email arrives and returns a bounding box for
-            every extracted value. This demo classifies and extracts from a
-            batch you upload, using XtractFlow template definitions.
+            ingests invoices as email arrives and returns a citation for every
+            extracted value. This demo classifies and extracts from a batch you
+            upload, using XtractFlow template definitions.
           </p>
         </div>
 
