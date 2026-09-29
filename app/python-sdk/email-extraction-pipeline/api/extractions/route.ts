@@ -51,11 +51,15 @@ export async function GET(request: NextRequest) {
     }
     params.push(limit, offset);
 
+    // Newest RECEIVED first — the same date the list groups by and shows. The
+    // page groups consecutive rows by day in one walk, so ordering by anything
+    // else splits a day in two: a Resend retry can insert a row (created_at)
+    // hours after the email arrived (received_at). created_at breaks ties.
     const { rows } = await pool.query(
       `select ${LIST_COLUMNS}
          from extractions
          ${where}
-        order by created_at desc
+        order by coalesce(received_at, created_at) desc, created_at desc
         limit $${params.length - 1} offset $${params.length}`,
       params,
     );
