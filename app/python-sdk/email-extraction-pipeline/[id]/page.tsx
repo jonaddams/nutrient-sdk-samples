@@ -1,7 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useMemo } from "react";
 import { DetailWorkspace } from "../_components/DetailWorkspace";
+import { filterFromParams } from "../_lib/list-filter";
 import "../styles.css";
 
 /**
@@ -21,13 +22,25 @@ import "../styles.css";
  */
 export default function ExtractionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = use(params);
+  const sp = use(searchParams);
+  const status = typeof sp.status === "string" ? sp.status : "";
+  const q = typeof sp.q === "string" ? sp.q : "";
+  // The list filter the reader arrived with, so prev/next pages through the
+  // rows they were looking at. Memoised on its values: a fresh object every
+  // render would refetch the neighbours every render.
+  const filter = useMemo(
+    () => filterFromParams(new URLSearchParams({ status, q })),
+    [status, q],
+  );
   return (
     <div className="min-h-screen bg-[var(--bg-elev)]">
-      <DetailWorkspace id={id} />
+      <DetailWorkspace id={id} filter={filter} />
     </div>
   );
 }

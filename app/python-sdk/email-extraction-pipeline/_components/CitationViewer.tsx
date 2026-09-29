@@ -16,10 +16,22 @@ import type { FieldCitation } from "../_lib/types";
 
 const LICENSE_KEY = process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY;
 
+const BOXES_ID = "citation-boxes";
+
 // Navigation only. Citations ARE annotations, so an editing tool within reach
-// lets a stray click delete the thing this view exists to show.
-const TOOLBAR: ToolbarItem[] = [
+// lets a stray click delete the thing this view exists to show. The one custom
+// item shows or hides them; `selected` is kept in step with the state.
+const toolbar = (showBoxes: boolean, onToggle: () => void): ToolbarItem[] => [
   { type: "sidebar-thumbnails" },
+  {
+    type: "custom",
+    id: BOXES_ID,
+    // With no icon, the SDK renders the title as the button's label.
+    title: "Boxes",
+    className: "ep-tb-boxes",
+    selected: showBoxes,
+    onPress: onToggle,
+  },
   { type: "pager" },
   { type: "spacer" },
   { type: "zoom-out" },
@@ -42,6 +54,8 @@ export function CitationViewer({
   const instanceRef = useRef<Instance | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBoxes, setShowBoxes] = useState(true);
+  const toggleBoxes = useCallback(() => setShowBoxes((v) => !v), []);
 
   // Annotation id -> field path, so a press on the canvas can select the field.
   const annotationToPath = useRef(new Map<string, string>());
@@ -91,7 +105,7 @@ export function CitationViewer({
         document: documentUrl,
         licenseKey: LICENSE_KEY,
         useCDN: true,
-        toolbarItems: TOOLBAR,
+        toolbarItems: toolbar(true, toggleBoxes),
       })
         .then((instance: Instance) => {
           if (cancelled) {
@@ -123,6 +137,7 @@ export function CitationViewer({
         });
     };
 
+    setShowBoxes(true);
     tryLoad();
     return () => {
       cancelled = true;
@@ -135,7 +150,7 @@ export function CitationViewer({
       annotationToPath.current.clear();
       painted.current.clear();
     };
-  }, [documentUrl, resolvePath]);
+  }, [documentUrl, resolvePath, toggleBoxes]);
 
   // Draw the citations once the document is ready.
   // biome-ignore lint/correctness/useExhaustiveDependencies: activePath is handled by the restyle effect; rebuilding on every click would flicker the layer.
@@ -198,6 +213,33 @@ export function CitationViewer({
       cancelled = true;
     };
   }, [ready, citations]);
+
+  // Show or hide the citation layer. The only annotations in this viewer are
+  // citations, so the SDK's own showAnnotations switch hides exactly the boxes
+  // without deleting and recreating them.
+  //
+  // The SDK only allows showAnnotations: false in read-only mode (it throws
+  // otherwise), so the two flip together in one update. Read-only must come
+  // back OFF when the boxes return: annotations.press only fires for editable
+  // annotations, and that press is what selects a field from the page.
+  useEffect(() => {
+    const instance = instanceRef.current;
+    if (!ready || !instance) return;
+    instance.setViewState((vs) =>
+      vs.set("readOnly", !showBoxes).set("showAnnotations", showBoxes),
+    );
+    instance.setToolbarItems((items) =>
+      items.map((item) =>
+        item.id === BOXES_ID ? { ...item, selected: showBoxes } : item,
+      ),
+    );
+  }, [ready, showBoxes]);
+
+  // Selecting a field with the boxes hidden would scroll to a highlight you
+  // cannot see, so a selection brings them back.
+  useEffect(() => {
+    if (activePath) setShowBoxes(true);
+  }, [activePath]);
 
   // Restyle on selection, and scroll the selected citation into view.
   useEffect(() => {
