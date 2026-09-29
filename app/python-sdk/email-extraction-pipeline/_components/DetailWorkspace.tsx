@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { ExtractionDetail } from "../_lib/types";
+import {
+  filterToQuery,
+  type ListFilter,
+  type Neighbours,
+  neighbours,
+} from "../_lib/list-filter";
+import type { ExtractionDetail, ExtractionListItem } from "../_lib/types";
 import { CitationViewer } from "./CitationViewer";
 
 const BASE = "/python-sdk/email-extraction-pipeline";
@@ -60,8 +67,34 @@ const CONTEXT_COPY: Record<string, string> = {
 
 type Tab = "fields" | "lines" | "run" | "json";
 
-export function DetailWorkspace({ id }: { id: string }) {
+function Chevron({ d }: { d: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
+export function DetailWorkspace({
+  id,
+  filter,
+}: {
+  id: string;
+  filter: ListFilter;
+}) {
+  const router = useRouter();
   const [detail, setDetail] = useState<ExtractionDetail | null>(null);
+  const [pager, setPager] = useState<Neighbours | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("fields");
   const [activePath, setActivePath] = useState<string | null>(null);
@@ -83,23 +116,60 @@ export function DetailWorkspace({ id }: { id: string }) {
     };
   }, [id]);
 
-  // Escape returns to the list. The detail is a route now, so this is the
-  // keyboard equivalent of the back button rather than closing a panel.
+  // The filter came in on the URL; carrying it on every link out is what keeps
+  // prev/next, Back and Esc inside the list the reader was looking at.
+  const query = filterToQuery(filter);
+  const listHref = `${BASE}${query}`;
+
+  // Prev/next walks the same rows the list page showed: the same endpoint
+  // (first page, newest first) through the same filter. Loaded beside the
+  // detail rather than after it, and non-fatal: without it there is no pager.
+  useEffect(() => {
+    let cancelled = false;
+    setPager(null);
+    (async () => {
+      try {
+        const res = await fetch(`${BASE}/api/extractions`);
+        if (!res.ok) return;
+        const body = (await res.json()) as {
+          extractions?: ExtractionListItem[];
+        };
+        if (!cancelled)
+          setPager(neighbours(body.extractions ?? [], id, filter));
+      } catch {
+        // No pager is a fine degradation; the detail itself still renders.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, filter]);
+
+  const prevId = pager?.prevId ?? null;
+  const nextId = pager?.nextId ?? null;
+
+  // Escape returns to the list; J and K step through it. Not the arrow keys:
+  // they scroll the document inside the viewer.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
       if (el && /input|textarea/i.test(el.tagName)) return;
-      if (e.key === "Escape") window.location.assign(BASE);
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "Escape") router.push(listHref);
+      else if (e.key === "j" && nextId)
+        router.push(`${BASE}/${nextId}${query}`);
+      else if (e.key === "k" && prevId)
+        router.push(`${BASE}/${prevId}${query}`);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [router, listHref, query, prevId, nextId]);
 
   if (error)
     return (
       <main className="ep ep-d mx-auto px-6 py-8">
         <p className="ep-err mono">{error}</p>
-        <Link href={BASE} className="ep-link">
+        <Link href={listHref} className="ep-link">
           Back to extractions
         </Link>
       </main>
@@ -131,14 +201,14 @@ export function DetailWorkspace({ id }: { id: string }) {
           <span>/</span>
           <Link href="/python-sdk">Python SDK</Link>
           <span>/</span>
-          <Link href={BASE}>Email Extraction Pipeline</Link>
+          <Link href={listHref}>Email Extraction Pipeline</Link>
           <span>/</span>
           <span className="mono">{detail.email_id.slice(0, 14)}</span>
         </nav>
 
         <div className="ep-dhead-row">
           <Link
-            href={BASE}
+            href={listHref}
             className="btn ghost icon"
             title="All extractions (Esc)"
             aria-label="Back to extractions"
@@ -176,6 +246,33 @@ export function DetailWorkspace({ id }: { id: string }) {
               )}
             </div>
           </div>
+          {pager && (
+            <div className="ep-dactions">
+              <div className="ep-pager">
+                <button
+                  type="button"
+                  disabled={!prevId}
+                  onClick={() => router.push(`${BASE}/${prevId}${query}`)}
+                  title="Previous (K)"
+                  aria-label="Previous extraction"
+                >
+                  <Chevron d="m15 18-6-6 6-6" />
+                </button>
+                <span className="mono">
+                  {pager.index + 1} / {pager.total}
+                </span>
+                <button
+                  type="button"
+                  disabled={!nextId}
+                  onClick={() => router.push(`${BASE}/${nextId}${query}`)}
+                  title="Next (J)"
+                  aria-label="Next extraction"
+                >
+                  <Chevron d="m9 18 6-6-6-6" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

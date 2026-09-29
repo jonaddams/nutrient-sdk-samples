@@ -1,8 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { PythonSampleHeader } from "../_components/PythonSampleHeader";
+import {
+  ALL,
+  filterFromParams,
+  filterToQuery,
+  matchesFilter,
+} from "./_lib/list-filter";
 import type { ExtractionListItem } from "./_lib/types";
 // Global CSS, deliberately scoped under .ep — see styles.css.
 import "./styles.css";
@@ -183,16 +196,40 @@ function ListRow({
   );
 }
 
-export default function EmailExtractionPipelinePage() {
+export default function EmailExtractionPipelinePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const router = useRouter();
+  // The filter lives in the URL, not only in state: the detail page reads it
+  // back to page through the same rows, and a filtered view survives a reload.
+  const initial = filterFromParams(
+    new URLSearchParams(
+      Object.entries(use(searchParams)).flatMap(([k, v]) =>
+        typeof v === "string" ? [[k, v]] : [],
+      ),
+    ),
+  );
   const [items, setItems] = useState<ExtractionListItem[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [replaying, setReplaying] = useState<string | null>(null);
   const [replayError, setReplayError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState(initial.status);
+  const [query, setQuery] = useState(initial.q);
+  const filterQuery = filterToQuery({ status: statusFilter, q: query });
+
+  // replaceState rather than router.replace: Next keeps useSearchParams in sync
+  // with it, and it costs no server round trip per keystroke in the search box.
+  useEffect(() => {
+    window.history.replaceState(
+      null,
+      "",
+      `/python-sdk/email-extraction-pipeline${filterQuery}`,
+    );
+  }, [filterQuery]);
 
   // Chips are driven by `counts` (the server's totals across ALL rows), not by
   // what is currently loaded — so a count never changes just because a filter
@@ -206,25 +243,13 @@ export default function EmailExtractionPipelinePage() {
     return [["All", total] as const, ...byStatus];
   }, [counts]);
 
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return items.filter((row) => {
-      if (statusFilter !== "All" && row.status !== statusFilter) return false;
-      if (!q) return true;
-      // Search the extracted values too, not just the envelope — finding an
-      // invoice by its number or vendor is the reason you would search here.
-      const haystack = [
-        row.from_address,
-        row.subject,
-        ...Object.values(row.extracted_data ?? {}).map((v) =>
-          typeof v === "object" ? "" : String(v ?? ""),
-        ),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [items, statusFilter, query]);
+  const visible = useMemo(
+    () =>
+      items.filter((row) =>
+        matchesFilter(row, { status: statusFilter, q: query }),
+      ),
+    [items, statusFilter, query],
+  );
 
   // Consecutive runs of the same day become one group. Rows are already
   // newest-first from the API, so this is a walk rather than a sort.
@@ -417,7 +442,7 @@ export default function EmailExtractionPipelinePage() {
               type="button"
               className="ep-link"
               onClick={() => {
-                setStatusFilter("All");
+                setStatusFilter(ALL);
                 setQuery("");
               }}
             >
@@ -460,7 +485,7 @@ export default function EmailExtractionPipelinePage() {
                     row={row}
                     onOpen={() =>
                       router.push(
-                        `/python-sdk/email-extraction-pipeline/${row.id}`,
+                        `/python-sdk/email-extraction-pipeline/${row.id}${filterQuery}`,
                       )
                     }
                   />
