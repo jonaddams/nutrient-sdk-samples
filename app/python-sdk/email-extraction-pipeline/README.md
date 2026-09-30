@@ -109,6 +109,21 @@ webhook's page into `RESEND_WEBHOOK_SECRET`.
 Resend has to reach the endpoint, so local testing needs a tunnel — or just use the
 Replay buttons, which drive the same route with a locally signed payload.
 
+**Keep exactly one webhook per endpoint.** Resend delivers every event to every
+webhook, and each webhook signs with its own secret. A leftover webhook pointing at
+the same URL (say, from an earlier setup) signs with a secret your deployment no
+longer has, so every email arrives twice: one delivery returns 200 and the other
+401. Resend keeps retrying the failing one and eventually disables it, then emails
+you asking to re-enable it. Don't: delete the stale webhook instead. The route logs
+the reason for every 401 (`[inbound] rejected webhook: …`), which is how to tell a
+duplicate from a genuine outage.
+
+**Rotating the signing secret** is a hard cutover, because the route accepts one
+secret. Rotate it in Resend, update `RESEND_WEBHOOK_SECRET`, and redeploy. Anything
+delivered in between gets a 401 and is retried after the deploy. Then check both
+halves: a Replay proves the deployment loaded the new value, since it signs with it,
+and one real email proves Resend agrees.
+
 ### Two different filters, for two different problems
 
 **`INBOUND_RECIPIENT` — is this message mine?**
@@ -209,6 +224,12 @@ Replayed mail is addressed to `INBOUND_RECIPIENT` and sent from a derived addres
 sender allowlist a live delivery does. Turning the allowlist on therefore does not
 break the buttons. Override with `REPLAY_FROM`.
 
+**Replaying from a local dev server writes to whichever database `.env.local` points
+at, but the workflow run lives in that dev server.** Stop the server mid-extraction
+and the row stays `processing` for good: there is no longer a run to resume it, and
+the sweep only restarts rows still in `received`. Point local development at its
+own database, or let replays finish before stopping the server.
+
 For the failure paths, drive it from the command line:
 
 ```bash
@@ -234,6 +255,26 @@ pnpm tsx scripts/email-extraction-pipeline/sign-and-post.ts clean-invoice --from
 
 Any `whsec_`-prefixed base64 value works locally as long as the script and the
 server agree.
+
+## Reviewing an extraction
+
+The list's status chips and search box live in the URL (`?status=needs_review&q=…`),
+so a filtered view survives a reload and can be sent to someone. Opening a row keeps
+the filter: the detail page's `‹ 3 / 9 ›` pager and the **J** / **K** keys step through
+exactly the rows you were looking at, and Back or **Esc** returns to the same filtered
+list. Both pages share one filter function (`_lib/list-filter.ts`), so they cannot
+disagree about what "the list" is.
+
+Clicking a field scrolls to its citation on the page, and clicking a citation selects
+its field. The viewer's **Citations** button hides or shows them all. Two Web SDK
+details are worth copying from `_components/CitationViewer.tsx`:
+
+- **Hiding annotations requires read-only mode.** `ViewState.showAnnotations: false`
+  throws unless `readOnly` is also `true`, so the two flip together.
+- **`readOnly` must come back off when the citations return.** `annotations.press`
+  only fires for editable annotations, and that press is what selects a field from
+  the page. Citations stay "editable" but can't actually be moved: the press
+  handler's `preventDefault()` suppresses selection, so there are no handles.
 
 ## Running the tests
 
