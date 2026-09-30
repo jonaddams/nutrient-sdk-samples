@@ -305,6 +305,7 @@ function ResultsContent() {
               <div className="font-mono text-sm">
                 {processingLogs.map((log, index) => (
                   <div
+                    // biome-ignore lint/suspicious/noArrayIndexKey: the log is append-only (addLog is its only writer), so a line's index never changes, and messages can repeat, so content alone is not unique.
                     key={`log-${index}-${log.substring(0, 20)}`}
                     className="mb-1"
                     style={{ color: "var(--data-green)" }}
