@@ -277,13 +277,34 @@ human-verified key in `../extraction-studio/lib/verified.ts`):
   real accuracy signal.
 - ~8% of values span more than one text block, so draw every `source_bbox` rather
   than the single merged `bbox`.
-- **The values are stable across runs; the citations are not.** The same invoice
-  replayed minutes apart returned byte-identical numbers — same total, same nine
-  line items, sums matching — but a different number of grounded fields (25 or 26,
-  and on one run a field that could not be located at all). So the same document
-  can land `processed` on one run and `needs_review` with `ungrounded_field` on the
-  next. That is correct behaviour, not a bug, but expect it when demonstrating.
-  It is also why no accuracy claim here is stated as a single number.
+- **Expect the same document to land differently across runs.** It is measured
+  below, and it is why no accuracy claim here is stated as a single number.
+
+### Run-to-run variance, measured
+
+Each replay fixture was sent through production 10 times on 2026-09-30 (30 runs):
+
+| Fixture | Landed | Review flags | What varied |
+|---|---|---|---|
+| Clean invoice | 8 `processed`, 2 `needs_review` | `ungrounded_field` ×2 | Headline values identical in all 10. Fields with a citation: 6–8 of 10. Line items: the 9 lines in 8 runs, the 3 section subtotals in 2 |
+| Scanned invoice | 10 `needs_review` | `missing_required` ×9, `total_mismatch` ×4 | Totals identical. Discount sign (`122.00` vs `-122.00`) in 4 runs; invoice number `00162` vs `No 00162` in 3; vendor name found in 1 |
+| Body only | 10 `needs_review` | `no_document_to_extract` ×10 | Nothing. With no document there is nothing to cite |
+
+Three things worth copying from that:
+
+- **On a clean invoice the numbers hold; the review status does not.**
+  `needs_review` tracked citation coverage exactly: both runs with only 6 of 10
+  fields cited were flagged, and every run with 7 or 8 passed. The values were the
+  same either way.
+- **The arithmetic checks catch a wrong number, not a coarser reading.** In 2 runs
+  the model returned the three section subtotals as the line items. They sum to
+  the subtotal exactly, so both checks pass. One of those runs landed `processed`
+  with no flag. Nothing here compares the line-item count against the page.
+- **Schema ambiguity shows up as variance.** On the scanned invoice the model
+  returned the discount as a negative number in 4 of 10 runs and as a positive one
+  in 6. Subtracting a negative discount counts it twice, and `total_mismatch` caught it
+  every time. Saying "discount as a positive amount" in the schema, or taking the
+  absolute value before the check, would remove that source of variance.
 
 ### The durable workflow earns its keep
 
