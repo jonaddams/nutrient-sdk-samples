@@ -225,6 +225,99 @@ export default function Home() {
         </div>
       </a>
 
+      <a
+        href="https://bindery.jonaddams.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sdk-card"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: "var(--space-4)",
+          padding: "var(--space-6) var(--space-5)",
+          borderBottom: "1px solid var(--line)",
+          transition: "background .15s var(--ease)",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "var(--accent)",
+              }}
+            ></span>
+            <span
+              className="id"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-xs)",
+                letterSpacing: ".14em",
+                textTransform: "uppercase",
+                color: "var(--ink-4)",
+              }}
+            >
+              App 02 — bindery
+            </span>
+          </div>
+          <h3
+            style={{
+              fontFamily: "var(--font-display)",
+              fontStyle: "var(--display-style)",
+              fontWeight:
+                "var(--display-weight)" as React.CSSProperties["fontWeight"],
+              fontSize: 32,
+              letterSpacing: "-.015em",
+              lineHeight: 1.05,
+              margin: "0 0 8px",
+              color: "var(--ink)",
+            }}
+          >
+            Bindery
+          </h3>
+          <p
+            style={{
+              margin: 0,
+              color: "var(--ink-3)",
+              fontSize: "var(--text-sm)",
+              maxWidth: "52ch",
+              lineHeight: 1.55,
+            }}
+          >
+            A document workspace — Google and Microsoft sign-in, upload, the Web
+            SDK viewer with comments and @mentions, and server tools for OCR,
+            redaction, watermarking and PDF/A. Email and text notifications.
+          </p>
+          <div
+            style={{
+              marginTop: 16,
+              display: "flex",
+              gap: "var(--space-4)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-xs)",
+              letterSpacing: ".1em",
+              textTransform: "uppercase",
+              color: "var(--ink-3)",
+              flexWrap: "wrap",
+            }}
+          >
+            <span>7 screens</span>
+            <span>4 server tools</span>
+            <span>Light + dark</span>
+            <span>Mobile responsive</span>
+          </div>
+        </div>
+      </a>
+
       <div className="section-label">
         <div className="num">/ Index</div>
         <div className="title">Pick an SDK</div>
