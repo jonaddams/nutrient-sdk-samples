@@ -80,21 +80,6 @@ export interface CodeMirrorInstance {
   setSize(width: string | number, height: string | number): void;
 }
 
-// Application State Types
-export interface AppState {
-  docAuthSystem: DocAuthSystem | null;
-  template: TemplateType | null;
-  customTemplateBinary: ArrayBuffer | null;
-  templateDocument: DocAuthDocument | null;
-  templateEditor: DocAuthEditor | null;
-  dataJson: TemplateData | null;
-  dataEditor: CodeMirrorInstance | null;
-  docxDocument: DocAuthDocument | null;
-  docxEditor: DocAuthEditor | null;
-  pdfViewer: PSPDFKitViewer | null;
-  pdfDocument: ArrayBuffer | null;
-}
-
 // Template Types
 export type TemplateType = "checklist" | "invoice" | "menu" | "custom";
 
@@ -108,53 +93,6 @@ export interface TemplateConfig {
 export interface TemplateData {
   config: TemplateConfig;
   model: Record<string, unknown>;
-}
-
-// Step Management Types
-export type StepType =
-  | "template-selection"
-  | "template-editor"
-  | "data-editor"
-  | "docx-editor"
-  | "pdf-viewer";
-
-export interface StepState {
-  currentStep: StepType;
-  isTransitioning: boolean;
-  transitionMessage: string;
-}
-
-// Template Selection Types
-export interface TemplateOption {
-  id: TemplateType;
-  name: string;
-  description: string;
-  imagePath: string;
-}
-
-// Error Types
-export interface AppError {
-  message: string;
-  step?: StepType;
-  details?: unknown;
-}
-
-// Component Props Types
-export interface StepProps {
-  isActive: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
-  appState: AppState;
-  updateAppState: (updates: Partial<AppState>) => void;
-  navigateToStep?: (step: StepType) => Promise<void>;
-  showError?: (message: string, duration?: number) => string;
-  showSuccess?: (message: string, duration?: number) => string;
-  showWarning?: (message: string, duration?: number) => string;
-}
-
-export interface TransitionProps {
-  isVisible: boolean;
-  message: string;
 }
 
 // Programmatic API types (used inside transaction() callbacks)
