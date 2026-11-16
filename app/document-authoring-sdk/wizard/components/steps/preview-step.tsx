@@ -545,7 +545,7 @@ export default function PreviewStep() {
         )}
         <div
           ref={editorRef}
-          className="absolute inset-0"
+          className="docauth-host absolute inset-0"
           style={{
             position: "absolute",
             top: 0,

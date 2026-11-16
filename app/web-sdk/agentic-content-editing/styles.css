@@ -259,3 +259,39 @@
 .ace-form .ace-btn {
   align-self: flex-end;
 }
+
+/* globals.css makes every ul/ol a flex column with custom counters, which
+   strips list markers from the agent's Markdown replies. Restore them here. */
+.ace-md ul,
+.ace-md ol {
+  display: block;
+}
+.ace-md ul {
+  list-style: disc;
+}
+.ace-md ol {
+  list-style: decimal;
+}
+.ace-md ol > li::before {
+  content: none;
+}
+
+/* Dark theme: the light tints above glare (or vanish) on the dark panel. */
+[data-theme="dark"] .ace-tool-detail {
+  color: #fcd34d;
+}
+[data-theme="dark"] .ace-tool-failed .ace-tool-detail {
+  color: #fca5a5;
+}
+[data-theme="dark"] .ace-error {
+  color: #fca5a5;
+  background: rgb(239 68 68 / 0.14);
+}
+[data-theme="dark"] .ace-warn {
+  color: #fcd34d;
+  background: rgb(245 158 11 / 0.14);
+}
+[data-theme="dark"] .ace-ok {
+  color: #86efac;
+  background: rgb(34 197 94 / 0.14);
+}

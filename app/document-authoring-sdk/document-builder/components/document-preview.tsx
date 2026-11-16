@@ -78,7 +78,7 @@ export default function DocumentPreview({
   }, [docAuthSystem, onEditorReady]);
 
   return (
-    <div className="h-full flex flex-col bg-gray-100 dark:bg-gray-200">
+    <div className="docauth-host h-full flex flex-col bg-gray-100 dark:bg-gray-200">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/80">
           <div className="text-center">
