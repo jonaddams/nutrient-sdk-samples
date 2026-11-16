@@ -11,6 +11,7 @@ import {
   toUIMessageStream,
   type UIMessage,
 } from "ai";
+import { sanitizeChatMessages } from "@/lib/ai/sanitizeChatMessages";
 import { REDLINE_INSTRUCTIONS } from "../../playbook";
 
 export const maxDuration = 120;
@@ -59,10 +60,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: MODEL,
     system: SYSTEM,
-    // The client must not inject its own system prompt.
-    messages: await convertToModelMessages(
-      messages.filter((m) => m.role === "user" || m.role === "assistant"),
-    ),
+    messages: await convertToModelMessages(sanitizeChatMessages(messages)),
     tools,
     maxOutputTokens: 4000,
   });

@@ -314,7 +314,11 @@ function Message({ message }: { message: UIMessage }) {
           return message.role === "assistant" ? (
             // No rehype-raw: model output is untrusted, so raw HTML stays inert.
             <div key={key} className="ace-text ace-md">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                disallowedElements={["img"]}
+                unwrapDisallowed
+              >
                 {part.text}
               </ReactMarkdown>
             </div>

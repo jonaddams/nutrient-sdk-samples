@@ -6,6 +6,7 @@ import {
   toUIMessageStream,
   type UIMessage,
 } from "ai";
+import { sanitizeChatMessages } from "@/lib/ai/sanitizeChatMessages";
 import { modelTools, SYSTEM_PROMPT } from "../../tools";
 
 export const maxDuration = 60;
@@ -52,10 +53,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: MODEL,
     system: SYSTEM_PROMPT,
-    // The client must not inject its own system prompt.
-    messages: await convertToModelMessages(
-      messages.filter((m) => m.role === "user" || m.role === "assistant"),
-    ),
+    messages: await convertToModelMessages(sanitizeChatMessages(messages)),
     tools: modelTools,
     maxOutputTokens: 4000,
   });
