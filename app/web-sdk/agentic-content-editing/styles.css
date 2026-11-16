@@ -103,6 +103,23 @@
   white-space: pre-wrap;
 }
 
+.ace-md {
+  white-space: normal;
+}
+.ace-md p,
+.ace-md ul,
+.ace-md ol {
+  margin: 0 0 var(--space-2);
+}
+.ace-md ul,
+.ace-md ol {
+  padding-left: 1.2em;
+}
+.ace-md code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
 .ace-msg-user .ace-text {
   align-self: flex-end;
   background: var(--ink);

@@ -8,6 +8,8 @@ import {
   type UIMessage,
 } from "ai";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { createExecutor } from "./executor";
 import { type ToolName, WRITE_TOOLS } from "./tools";
 import "./styles.css";
@@ -309,7 +311,14 @@ function Message({ message }: { message: UIMessage }) {
       {message.parts.map((part, i) => {
         const key = `${message.id}-${i}`;
         if (part.type === "text") {
-          return (
+          return message.role === "assistant" ? (
+            // No rehype-raw: model output is untrusted, so raw HTML stays inert.
+            <div key={key} className="ace-text ace-md">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {part.text}
+              </ReactMarkdown>
+            </div>
+          ) : (
             <p key={key} className="ace-text">
               {part.text}
             </p>

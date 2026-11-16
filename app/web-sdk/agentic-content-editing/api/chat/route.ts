@@ -1,3 +1,4 @@
+import { anthropic } from "@ai-sdk/anthropic";
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
@@ -9,8 +10,12 @@ import { modelTools, SYSTEM_PROMPT } from "../../tools";
 
 export const maxDuration = 60;
 
-// AI Gateway model string. Override per deployment without a code change.
-const MODEL = process.env.AGENTIC_EDIT_MODEL ?? "anthropic/claude-sonnet-5.5";
+// With ANTHROPIC_API_KEY set, call Anthropic directly (AGENTIC_EDIT_MODEL is
+// an Anthropic model id); otherwise route through AI Gateway
+// (AGENTIC_EDIT_MODEL is a gateway string like "anthropic/claude-sonnet-5.5").
+const MODEL = process.env.ANTHROPIC_API_KEY
+  ? anthropic(process.env.AGENTIC_EDIT_MODEL ?? "claude-sonnet-5-5")
+  : (process.env.AGENTIC_EDIT_MODEL ?? "anthropic/claude-sonnet-5.5");
 
 // Public, unauthenticated endpoint that spends model credits: bound every request.
 // ponytail: size caps only, no per-IP rate limit; add BotID or a limiter if the demo is abused.

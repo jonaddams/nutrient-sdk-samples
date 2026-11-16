@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.105",
     "@ai-sdk/react": "^4.0.177",
     "@nutrient-sdk/viewer": "^1.16.1",
     "@vercel/blob": "^2.8.0",
