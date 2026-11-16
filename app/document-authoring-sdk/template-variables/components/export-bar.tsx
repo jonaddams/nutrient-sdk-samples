@@ -27,13 +27,13 @@ export default function ExportBar({ document: doc }: ExportBarProps) {
     setExporting(format);
     try {
       if (format === "pdf") {
-        const buffer = await doc.exportPDF();
+        const buffer = await doc.export({ format: "pdf" });
         triggerDownload(
           new Blob([buffer], { type: "application/pdf" }),
           "invoice.pdf",
         );
       } else if (format === "docx") {
-        const buffer = await doc.exportDOCX();
+        const buffer = await doc.export({ format: "docx" });
         triggerDownload(
           new Blob([buffer], {
             type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

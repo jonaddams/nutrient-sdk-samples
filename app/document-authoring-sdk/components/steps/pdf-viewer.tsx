@@ -29,7 +29,7 @@ export default function PdfViewer({
     setIsLoading(true);
     try {
       // Generate PDF from DOCX document
-      const pdfBuffer = await appState.docxDocument.exportPDF();
+      const pdfBuffer = await appState.docxDocument.export({ format: "pdf" });
 
       // Load the PDF into Web SDK viewer
       if (window.NutrientViewer && viewerRef.current) {

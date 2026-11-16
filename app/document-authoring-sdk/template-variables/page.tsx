@@ -129,11 +129,10 @@ export default function TemplateVariablesPage() {
 
       const token = `{{${variable.token}}}`;
       try {
-        editor.insertTextAtCursor(token);
+        editor.insertContentAtCursor({ content: token });
       } catch {
-        // Fallback: log guidance if insertTextAtCursor isn't available
         console.warn(
-          "insertTextAtCursor not available. Place cursor in editor first, then click a variable.",
+          "Could not insert at the cursor. Place the cursor in the editor first, then click a variable.",
         );
         return;
       }

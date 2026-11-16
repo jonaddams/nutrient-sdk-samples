@@ -38,7 +38,7 @@ export const samples: Sample[] = [
     name: "Click-to-Scroll Outline",
     category: "Navigation",
     description:
-      "Sidebar outline derived from the document model that jumps to a heading on click. Approximate (the SDK has no public scroll-to API) — see in-page notes",
+      "Sidebar outline derived from the document model that jumps to and highlights a heading on click, using the Find and navigateTo APIs",
     path: "/document-authoring-sdk/click-to-scroll",
   },
 ];
