@@ -291,3 +291,54 @@
   opacity: 0.4;
   cursor: default;
 }
+
+/* Dark theme: the light tints above glare on the dark panel. Keep the same
+   hue cues (red = removed, green = added, blue = rule) as translucent fills. */
+[data-theme="dark"] .acr-rule {
+  color: #bfdbfe;
+  background: rgb(59 130 246 / 0.22);
+}
+[data-theme="dark"] .acr-rev-insertion {
+  color: #86efac;
+  background: rgb(34 197 94 / 0.14);
+}
+[data-theme="dark"] .acr-rev-deletion {
+  color: #fca5a5;
+  background: rgb(239 68 68 / 0.14);
+}
+[data-theme="dark"] .acr-banner {
+  color: #bfdbfe;
+  background: rgb(59 130 246 / 0.14);
+  border-color: rgb(59 130 246 / 0.35);
+}
+[data-theme="dark"] .acr-error {
+  color: #fca5a5;
+  background: rgb(239 68 68 / 0.14);
+}
+[data-theme="dark"] .acr-tool-error {
+  color: #fca5a5;
+}
+[data-theme="dark"] .acr-rule-manual {
+  color: var(--ink-2);
+  background: var(--line);
+}
+
+/* globals.css makes every ul/ol a flex column with custom counters, which
+   strips list markers from the agent's Markdown replies. Restore them here. */
+.acr-md ul,
+.acr-md ol {
+  display: block;
+}
+.acr-md ul {
+  list-style: disc;
+}
+.acr-md ol {
+  list-style: decimal;
+}
+.acr-md ol > li::before {
+  content: none;
+}
+
+.acr-run + .acr-hint {
+  margin-top: var(--space-2);
+}

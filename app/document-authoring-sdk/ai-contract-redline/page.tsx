@@ -366,9 +366,10 @@ export default function AiContractRedlinePage() {
       <div className="acr-wrapper">
         <div
           ref={containerRef}
-          // Same as the other DocAuth samples: the SDK toolbar has no background
-          // of its own, so keep its backdrop light in both app themes.
-          className="acr-editor bg-gray-100 dark:bg-gray-200"
+          // Same as the other DocAuth samples: docauth-host pins the SDK's
+          // colour tokens (see globals.css), and the light backdrop sits behind
+          // its transparent toolbar in both app themes.
+          className="docauth-host acr-editor bg-gray-100 dark:bg-gray-200"
         />
 
         <aside className="acr-panel" aria-label="Contract agent">

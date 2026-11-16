@@ -1496,3 +1496,14 @@ ol > li::before {
 }
 ul li, ol li { font-family: var(--font-body); }
 ol p { margin: 0; }
+
+/* Document Authoring editor host. The SDK renders in a shadow root and
+   styles text with var(--foreground, #202124) and var(--background, #fff).
+   Custom properties inherit through shadow DOM, so this site's own
+   --foreground/--background tokens (near-white/near-black in dark mode)
+   leak in and hide comment authors and text. Pin them back to the SDK's
+   defaults on every element that hosts an editor. */
+.docauth-host {
+  --foreground: #202124;
+  --background: #fff;
+}
