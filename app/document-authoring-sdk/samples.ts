@@ -14,6 +14,13 @@ import type { Sample } from "@/app/_components/SamplesIndex";
  */
 export const samples: Sample[] = [
   {
+    name: "AI Contract Redline",
+    category: "AI",
+    description:
+      "An AI agent redlines vendor paper against your legal playbook as tracked changes, each with a comment citing the rule; accept or reject each change, then export a Word redline",
+    path: "/document-authoring-sdk/ai-contract-redline",
+  },
+  {
     name: "Document Generator",
     category: "Templates",
     description:

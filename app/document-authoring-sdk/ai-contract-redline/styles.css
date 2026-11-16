@@ -1,0 +1,293 @@
+.acr-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.acr-editor {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+}
+
+.acr-panel {
+  width: 380px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--bg-elev);
+  font-size: 14px;
+}
+
+.acr-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+}
+.acr-tab {
+  flex: 1;
+  padding: var(--space-3) var(--space-2);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.acr-tab-active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.acr-messages,
+.acr-changes,
+.acr-playbook {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.acr-intro p {
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.acr-run {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.acr-hint,
+.acr-empty {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+.acr-msg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.acr-text {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.acr-msg-user .acr-text {
+  align-self: flex-end;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 10px;
+  padding: var(--space-2) var(--space-3);
+  max-width: 90%;
+}
+.acr-md {
+  white-space: normal;
+}
+.acr-md p,
+.acr-md ul,
+.acr-md ol {
+  margin: 0 0 var(--space-2);
+}
+.acr-md ul,
+.acr-md ol {
+  padding-left: 1.2em;
+}
+
+.acr-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 12px;
+  padding: 4px var(--space-2);
+  border-left: 3px solid var(--line);
+  color: var(--ink-3);
+}
+.acr-tool-write {
+  border-left-color: #2563eb;
+}
+.acr-tool-failed {
+  border-left-color: #dc2626;
+}
+.acr-tool-name {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+.acr-tool-detail {
+  flex-basis: 100%;
+  color: var(--ink-2);
+}
+.acr-tool-error {
+  color: #dc2626;
+}
+
+.acr-status {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.acr-error {
+  font-size: 13px;
+  color: #991b1b;
+  background: #fef2f2;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+}
+
+.acr-banner {
+  margin: 0 var(--space-4) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.acr-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--line);
+}
+.acr-input {
+  width: 100%;
+  resize: none;
+  font: inherit;
+  font-size: 14px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.acr-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.acr-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.acr-bulk,
+.acr-change-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.acr-change-list,
+.acr-revisions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.acr-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.acr-change {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: var(--space-3);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.acr-change-head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.acr-change-reason {
+  line-height: 1.4;
+}
+.acr-rule {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #1e40af;
+  background: #dbeafe;
+}
+.acr-rule-manual {
+  color: var(--ink-2);
+  background: var(--line);
+}
+.acr-rev {
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.acr-rev-insertion {
+  color: #166534;
+  background: #f0fdf4;
+}
+.acr-rev-deletion {
+  color: #991b1b;
+  background: #fef2f2;
+  text-decoration: line-through;
+}
+.acr-rev-other {
+  color: var(--ink-3);
+}
+
+.acr-playbook ol {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  line-height: 1.5;
+}
+
+.acr-footer {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.acr-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+.acr-btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.acr-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
