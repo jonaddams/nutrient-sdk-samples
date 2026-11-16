@@ -38,8 +38,9 @@ export default function OutlineSidebar({
           className="text-xs leading-relaxed"
           style={{ color: "var(--ink-3)" }}
         >
-          Click a heading to jump to it. Position is approximated from the
-          document model — the SDK has no public scroll-to API yet.
+          Click a heading to jump to it and highlight it, using{" "}
+          <code>editor.find.search()</code> and <code>editor.navigateTo()</code>
+          .
         </p>
       </header>
 
@@ -114,8 +115,8 @@ export default function OutlineSidebar({
           color: "var(--ink-4)",
         }}
       >
-        Heuristic: paragraphs with bold formatting and pointSize ≥ 14 are
-        treated as headings. Scroll target is weighted by character count.
+        Paragraphs with bold formatting and pointSize ≥ 14 are treated as
+        headings; the outline is read with the Programmatic API.
       </footer>
     </aside>
   );

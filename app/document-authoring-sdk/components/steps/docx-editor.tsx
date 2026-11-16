@@ -108,7 +108,9 @@ export default function DocxEditor({
         }
 
         console.log("🔧 Exporting template to DOCX buffer...");
-        const templateBuffer = await appState.templateDocument.exportDOCX();
+        const templateBuffer = await appState.templateDocument.export({
+          format: "docx",
+        });
         console.log(
           "✅ Template exported to buffer, size:",
           templateBuffer.byteLength,
@@ -148,7 +150,9 @@ export default function DocxEditor({
         );
 
         console.log("🔧 Importing populated DOCX into Document Authoring...");
-        docxDocument = await docAuthSystem.importDOCX(docxBuffer);
+        docxDocument = await docAuthSystem.import(docxBuffer, {
+          format: "docx",
+        });
         console.log("✅ DOCX document imported:", docxDocument);
 
         updateAppState({ docxDocument });

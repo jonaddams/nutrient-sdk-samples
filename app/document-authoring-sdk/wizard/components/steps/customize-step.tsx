@@ -167,8 +167,9 @@ export default function CustomizeStep() {
       let templateDocument: any = null;
 
       if (state.template === "custom" && state.customTemplateBinary) {
-        templateDocument = await docAuthSystem.importDOCX(
+        templateDocument = await docAuthSystem.import(
           state.customTemplateBinary,
+          { format: "docx" },
         );
         console.log("✅ Custom DOCX template imported");
       } else {

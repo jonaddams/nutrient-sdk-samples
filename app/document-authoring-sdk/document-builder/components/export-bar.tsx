@@ -26,7 +26,7 @@ export default function ExportBar({ document: doc }: ExportBarProps) {
     if (!doc) return;
     setExporting("pdf");
     try {
-      const buffer = await doc.exportPDF();
+      const buffer = await doc.export({ format: "pdf" });
       triggerDownload(
         new Blob([buffer], { type: "application/pdf" }),
         "report.pdf",
@@ -42,7 +42,7 @@ export default function ExportBar({ document: doc }: ExportBarProps) {
     if (!doc) return;
     setExporting("docx");
     try {
-      const buffer = await doc.exportDOCX();
+      const buffer = await doc.export({ format: "docx" });
       triggerDownload(
         new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -143,7 +143,9 @@ export default function PreviewStep() {
         }
 
         console.log("🔧 Exporting template to DOCX buffer...");
-        const templateBuffer = await state.templateDocument.exportDOCX();
+        const templateBuffer = await state.templateDocument.export({
+          format: "docx",
+        });
         console.log(
           "✅ Template exported to buffer, size:",
           templateBuffer.byteLength,
@@ -174,7 +176,11 @@ export default function PreviewStep() {
         }
         console.log("Data to populate:", dataJson);
         const docxBuffer = await window.PSPDFKit.populateDocumentTemplate(
-          { document: templateBuffer },
+          {
+            document: templateBuffer,
+            useCDN: true,
+            licenseKey: process.env.NEXT_PUBLIC_NUTRIENT_LICENSE_KEY,
+          },
           dataJson,
         );
         console.log(
@@ -183,7 +189,9 @@ export default function PreviewStep() {
         );
 
         console.log("🔧 Importing populated DOCX into Document Authoring...");
-        docxDocument = await docAuthSystem.importDOCX(docxBuffer);
+        docxDocument = await docAuthSystem.import(docxBuffer, {
+          format: "docx",
+        });
         console.log("✅ DOCX document imported:", docxDocument);
 
         dispatch({ type: "SET_DOCX_DOCUMENT", payload: docxDocument });
@@ -429,7 +437,7 @@ export default function PreviewStep() {
     setIsGenerating(true);
     try {
       console.log("📄 Generating PDF from DOCX document...");
-      const pdfBuffer = await state.docxDocument.exportPDF();
+      const pdfBuffer = await state.docxDocument.export({ format: "pdf" });
       console.log("✅ PDF generated, size:", pdfBuffer.byteLength);
 
       // Create a copy of the ArrayBuffer to prevent detachment

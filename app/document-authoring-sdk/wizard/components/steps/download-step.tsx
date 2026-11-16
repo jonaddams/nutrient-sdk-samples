@@ -254,7 +254,7 @@ export default function DownloadStep() {
     setIsDownloading(true);
     try {
       console.log("💾 Downloading DOCX...");
-      const docxBuffer = await state.docxDocument.exportDOCX();
+      const docxBuffer = await state.docxDocument.export({ format: "docx" });
       const blob = new Blob([docxBuffer], {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       });

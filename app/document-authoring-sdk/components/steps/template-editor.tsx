@@ -99,8 +99,9 @@ export default function TemplateEditor({
         console.log("📄 Loading template document for:", appState.template);
 
         if (appState.template === "custom" && appState.customTemplateBinary) {
-          templateDocument = await docAuthSystem.importDOCX(
+          templateDocument = await docAuthSystem.import(
             appState.customTemplateBinary,
+            { format: "docx" },
           );
           console.log("✅ Custom DOCX template imported");
         } else {

@@ -8,16 +8,37 @@ export interface DocAuthSystem {
     element: HTMLElement,
     options: { document: DocAuthDocument },
   ) => Promise<DocAuthViewer>;
-  importDOCX: (buffer: ArrayBuffer) => Promise<DocAuthDocument>;
+  import: (
+    blob: Blob | ArrayBuffer | Uint8Array,
+    options?: { format?: "docx" | "rtf" | "odt" | "markdown" },
+  ) => Promise<DocAuthDocument>;
   loadDocument: (docJson: unknown) => Promise<DocAuthDocument>;
   createDocumentFromPlaintext: (text: string) => Promise<DocAuthDocument>;
 }
+
+/** Portable document location (DocAuth >= 1.22); opaque to callers. */
+export type DocAuthLocation = unknown;
+
+type LocationResult<T = object> =
+  | ({ ok: true } & T)
+  | {
+      ok: false;
+      reason: "document-mismatch" | "invalid-location" | "unsupported-location";
+    };
 
 export interface DocAuthEditor {
   destroy: () => void;
   currentDocument: () => DocAuthDocument;
   setCurrentDocument: (doc: DocAuthDocument) => void;
-  insertTextAtCursor: (text: string) => void;
+  insertContentAtCursor: (options: { content: string }) => void;
+  find: {
+    search: (query: string) => Promise<{ location: DocAuthLocation }[]>;
+  };
+  navigateTo: (location: DocAuthLocation) => Promise<LocationResult>;
+  addVisualHighlight: (
+    location: DocAuthLocation,
+    options?: { color?: string; opacity?: number },
+  ) => Promise<LocationResult<{ highlight: { remove: () => void } }>>;
 }
 
 export interface DocAuthViewer {
@@ -26,8 +47,9 @@ export interface DocAuthViewer {
 }
 
 export interface DocAuthDocument {
-  exportDOCX: () => Promise<ArrayBuffer>;
-  exportPDF: () => Promise<ArrayBuffer>;
+  export: (config: {
+    format: "pdf" | "docx" | "markdown" | "rtf" | "odt";
+  }) => Promise<ArrayBuffer>;
   transaction: <T = void>(
     callback: (draft: ProgrammaticDocument) => Promise<T> | T,
   ) => Promise<T>;
@@ -42,7 +64,7 @@ export interface PSPDFKitViewer {
 
 export interface PSPDFKit {
   populateDocumentTemplate: (
-    options: { document: ArrayBuffer },
+    options: { document: ArrayBuffer; useCDN?: boolean; licenseKey?: string },
     data: TemplateData,
   ) => Promise<ArrayBuffer>;
   unload: (container: HTMLElement | PSPDFKitViewer) => Promise<void>;
@@ -140,16 +162,13 @@ export interface ProgrammaticDocument {
   body: () => ProgrammaticBody;
 }
 
+// Since 1.15 the body is one flat block-level container; sections are
+// marked by section-break paragraphs, and Section.content() no longer exists.
 export interface ProgrammaticBody {
-  sections: () => ProgrammaticSection[];
-  addSection: (index: number) => ProgrammaticSection;
+  content: () => ProgrammaticBlockLevelContainer;
 }
 
-export interface ProgrammaticSection {
-  content: () => ProgrammaticSectionContent;
-}
-
-export interface ProgrammaticSectionContent {
+export interface ProgrammaticBlockLevelContainer {
   blocklevels: () => ProgrammaticBlockLevel[];
   addParagraph: (index: number) => ProgrammaticParagraph;
   addTable: (index: number) => ProgrammaticTable;

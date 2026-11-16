@@ -7,10 +7,8 @@ import EditorPanel from "./components/editor-panel";
 import OutlineSidebar from "./components/outline-sidebar";
 import {
   extractOutline,
-  getEditorScroller,
   type HeadingEntry,
   type MinimalDocument,
-  scrollToFraction,
 } from "./lib/outline";
 
 export default function ClickToScrollPage() {
@@ -21,7 +19,7 @@ export default function ClickToScrollPage() {
   const [headings, setHeadings] = useState<HeadingEntry[]>([]);
   const [outlineLoading, setOutlineLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const editorContainerRef = useRef<HTMLElement | null>(null);
+  const highlightRef = useRef<{ remove: () => void } | null>(null);
   const sdkInitialized = useRef(false);
 
   // Load DocAuth SDK from window (CDN bundle in app/layout.tsx).
@@ -48,47 +46,49 @@ export default function ClickToScrollPage() {
     init();
   }, []);
 
-  const handleEditorReady = useCallback(
-    async (ed: DocAuthEditor, container: HTMLElement) => {
-      setEditor(ed);
-      editorContainerRef.current = container;
-      setOutlineLoading(true);
-      try {
-        const doc = ed.currentDocument() as unknown as MinimalDocument;
-        const found = await extractOutline(doc);
-        setHeadings(found);
-      } catch (error) {
-        console.error("Click-to-scroll: outline extraction failed:", error);
-        setHeadings([]);
-      } finally {
-        setOutlineLoading(false);
-      }
-    },
-    [],
-  );
+  const handleEditorReady = useCallback(async (ed: DocAuthEditor) => {
+    setEditor(ed);
+    setOutlineLoading(true);
+    try {
+      const doc = ed.currentDocument() as unknown as MinimalDocument;
+      const found = await extractOutline(doc);
+      setHeadings(found);
+    } catch (error) {
+      console.error("Click-to-scroll: outline extraction failed:", error);
+      setHeadings([]);
+    } finally {
+      setOutlineLoading(false);
+    }
+  }, []);
 
   const handleSelect = useCallback(
-    (index: number) => {
+    async (index: number) => {
       const heading = headings[index];
-      const container = editorContainerRef.current;
-      if (!heading || !container) return;
-      const scroller = getEditorScroller(container);
-      if (!scroller) {
-        console.warn(
-          "Click-to-scroll: shadow scroll container not found — the SDK's internal DOM may have changed.",
-        );
-        return;
-      }
-      scrollToFraction(scroller, heading.fraction);
+      if (!heading || !editor) return;
       setActiveIndex(index);
+      try {
+        const matches = await editor.find.search(heading.text);
+        const match = matches[heading.matchIndex] ?? matches[0];
+        if (!match) return;
+        const nav = await editor.navigateTo(match.location);
+        if (!nav.ok) {
+          console.warn("Click-to-scroll: cannot navigate:", nav.reason);
+          return;
+        }
+        highlightRef.current?.remove();
+        const hl = await editor.addVisualHighlight(match.location);
+        highlightRef.current = hl.ok ? hl.highlight : null;
+      } catch (error) {
+        console.error("Click-to-scroll: navigation failed:", error);
+      }
     },
-    [headings],
+    [headings, editor],
   );
 
   return (
     <SampleCanvas
       title="Click-to-Scroll Outline"
-      description="Sidebar outline that jumps to headings. Approximate — see notes in the sidebar."
+      description="Sidebar outline that jumps to headings with the Find and navigateTo APIs."
       breadcrumbs={[
         { label: "Home", href: "/" },
         {
