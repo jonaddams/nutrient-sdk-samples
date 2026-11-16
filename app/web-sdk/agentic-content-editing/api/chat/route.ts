@@ -19,7 +19,7 @@ const MAX_BODY_BYTES = 400_000;
 
 export async function POST(req: Request) {
   const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) {
+  if (new TextEncoder().encode(raw).length > MAX_BODY_BYTES) {
     return Response.json(
       { error: "Conversation too long. Reset the chat." },
       { status: 413 },
@@ -47,7 +47,10 @@ export async function POST(req: Request) {
   const result = streamText({
     model: MODEL,
     system: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages),
+    // The client must not inject its own system prompt.
+    messages: await convertToModelMessages(
+      messages.filter((m) => m.role === "user" || m.role === "assistant"),
+    ),
     tools: modelTools,
     maxOutputTokens: 4000,
   });
