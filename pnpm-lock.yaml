@@ -14,6 +14,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^4.0.177
         version: 4.0.177(react@19.2.7)(zod@4.6.7)
+      '@nutrient-sdk/document-authoring-ai':
+        specifier: ^2.0.0
+        version: 2.0.0(ai@7.0.173(zod@4.6.7))
       '@nutrient-sdk/viewer':
         specifier: ^1.16.1
         version: 1.16.1
@@ -923,6 +926,18 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@nutrient-sdk/document-authoring-ai@2.0.0':
+    resolution: {integrity: sha512-S/hozX+s0VpySERk/DFH66tK9Owtd62ZwQnuy4pXTDGHiLuWpbr/KQJqrayjq3itl2Rqag9+TchxfGPHSkABEw==}
+    hasBin: true
+    peerDependencies:
+      '@nutrient-sdk/document-authoring': '>=1.21.0'
+      ai: ^6.0.0 || ^7.0.0
+    peerDependenciesMeta:
+      '@nutrient-sdk/document-authoring':
+        optional: true
+      ai:
+        optional: true
 
   '@nutrient-sdk/viewer@1.16.1':
     resolution: {integrity: sha512-bOSlA2WAe91qPdKBN+iY59o7jc5ccaMJIRELaVh13I2e+4d614T4JLk/xsG2YWjVFZkiLKhXipYkVdsDzYMMMA==}
@@ -4684,6 +4699,12 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
+
+  '@nutrient-sdk/document-authoring-ai@2.0.0(ai@7.0.173(zod@4.6.7))':
+    dependencies:
+      zod: 4.6.7
+    optionalDependencies:
+      ai: 7.0.173(zod@4.6.7)
 
   '@nutrient-sdk/viewer@1.16.1':
     dependencies:

@@ -19,6 +19,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.105",
     "@ai-sdk/react": "^4.0.177",
+    "@nutrient-sdk/document-authoring-ai": "^2.0.0",
     "@nutrient-sdk/viewer": "^1.16.1",
     "@vercel/blob": "^2.8.0",
     "ai": "^7.0.173",
