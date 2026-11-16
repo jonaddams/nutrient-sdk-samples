@@ -1,0 +1,244 @@
+.ace-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.ace-viewer {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.ace-panel {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--line);
+  background: var(--bg-elev);
+  min-height: 0;
+}
+
+.ace-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.ace-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+.ace-link {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.ace-link:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ace-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: 14px;
+}
+
+.ace-empty p {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ace-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ace-chip {
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+.ace-chip:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+.ace-chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ace-msg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ace-text {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.ace-msg-user .ace-text {
+  align-self: flex-end;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 10px;
+  padding: var(--space-2) var(--space-3);
+  max-width: 90%;
+}
+
+.ace-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 12px;
+  padding: 4px var(--space-2);
+  border-left: 3px solid var(--line);
+  color: var(--ink-3);
+}
+.ace-tool-write {
+  border-left-color: #2563eb;
+}
+.ace-tool-failed {
+  border-left-color: #dc2626;
+}
+
+.ace-tool-name {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--ink);
+}
+
+.ace-tool-detail {
+  flex-basis: 100%;
+  color: #b45309;
+}
+.ace-tool-failed .ace-tool-detail {
+  color: #dc2626;
+}
+
+.ace-tool-call {
+  flex-basis: 100%;
+  font-size: 12px;
+}
+.ace-tool-call summary {
+  cursor: pointer;
+  color: var(--ink-3);
+}
+.ace-tool-call pre {
+  margin: 4px 0 0;
+  max-height: 220px;
+  overflow: auto;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ace-status {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.ace-error,
+.ace-warn,
+.ace-ok {
+  font-size: 13px;
+  line-height: 1.4;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+}
+.ace-error {
+  color: #991b1b;
+  background: #fef2f2;
+}
+.ace-warn {
+  color: #92400e;
+  background: #fffbeb;
+}
+.ace-ok {
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.ace-review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.ace-review-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.ace-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.ace-input {
+  width: 100%;
+  resize: none;
+  font: inherit;
+  font-size: 14px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.ace-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+.ace-btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.ace-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ace-form .ace-btn {
+  align-self: flex-end;
+}
