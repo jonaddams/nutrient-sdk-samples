@@ -17,8 +17,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.105",
+    "@ai-sdk/react": "^4.0.177",
     "@nutrient-sdk/viewer": "^1.16.1",
     "@vercel/blob": "^2.8.0",
+    "ai": "^7.0.173",
     "lucide-react": "^1.21.0",
     "minisearch": "^7.2.0",
     "next": "16.2.9",
@@ -30,7 +33,8 @@
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.28.1",
-    "workflow": "4.8.9"
+    "workflow": "4.8.9",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",

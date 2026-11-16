@@ -63,6 +63,13 @@ export const samples: Sample[] = [
     path: "/web-sdk/collaboration-comments",
   },
   {
+    name: "Agentic Content Editing",
+    category: "Content Editor",
+    description:
+      "Ask an AI agent to edit the PDF's text — it reads text blocks and rewrites, restyles, adds, and removes them live via instance.contentEditor, then you Save or Discard",
+    path: "/web-sdk/agentic-content-editing",
+  },
+  {
     name: "Content Editing API",
     category: "Content Editor",
     description:
