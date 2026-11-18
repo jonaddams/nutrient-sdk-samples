@@ -9,13 +9,19 @@ const nextConfig: NextConfig = {
   // contract-rag embeds queries locally; the ONNX runtime is a native addon
   // and must be required at runtime, not bundled.
   serverExternalPackages: ["@huggingface/transformers", "onnxruntime-node"],
-  // transformers.js imports sharp at load time (unused for text embeddings).
-  // Tracing copies sharp's .node addon but not the libvips .so it dlopens, so
-  // the route crashed on Vercel with ERR_DLOPEN_FAILED libvips-cpp.so.
+  // Native pieces Next's tracer misses for the contract-rag embedder (each one
+  // a 500 on Vercel): sharp's libvips .so (transformers.js imports sharp at
+  // load, unused for text) and onnxruntime-node, reached through a pnpm store
+  // symlink. Only the linux-x64 ONNX binary: the package ships ~290 MB across
+  // all platforms.
   outputFileTracingIncludes: {
     "/ai-document-processing/contract-rag/api/ask": [
       "./node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64/**/*",
       "./node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64/**/*",
+      // Through transformers' own store symlink, so its import resolves.
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/package.json",
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/dist/**/*",
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/bin/napi-v6/linux/x64/**/*",
     ],
   },
   env: {
