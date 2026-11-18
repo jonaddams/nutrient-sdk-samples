@@ -296,3 +296,65 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* "How this works" explainer (how-it-works.tsx), collapsed by default. */
+.callout.crag-how {
+  padding: var(--space-3) var(--space-4);
+}
+.crag-how summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+.crag-how summary::-webkit-details-marker {
+  display: none;
+}
+/* display:flex drops the native disclosure triangle, so say it in words. */
+.crag-how summary::after {
+  content: "Show the 6 stages ▾";
+  font-size: var(--text-xs);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.crag-how[open] summary::after {
+  content: "Hide ▴";
+}
+.crag-how-summary {
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+/* Titles carry their own step numbers; suppress the global ol counter. */
+.crag-how-grid > li::before {
+  content: none;
+}
+.crag-how-grid {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.crag-how-grid li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.crag-how-grid h4 {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+.crag-how-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+@media (max-width: 1100px) {
+  .crag-how-grid {
+    grid-template-columns: 1fr;
+  }
+}
