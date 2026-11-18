@@ -16,7 +16,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
 }
-.crag-preset {
+/* .chip.crag-preset so it beats the global .chip pill radius regardless of
+   stylesheet order. */
+.chip.crag-preset {
+  border-radius: var(--r-2);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -28,7 +31,101 @@
 }
 .crag-why {
   font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+/* Selected chip inverts to ink-on-bg; a fixed grey would vanish on it. */
+.chip[aria-pressed="true"] .crag-why {
+  color: inherit;
+  opacity: 0.75;
+}
+/* Highlight colour picker. The control is Extraction Studio's HighlightColor;
+   its rules there are scoped to .studio-shell and only load on that page, so
+   they are mirrored here under .crag-panel. Keep the two in step. */
+.crag-highlight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.crag-highlight-label {
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+.crag-panel .citation-swatches {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.crag-panel .citation-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-1);
+  cursor: pointer;
+  transition: box-shadow 0.12s var(--ease);
+}
+.crag-panel .citation-swatch[aria-pressed="true"],
+.crag-panel .citation-picker[data-custom="true"] {
+  box-shadow:
+    0 0 0 2px var(--bg-elev),
+    0 0 0 4px var(--ink);
+}
+.crag-panel .citation-swatch:focus-visible,
+.crag-panel .citation-picker:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.crag-panel .citation-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-1);
+  background: var(--surface);
   color: var(--ink-3);
+  cursor: pointer;
+}
+.crag-panel .citation-picker:hover,
+.crag-panel .citation-picker[data-custom="true"] {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.crag-panel .citation-dot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  pointer-events: none;
+}
+/* The real <input type="color">, invisible over the dropper button. Keep it a
+   live input: that is what preserves the OS picker and system eyedropper. */
+.crag-panel .citation-color-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.crag-panel .citation-hex {
+  width: 11ch;
+  padding: 4px var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--bg-elev);
+  color: var(--ink);
+  font-size: var(--text-xs);
 }
 .crag-form {
   display: flex;
