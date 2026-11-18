@@ -20,4 +20,11 @@ export const samples: Sample[] = [
       "Automatically classify and extract data from invoices, receipts, and purchase orders with built-in validation",
     path: "/ai-document-processing/invoices",
   },
+  {
+    name: "Contract Q&A with Verifiable Citations",
+    category: "Retrieval",
+    description:
+      "RAG over a legal deal room, side by side: plain-text extraction misses scanned schedules and dense tables that Nutrient parsing answers, and every Nutrient citation highlights its exact source on the page",
+    path: "/ai-document-processing/contract-rag",
+  },
 ];

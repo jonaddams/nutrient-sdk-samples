@@ -6,6 +6,28 @@ import { withWorkflow } from "workflow/next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: false, // Disabled due to incompatibility with NutrientViewer SDK initialization
+  // contract-rag embeds queries locally; the ONNX runtime is a native addon
+  // and must be required at runtime, not bundled.
+  serverExternalPackages: ["@huggingface/transformers", "onnxruntime-node"],
+  // Native pieces Next's tracer misses for the contract-rag embedder (each one
+  // a 500 on Vercel): sharp's libvips .so (transformers.js imports sharp at
+  // load, unused for text) and onnxruntime-node, reached through a pnpm store
+  // symlink. Only the linux-x64 ONNX binary: the package ships ~290 MB across
+  // all platforms.
+  outputFileTracingIncludes: {
+    "/ai-document-processing/contract-rag/api/ask": [
+      "./node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64/**/*",
+      "./node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64/**/*",
+      // Through transformers' own store symlink, so its import resolves.
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/package.json",
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/dist/**/*",
+      "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/bin/napi-v6/linux/x64/**/*",
+      // ...which resolves onnxruntime-common through pnpm's hoisted symlink
+      // (already traced). Its CJS build is not, so add the files at the REAL
+      // path: files under a symlinked dir make Vercel reject the package.
+      "./node_modules/.pnpm/onnxruntime-common@*/node_modules/onnxruntime-common/**/*",
+    ],
+  },
   env: {
     WEB_SDK_VERSION: process.env.NEXT_PUBLIC_WEB_SDK_VERSION,
   },

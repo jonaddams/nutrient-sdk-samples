@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
-import { SampleHeader } from "./SampleHeader";
+import { SampleHeader, type Section } from "./SampleHeader";
 
 interface SampleFrameProps {
   title: string;
   description?: string;
+  /** Breadcrumb parent for samples outside /web-sdk (default: Web SDK) */
+  section?: Section;
   /** Optional sidebar rendered to the left or right of the viewer */
   sidebar?: ReactNode;
   /** Side the sidebar should appear on (default: "left") */
@@ -26,6 +28,7 @@ interface SampleFrameProps {
 export function SampleFrame({
   title,
   description,
+  section,
   sidebar,
   sidebarSide = "left",
   sidebarWidth = 320,
@@ -38,7 +41,7 @@ export function SampleFrame({
 }: SampleFrameProps) {
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <SampleHeader title={title} description={description} />
+      <SampleHeader title={title} description={description} section={section} />
       <main
         className="shell"
         style={{
