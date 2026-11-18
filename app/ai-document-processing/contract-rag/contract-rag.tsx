@@ -2,6 +2,8 @@
 
 import type { Instance } from "@nutrient-sdk/viewer";
 import { useEffect, useRef, useState } from "react";
+import { HighlightColor } from "@/app/python-sdk/extraction-studio/_components/HighlightColor";
+import { hexToRgb } from "@/app/python-sdk/extraction-studio/lib/citations";
 import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { AskResponse } from "./api/ask/route";
 import { type Box, matchRows } from "./lib/chunk";
@@ -27,6 +29,16 @@ type Column =
 
 type Target = { doc: string; page: number; boxes?: Box[] };
 
+// Magenta, not amber: the yellow highlight was hard to see on these scans.
+// Must be one of Extraction Studio's CITATION_PRESETS so its swatch shows active.
+const DEFAULT_HIGHLIGHT = "#d63384";
+
+// The subset of an annotation record this file touches (Immutable.js record).
+type Highlight = {
+  id: string;
+  set: (key: string, value: unknown) => Highlight;
+};
+
 const TOOLBAR = [
   "sidebar-thumbnails",
   "pager",
@@ -35,6 +47,12 @@ const TOOLBAR = [
   "zoom-mode",
   "search",
 ];
+
+function toColor(NV: NonNullable<typeof window.NutrientViewer>, hex: string) {
+  // HighlightColor only ever commits a valid 6-digit hex.
+  const rgb = hexToRgb(hex) ?? { r: 214, g: 51, b: 132 };
+  return new NV.Color(rgb);
+}
 
 async function waitForSdk() {
   for (let i = 0; i < 100 && !window.NutrientViewer; i++) {
@@ -48,7 +66,11 @@ export default function ContractRag() {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<Instance | null>(null);
   const loadedDocRef = useRef<string | null>(null);
-  const highlightIdsRef = useRef<string[]>([]);
+  const highlightsRef = useRef<Highlight[]>([]);
+  // Read by queued viewer work, which must see the latest pick, not the value
+  // captured when the work was queued.
+  const colorRef = useRef(DEFAULT_HIGHLIGHT);
+  const [color, setColor] = useState(DEFAULT_HIGHLIGHT);
   // Viewer work is serialized: a second click must not race a document load.
   const queueRef = useRef<Promise<void>>(Promise.resolve());
   const askIdRef = useRef(0);
@@ -83,14 +105,14 @@ export default function ContractRag() {
         initialViewState: new NV.ViewState({ currentPageIndex: t.page }),
       });
       loadedDocRef.current = t.doc;
-      highlightIdsRef.current = [];
+      highlightsRef.current = [];
     }
     const instance = instanceRef.current;
     if (!instance) return;
 
-    if (highlightIdsRef.current.length) {
-      await instance.delete(highlightIdsRef.current);
-      highlightIdsRef.current = [];
+    if (highlightsRef.current.length) {
+      await instance.delete(highlightsRef.current.map((h) => h.id));
+      highlightsRef.current = [];
     }
     if (!t.boxes?.length) {
       instance.setViewState((v) => v.set("currentPageIndex", t.page));
@@ -110,22 +132,43 @@ export default function ContractRag() {
         }),
       };
     });
+    const c = toColor(NV, colorRef.current);
     const created = await instance.create(
       rects.map(
         ({ page, rect }) =>
           new NV.Annotations.RectangleAnnotation({
             pageIndex: page,
             boundingBox: rect,
-            strokeColor: new NV.Color({ r: 234, g: 88, b: 12 }),
+            strokeColor: c,
             strokeWidth: 2,
-            fillColor: new NV.Color({ r: 253, g: 224, b: 71 }),
-            opacity: 0.35,
+            fillColor: c,
+            opacity: 0.4,
           }),
       ),
     );
     // create() is typed as the generic Change union; these are annotations.
-    highlightIdsRef.current = (created as { id: string }[]).map((a) => a.id);
+    highlightsRef.current = created as unknown as Highlight[];
     instance.jumpToRect(rects[0].page, rects[0].rect);
+  }
+
+  /** Recolour the highlights already on the page, in place (no re-scroll). */
+  function changeColor(hex: string) {
+    colorRef.current = hex;
+    setColor(hex);
+    queueRef.current = queueRef.current
+      .then(async () => {
+        const instance = instanceRef.current;
+        const NV = window.NutrientViewer;
+        if (!instance || !NV || !highlightsRef.current.length) return;
+        const c = toColor(NV, hex);
+        const updated = await instance.update(
+          highlightsRef.current.map((h) =>
+            h.set("strokeColor", c).set("fillColor", c),
+          ) as unknown as Parameters<Instance["update"]>[0],
+        );
+        highlightsRef.current = updated as unknown as Highlight[];
+      })
+      .catch((e) => console.error("contract-rag recolour:", e));
   }
 
   function show(t: Target) {
@@ -250,6 +293,15 @@ export default function ContractRag() {
             Ask both
           </button>
         </form>
+        <div className="crag-highlight">
+          <span className="crag-highlight-label">Highlight color</span>
+          <HighlightColor
+            label="Highlight color"
+            embedded
+            value={color}
+            onChange={changeColor}
+          />
+        </div>
       </section>
 
       {asked && (
