@@ -6,6 +6,9 @@ import { withWorkflow } from "workflow/next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: false, // Disabled due to incompatibility with NutrientViewer SDK initialization
+  // contract-rag embeds queries locally; the ONNX runtime is a native addon
+  // and must be required at runtime, not bundled.
+  serverExternalPackages: ["@huggingface/transformers", "onnxruntime-node"],
   env: {
     WEB_SDK_VERSION: process.env.NEXT_PUBLIC_WEB_SDK_VERSION,
   },

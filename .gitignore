@@ -59,4 +59,5 @@ docs/internal/
 Claude Design - Nutrient SDK Samples Website/
 
 .dev-server.log
+scripts/.contract-rag-cache/
 /.swc

@@ -96,7 +96,9 @@ export function capText(units: IndexUnit[], cap = DEFAULT_TEXT_CAP): IndexUnit[]
 
 // ─── Format-specific extractors ──────────────────────────────────────────────
 
-async function extractPdf(buffer: Buffer, entry: CorpusEntry): Promise<IndexUnit[]> {
+// Exported for scripts/build-contract-rag-index.ts, which uses it as the
+// "plain text extraction" baseline.
+export async function extractPdf(buffer: Buffer, entry: CorpusEntry): Promise<IndexUnit[]> {
   const data = new Uint8Array(buffer);
   const loadingTask = pdfjs.getDocument({ data, useSystemFonts: true });
   const doc = await loadingTask.promise;
