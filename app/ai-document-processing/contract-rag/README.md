@@ -41,8 +41,17 @@ costs nothing.
 - `ANTHROPIC_API_KEY` is required. `CONTRACT_RAG_MODEL` is optional (default
   `claude-sonnet-5-5`). Answers use Claude's native `search_result` citations,
   so every citation maps back to a chunk and its boxes.
-- Queries are embedded locally with transformers.js (`Xenova/bge-small-en-v1.5`,
-  about 33 MB, downloaded once per server instance into the OS temp dir).
+- Embeddings come from one of two providers, set by `CONTRACT_RAG_EMBEDDINGS`:
+  - `local` (default): transformers.js, `Xenova/bge-small-en-v1.5`. No key
+    needed. Each cold server instance downloads about 33 MB from
+    huggingface.co, so a Hugging Face outage breaks cold instances.
+  - `openai`: `text-embedding-3-small` at 512 dimensions. Needs
+    `OPENAI_API_KEY`. No native modules and no model download.
+
+  The two use different vector spaces, so each has its own index
+  (`data/index.json`, `data/index-openai.json`). `pnpm index:contract-rag`
+  builds the OpenAI index whenever `OPENAI_API_KEY` is set. The preset
+  questions are verified per provider: switch providers and re-run the 5x check.
 
 ## Known limits
 

@@ -5,8 +5,9 @@
  *   Nutrient:   DWS /extraction/parse (structure, plus understand on the table
  *               pages listed in CORPUS) -> paragraph/table-aware chunks + boxes
  *
- * Both are embedded with the same local model and written to one JSON file the
- * API route imports. Parse responses are cached under scripts/.contract-rag-cache
+ * Both pipelines are embedded with the same model, once per embedding provider
+ * (local always; OpenAI when OPENAI_API_KEY is set), one JSON file each, which
+ * the API route imports. Parse responses are cached under scripts/.contract-rag-cache
  * (gitignored), so a re-run after a chunking change spends no credits.
  *
  * Run:  pnpm index:contract-rag
@@ -26,20 +27,26 @@ import {
   parsedChunks,
 } from "../app/ai-document-processing/contract-rag/lib/chunk";
 import { CORPUS } from "../app/ai-document-processing/contract-rag/lib/corpus";
-import { embedPassages } from "../app/ai-document-processing/contract-rag/lib/embed";
+import {
+  embedPassages,
+  type Provider,
+} from "../app/ai-document-processing/contract-rag/lib/embed";
 import { extractPdf } from "./extract";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const PDF_DIR = join(ROOT, "public", "documents", "contract-rag");
 const CACHE_DIR = join(ROOT, "scripts", ".contract-rag-cache");
-const OUT = join(
+const DATA_DIR = join(
   ROOT,
   "app",
   "ai-document-processing",
   "contract-rag",
   "data",
-  "index.json",
 );
+const INDEX_FILE: Record<Provider, string> = {
+  local: "index.json",
+  openai: "index-openai.json",
+};
 
 try {
   process.loadEnvFile(join(ROOT, ".env.local"));
@@ -122,11 +129,14 @@ async function parseDoc(doc: (typeof CORPUS)[number], bytes: Buffer) {
 
 const round = (v: number[]) => v.map((x) => Math.round(x * 1e4) / 1e4);
 
-async function embedAll(chunks: Chunk[]) {
+async function embedAll(chunks: Chunk[], provider: Provider) {
   const out: (Chunk & { v: number[] })[] = [];
   for (let i = 0; i < chunks.length; i += 32) {
     const batch = chunks.slice(i, i + 32);
-    const vecs = await embedPassages(batch.map((c) => c.text));
+    const vecs = await embedPassages(
+      batch.map((c) => c.text),
+      provider,
+    );
     for (const [j, c] of batch.entries()) out.push({ ...c, v: round(vecs[j]) });
   }
   return out;
@@ -149,16 +159,23 @@ async function main() {
     parsed.push(...parsedChunks(doc.id, await parseDoc(doc, bytes)));
   }
 
-  console.log(
-    `\nembedding ${naive.length} plain-text + ${parsed.length} Nutrient chunks...`,
-  );
-  const index = {
-    naive: await embedAll(naive),
-    parsed: await embedAll(parsed),
-  };
-  await mkdir(join(OUT, ".."), { recursive: true });
-  await writeFile(OUT, JSON.stringify(index));
-  console.log(`wrote ${OUT}`);
+  await mkdir(DATA_DIR, { recursive: true });
+  for (const provider of ["local", "openai"] as const) {
+    if (provider === "openai" && !process.env.OPENAI_API_KEY) {
+      console.log("\nOPENAI_API_KEY not set: skipping the OpenAI index.");
+      continue;
+    }
+    console.log(
+      `\n[${provider}] embedding ${naive.length} plain-text + ${parsed.length} Nutrient chunks...`,
+    );
+    const index = {
+      naive: await embedAll(naive, provider),
+      parsed: await embedAll(parsed, provider),
+    };
+    const out = join(DATA_DIR, INDEX_FILE[provider]);
+    await writeFile(out, JSON.stringify(index));
+    console.log(`wrote ${out}`);
+  }
 }
 
 main().catch((e) => {

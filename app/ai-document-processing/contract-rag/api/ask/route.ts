@@ -1,8 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
-import index from "../../data/index.json";
 import { type Chunk, topK } from "../../lib/chunk";
 import { docById } from "../../lib/corpus";
-import { embedQuery } from "../../lib/embed";
+import { activeProvider, embedQuery, type Provider } from "../../lib/embed";
 
 export const maxDuration = 60;
 
@@ -16,7 +15,29 @@ const SYSTEM =
   'You answer questions about a set of contracts. Answer only from the provided search results, concisely. If the answer is not in them, reply exactly: "Not found in these documents."';
 
 type Indexed = Chunk & { v: number[] };
-const INDEXES = index as unknown as Record<"naive" | "parsed", Indexed[]>;
+type Indexes = Record<"naive" | "parsed", Indexed[]>;
+
+// Each embedding provider has its own vector space, so its own index. Load only
+// the active one (~2 MB each).
+const PROVIDER: Provider = activeProvider();
+// Created on first request, not at module load: a rejection nobody is awaiting
+// yet would be an unhandled rejection.
+let indexes: Promise<Indexes> | null = null;
+const loadIndexes = () =>
+  (indexes ??= (
+    PROVIDER === "openai"
+      ? import("../../data/index-openai.json")
+      : import("../../data/index.json")
+  ).then((m) => {
+    const idx = m.default as unknown as Indexes;
+    // An unbuilt index would make every answer "Not found", which reads like a
+    // real result. Fail loudly instead.
+    if (!idx.naive.length || !idx.parsed.length)
+      throw new Error(
+        `The ${PROVIDER} index is empty: run pnpm index:contract-rag${PROVIDER === "openai" ? " with OPENAI_API_KEY set" : ""}.`,
+      );
+    return idx;
+  }));
 
 let client: Anthropic | null = null;
 
@@ -66,7 +87,20 @@ export async function POST(req: Request) {
     );
   }
 
-  const top = topK(await embedQuery(question), INDEXES[pipeline], TOP_K);
+  let top: ReturnType<typeof topK<Indexed>>;
+  try {
+    const [q, idx] = await Promise.all([
+      embedQuery(question, PROVIDER),
+      loadIndexes(),
+    ]);
+    top = topK(q, idx[pipeline], TOP_K);
+  } catch (e) {
+    console.error(`contract-rag: ${PROVIDER} embedding failed`, e);
+    return Response.json(
+      { error: "Retrieval is unavailable right now. Try again." },
+      { status: 502 },
+    );
+  }
   const title = (c: Chunk) =>
     `${docById(c.doc)?.title ?? c.doc}, page ${c.page + 1}`;
 
