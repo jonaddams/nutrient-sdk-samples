@@ -22,8 +22,10 @@ const nextConfig: NextConfig = {
       "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/package.json",
       "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/dist/**/*",
       "./node_modules/.pnpm/@huggingface+transformers@*/node_modules/onnxruntime-node/bin/napi-v6/linux/x64/**/*",
-      // ...which resolves onnxruntime-common through pnpm's hoisted dir.
-      "./node_modules/.pnpm/node_modules/onnxruntime-common/**/*",
+      // ...which resolves onnxruntime-common through pnpm's hoisted symlink
+      // (already traced). Its CJS build is not, so add the files at the REAL
+      // path: files under a symlinked dir make Vercel reject the package.
+      "./node_modules/.pnpm/onnxruntime-common@*/node_modules/onnxruntime-common/**/*",
     ],
   },
   env: {
