@@ -6,6 +6,7 @@ import { HighlightColor } from "@/app/python-sdk/extraction-studio/_components/H
 import { hexToRgb } from "@/app/python-sdk/extraction-studio/lib/citations";
 import { SampleFrame } from "@/app/web-sdk/_components/SampleFrame";
 import type { AskResponse } from "./api/ask/route";
+import { HowItWorks } from "./how-it-works";
 import { type Box, matchRows } from "./lib/chunk";
 import { CORPUS, docById, PRESET_QUESTIONS } from "./lib/corpus";
 import "./styles.css";
@@ -359,6 +360,7 @@ export default function ContractRag() {
         label: "AI Document Processing",
         href: "/ai-document-processing",
       }}
+      intro={<HowItWorks />}
       wide
       sidebar={panel}
       sidebarWidth={640}
